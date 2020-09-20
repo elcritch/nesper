@@ -15,3 +15,4 @@ proc esp_err_to_name_r*(code: esp_err_t; buf: cstring; buflen: csize): cstring {
 proc ESP_ERROR_CHECK*(x: cint) {.cdecl, importc: "ESP_ERROR_CHECK", header: "freertos/FreeRTOS.h".}
 proc ESP_ERROR_CHECK_WITHOUT_ABORT*(x: cint) {.cdecl,
     importc: "ESP_ERROR_CHECK_WITHOUT_ABORT", header: "freertos/FreeRTOS.h".}
+
