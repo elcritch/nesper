@@ -66,10 +66,11 @@ type
 ## Pack using bitfields for better memory use
 
 type
-  vector_desc_t* {.importcpp: "vector_desc_t", header: "freertos/FreeRTOS.h", bycopy.} = object ##  int flags: 16;                          //OR of VECDESC_FLAG_* defines
-                                                                             ##  unsigned int cpu: 1;
-                                                                             ##  unsigned int intno: 5;
-                                                                             ##  int source: 8;                          //Interrupt mux flags, used when not shared
+  vector_desc_t* {.importcpp: "vector_desc_t", header: "freertos/FreeRTOS.h", bycopy.} = object
+    ##  int flags: 16;                          //OR of VECDESC_FLAG_* defines
+    ##  unsigned int cpu: 1;
+    ##  unsigned int intno: 5;
+    ##  int source: 8;                          //Interrupt mux flags, used when not shared
     flags* {.importc: "flags".}: cint ## OR of VECDESC_FLAG_* defines
     cpu* {.importc: "cpu".}: cuint
     intno* {.importc: "intno".}: cuint
