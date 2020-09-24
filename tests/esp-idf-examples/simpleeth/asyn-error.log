@@ -1,0 +1,20 @@
+0x40107ba7: newSeqPayload at /home/elcritch/.asdf/installs/nim/devel/lib/system/seqs_v2.nim:38 (discriminator 8)
+0x40107c1d: newSeq__0du5Us2v5bU6GIaJAPx4mw at /home/elcritch/.asdf/installs/nim/devel/lib/system.nim:644
+0x4010a470: auxWriteStackTrace__cEBhPS13dF9bIXoO5ipUApw at /home/elcritch/.asdf/installs/nim/devel/lib/system/excpt.nim:224
+0x4010a4ca: rawWriteStackTrace__zo0sKsXK7oXYz0ERc41mPw at /home/elcritch/.asdf/installs/nim/devel/lib/system/excpt.nim:328
+0x4010d302: getStackTraceEntries__9bQRI0oawDvYWdmWCeQkCQw at /home/elcritch/.asdf/installs/nim/devel/lib/system/excpt.nim:537
+0x400e3593: newFuture__VtQuu6AalFf9ctR9cpEfL1rQ at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim:112
+0x400e3692: newFutureVar__XDPsxWPxi0l6fpPZSAM3yw at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim:131
+0x400f2169: processClientIter__EWkU6XVqweduW9a0tak9cXyg_2 at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim:284
+0x400e7b1e: processClientNimAsyncContinue__MeADiwFdYVlucEKpa8KHdg_2 at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim:23
+0x400f259d: processClient__hc4zfpq4yysbMo9bAsMN1xA at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim:246 (discriminator 1)
+0x400f2761: serveIter__EWkU6XVqweduW9a0tak9cXyg at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim:313
+0x400e7ed2: serveNimAsyncContinue__MeADiwFdYVlucEKpa8KHdg_3 at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim:23
+0x400d92f1: processPendingCallbacks__xdICRvJ1ns9byYHPjM07uJQ at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncdispatch.nim:214 (discriminator 1)
+0x400da5a9: runOnce__nEnn7ilZ6aSkcXTtLEKnJA at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncdispatch.nim:1348 (discriminator 2)
+0x400da649: poll__wcvh7vf5dGU1VYto9aiAnpA at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncdispatch.nim:1589
+0x400da6ec: waitFor__zz9aVsJN0aTuFUXvzKrFo9cA at /home/elcritch/.asdf/installs/nim/devel/lib/pure/asyncdispatch.nim:1899
+0x400d64bd: run_http_server at /home/elcritch/projects/pt/third-party/esp32_nim_net_example/nim/example_server.nim:12
+0x400d4e56: app_main at /home/elcritch/projects/pt/third-party/esp32_nim_net_example/build/../main/ethernet_example_main.c:145
+0x400d361e: main_task at /home/elcritch/projects/pt/esp-idf/components/esp32/cpu_start.c:580
+0x40084ac1: vPortTaskWrapper at /home/elcritch/projects/pt/esp-idf/components/freertos/xtensa/port.c:143

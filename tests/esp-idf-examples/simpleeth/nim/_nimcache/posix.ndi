@@ -1,0 +1,5 @@
+SOMAXCONN	SOMAXCONN__0XWtgJz0atYHiEz9b9aVOcQg	/home/elcritch/.asdf/installs/nim/devel/lib/posix/posix_freertos_consts.nim	402	4
+MAP_POPULATE	MAP_POPULATE__VA0iC4AP6fJAacff09cx89ag	/home/elcritch/.asdf/installs/nim/devel/lib/posix/posix_other.nim	595	4
+IN6_IS_ADDR_V4MAPPED	IN6_IS_ADDR_V4MAPPED__6KWoyJxz9c9cfnUA9b5aeMx3w	/home/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	966	7
+result	result	/home/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	966	2
+bits32	bits32	/home/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	967	8
