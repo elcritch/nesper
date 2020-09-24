@@ -1,0 +1,8 @@
+failedAssertImpl	failedAssertImpl__W9cjVocn1tjhW7p7xohJj6A	/Users/elcritch/.asdf/installs/nim/devel/lib/system/assertions.nim	25	5
+raiseAssert	raiseAssert__gpGJG5CoQzE64skFd9bPG7A	/Users/elcritch/.asdf/installs/nim/devel/lib/system/assertions.nim	22	5
+msg	msg	/Users/elcritch/.asdf/installs/nim/devel/lib/system/assertions.nim	22	18
+sysFatal	sysFatal__3MqFiUWEqQBXOyOla7Oh4gassertions	/Users/elcritch/.asdf/installs/nim/devel/lib/system/fatal.nim	48	7
+message	message	/Users/elcritch/.asdf/installs/nim/devel/lib/system/fatal.nim	48	35
+blitTmp	blitTmp	/Users/elcritch/.asdf/installs/nim/devel/lib/system/fatal.nim	49	29
+dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/system/fatal.nim	49	4
+src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/system/fatal.nim	49	4
