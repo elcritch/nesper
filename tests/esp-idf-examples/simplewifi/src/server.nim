@@ -7,6 +7,7 @@ proc cb*(req: Request) {.async.} =
     inc count
     echo "req #", count
     await req.respond(Http200, "Hello World from nim on ESP32")
+    GC_fullCollect()
 
 proc run_http_server*() {.exportc.} =
     echo "starting http server on port 8181"
