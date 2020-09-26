@@ -1,11 +1,6 @@
 getMonoTime	getMonoTime__QkEugs2Q2iFK9b83sl2B6wA	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	86	5
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	86	0
-ticks	ticks	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	97	8
-machAbsoluteTimeFreq	machAbsoluteTimeFreq	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	98	8
-a	a	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	12
-b	b	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	15
-res	res	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	21
-result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	123	15
+ts	ts	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	103	8
 <=	lteq___3KIZNy1Wl5YmzvX5mBokLA	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	140	5
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	140	0
 ==	eqeq___3KIZNy1Wl5YmzvX5mBokLA_2	/Users/elcritch/.asdf/installs/nim/devel/lib/std/monotimes.nim	144	5

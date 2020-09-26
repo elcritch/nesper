@@ -5,15 +5,15 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${COMPONENT_DIR}/
 execute_process(COMMAND nim printlib OUTPUT_VARIABLE NIMLIB)
 
 execute_process(
-  COMMAND nim dump file.json 2>&1 | grep lib | sort | head -n1
+  COMMAND nim printlib
   COMMAND nim c --nimCache:${COMPONENT_DIR}/nimcache/ --noMain --genScript --compileOnly ${COMPONENT_DIR}/main.nim
   WORKING_DIRECTORY ${COMPONENT_DIR}
+  COMMAND_ECHO STDOUT
 )
 
 file(GLOB nim_sources ${COMPONENT_DIR}/nimcache/*.c )
 
 message("NIMLIB::: " ${NIMLIB} )
-message("ECHO::: " ${nim_sources} )
 list(APPEND SRCS ${nim_sources})
 
 idf_component_register(SRCS "ethernet_example_main.c" ${nim_sources}

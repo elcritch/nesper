@@ -46,8 +46,8 @@ dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim	247	3
 =	eq___MheV9cAHfzgDRoyMSWI7u3w	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	297	5
 dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	297	5
 src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	297	5
-dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2364	26
-src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2364	26
+dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2391	26
+src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2391	26
 serveIter	serveIter__9bFW7o03uH9aU8ZP0CEQpILA	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim	203	30
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	300	2
 :envP	colonenvP_	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncmacro.nim	203	30
@@ -107,8 +107,8 @@ result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.
 dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim	393	20
 src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim	393	20
 fromProc	fromProc	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim	125	22
-dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	208	14
-src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	208	14
+dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	211	14
+src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	211	14
 future	future	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncfutures.nim	388	14
 dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/httpcore.nim	118	6
 src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/httpcore.nim	118	6
@@ -180,12 +180,12 @@ socket	socket	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncnet.nim	451
 data	data	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncnet.nim	451	32
 flags	flags	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asyncnet.nim	452	11
 s	s	/Users/elcritch/.asdf/installs/nim/devel/lib/system/strmantle.nim	30	16
-uri	uri	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	218	15
-result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	218	28
+uri	uri	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	236	15
+result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/uri.nim	236	28
 obj	obj	/Users/elcritch/.asdf/installs/nim/devel/lib/system/arc.nim	240	11
 subclass	subclass	/Users/elcritch/.asdf/installs/nim/devel/lib/system/arc.nim	240	28
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/system/arc.nim	240	0
-result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2327	2
+result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	2354	2
 =sink	eqsink___BahNd9crgOjUMmAabni9bSig	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	202	40
 dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	202	40
 src	src	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/asynchttpserver.nim	202	40

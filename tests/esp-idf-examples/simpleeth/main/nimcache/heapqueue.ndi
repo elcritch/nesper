@@ -5,11 +5,11 @@ clear	clear__uwU9c2lsLU9ak4QmYnE6XQuA	/Users/elcritch/.asdf/installs/nim/devel/l
 s	s	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	947	16
 newlen	newlen	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	947	31
 len	len__RjQWrCkdfvnNzFdZkV0dRQheapqueue	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	63	5
-[]	X5BX5D___ga3gGGJp3oFNnh3EnkLdsQheapqueue	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	67	5
+[]	X5BX5D___UJ0Pc8uyocnxAC22hPdw4gheapqueue	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	67	5
 pop	pop__TlOaAtzBOZyVC1usll2RJQ	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	118	5
 lastelt	lastelt	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	121	6
-s	s	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1802	13
-L	L	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1811	6
+s	s	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1829	13
+L	L	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1838	6
 siftup	siftup__KT07fwIP1Mswyo2fH5Meeg	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	92	5
 heap	heap	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	92	15
 p	p	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	92	39
@@ -23,8 +23,8 @@ heapCmp	heapCmp__2QyOfd9anp1pOLWfLRbzHQgheapqueue	/Users/elcritch/.asdf/installs
 x	x	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	71	16
 y	y	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	71	19
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	71	0
-x	x	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1835	20
-y	y	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1835	23
+x	x	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1862	20
+y	y	/Users/elcritch/.asdf/installs/nim/devel/lib/system.nim	1862	23
 dest	dest	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	68	2
 siftdown	siftdown__Zxh1g3A3MXNfUq88v9arH1w	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	74	5
 heap	heap	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/heapqueue.nim	74	17

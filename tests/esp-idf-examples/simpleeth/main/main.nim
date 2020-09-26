@@ -1,6 +1,7 @@
 import asynchttpserver, asyncdispatch, net
 
 var count = 0
+
 proc cb*(req: Request) {.async.} =
     inc count
     echo "req #", count

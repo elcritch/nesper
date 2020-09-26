@@ -1,1 +1,5 @@
-MAP_POPULATE	MAP_POPULATE__VA0iC4AP6fJAacff09cx89ag	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix_macos_amd64.nim	546	4
+SOMAXCONN	SOMAXCONN__0XWtgJz0atYHiEz9b9aVOcQg	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix_freertos_consts.nim	417	4
+MAP_POPULATE	MAP_POPULATE__VA0iC4AP6fJAacff09cx89ag	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix_other.nim	600	4
+IN6_IS_ADDR_V4MAPPED	IN6_IS_ADDR_V4MAPPED__6KWoyJxz9c9cfnUA9b5aeMx3w	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	966	7
+result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	966	2
+bits32	bits32	/Users/elcritch/.asdf/installs/nim/devel/lib/posix/posix.nim	967	8

@@ -2,7 +2,7 @@ len	len__DQsAQkVd9bSjHr0J9c6igsXgdeques	/Users/elcritch/.asdf/installs/nim/devel
 addLast	addLast__AjJTTDDB8sceZqEDAtFWRA	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	320	5
 expandIfNeeded	expandIfNeeded__1x32uzSajoB9apwB9bmROoXg	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	285	5
 deq	deq	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	285	23
-correctSize`gensym287	correctSizeX60gensym287_	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	70	6
+correctSize`gensym178	correctSizeX60gensym178_	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	70	6
 x	x	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/math.nim	175	21
 cap	cap	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	287	6
 n	n	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/collections/deques.nim	289	8

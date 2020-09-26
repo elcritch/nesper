@@ -9,6 +9,10 @@ unitTo	unitTo	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	40
 quantity	quantity	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	63
 result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	0
 unitWeights	unitWeights__cpugRVHYEC9bUpLa71eZMsQ	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	382	6
+a	a	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	12
+b	b	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	15
+res	res	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	115	21
+result	result	/Users/elcritch/.asdf/installs/nim/devel/lib/system/integerops.nim	123	15
 convert	convert__vsrmXCcg8GubJb67VXeq4wtimes	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	5
 unitFrom	unitFrom	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	30
 unitTo	unitTo	/Users/elcritch/.asdf/installs/nim/devel/lib/pure/times.nim	399	40
