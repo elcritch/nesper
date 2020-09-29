@@ -18,15 +18,5 @@ proc ESP_ERROR_CHECK_WITHOUT_ABORT*(x: cint) {.cdecl,
 
 #define ESP_LOGI( tag, format, ... )  
 #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%d) %s: " format LOG_RESET_COLOR "\n"
-proc esp_log_write(level: esp_log_level_t, tag: cstring, format: cstring, ...) {.importc: "esp_log_write", varargs, header: "esp_log.h".}
-
-proc esp_loge*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGE", varargs, header: "esp_log.h".}
-proc esp_logw*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGW", varargs, header: "esp_log.h".}
-proc esp_logi*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGI", varargs, header: "esp_log.h".}
-proc esp_logd*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGD", varargs, header: "esp_log.h".}
-proc esp_logv*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, header: "esp_log.h".}
-
-proc esp_log_timestamp*(void): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
-
 
 

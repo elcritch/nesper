@@ -18,17 +18,13 @@ type
 
 proc esp_log_timestamp*(): uint32 {.importc: "esp_log_timestamp", header: "esp_log.h".}
 
-proc esp_log_write*(level: esp_log_level_t; tag: cstring; format: cstring) {.varargs.} =
-  discard
+proc esp_log_write*(level: esp_log_level_t, tag: cstring, format: cstring) {.
+  importc: "esp_log_write", varargs, header: "esp_log.h".}
 
-##  #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%d) %s: " format LOG_RESET_COLOR "\n"
-##  #define ESP_LOGE( tag, format, ... )  if (LOG_LOCAL_LEVEL >= ESP_LOG_ERROR)   { esp_log_write(ESP_LOG_ERROR,   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); }
-##  #define ESP_LOGW( tag, format, ... )  if (LOG_LOCAL_LEVEL >= ESP_LOG_WARN)    { esp_log_write(ESP_LOG_WARN,    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); }
-##  #define ESP_LOGI( tag, format, ... )  if (LOG_LOCAL_LEVEL >= ESP_LOG_INFO)    { esp_log_write(ESP_LOG_INFO,    tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); }
-##  #define ESP_LOGD( tag, format, ... )  if (LOG_LOCAL_LEVEL >= ESP_LOG_DEBUG)   { esp_log_write(ESP_LOG_DEBUG,   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag, ##__VA_ARGS__); }
-##  #define ESP_LOGV( tag, format, ... )  if (LOG_LOCAL_LEVEL >= ESP_LOG_VERBOSE) { esp_log_write(ESP_LOG_VERBOSE, tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag, ##__VA_ARGS__); }
-##  Assume that flash encryption is not enabled. Put here since in partition.c
-##  esp_log.h is included later than esp_flash_encrypt.h.
+proc esp_loge*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGE", varargs, header: "esp_log.h".}
+proc esp_logw*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGW", varargs, header: "esp_log.h".}
+proc esp_logi*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGI", varargs, header: "esp_log.h".}
+proc esp_logd*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGD", varargs, header: "esp_log.h".}
+proc esp_logv*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, header: "esp_log.h".}
 
-template esp_flash_encryption_enabled*(): untyped =
-  false
+proc esp_log_timestamp*(void): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
