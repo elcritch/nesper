@@ -1,6 +1,6 @@
 
 type
-  esp_err_t* = int32
+  esp_err_t* = distinct int32
 
 ##  Definitions for error constants.
 
