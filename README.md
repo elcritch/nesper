@@ -18,8 +18,8 @@ Supported ESP-IDF libraries:
 - [x] Most of the basic `FreeRTOS.h` header 
 - [x] NVS Flash
 - [x] UART 
-- [ ] SPI 
-- [ ] I2C 
+- [x] SPI
+- [x] I2C 
 
 Things I'd like to get to:
 
