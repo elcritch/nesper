@@ -4,13 +4,15 @@ Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP A
 
 ## Status
 
-This is a Work in Progress (tm). I'm using it for a few work projects as I really dislike programming C/C++, despite C's elegance. When you just want a hash table in C it's a pain. C++ is about 5 different languages now and I have to idea how to use half of them anymore. Rust doesn't work on half the thins I want to program. MicroPython? ... No. 
+TLDR; Real reason? It's a bit of fun in a sometimes tricky field. 
 
-TLDR; Real reason? It's kinda fun in a sometimes tricky field. 
+This is a Work in Progress (tm). I'm using it for a few work projects as I generally dislike programming C/C++ (despite C's elegance in the small). When you just want a hash table in C it's tedious and error prone. C++ is about 5 different languages and I have to idea how to use half of them anymore. Rust doesn't work on half of the boards I want to program. MicroPython? ... Nope - I need speed and efficiency. 
 
 ## Library
 
 The library is currently a collection of random ESP-IDF libraries that I import using `c2nim` as needed. Sometimes there's a bit extra wrapping to provide a nicer Nim API. 
+
+Caveat: these features are tested as they're used for my use case. However, both Nim and the esp-idf seem designed well enough that they mostly "just work". PR's are welcome! 
 
 Supported ESP-IDF libraries: 
 
@@ -69,21 +71,26 @@ Nim is a flexible language which compiles to a variety of backend "host" languag
 
 Nim has a few nice features for embedded work: 
 
-- High level language and semantics
-- Flexible garbage collector including options for manual memory management
-- Ability to do low level bit-fiddling including pointer manipulations
-- Relatively complete standard library, including JSON, MessagePack, Time, crypto libraries
-- Wrappers around native socket based API's like LwIP's emulated `select`, simplifying networking
-- Efficient compiler that eliminates un-needed code (e.g. json support using a few extra kB's)
-- Fast compilation, generated C compiles fast with few included headers
-- One of the simplest FFI's around to import and/or wrap C/C++ libraries
-- Options for deterministic exception handling using a C goto based method
+Language:
+- High level language and semantics with low level bit fiddling and pointers
+- Flexible garbage collector or manual memory management
+    + ARC GC allows using native-C debuggers, meaning any embedded debuggers should work too!
+    + ARG GC doesn't use locks, and utilizies move semantics -- it's fast
+- Simple FFI's around to import and/or wrap C/C++ libraries
+- Async/Event support
+- Real hygenic language macros, and collections with generics!
+- Very flexible and hackable standard library!
+
+Libraries: 
+- Simplified network wrappers around native sockets (i.e. use `select` w/o a PhD)
+- Sane standard library, including JSON, datetime, crypto, ...
+    + Efficient compiler that eliminates un-needed code (i.e. json support using a few extra kB's)
+    + Package library manager
+
+Compiler:
+- Fast compilation, generated C compiles fast
+- Deterministic exception handling using a non-malloc friendly goto technique
 - Object-oriented like programming that's not based on vtables 
-- Async support in standard library
-- Real hygenic language macros!
-- Real types with generics!
-- Re-use normal native-C debuggers, meaning any embedded debuggers should work too!
-- Very flexible and hackable standard library!!
 
 There are a few cons of Nim: 
 
