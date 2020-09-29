@@ -121,7 +121,7 @@ type
 ##
 
 proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
-                        slv_rx_buf_len: csize; slv_tx_buf_len: csize;
+                        slv_rx_buf_len: csize_t; slv_tx_buf_len: csize_t;
                         intr_alloc_flags: cint): esp_err_t {.
     importc: "i2c_driver_install", header: "driver/i2c.h".}
 ## *
@@ -298,7 +298,7 @@ proc i2c_master_write_byte*(cmd_handle: i2c_cmd_handle_t; data: uint8; ack_en: b
 ##
 
 proc i2c_master_write*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
-                      data_len: csize; ack_en: bool): esp_err_t {.
+                      data_len: csize_t; ack_en: bool): esp_err_t {.
     importc: "i2c_master_write", header: "i2c.h".}
 ## *
 ##  @brief Queue command for I2C master to read one byte from I2C bus
@@ -339,7 +339,7 @@ proc i2c_master_read_byte*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
 ##
 
 proc i2c_master_read*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
-                     data_len: csize; ack: i2c_ack_type_t): esp_err_t {.
+                     data_len: csize_t; ack: i2c_ack_type_t): esp_err_t {.
     importc: "i2c_master_read", header: "i2c.h".}
 ## *
 ##  @brief Queue command for I2C master to generate a stop signal
@@ -415,7 +415,7 @@ proc i2c_slave_write_buffer*(i2c_num: i2c_port_t; data: ptr uint8; size: cint;
 ##      - Others(>=0) The number of data bytes that read from I2C slave buffer.
 ##
 
-proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csize;
+proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csize_t;
                            ticks_to_wait: TickType_t): cint {.
     importc: "i2c_slave_read_buffer", header: "i2c.h".}
 ## *
