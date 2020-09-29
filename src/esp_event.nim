@@ -12,20 +12,18 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, freertos/FreeRTOS, freertos/task, freertos/queue, freertos/semphr,
-  esp_event_base, esp_event_legacy
+import consts
 
 ## / Configuration for creating event loops
 
 type
   esp_event_loop_args_t* {.importc: "esp_event_loop_args_t", header: "esp_event.h",
                           bycopy.} = object
-    queue_size* {.importc: "queue_size".}: int32_t ## *< size of the event loop queue
+    queue_size* {.importc: "queue_size".}: int32 ## *< size of the event loop queue
     task_name* {.importc: "task_name".}: cstring ## *< name of the event loop task; if NULL,
                                              ##                                                         a dedicated task is not created for event loop
     task_priority* {.importc: "task_priority".}: UBaseType_t ## *< priority of the event loop task, ignored if task name is NULL
-    task_stack_size* {.importc: "task_stack_size".}: uint32_t ## *< stack size of the event loop task, ignored if task name is NULL
+    task_stack_size* {.importc: "task_stack_size".}: uint32 ## *< stack size of the event loop task, ignored if task name is NULL
     task_core_id* {.importc: "task_core_id".}: BaseType_t ## *< core to which the event loop task is pinned to,
                                                       ##                                                         ignored if task name is NULL
 
@@ -142,7 +140,7 @@ proc esp_event_loop_run*(event_loop: esp_event_loop_handle_t;
 ##   - Others: Fail
 ##
 
-proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32_t;
+proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32;
                                 event_handler: esp_event_handler_t;
                                 event_handler_arg: pointer): esp_err_t {.
     importc: "esp_event_handler_register", header: "esp_event.h".}
@@ -173,7 +171,7 @@ proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32_t
 
 proc esp_event_handler_register_with*(event_loop: esp_event_loop_handle_t;
                                      event_base: esp_event_base_t;
-                                     event_id: int32_t;
+                                     event_id: int32;
                                      event_handler: esp_event_handler_t;
                                      event_handler_arg: pointer): esp_err_t {.
     importc: "esp_event_handler_register_with", header: "esp_event.h".}
@@ -219,7 +217,7 @@ proc esp_event_handler_register_with*(event_loop: esp_event_loop_handle_t;
 
 proc esp_event_handler_instance_register_with*(
     event_loop: esp_event_loop_handle_t; event_base: esp_event_base_t;
-    event_id: int32_t; event_handler: esp_event_handler_t;
+    event_id: int32; event_handler: esp_event_handler_t;
     event_handler_arg: pointer; instance: ptr esp_event_handler_instance_t): esp_err_t {.
     importc: "esp_event_handler_instance_register_with", header: "esp_event.h".}
 ## *
@@ -250,7 +248,7 @@ proc esp_event_handler_instance_register_with*(
 ##
 
 proc esp_event_handler_instance_register*(event_base: esp_event_base_t;
-    event_id: int32_t; event_handler: esp_event_handler_t;
+    event_id: int32; event_handler: esp_event_handler_t;
     event_handler_arg: pointer; instance: ptr esp_event_handler_instance_t): esp_err_t {.
     importc: "esp_event_handler_instance_register", header: "esp_event.h".}
 ## *
@@ -278,7 +276,7 @@ proc esp_event_handler_instance_register*(event_base: esp_event_base_t;
 ##  @return others fail
 ##
 
-proc esp_event_handler_unregister*(event_base: esp_event_base_t; event_id: int32_t;
+proc esp_event_handler_unregister*(event_base: esp_event_base_t; event_id: int32;
                                   event_handler: esp_event_handler_t): esp_err_t {.
     importc: "esp_event_handler_unregister", header: "esp_event.h".}
 ## *
@@ -303,7 +301,7 @@ proc esp_event_handler_unregister*(event_base: esp_event_base_t; event_id: int32
 
 proc esp_event_handler_unregister_with*(event_loop: esp_event_loop_handle_t;
                                        event_base: esp_event_base_t;
-                                       event_id: int32_t;
+                                       event_id: int32;
                                        event_handler: esp_event_handler_t): esp_err_t {.
     importc: "esp_event_handler_unregister_with", header: "esp_event.h".}
 ## *
@@ -332,7 +330,7 @@ proc esp_event_handler_unregister_with*(event_loop: esp_event_loop_handle_t;
 
 proc esp_event_handler_instance_unregister_with*(
     event_loop: esp_event_loop_handle_t; event_base: esp_event_base_t;
-    event_id: int32_t; instance: esp_event_handler_instance_t): esp_err_t {.
+    event_id: int32; instance: esp_event_handler_instance_t): esp_err_t {.
     importc: "esp_event_handler_instance_unregister_with", header: "esp_event.h".}
 ## *
 ##  @brief Unregister a handler from the system event loop.
@@ -351,7 +349,7 @@ proc esp_event_handler_instance_unregister_with*(
 ##
 
 proc esp_event_handler_instance_unregister*(event_base: esp_event_base_t;
-    event_id: int32_t; instance: esp_event_handler_instance_t): esp_err_t {.
+    event_id: int32; instance: esp_event_handler_instance_t): esp_err_t {.
     importc: "esp_event_handler_instance_unregister", header: "esp_event.h".}
 ## *
 ##  @brief Posts an event to the system default event loop. The event loop library keeps a copy of event_data and manages
@@ -372,7 +370,7 @@ proc esp_event_handler_instance_unregister*(event_base: esp_event_base_t;
 ##   - Others: Fail
 ##
 
-proc esp_event_post*(event_base: esp_event_base_t; event_id: int32_t;
+proc esp_event_post*(event_base: esp_event_base_t; event_id: int32;
                     event_data: pointer; event_data_size: csize;
                     ticks_to_wait: TickType_t): esp_err_t {.
     importc: "esp_event_post", header: "esp_event.h".}
@@ -400,7 +398,7 @@ proc esp_event_post*(event_base: esp_event_base_t; event_id: int32_t;
 ##
 
 proc esp_event_post_to*(event_loop: esp_event_loop_handle_t;
-                       event_base: esp_event_base_t; event_id: int32_t;
+                       event_base: esp_event_base_t; event_id: int32;
                        event_data: pointer; event_data_size: csize;
                        ticks_to_wait: TickType_t): esp_err_t {.
     importc: "esp_event_post_to", header: "esp_event.h".}
@@ -427,7 +425,7 @@ when CONFIG_ESP_EVENT_POST_FROM_ISR:
   ##                           data size of more than 4 bytes
   ##   - Others: Fail
   ##
-  proc esp_event_isr_post*(event_base: esp_event_base_t; event_id: int32_t;
+  proc esp_event_isr_post*(event_base: esp_event_base_t; event_id: int32;
                           event_data: pointer; event_data_size: csize;
                           task_unblocked: ptr BaseType_t): esp_err_t {.
       importc: "esp_event_isr_post", header: "esp_event.h".}
@@ -455,7 +453,7 @@ when CONFIG_ESP_EVENT_POST_FROM_ISR:
   ##   - Others: Fail
   ##
   proc esp_event_isr_post_to*(event_loop: esp_event_loop_handle_t;
-                             event_base: esp_event_base_t; event_id: int32_t;
+                             event_base: esp_event_base_t; event_id: int32;
                              event_data: pointer; event_data_size: csize;
                              task_unblocked: ptr BaseType_t): esp_err_t {.
       importc: "esp_event_isr_post_to", header: "esp_event.h".}
