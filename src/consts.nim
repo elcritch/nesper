@@ -38,7 +38,6 @@ type
 #     pvDummy2* {.importc: "pvDummy2".}: pointer
 #     uxDummy2* {.importc: "uxDummy2".}: UBaseType_t
 
-
 #   StaticSemaphore_t* = StaticQueue_t
   portCHAR* = int8
   portFLOAT* = cfloat
