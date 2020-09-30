@@ -3,8 +3,8 @@
 # import strutils
 import options
 
-import ../consts
-import ../general
+import consts
+import general
 import esp/nvs
 import esp/nvs_flash
 
