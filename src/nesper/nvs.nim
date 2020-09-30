@@ -5,8 +5,8 @@ import options
 
 import consts
 import general
-import nvs_raw
-import nvs_flash
+import esp/nvs
+import esp/nvs_flash
 
 
 type
