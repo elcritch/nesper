@@ -1,4 +1,4 @@
-import ../consts
+import consts
 
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: cint
 
