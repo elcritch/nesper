@@ -73,7 +73,7 @@
 ##  xQueueSend(), xQueueReceive(), etc.
 ##
 
-import consts
+import ../consts
 import FreeRTOS
 
 type

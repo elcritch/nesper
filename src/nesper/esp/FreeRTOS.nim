@@ -91,7 +91,7 @@
 
 ##  Basic FreeRTOS definitions.
 
-import consts
+import ../consts
 
 
 # type

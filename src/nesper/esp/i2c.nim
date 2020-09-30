@@ -11,7 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import consts
+import ../consts
 
 ## *
 ##  @brief I2C port number, can be I2C_NUM_0 ~ (I2C_NUM_MAX-1).

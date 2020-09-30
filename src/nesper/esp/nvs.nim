@@ -14,7 +14,7 @@
 ## *
 ##  Opaque pointer type representing non-volatile storage handle
 ##
-import consts
+import ../consts
 
 type
   nvs_handle_t* = uint32
