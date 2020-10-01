@@ -264,8 +264,8 @@ type
                                       ##
                                       ##   Example: write 0x123400 and address_bits=24 to send address of 0x12, 0x34, 0x00 (in previous version, you may have to write 0x12340000).
                                       ##
-    length* {.importc: "length".}: csize ## /< Total data length, in bits
-    rxlength* {.importc: "rxlength".}: csize ## /< Total data length received, should be not greater than ``length`` in full-duplex mode (0 defaults this to the value of ``length``).
+    length* {.importc: "length".}: csize_t ## /< Total data length, in bits
+    rxlength* {.importc: "rxlength".}: csize_t ## /< Total data length received, should be not greater than ``length`` in full-duplex mode (0 defaults this to the value of ``length``).
     user* {.importc: "user".}: pointer ## /< User-defined variable. Can be used to store eg transaction ID.
     ano_spi_master_144* {.importc: "ano_spi_master_144".}: INNER_C_UNION_spi_master_142
     ano_spi_master_148* {.importc: "ano_spi_master_148".}: INNER_C_UNION_spi_master_146
