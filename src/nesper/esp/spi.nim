@@ -34,8 +34,7 @@ const
 ##       the MSB, this helps to shift the data to the MSB.
 ##
 
-template SPI_SWAP_DATA_TX*(DATA, LEN: untyped): untyped =
-  __builtin_bswap32((uint32)(DATA) shl (32 - (LEN)))
+proc SPI_SWAP_DATA_TX*(DATA, LEN: untyped): untyped = {.importc: "spi_bus_free", header: "spi_common.h".}
 
 ## *
 ##  Transform received data of length <= 32 bits to the format of an unsigned integer.
@@ -49,8 +48,7 @@ template SPI_SWAP_DATA_TX*(DATA, LEN: untyped): untyped =
 ##       the MSB, this helps to shift the data to the LSB.
 ##
 
-template SPI_SWAP_DATA_RX*(DATA, LEN: untyped): untyped =
-  (__builtin_bswap32(DATA) shr (32 - (LEN)))
+proc SPI_SWAP_DATA_RX*(DATA, LEN: untyped): untyped = {.importc: "spi_bus_free", header: "spi_common.h".}
 
 const
   SPICOMMON_BUSFLAG_SLAVE* = 0

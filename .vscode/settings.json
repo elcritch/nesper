@@ -1,0 +1,5 @@
+{
+	"nim.buildOnSave": false,
+	"nim.buildCommand": "c",
+	"nim.lintOnSave": true,
+}
