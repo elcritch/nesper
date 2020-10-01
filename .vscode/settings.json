@@ -2,4 +2,5 @@
 	"nim.buildOnSave": false,
 	"nim.buildCommand": "c",
 	"nim.lintOnSave": true,
+	"nim.project": ["src/nesper.nim"]
 }
