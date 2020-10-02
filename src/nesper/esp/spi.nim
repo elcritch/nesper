@@ -35,6 +35,7 @@ type
     # semphr_polling* {.importc: "semphr_polling".}: SemaphoreHandle_t ## semaphore to notify the device it claimed the bus
     # waiting* {.importc: "waiting".}: bool ## the device is waiting for the exclusive control of the bus
 
+# proc __builtin_bswap32*(data: uint32): uin32 {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
 
 ## *
 ##  Transform unsigned integer of length <= 32 bits to the format which can be
@@ -51,7 +52,10 @@ type
 ##       the MSB, this helps to shift the data to the MSB.
 ##
 
-# proc SPI_SWAP_DATA_TX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
+proc SPI_SWAP_DATA_TX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
+
+# proc swap_data_tx*(data: untyped, len: uint32): uint32 =
+  # bigEndian( data shl (32-len) )
 
 
 ## *
@@ -66,7 +70,11 @@ type
 ##       the MSB, this helps to shift the data to the LSB.
 ##
 
-# proc SPI_SWAP_DATA_RX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_RX", header: "spi_common.h".}
+proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", header: "spi_common.h".}
+
+# proc swap_data_rx*(data: untyped, len: uint32): uint32 =
+  # bigEndian(data) shr (32-len)
+
 
 const
   SPICOMMON_BUSFLAG_SLAVE* = 0
@@ -104,6 +112,37 @@ type
                                             ##   by the driver. Note that if ESP_INTR_FLAG_IRAM is set, ALL the callbacks of
                                             ##   the driver, and their callee functions, should be put in the IRAM.
                                             ##
+
+type
+  INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
+      union.}
+    buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
+    data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+
+  INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
+      union.}
+    buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
+    data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
+
+  spi_transaction_t* {.importc: "spi_transaction_t", header: "spi_master.h", bycopy.} = object
+    flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_TRANS_* flags
+    cmd* {.importc: "cmd".}: uint16 ## *< Command data, of which the length is set in the ``command_bits`` of spi_device_interface_config_t.
+                                  ##
+                                  ##   <b>NOTE: this field, used to be "command" in ESP-IDF 2.1 and before, is re-written to be used in a new way in ESP-IDF 3.0.</b>
+                                  ##
+                                  ##   Example: write 0x0123 and command_bits=12 to send command 0x12, 0x3_ (in previous version, you may have to write 0x3_12).
+                                  ##
+    `addr`* {.importc: "addr".}: uint64 ## *< Address data, of which the length is set in the ``address_bits`` of spi_device_interface_config_t.
+                                      ##
+                                      ##   <b>NOTE: this field, used to be "address" in ESP-IDF 2.1 and before, is re-written to be used in a new way in ESP-IDF3.0.</b>
+                                      ##
+                                      ##   Example: write 0x123400 and address_bits=24 to send address of 0x12, 0x34, 0x00 (in previous version, you may have to write 0x12340000).
+                                      ##
+    length* {.importc: "length".}: csize_t ## /< Total data length, in bits
+    rxlength* {.importc: "rxlength".}: csize_t ## /< Total data length received, should be not greater than ``length`` in full-duplex mode (0 defaults this to the value of ``length``).
+    user* {.importc: "user".}: pointer ## /< User-defined variable. Can be used to store eg transaction ID.
+    tx*: INNER_C_UNION_spi_master_tx
+    rx*: INNER_C_UNION_spi_master_rx
 
 
 ## *
@@ -255,37 +294,6 @@ const
 ## *
 ##  This structure describes one SPI transaction. The descriptor should not be modified until the transaction finishes.
 ##
-
-type
-  INNER_C_UNION_spi_master_142* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
-      union.}
-    tx_buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
-    tx_data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
-
-  INNER_C_UNION_spi_master_146* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
-      union.}
-    rx_buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
-    rx_data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
-
-  spi_transaction_t* {.importc: "spi_transaction_t", header: "spi_master.h", bycopy.} = object
-    flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_TRANS_* flags
-    cmd* {.importc: "cmd".}: uint16 ## *< Command data, of which the length is set in the ``command_bits`` of spi_device_interface_config_t.
-                                  ##
-                                  ##   <b>NOTE: this field, used to be "command" in ESP-IDF 2.1 and before, is re-written to be used in a new way in ESP-IDF 3.0.</b>
-                                  ##
-                                  ##   Example: write 0x0123 and command_bits=12 to send command 0x12, 0x3_ (in previous version, you may have to write 0x3_12).
-                                  ##
-    `addr`* {.importc: "addr".}: uint64 ## *< Address data, of which the length is set in the ``address_bits`` of spi_device_interface_config_t.
-                                      ##
-                                      ##   <b>NOTE: this field, used to be "address" in ESP-IDF 2.1 and before, is re-written to be used in a new way in ESP-IDF3.0.</b>
-                                      ##
-                                      ##   Example: write 0x123400 and address_bits=24 to send address of 0x12, 0x34, 0x00 (in previous version, you may have to write 0x12340000).
-                                      ##
-    length* {.importc: "length".}: csize_t ## /< Total data length, in bits
-    rxlength* {.importc: "rxlength".}: csize_t ## /< Total data length received, should be not greater than ``length`` in full-duplex mode (0 defaults this to the value of ``length``).
-    user* {.importc: "user".}: pointer ## /< User-defined variable. Can be used to store eg transaction ID.
-    ano_spi_master_144* {.importc: "ano_spi_master_144".}: INNER_C_UNION_spi_master_142
-    ano_spi_master_148* {.importc: "ano_spi_master_148".}: INNER_C_UNION_spi_master_146
 
 
 ## the rx data should start from a 32-bit aligned address to get around dma issue.
