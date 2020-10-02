@@ -34,7 +34,7 @@ const
 ##       the MSB, this helps to shift the data to the MSB.
 ##
 
-proc SPI_SWAP_DATA_TX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
+# proc SPI_SWAP_DATA_TX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
 
 
 ## *
@@ -49,7 +49,7 @@ proc SPI_SWAP_DATA_TX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_TX
 ##       the MSB, this helps to shift the data to the LSB.
 ##
 
-proc SPI_SWAP_DATA_RX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_RX", header: "spi_common.h".}
+# proc SPI_SWAP_DATA_RX*(DATA, LEN: uint32): uint32 = {.importc: "SPI_SWAP_DATA_RX", header: "spi_common.h".}
 
 const
   SPICOMMON_BUSFLAG_SLAVE* = 0
