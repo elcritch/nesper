@@ -92,10 +92,10 @@ const
 ## Periheral Clock {{
 
 const
+  APB_CLK_FREQ* = (80 * 1000000)  ## unit: Hz
   APB_CLK_FREQ_ROM* = (26 * 1000000)
   CPU_CLK_FREQ_ROM* = APB_CLK_FREQ_ROM
   CPU_CLK_FREQ* = APB_CLK_FREQ
-  APB_CLK_FREQ* = (80 * 1000000)  ## unit: Hz
   REF_CLK_FREQ* = (1000000)
   UART_CLK_FREQ* = APB_CLK_FREQ
   WDT_CLK_FREQ* = APB_CLK_FREQ
