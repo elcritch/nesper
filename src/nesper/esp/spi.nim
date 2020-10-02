@@ -19,6 +19,23 @@ import ../consts
 const
   SPI_MAX_DMA_LEN* = (4096 - 4)
 
+type
+  spi_host_device_t* = enum
+    SPI1_HOST = 0,              ## /< SPI1
+    SPI2_HOST = 1,              ## /< SPI2
+    SPI3_HOST = 2               ## /< SPI3
+
+  spi_device_t* {.importc: "spi_device_t", header: "spi_master.h", bycopy.} = object
+    id* {.importc: "id".}: cint
+    # trans_queue* {.importc: "trans_queue".}: QueueHandle_t
+    # ret_queue* {.importc: "ret_queue".}: QueueHandle_t
+    # cfg* {.importc: "cfg".}: spi_device_interface_config_t
+    # timing_conf* {.importc: "timing_conf".}: spi_hal_timing_conf_t
+    # host* {.importc: "host".}: ptr spi_host_t
+    # semphr_polling* {.importc: "semphr_polling".}: SemaphoreHandle_t ## semaphore to notify the device it claimed the bus
+    # waiting* {.importc: "waiting".}: bool ## the device is waiting for the exclusive control of the bus
+
+
 ## *
 ##  Transform unsigned integer of length <= 32 bits to the format which can be
 ##  sent by the SPI driver directly.
@@ -284,16 +301,6 @@ type
     command_bits* {.importc: "command_bits".}: uint8 ## /< The command length in this transaction, in bits.
     address_bits* {.importc: "address_bits".}: uint8 ## /< The address length in this transaction, in bits.
     dummy_bits* {.importc: "dummy_bits".}: uint8 ## /< The dummy length in this transaction, in bits.
-
-  spi_device_t* {.importc: "spi_device_t", header: "spi_master.h", bycopy.} = object
-    id* {.importc: "id".}: cint
-    # trans_queue* {.importc: "trans_queue".}: QueueHandle_t
-    # ret_queue* {.importc: "ret_queue".}: QueueHandle_t
-    # cfg* {.importc: "cfg".}: spi_device_interface_config_t
-    # timing_conf* {.importc: "timing_conf".}: spi_hal_timing_conf_t
-    # host* {.importc: "host".}: ptr spi_host_t
-    # semphr_polling* {.importc: "semphr_polling".}: SemaphoreHandle_t ## semaphore to notify the device it claimed the bus
-    # waiting* {.importc: "waiting".}: bool ## the device is waiting for the exclusive control of the bus
 
 
   spi_device_handle_t* = ptr spi_device_t
