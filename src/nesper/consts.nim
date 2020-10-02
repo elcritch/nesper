@@ -1,3 +1,4 @@
+import soc
 
 type
   esp_err_t* = int32
