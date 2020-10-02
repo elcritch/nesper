@@ -117,12 +117,12 @@ type
   INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
       union.}
     buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
-    data* {.importc: "tx_data".}: uint32 ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+    data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
 
   INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "spi_master.h", bycopy.} = object {.
       union.}
     buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
-    data* {.importc: "rx_data".}: uint32 ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
+    data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
 
   spi_transaction_t* {.importc: "spi_transaction_t", header: "spi_master.h", bycopy.} = object
     flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_TRANS_* flags
