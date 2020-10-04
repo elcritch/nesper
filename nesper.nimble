@@ -10,3 +10,9 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 1.2.0"
+
+
+# Tasks
+task test, "Runs the test suite":
+  exec "nim c --os:freertos tests/tnvs.nim"
+

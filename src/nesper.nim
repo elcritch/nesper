@@ -5,8 +5,8 @@
 import nesper/consts
 import nesper/general
 
-export nesper/consts
-export nesper/general
+export consts
+export general
 
 # type
 #   Submodule* = object
