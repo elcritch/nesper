@@ -175,6 +175,9 @@ type
 proc spi_bus_initialize*(host_id: spi_host_device_t;
                         bus_config: ptr spi_bus_config_t; dma_chan: cint): esp_err_t {.
     importc: "spi_bus_initialize", header: "spi_common.h".}
+
+
+
 ## *
 ##  @brief Free a SPI bus
 ##
@@ -333,11 +336,13 @@ type
 ##          - ESP_ERR_NO_MEM        if out of memory
 ##          - ESP_OK                on success
 ##
-
 proc spi_bus_add_device*(host_id: spi_host_device_t;
                         dev_config: ptr spi_device_interface_config_t;
                         handle: ptr spi_device_handle_t): esp_err_t {.
     importc: "spi_bus_add_device", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Remove a device from the SPI bus
 ##
@@ -350,6 +355,9 @@ proc spi_bus_add_device*(host_id: spi_host_device_t;
 
 proc spi_bus_remove_device*(handle: spi_device_handle_t): esp_err_t {.
     importc: "spi_bus_remove_device", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Queue a SPI transaction for interrupt transaction execution. Get the result by ``spi_device_get_trans_result``.
 ##
@@ -372,6 +380,9 @@ proc spi_device_queue_trans*(handle: spi_device_handle_t;
                             trans_desc: ptr spi_transaction_t;
                             ticks_to_wait: TickType_t): esp_err_t {.
     importc: "spi_device_queue_trans", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Get the result of a SPI transaction queued earlier by ``spi_device_queue_trans``.
 ##
@@ -396,6 +407,9 @@ proc spi_device_get_trans_result*(handle: spi_device_handle_t;
                                  trans_desc: ptr ptr spi_transaction_t;
                                  ticks_to_wait: TickType_t): esp_err_t {.
     importc: "spi_device_get_trans_result", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Send a SPI transaction, wait for it to complete, and return the result
 ##
@@ -416,6 +430,9 @@ proc spi_device_get_trans_result*(handle: spi_device_handle_t;
 proc spi_device_transmit*(handle: spi_device_handle_t;
                          trans_desc: ptr spi_transaction_t): esp_err_t {.
     importc: "spi_device_transmit", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Immediately start a polling transaction.
 ##
@@ -440,6 +457,9 @@ proc spi_device_polling_start*(handle: spi_device_handle_t;
                               trans_desc: ptr spi_transaction_t;
                               ticks_to_wait: TickType_t): esp_err_t {.
     importc: "spi_device_polling_start", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Poll until the polling transaction ends.
 ##
@@ -458,6 +478,9 @@ proc spi_device_polling_start*(handle: spi_device_handle_t;
 
 proc spi_device_polling_end*(handle: spi_device_handle_t; ticks_to_wait: TickType_t): esp_err_t {.
     importc: "spi_device_polling_end", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Send a polling transaction, wait for it to complete, and return the result
 ##
@@ -478,6 +501,9 @@ proc spi_device_polling_end*(handle: spi_device_handle_t; ticks_to_wait: TickTyp
 proc spi_device_polling_transmit*(handle: spi_device_handle_t;
                                  trans_desc: ptr spi_transaction_t): esp_err_t {.
     importc: "spi_device_polling_transmit", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Occupy the SPI bus for a device to do continuous transactions.
 ##
@@ -495,6 +521,9 @@ proc spi_device_polling_transmit*(handle: spi_device_handle_t;
 
 proc spi_device_acquire_bus*(device: spi_device_handle_t; wait: TickType_t): esp_err_t {.
     importc: "spi_device_acquire_bus", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Release the SPI bus occupied by the device. All other devices can start sending transactions.
 ##
@@ -503,6 +532,9 @@ proc spi_device_acquire_bus*(device: spi_device_handle_t; wait: TickType_t): esp
 
 proc spi_device_release_bus*(dev: spi_device_handle_t) {.
     importc: "spi_device_release_bus", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Calculate the working frequency that is most close to desired frequency.
 ##
@@ -515,6 +547,9 @@ proc spi_device_release_bus*(dev: spi_device_handle_t) {.
 
 proc spi_get_actual_clock*(fapb: cint; hz: cint; duty_cycle: cint): cint {.
     importc: "spi_get_actual_clock", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Calculate the timing settings of specified frequency and settings.
 ##
@@ -533,6 +568,9 @@ proc spi_get_actual_clock*(fapb: cint; hz: cint; duty_cycle: cint): cint {.
 proc spi_get_timing*(gpio_is_used: bool; input_delay_ns: cint; eff_clk: cint;
                     dummy_o: ptr cint; cycles_remain_o: ptr cint) {.
     importc: "spi_get_timing", header: "spi_master.h".}
+
+
+
 ## *
 ##  @brief Get the frequency limit of current configurations.
 ##          SPI master working at this limit is OK, while above the limit, full duplex mode and DMA will not work,
