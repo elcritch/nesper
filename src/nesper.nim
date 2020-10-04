@@ -4,9 +4,11 @@
 
 import nesper/consts
 import nesper/general
+import nesper/esp/esp_log
 
 export consts
 export general
+export esp_log
 
 # type
 #   Submodule* = object

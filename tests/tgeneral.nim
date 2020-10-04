@@ -2,6 +2,10 @@
 import nesper
 
 
+const TAG = "main"
+
+ESP_LOGI(TAG, "Initializing device...")
+    
 echo "ESP_OK: " & $ESP_OK
 echo ""
 

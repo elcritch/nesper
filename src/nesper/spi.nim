@@ -3,6 +3,8 @@ import endians
 import nesper
 import nesper/esp/spi
 
+export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t
+
 type
   SpiError* = object of Exception
 
