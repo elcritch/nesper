@@ -8,40 +8,47 @@ import general
 import esp/nvs
 import esp/nvs_flash
 
-
 type
   NvsError* = object of Exception
+    error*: esp_err_t
 
-var nhandle: nvs_handle_t 
-var handle: Option[nvs_handle_t] 
-var nvs_error*: esp_err_t
+  NvsObject = object
+    mode*: nvs_open_mode_t 
+    handle*: nvs_handle_t 
 
-proc doNvsSetup*() =
+proc newNvsError(msg: string, error: esp_err_t): ref NvsError =
+  new(result)
+  result.msg = msg
+  result.code = msg
+
+proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
   # // Initialize NVS
   nvs_error = nvs_flash_init()
+
   if nvs_error == ESP_ERR_NVS_NO_FREE_PAGES or nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND:
     echo("NVS partition was truncated and needs to be erased")
     nvs_error = nvs_flash_erase()
     if ESP_OK != nvs_error:
-      raise newException(NvsError, "Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS")
+      raise newNvsError(NvsError, "Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS", nvs_error)
     echo("NVS partition was erased, now initializing it")
     nvs_error = nvs_flash_init()
     if ESP_OK != nvs_error:
-      raise newException(NvsError, "Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS")
+      raise newNvsError(NvsError, "Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS", nvs_error)
 
   #// Open
   echo("Opening Non-Volatile Storage (NVS) handle... ")
 
   # Set NVS handle
-  nvs_error = nvs_open("storage", NVS_READWRITE, addr(nhandle))
+  nvs_error = nvs_open(name, NVS_READWRITE, addr(result.handle))
 
   if nvs_error != ESP_OK:
     echo("Error (%s) opening NVS handle!", esp_err_to_name(nvs_error))
-    raise newException(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
-  handle = some(nhandle)
+  result.mode = mode
+  result.mode = mode
 
-proc doNvsGetInt*(key: string): Option[int32] =
+proc getInt*(nvs: NvsObject, key: string): Option[int32] =
   # echo("nvsGetInt: ",  )
   var value: int32 = 0
   ##  value will default to 0, if not set yet in NVS
@@ -56,28 +63,27 @@ proc doNvsGetInt*(key: string): Option[int32] =
     # echo("The value is not initialized yet!")
     none[int32]()
   else:
-    raise newException(NvsError, "Error reading value (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error reading value (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
-proc doNvsSetInt*(key: string; value: int32) =
+proc setInt*(nvs: NvsObject, key: string; value: int32) =
   ##  Write
   var nvs_error = nvs_set_i32(handle.get(), key.cstring, value)
   if (nvs_error != ESP_OK):
-    raise newException(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
   ##  Commit written value.
   echo("Committing updates in NVS ... ")
   nvs_error = nvs_commit(handle.get())
   if (nvs_error != ESP_OK):
-    raise newException(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error opening nvs (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
   
-proc doNvsSetStr*(key: string, data: string) =
+proc setStr*(nvs: NvsObject, key: string, data: string) =
   var nvs_error: esp_err_t
   nvs_error = nvs_set_str(handle.get(), key.cstring, data.cstring)
   if (nvs_error != ESP_OK):
-    raise newException(NvsError, "Error writing string (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error writing string (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
-
-proc doNvsGetStr*(key: string): Option[string] =
+proc getStr*(nvs: NvsObject, key: string): Option[string] =
   var required_size: csize
   var nvs_error: esp_err_t = nvs_get_str(handle.get(), "DataCollected", nil, addr(required_size))
 
@@ -88,11 +94,11 @@ proc doNvsGetStr*(key: string): Option[string] =
     nvs_error = nvs_get_str(handle.get(), "DataCollected", data.cstring, addr(required_size))
 
     if (nvs_error != ESP_OK):
-      raise newException(NvsError, "Error reading string (" & $esp_err_to_name(nvs_error) & ")")
+      raise newNvsError(NvsError, "Error reading string (" & $esp_err_to_name(nvs_error) & "\)", nvs_error)
     else:
       some(data)
 
   of ESP_ERR_NVS_NOT_FOUND:
     none[string]()
   else:
-    raise newException(NvsError, "Error reading string size (" & $esp_err_to_name(nvs_error) & ")")
+    raise newNvsError(NvsError, "Error reading string size (" & $esp_err_to_name(nvs_error) & "\)", nvs_error)
