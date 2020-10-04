@@ -1,14 +1,13 @@
 
-import nesper/consts
-import nesper/general
+import nesper
 import nesper/nvs
 
 
-let nvs = newNvs("storage", NVS_READONLY)
+let nvs_handle = newNvs("storage", NVS_READONLY)
 
-nvs.setInt("a", 1)
+nvs_handle.setInt("a", 1)
 
-let a = nvs.getInt("a")
+let a = nvs_handle.getInt("a")
 
 echo "a: " & $a
 
