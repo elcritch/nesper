@@ -11,9 +11,9 @@ import nesper/spi
 
 var dev: spi_device_handle_t
 
-let trn1 = dev.newSpiTrans([1'u8, 2'u8, 3'u8])
-let trn2 = dev.newSpiTrans([1'u8, 2'u8, 3'u8, 4'u8, 5'u8])
-let trn3 = dev.newSpiTrans(@[1'u8, 2'u8, 3'u8])
+let trn1 = dev.newSpiTrans([byte 1, 2, 3])
+let trn2 = dev.newSpiTrans([byte 1, 2, 3, 4, 5])
+let trn3 = dev.newSpiTrans(@[1'u8, 2, 3])
 
 echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
