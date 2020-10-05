@@ -36,8 +36,8 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
 proc newSpiBus*(host: spi_host_device_t;
                 miso, mosi, sclk: int;
                 quadwp = -1, quadhd = -1, max_transfer_sz = 0;
-                flags: SpiBusFlag,
-                intr_flags: cint,
+                flags: HashSet[SpiBusFlag],
+                intr_flags: HashSet[cint],
                 dma_channel = range[0..2]): spi_bus_config_t = 
   var buscfg: spi_bus_config_t 
 
@@ -47,6 +47,14 @@ proc newSpiBus*(host: spi_host_device_t;
   buscfg.quadwp_io_num = quadwp
   buscfg.quadhd_io_num = quadhd
   buscfg.max_transfer_sz = max_transfer_sz
+
+  buscfg.flags = 0
+  for flg in flags:
+    buscfg.flags = flg or buscfg.flags 
+
+  buscfg.intr_flags = 0
+  for flg in intr_flags:
+    buscfg.intr_flags = flg or buscfg.intr_flags 
 
     #//Initialize the SPI bus
   let ret = spi_bus_initialize(host, addr(buscfg), dma_channel)
