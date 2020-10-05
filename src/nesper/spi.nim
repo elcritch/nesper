@@ -1,12 +1,18 @@
 
 import endians
+import sets
+
+import consts, general
 import nesper
 import nesper/esp/spi
 
 export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t
 
 type
+
   SpiError* = object of Exception
+    code*: esp_err_t
+
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
   # bigEndian( data shl (32-len) )
@@ -21,6 +27,31 @@ proc swapDataRx*(data: uint32, len: uint32): uint32 =
   addr(outp).bigEndian32(inp.addr())
 
   return outp shr (32-len)
+
+proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
+  new(result)
+  result.msg = msg
+  result.code = error
+
+proc newSpiBus*(host: spi_host_device_t;
+                miso, mosi, sclk, quadwp = -1, quadhd = -1, max_transfer_sz: int;
+                flags: SpiBusFlag,
+                intr_flags: cint,
+                dma_channel = range[0..2]): spi_bus_config_t = 
+  var buscfg: spi_bus_config_t 
+
+  buscfg.miso_io_num = 37
+  buscfg.mosi_io_num = 35
+  buscfg.sclk_io_num = 36
+  buscfg.quadwp_io_num = -1
+  buscfg.quadhd_io_num = -1
+  buscfg.max_transfer_sz = 32
+
+    #//Initialize the SPI bus
+  let ret = spi_bus_initialize(host, addr(buscfg), dma_channel)
+  if (ret != ESP_OK):
+    raise newSpiError("Error opening nvs (" & $esp_err_to_name(ret) & ")", ret)
+
 
 proc spiWrite*[N](spi: spi_device_handle_t, data: array[N, uint8]) =
   var ret: esp_err_t

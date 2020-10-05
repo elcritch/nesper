@@ -75,17 +75,19 @@ proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", head
 # proc swap_data_rx*(data: untyped, len: uint32): uint32 =
   # bigEndian(data) shr (32-len)
 
+type 
+  SpiBusFlag* = distinct uint32
 
 const
-  SPICOMMON_BUSFLAG_SLAVE* = 0
-  SPICOMMON_BUSFLAG_MASTER* = (1 shl 0) ## /< Initialize I/O in master mode
-  SPICOMMON_BUSFLAG_IOMUX_PINS* = (1 shl 1) ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
-  SPICOMMON_BUSFLAG_SCLK* = (1 shl 2) ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
-  SPICOMMON_BUSFLAG_MISO* = (1 shl 3) ## /< Check existing of MISO pin. Or indicates MISO line initialized.
-  SPICOMMON_BUSFLAG_MOSI* = (1 shl 4) ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
-  SPICOMMON_BUSFLAG_DUAL* = (1 shl 5) ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
-  SPICOMMON_BUSFLAG_WPHD* = (1 shl 6) ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
-  SPICOMMON_BUSFLAG_QUAD* = (SPICOMMON_BUSFLAG_DUAL or SPICOMMON_BUSFLAG_WPHD) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
+  SPICOMMON_BUSFLAG_SLAVE* = SpiBusFlag(0)
+  SPICOMMON_BUSFLAG_MASTER* = SpiBusFlag(1 shl 0) ## /< Initialize I/O in master mode
+  SPICOMMON_BUSFLAG_IOMUX_PINS* = SpiBusFlag(1 shl 1) ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
+  SPICOMMON_BUSFLAG_SCLK* = SpiBusFlag(1 shl 2) ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
+  SPICOMMON_BUSFLAG_MISO* = SpiBusFlag(1 shl 3) ## /< Check existing of MISO pin. Or indicates MISO line initialized.
+  SPICOMMON_BUSFLAG_MOSI* = SpiBusFlag(1 shl 4) ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
+  SPICOMMON_BUSFLAG_DUAL* = SpiBusFlag(1 shl 5) ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
+  SPICOMMON_BUSFLAG_WPHD* = SpiBusFlag(1 shl 6) ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
+  SPICOMMON_BUSFLAG_QUAD* = SpiBusFlag(SPICOMMON_BUSFLAG_DUAL.uint32 or SPICOMMON_BUSFLAG_WPHD.uint32) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
   SPICOMMON_BUSFLAG_NATIVE_PINS* = SPICOMMON_BUSFLAG_IOMUX_PINS
 
 ## *
@@ -106,7 +108,7 @@ type
     quadwp_io_num* {.importc: "quadwp_io_num".}: cint ## /< GPIO pin for WP (Write Protect) signal which is used as D2 in 4-bit communication modes, or -1 if not used.
     quadhd_io_num* {.importc: "quadhd_io_num".}: cint ## /< GPIO pin for HD (HolD) signal which is used as D3 in 4-bit communication modes, or -1 if not used.
     max_transfer_sz* {.importc: "max_transfer_sz".}: cint ## /< Maximum transfer size, in bytes. Defaults to 4094 if 0.
-    flags* {.importc: "flags".}: uint32 ## /< Abilities of bus to be checked by the driver. Or-ed value of ``SPICOMMON_BUSFLAG_*`` flags.
+    flags* {.importc: "flags".}: SpiBusFlag ## /< Abilities of bus to be checked by the driver. Or-ed value of ``SPICOMMON_BUSFLAG_*`` flags.
     intr_flags* {.importc: "intr_flags".}: cint ## *< Interrupt flag for the bus to set the priority, and IRAM attribute, see
                                             ##   ``esp_intr_alloc.h``. Note that the EDGE, INTRDISABLED attribute are ignored
                                             ##   by the driver. Note that if ESP_INTR_FLAG_IRAM is set, ALL the callbacks of
