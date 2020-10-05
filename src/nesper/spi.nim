@@ -13,6 +13,8 @@ type
   SpiError* = object of Exception
     code*: esp_err_t
 
+  SpiTrans* = object of Exception
+    code*: esp_err_t
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
   # bigEndian( data shl (32-len) )
@@ -35,8 +37,9 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
 
 proc newSpiBus*(host: spi_host_device_t;
                 miso, mosi, sclk: int;
-                quadwp = -1, quadhd = -1, max_transfer_sz = 0;
-                flags: HashSet[SpiBusFlag],
+                quadwp = -1, quadhd = -1;
+                max_transfer_sz = 4094;
+                flags: set[SpiBusFlag],
                 intr_flags: HashSet[cint],
                 dma_channel = range[0..2]): spi_bus_config_t = 
   var buscfg: spi_bus_config_t 
@@ -89,6 +92,16 @@ proc spiWrite*(spi: spi_device_handle_t, data: seq[uint8]) =
 
   if ret != ESP_OK:
     raise newException(SpiError, "SPI Error (" & $esp_err_to_name(ret) & ") ")
+
+proc getTransactionResults() = 
+  var rtrans: spi_transaction_t
+  var ret: esp_err_t
+  # # //Wait for all 6 transactions to be done and get back the results.
+  # for (int x=0; x<6; x++) {
+  #   ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+  #   assert(ret==ESP_OK);
+  #   //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
+  # }
 
 when isMainModule:
   var spi1: spi_device_handle_t
