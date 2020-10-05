@@ -34,18 +34,19 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
   result.code = error
 
 proc newSpiBus*(host: spi_host_device_t;
-                miso, mosi, sclk, quadwp = -1, quadhd = -1, max_transfer_sz: int;
+                miso, mosi, sclk: int;
+                quadwp = -1, quadhd = -1, max_transfer_sz = 0;
                 flags: SpiBusFlag,
                 intr_flags: cint,
                 dma_channel = range[0..2]): spi_bus_config_t = 
   var buscfg: spi_bus_config_t 
 
-  buscfg.miso_io_num = 37
-  buscfg.mosi_io_num = 35
-  buscfg.sclk_io_num = 36
-  buscfg.quadwp_io_num = -1
-  buscfg.quadhd_io_num = -1
-  buscfg.max_transfer_sz = 32
+  buscfg.miso_io_num = miso
+  buscfg.mosi_io_num = mosi
+  buscfg.sclk_io_num = sclk
+  buscfg.quadwp_io_num = quadwp
+  buscfg.quadhd_io_num = quadhd
+  buscfg.max_transfer_sz = max_transfer_sz
 
     #//Initialize the SPI bus
   let ret = spi_bus_initialize(host, addr(buscfg), dma_channel)
