@@ -11,7 +11,7 @@ import esp/nvs_flash
 export nvs_open_mode_t
 
 type
-  NvsError* = object of Exception
+  NvsError* = object of OSError
     code*: esp_err_t
 
   NvsObject = object

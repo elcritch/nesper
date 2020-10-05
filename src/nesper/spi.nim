@@ -5,18 +5,19 @@ import sets
 import consts, general
 import nesper
 import esp/spi
+import sequtils
 
-export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t
+export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 
 type
 
-  SpiError* = object of Exception
+  SpiError* = object of OSError
     code*: esp_err_t
 
-  SpiTrans*[N] = ref object
+  SpiTrans* = ref object
     trn*: spi_transaction_t
-    data_s*: ref seq[uint8]
-    data_a*: ref array[N, uint8]
+    tx_data*: seq[uint8]
+    rx_data*: seq[uint8]
 
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
@@ -68,12 +69,10 @@ proc newSpiBus*(host: spi_host_device_t;
   if (ret != ESP_OK):
     raise newSpiError("Error opening nvs (" & $esp_err_to_name(ret) & ")", ret)
 
-proc spiTransaction*[N](spi: spi_device_handle_t;
-                        data: array[N, uint8]
+proc newSpiTrans*[N](spi: spi_device_handle_t;
+                        data: array[N, uint8],
                         ): SpiTrans =
 
-  result.data_a = nil
-  result.data_s = nil
   result.trn.length = data.len().csize_t() ## Command is 8 bits
 
   # For data less than 4 bytes, use data directly 
@@ -81,16 +80,15 @@ proc spiTransaction*[N](spi: spi_device_handle_t;
     for i in 0..high(data):
       result.trn.tx.data[i] = data[i]
   else:
-    result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
-    result.data_a = data
+    # This order is important, copy the seq then take the unsafe addr
+    result.tx_data = data.toSeq()
+    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-proc spiTransaction*(spi: spi_device_handle_t, data: seq[uint8]): SpiTrans =
-  result.data_a = nil
-  result.data_s = nil
-
+proc newSpiTrans*(spi: spi_device_handle_t, data: seq[uint8]): SpiTrans =
   result.trn.length = data.len().csize_t()
-  result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
-  result.data_s = data
+  # This order is important, copy the seq then take the unsafe addr
+  result.tx_data = data
+  result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
 
 proc spiWrite*[N](spi: spi_device_handle_t, data: array[N, uint8]) =
@@ -121,9 +119,9 @@ proc spiWrite*(spi: spi_device_handle_t, data: seq[uint8]) =
   if ret != ESP_OK:
     raise newException(SpiError, "SPI Error (" & $esp_err_to_name(ret) & ") ")
 
-proc getTransactionResults() = 
-  var rtrans: spi_transaction_t
-  var ret: esp_err_t
+# proc getTransactionResults() = 
+#   var rtrans: spi_transaction_t
+#   var ret: esp_err_t
   # # //Wait for all 6 transactions to be done and get back the results.
   # for (int x=0; x<6; x++) {
   #   ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
