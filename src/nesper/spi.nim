@@ -136,9 +136,3 @@ proc newSpiTrans*(spi: spi_device_handle_t;
   #   assert(ret==ESP_OK);
   #   //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
   # }
-
-when isMainModule:
-  var spi1: spi_device_handle_t
-  spi1.spiWrite([1'u8, 2'u8, 3'u8])
-
-  spi1.spiWrite([1'u8, 2'u8, 3'u8, 4'u8, 5'u8])
