@@ -69,11 +69,21 @@ proc newSpiBus*(host: spi_host_device_t;
   if (ret != ESP_OK):
     raise newSpiError("Error opening nvs (" & $esp_err_to_name(ret) & ")", ret)
 
+# TODO: setup spi device (create spi_device_interface_config_t )
+#   - Note: SPI_DEVICE_* is bitwise flags in  spi_device_interface_config_t
+# TODO: setup spi device rx memory
+# TODO: setup cmd/addr
+# TODO: setup cmd/addr custom sizes
+
 proc newSpiTrans*[N](spi: spi_device_handle_t;
                         data: array[N, uint8],
+                        rxlength = 9,
                         ): SpiTrans =
 
   result.trn.length = data.len().csize_t() ## Command is 8 bits
+
+  # if spi.
+    # raise newException(SpiError, "SPI Error: rxlength must be less than length")
 
   # For data less than 4 bytes, use data directly 
   when data.len() <= 3:
