@@ -4,7 +4,7 @@ import sets
 
 import consts, general
 import nesper
-import nesper/esp/spi
+import esp/spi
 
 export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t
 
@@ -13,9 +13,10 @@ type
   SpiError* = object of Exception
     code*: esp_err_t
 
-  SpiTrans* = ref object
+  SpiTrans*[N] = ref object
     trn*: spi_transaction_t
-    data*: ref
+    data_s*: ref seq[uint8]
+    data_a*: ref array[N, uint8]
 
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
@@ -71,21 +72,25 @@ proc spiTransaction*[N](spi: spi_device_handle_t;
                         data: array[N, uint8]
                         ): SpiTrans =
 
+  result.data_a = nil
+  result.data_s = nil
   result.trn.length = data.len().csize_t() ## Command is 8 bits
 
+  # For data less than 4 bytes, use data directly 
   when data.len() <= 3:
     for i in 0..high(data):
       result.trn.tx.data[i] = data[i]
-    result.data = nil
   else:
     result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
-    result.data = data
+    result.data_a = data
 
 proc spiTransaction*(spi: spi_device_handle_t, data: seq[uint8]): SpiTrans =
-  var ret: esp_err_t
+  result.data_a = nil
+  result.data_s = nil
+
   result.trn.length = data.len().csize_t()
   result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
-  result.data = data
+  result.data_s = data
 
 
 proc spiWrite*[N](spi: spi_device_handle_t, data: array[N, uint8]) =
