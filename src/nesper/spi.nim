@@ -13,8 +13,10 @@ type
   SpiError* = object of Exception
     code*: esp_err_t
 
-  SpiTrans* = object of Exception
-    code*: esp_err_t
+  SpiTrans* = ref object
+    trn*: spi_transaction_t
+    data*: ref
+
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
   # bigEndian( data shl (32-len) )
@@ -39,9 +41,10 @@ proc newSpiBus*(host: spi_host_device_t;
                 miso, mosi, sclk: int;
                 quadwp = -1, quadhd = -1;
                 max_transfer_sz = 4094;
-                flags: set[SpiBusFlag],
-                intr_flags: HashSet[cint],
-                dma_channel = range[0..2]): spi_bus_config_t = 
+                flags: set[SpiBusFlag] = {},
+                intr_flags: HashSet[cint] = initHashSet[cint](),
+                dma_channel = range[0..2]
+                ): spi_bus_config_t = 
   var buscfg: spi_bus_config_t 
 
   buscfg.miso_io_num = miso
@@ -63,6 +66,26 @@ proc newSpiBus*(host: spi_host_device_t;
   let ret = spi_bus_initialize(host, addr(buscfg), dma_channel)
   if (ret != ESP_OK):
     raise newSpiError("Error opening nvs (" & $esp_err_to_name(ret) & ")", ret)
+
+proc spiTransaction*[N](spi: spi_device_handle_t;
+                        data: array[N, uint8]
+                        ): SpiTrans =
+
+  result.trn.length = data.len().csize_t() ## Command is 8 bits
+
+  when data.len() <= 3:
+    for i in 0..high(data):
+      result.trn.tx.data[i] = data[i]
+    result.data = nil
+  else:
+    result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
+    result.data = data
+
+proc spiTransaction*(spi: spi_device_handle_t, data: seq[uint8]): SpiTrans =
+  var ret: esp_err_t
+  result.trn.length = data.len().csize_t()
+  result.trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
+  result.data = data
 
 
 proc spiWrite*[N](spi: spi_device_handle_t, data: array[N, uint8]) =
