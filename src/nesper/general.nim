@@ -1,6 +1,7 @@
 import consts
 
-var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: cint
+var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
+var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: uint32
 
 proc delay*( milsecs: cint ) {.cdecl, importc: "delay".}
 proc esp_restart*() {.cdecl, importc: "esp_restart".}

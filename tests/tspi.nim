@@ -29,3 +29,5 @@ echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
 echo "trn3: " & repr(trn3)
 echo "trn4: " & repr(trn4)
+
+trn1.pollingTransmit()

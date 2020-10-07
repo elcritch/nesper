@@ -196,22 +196,22 @@ proc newSpiTrans*(dev: SpiDev;
     result.tx_data = data
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
+proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t) {.inline.} = 
+proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_end(dev.handle, ticks_to_wait)
   if (ret != ESP_OK):
     raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
+proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_polling_transmit(trn.dev.handle, addr(trn.trn))
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc acquireBus*(trn: SpiDev, wait: TickType_t) {.inline.} = 
+proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_acquire_bus(trn.handle, wait)
   if (ret != ESP_OK):
     raise newSpiError("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
@@ -219,19 +219,19 @@ proc acquireBus*(trn: SpiDev, wait: TickType_t) {.inline.} =
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
 
-template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
+template withSpiBus*(dev: SpiDev, wait: TickType_t = portMAX_DELAY, blk: untyped): untyped =
   dev.acquireBus()
   blk
   dev.releaseBus()
 
-proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
+proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t =
     spi_device_queue_trans(trn.dev.handle, addr(trn.trn), ticks_to_wait)
 
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t): ptr spi_transaction_t {.inline.} = 
+proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): ptr spi_transaction_t {.inline.} = 
   let ret: esp_err_t =
     spi_device_get_trans_result(dev.handle, addr(result), ticks_to_wait)
 
