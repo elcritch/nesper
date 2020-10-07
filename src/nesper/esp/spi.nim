@@ -77,7 +77,7 @@ proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", head
 
 type 
 
-  SpiBusFlag* {.size: sizeof(cint).} = enum
+  SpiBusFlag* {.size: sizeof(uint32).} = enum
     BUSFLAG_SLAVE = (0)
     BUSFLAG_MASTER = (1 shl 0) ## /< Initialize I/O in master mode
     BUSFLAG_IOMUX_PINS = (1 shl 1) ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
@@ -217,22 +217,31 @@ elif APB_CLK_FREQ == 40 * 1000 * 1000:
     SPI_MASTER_FREQ_13M* = (APB_CLK_FREQ div 3) ## /< 26.67MHz
     SPI_MASTER_FREQ_20M* = (APB_CLK_FREQ div 2) ## /< 40MHz
     SPI_MASTER_FREQ_40M* = (APB_CLK_FREQ div 1) ## /< 80MHz
-const
-  SPI_DEVICE_TXBIT_LSBFIRST* = (1 shl 0) ## /< Transmit command/address/data LSB first instead of the default MSB first
-  SPI_DEVICE_RXBIT_LSBFIRST* = (1 shl 1) ## /< Receive data LSB first instead of the default MSB first
-  SPI_DEVICE_BIT_LSBFIRST* = (
-    SPI_DEVICE_TXBIT_LSBFIRST or SPI_DEVICE_RXBIT_LSBFIRST) ## /< Transmit and receive LSB first
-  SPI_DEVICE_3WIRE* = (1 shl 2)   ## /< Use MOSI (=spid) for both sending and receiving data
-  SPI_DEVICE_POSITIVE_CS* = (1 shl 3) ## /< Make CS positive during a transaction instead of negative
-  SPI_DEVICE_HALFDUPLEX* = (1 shl 4) ## /< Transmit data before receiving it, instead of simultaneously
-  SPI_DEVICE_CLK_AS_CS* = (1 shl 5) ## /< Output clock on CS line if CS is active
-                               ## * There are timing issue when reading at high frequency (the frequency is related to whether iomux pins are used, valid time after slave sees the clock).
-                               ##      - In half-duplex mode, the driver automatically inserts dummy bits before reading phase to fix the timing issue. Set this flag to disable this feature.
-                               ##      - In full-duplex mode, however, the hardware cannot use dummy bits, so there is no way to prevent data being read from getting corrupted.
-                               ##        Set this flag to confirm that you're going to work with output only, or read without dummy bits at your own risk.
-                               ##
-  SPI_DEVICE_NO_DUMMY* = (1 shl 6)
-  SPI_DEVICE_DDRCLK* = (1 shl 7)
+
+type
+
+  SpiDevice* {.size: sizeof(uint32).} = enum
+    TXBIT_LSBFIRST = (1 shl 0), ## \
+      ## Transmit command/address/data LSB first instead of the default MSB first
+    RXBIT_LSBFIRST = (1 shl 1), ## \
+      ## Receive data LSB first instead of the default MSB first
+    BIT_LSBFIRST = (TXBIT_LSBFIRST.uint32 or RXBIT_LSBFIRST.uint32), ## \
+      ## Transmit and receive LSB first
+    MOSI_3WIRE = (1 shl 2),   ## \
+      ## Use MOSI (=spid) for both sending and receiving data
+    POSITIVE_CS = (1 shl 3), ## \
+      ## Make CS positive during a transaction instead of negative
+    HALFDUPLEX = (1 shl 4), ## \
+      ## Transmit data before receiving it, instead of simultaneously
+    CLK_AS_CS = (1 shl 5), ## \
+      ## Output clock on CS line if CS is active \
+      ## * There are timing issue when reading at high frequency (the frequency is related to whether iomux pins are used, valid time after slave sees the clock). \
+      ##      - In half-duplex mode, the driver automatically inserts dummy bits before reading phase to fix the timing issue. Set this flag to disable this feature. \
+      ##      - In full-duplex mode, however, the hardware cannot use dummy bits, so there is no way to prevent data being read from getting corrupted. \
+      ##        Set this flag to confirm that you're going to work with output only, or read without dummy bits at your own risk. \
+      ##
+    NO_DUMMY = (1 shl 6),
+    DDRCLK = (1 shl 7)
 
 type
   transaction_cb_t* = proc (trans: ptr spi_transaction_t)
