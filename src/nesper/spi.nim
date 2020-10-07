@@ -80,6 +80,8 @@ proc newSpiTrans*(bus: spi_bus_config_t;
                     ## SPI mode (0-3)
                   cs_io_num: cint, ## \
                     ## CS GPIO pin for this device, or -1 if not used
+                  clock_speed_hz: cint, ## \
+                    ## Clock speed, divisors of 80MHz, in Hz. See ``SPI_MASTER_FREQ_*``.
                   dummy_bits: uint8 = 0, ## \
                     ## Amount of dummy bits to insert between address and data phase
                   duty_cycle_pos: uint16 = 0, ## \
@@ -88,8 +90,6 @@ proc newSpiTrans*(bus: spi_bus_config_t;
                     ## Amount of SPI bit-cycles the cs should be activated before the transmission (0-16). This only works on half-duplex transactions.
                   cs_cycles_posttrans: uint8 = 0, ## \
                     ## Amount of SPI bit-cycles the cs should stay active after the transmission (0-16)
-                  clock_speed_hz: cint, ## \
-                    ## Clock speed, divisors of 80MHz, in Hz. See ``SPI_MASTER_FREQ_*``.
                   input_delay_ns: cint = 0, ## \
                   ## Maximum data valid time of slave. The time required between SCLK and MISO \
                   ## valid, including the possible clock delay from slave to master. The driver uses this value to give an extra \
@@ -97,7 +97,7 @@ proc newSpiTrans*(bus: spi_bus_config_t;
                   ## performance at high frequency (over 8MHz), it's suggest to have the right value.
                   flags: set[SpiDevice], ## \
                     ## Flags from SpiDevices. Produces bitwise OR of SPI_DEVICE_* flags
-                  queue_size: cint = 1, ## \
+                  queue_size: int = 1, ## \
                     ## Transaction queue size. This sets how many transactions can be 'in the air' \
                     ## (queued using spi_device_queue_trans but not yet finished using \
                     ## spi_device_get_trans_result) at the same time
@@ -121,7 +121,7 @@ proc newSpiTrans*(bus: spi_bus_config_t;
   spidev.clock_speed_hz = clock_speed_hz
   spidev.input_delay_ns = input_delay_ns
   spidev.spics_io_num = cs_io_num
-  spidev.queue_size = queue_size
+  spidev.queue_size = queue_size.cint
   spidev.pre_cb = pre_cb
   spidev.post_cb = post_cb
 
