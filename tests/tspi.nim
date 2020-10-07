@@ -8,9 +8,16 @@ import nesper/spi
 #  define PIN_NUM_CLK  36
 #  define PIN_NUM_CS   34
 
-let bus = SPI1_HOST.initSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={BUSFLAG_MASTER})
+let
+  bus = SPI1_HOST.initSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={BUSFLAG_MASTER})
 
-var dev: spi_device_handle_t
+var
+  dev: SpiDev =
+    bus.newSpiDevice(commandlen = bits(3),
+                     addresslen = bits(4),
+                     mode=1, cs_io=23,
+                     clock_speed_hz = 1_000_000, 
+                     flags={})
 
 
 let trn1 = dev.newSpiTrans([byte 1, 2])

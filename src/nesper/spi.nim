@@ -1,6 +1,5 @@
 
 import endians
-import sets
 
 import consts, general
 import nesper
@@ -25,6 +24,7 @@ type
     dev*: spi_device_handle_t
 
   SpiTrans* = ref object
+    dev*: spi_device_handle_t
     trn*: spi_transaction_t
     tx_data*: seq[uint8]
     rx_data*: seq[uint8]
@@ -84,13 +84,13 @@ proc initSpiBus*(
 
 proc newSpiDevice*(
       bus: SpiBus,
-      command_bits: uint8, ## \
+      commandlen: bits, ## \
         ## Default amount of bits in command phase (0-16), used when ``SPI_TRANS_VARIABLE_CMD`` is not used, otherwise ignored.
-      address_bits: uint8, ## \
+      addresslen: bits, ## \
         ## Default amount of bits in address phase (0-64), used when ``SPI_TRANS_VARIABLE_ADDR`` is not used, otherwise ignored.
-      mode: uint8, ## \
+      mode: range[0..3], ## \
         ## SPI mode (0-3)
-      cs_io_num: cint, ## \
+      cs_io: int, ## \
         ## CS GPIO pin for this device, or -1 if not used
       clock_speed_hz: cint, ## \
         ## Clock speed, divisors of 80MHz, in Hz. See ``SPI_MASTER_FREQ_*``.
@@ -124,16 +124,16 @@ proc newSpiDevice*(
     ): SpiDev =
 
   var devcfg: spi_device_interface_config_t 
-  devcfg.command_bits = command_bits 
-  devcfg.address_bits = address_bits 
+  devcfg.command_bits = commandlen.uint8 
+  devcfg.address_bits = addresslen.uint8
   devcfg.dummy_bits = dummy_bits 
-  devcfg.mode = mode
+  devcfg.mode = mode.uint8
   devcfg.duty_cycle_pos = duty_cycle_pos
   devcfg.cs_ena_pretrans = cs_cycles_pretrans
   devcfg.cs_ena_posttrans = cs_cycles_posttrans
   devcfg.clock_speed_hz = clock_speed_hz
   devcfg.input_delay_ns = input_delay_ns
-  devcfg.spics_io_num = cs_io_num
+  devcfg.spics_io_num = cs_io.cint
   devcfg.queue_size = queue_size.cint
   devcfg.pre_cb = pre_cb
   devcfg.post_cb = post_cb
@@ -151,12 +151,12 @@ proc newSpiDevice*(
 # TODO: setup cmd/addr
 # TODO: setup cmd/addr custom sizes
 
-proc newSpiTrans*(spi: spi_device_handle_t;
+proc newSpiTrans*(spi: SpiDev;
                      data: openArray[uint8],
                      rxlen: bits = bits(9),
                      len: bits = bits(-1),
                      ): SpiTrans =
-
+  result.dev = spi.dev
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
@@ -174,11 +174,12 @@ proc newSpiTrans*(spi: spi_device_handle_t;
     result.tx_data = data.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-proc newSpiTrans*(spi: spi_device_handle_t;
+proc newSpiTrans*(spi: SpiDev;
                   data: seq[uint8],
                   rxlen: bits = bits(0),
                   len: bits = bits(-1),
                   ): SpiTrans =
+  result.dev = spi.dev
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
