@@ -206,7 +206,7 @@ proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY) {.inlin
   if (ret != ESP_OK):
     raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
+proc poll*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_polling_transmit(trn.dev.handle, addr(trn.trn))
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
@@ -219,8 +219,13 @@ proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} =
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
 
-template withSpiBus*(dev: SpiDev, wait: TickType_t = portMAX_DELAY, blk: untyped): untyped =
+template withSpiBus*(dev: SpiDev, blk: untyped) =
   dev.acquireBus()
+  blk
+  dev.releaseBus()
+
+template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped) =
+  dev.acquireBus(wait)
   blk
   dev.releaseBus()
 

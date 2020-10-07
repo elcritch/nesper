@@ -30,4 +30,14 @@ echo "trn2: " & repr(trn2)
 echo "trn3: " & repr(trn3)
 echo "trn4: " & repr(trn4)
 
-trn1.pollingTransmit()
+# Example: spi poll transmission
+trn1.poll()
+
+# Example spi queued transaction
+trn2.queue()
+
+# Example aquire bus
+withSpiBus(dev):
+  trn3.poll()
+  trn4.poll()
+
