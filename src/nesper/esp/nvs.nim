@@ -244,7 +244,7 @@ proc nvs_set_str*(handle: nvs_handle_t; key: cstring; value: cstring): esp_err_t
 ##              - ESP_ERR_NVS_VALUE_TOO_LONG if the value is too long
 ##
 
-proc nvs_set_blob*(handle: nvs_handle_t; key: cstring; value: pointer; length: csize): esp_err_t {.
+proc nvs_set_blob*(handle: nvs_handle_t; key: cstring; value: pointer; length: csize_t): esp_err_t {.
     cdecl, importc: "nvs_set_blob", header: "nvs.h".}
 ## *@{
 ## *
@@ -361,10 +361,10 @@ proc nvs_get_u64*(handle: nvs_handle_t; key: cstring; out_value: ptr uint64): es
 ## *@{
 
 proc nvs_get_str*(handle: nvs_handle_t; key: cstring; out_value: cstring;
-                 length: ptr csize): esp_err_t {.cdecl, importc: "nvs_get_str",
+                 length: ptr csize_t): esp_err_t {.cdecl, importc: "nvs_get_str",
     header: "nvs.h".}
 proc nvs_get_blob*(handle: nvs_handle_t; key: cstring; out_value: pointer;
-                  length: ptr csize): esp_err_t {.cdecl, importc: "nvs_get_blob",
+                  length: ptr csize_t): esp_err_t {.cdecl, importc: "nvs_get_blob",
     header: "nvs.h".}
 ## *@}
 ## *
@@ -443,10 +443,10 @@ proc nvs_close*(handle: nvs_handle_t) {.cdecl, importc: "nvs_close", header: "nv
 
 type
   nvs_stats_t* {.importc: "nvs_stats_t", header: "nvs.h", bycopy.} = object
-    used_entries* {.importc: "used_entries".}: csize ## *< Amount of used entries.
-    free_entries* {.importc: "free_entries".}: csize ## *< Amount of free entries.
-    total_entries* {.importc: "total_entries".}: csize ## *< Amount all available entries.
-    namespace_count* {.importc: "namespace_count".}: csize ## *< Amount name space.
+    used_entries* {.importc: "used_entries".}: csize_t ## *< Amount of used entries.
+    free_entries* {.importc: "free_entries".}: csize_t ## *< Amount of free entries.
+    total_entries* {.importc: "total_entries".}: csize_t ## *< Amount all available entries.
+    namespace_count* {.importc: "namespace_count".}: csize_t ## *< Amount name space.
 
 
 ## *
@@ -522,7 +522,7 @@ proc nvs_get_stats*(part_name: cstring; nvs_stats: ptr nvs_stats_t): esp_err_t {
 ##                Return param used_entries will be filled 0.
 ##
 
-proc nvs_get_used_entry_count*(handle: nvs_handle_t; used_entries: ptr csize): esp_err_t {.
+proc nvs_get_used_entry_count*(handle: nvs_handle_t; used_entries: ptr csize_t): esp_err_t {.
     cdecl, importc: "nvs_get_used_entry_count", header: "nvs.h".}
 ## *
 ##  @brief       Create an iterator to enumerate NVS entries based on one or more parameters

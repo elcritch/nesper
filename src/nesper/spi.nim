@@ -93,7 +93,7 @@ proc newSpiTrans*(spi: spi_device_handle_t;
 
   # For data less than 4 bytes, use data directly 
   if data.len() <= 3:
-    for i in low(0)..high(data):
+    for i in 0..high(data):
       result.trn.tx.data[i] = data[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
@@ -114,7 +114,7 @@ proc newSpiTrans*(spi: spi_device_handle_t;
   result.trn.rxlength = rxlen.uint
 
   if data.len() <= 3:
-    for i in low(0)..high(data):
+    for i in 0..high(data):
       result.trn.tx.data[i] = data[i]
   else:
     # This order is important, copy the seq then take the unsafe addr

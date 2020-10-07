@@ -86,7 +86,7 @@ proc setStr*(nvs: NvsObject, key: string, data: string) =
     raise newNvsError("Error writing string (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
 proc getStr*(nvs: NvsObject, key: string): Option[string] =
-  var required_size: csize
+  var required_size: csize_t
   var nvs_error: esp_err_t = nvs_get_str(nvs.handle, "DataCollected", nil, addr(required_size))
 
   case nvs_error
