@@ -16,11 +16,11 @@ type
   SpiError* = object of OSError
     code*: esp_err_t
 
-  SpiBus* = ref object
+  SpiBus* = object
     host*: spi_host_device_t
     buscfg*: spi_bus_config_t
 
-  SpiDev* = ref object
+  SpiDev* = object
     handle*: spi_device_handle_t
 
   SpiTrans* = ref object
