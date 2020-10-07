@@ -196,22 +196,3 @@ proc newSpiTrans*(spi: SpiDev;
     result.tx_data = data
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-# proc spiWrite*(spi: spi_device_handle_t, data: seq[uint8]) =
-#   var ret: esp_err_t
-#   var trn: spi_transaction_t
-#   trn.length = data.len().csize_t()
-#   trn.tx.buffer = unsafeAddr(data[0]) ## The data is the cmd itself
-#   ret = spi_device_polling_transmit(spi, addr(trn)) ## Transmit!
-
-#   if ret != ESP_OK:
-#     raise newException(SpiError, "SPI Error (" & $esp_err_to_name(ret) & ") ")
-
-# proc getTransactionResults() = 
-#   var rtrans: spi_transaction_t
-#   var ret: esp_err_t
-  # # //Wait for all 6 transactions to be done and get back the results.
-  # for (int x=0; x<6; x++) {
-  #   ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
-  #   assert(ret==ESP_OK);
-  #   //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
-  # }
