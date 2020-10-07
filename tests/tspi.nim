@@ -12,6 +12,7 @@ let bus = SPI1_HOST.initSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={B
 
 var dev: spi_device_handle_t
 
+
 let trn1 = dev.newSpiTrans([byte 1, 2])
 let trn2 = dev.newSpiTrans([byte 1, 2, 3])
 let trn3 = dev.newSpiTrans([byte 1, 2, 3, 4, 5])

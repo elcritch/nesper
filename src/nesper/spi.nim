@@ -17,6 +17,13 @@ type
   SpiError* = object of OSError
     code*: esp_err_t
 
+  SpiBus* = object
+    host*: spi_host_device_t
+    buscfg*: spi_bus_config_t
+
+  SpiDev* = object
+    dev*: spi_device_handle_t
+
   SpiTrans* = ref object
     trn*: spi_transaction_t
     tx_data*: seq[uint8]
@@ -42,38 +49,41 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
   result.msg = msg
   result.code = error
 
-proc initSpiBus*(host: spi_host_device_t;
-                miso, mosi, sclk: int;
-                quadwp = -1, quadhd = -1;
-                dma_channel: range[0..2],
-                flags: set[SpiBusFlag] = {},
-                intr_flags: int = 0,
-                max_transfer_sz = 4094
-                ): spi_bus_config_t = 
-  var buscfg: spi_bus_config_t 
+proc initSpiBus*(
+        host: spi_host_device_t;
+        miso, mosi, sclk: int;
+        quadwp = -1, quadhd = -1;
+        dma_channel: range[0..2],
+        flags: set[SpiBusFlag] = {},
+        intr_flags: int = 0,
+        max_transfer_sz = 4094
+      ): SpiBus = 
 
-  buscfg.miso_io_num = miso.cint
-  buscfg.mosi_io_num = mosi.cint
-  buscfg.sclk_io_num = sclk.cint
-  buscfg.quadwp_io_num = quadwp.cint
-  buscfg.quadhd_io_num = quadhd.cint
-  buscfg.max_transfer_sz = max_transfer_sz.cint
-  buscfg.intr_flags = intr_flags.cint
+  result.host = host
 
-  buscfg.flags = 0
+  result.buscfg.miso_io_num = miso.cint
+  result.buscfg.mosi_io_num = mosi.cint
+  result.buscfg.sclk_io_num = sclk.cint
+  result.buscfg.quadwp_io_num = quadwp.cint
+  result.buscfg.quadhd_io_num = quadhd.cint
+  result.buscfg.max_transfer_sz = max_transfer_sz.cint
+  result.buscfg.intr_flags = intr_flags.cint
+
+  result.buscfg.flags = 0
   for flg in flags:
-    buscfg.flags = flg.uint32 or buscfg.flags 
+    result.buscfg.flags = flg.uint32 or result.buscfg.flags 
 
     #//Initialize the SPI bus
-  let ret = spi_bus_initialize(host, addr(buscfg), dma_channel)
+  let ret = spi_bus_initialize(host, addr(result.buscfg), dma_channel)
   if (ret != ESP_OK):
-    raise newSpiError("Error opening nvs (" & $esp_err_to_name(ret) & ")", ret)
+    raise newSpiError("Error initializing spi (" & $esp_err_to_name(ret) & ")", ret)
+
 
 # TODO: setup spi device (create spi_device_interface_config_t )
 #   - Note: SPI_DEVICE_* is bitwise flags in  spi_device_interface_config_t
 
-proc newSpiTrans*(
-      bus: spi_bus_config_t;
+proc newSpiDevice*(
+      bus: SpiBus,
       command_bits: uint8, ## \
         ## Default amount of bits in command phase (0-16), used when ``SPI_TRANS_VARIABLE_CMD`` is not used, otherwise ignored.
       address_bits: uint8, ## \
@@ -111,26 +121,31 @@ proc newSpiTrans*(
       ## Callback to be called after a transmission has completed \
       ## This callback is called within interrupt \
       ## context should be in IRAM for best performance, see "Transferring Speed" 
-    ): spi_device_interface_config_t =
+    ): SpiDev =
 
-  var spidev: spi_device_interface_config_t 
-  spidev.command_bits = command_bits 
-  spidev.address_bits = address_bits 
-  spidev.dummy_bits = dummy_bits 
-  spidev.mode = mode
-  spidev.duty_cycle_pos = duty_cycle_pos
-  spidev.cs_ena_pretrans = cs_cycles_pretrans
-  spidev.cs_ena_posttrans = cs_cycles_posttrans
-  spidev.clock_speed_hz = clock_speed_hz
-  spidev.input_delay_ns = input_delay_ns
-  spidev.spics_io_num = cs_io_num
-  spidev.queue_size = queue_size.cint
-  spidev.pre_cb = pre_cb
-  spidev.post_cb = post_cb
+  var devcfg: spi_device_interface_config_t 
+  devcfg.command_bits = command_bits 
+  devcfg.address_bits = address_bits 
+  devcfg.dummy_bits = dummy_bits 
+  devcfg.mode = mode
+  devcfg.duty_cycle_pos = duty_cycle_pos
+  devcfg.cs_ena_pretrans = cs_cycles_pretrans
+  devcfg.cs_ena_posttrans = cs_cycles_posttrans
+  devcfg.clock_speed_hz = clock_speed_hz
+  devcfg.input_delay_ns = input_delay_ns
+  devcfg.spics_io_num = cs_io_num
+  devcfg.queue_size = queue_size.cint
+  devcfg.pre_cb = pre_cb
+  devcfg.post_cb = post_cb
 
-  spidev.flags = 0
+  devcfg.flags = 0
   for flg in flags:
-    spidev.flags = flg.uint32 or spidev.flags 
+    devcfg.flags = flg.uint32 or devcfg.flags 
+
+  let ret = spi_bus_add_device(bus.host, unsafeAddr(devcfg), addr(result.dev))
+
+  if (ret != ESP_OK):
+    raise newSpiError("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
 
 # TODO: setup spi device rx memory
 # TODO: setup cmd/addr
