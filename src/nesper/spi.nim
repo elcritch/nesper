@@ -77,8 +77,8 @@ proc newSpiBus*(host: spi_host_device_t;
 # TODO: setup cmd/addr
 # TODO: setup cmd/addr custom sizes
 
-proc newSpiTrans*[N](spi: spi_device_handle_t;
-                     data: array[N, uint8],
+proc newSpiTrans*(spi: spi_device_handle_t;
+                     data: openArray[uint8],
                      rxlen: bits = bits(9),
                      len: bits = bits(-1),
                      ): SpiTrans =
@@ -92,8 +92,8 @@ proc newSpiTrans*[N](spi: spi_device_handle_t;
   result.trn.rxlength = rxlen.uint
 
   # For data less than 4 bytes, use data directly 
-  when data.len() <= 3:
-    for i in 0..high(data):
+  if data.len() <= 3:
+    for i in low(0)..high(data):
       result.trn.tx.data[i] = data[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
@@ -113,9 +113,13 @@ proc newSpiTrans*(spi: spi_device_handle_t;
 
   result.trn.rxlength = rxlen.uint
 
-  # This order is important, copy the seq then take the unsafe addr
-  result.tx_data = data
-  result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+  if data.len() <= 3:
+    for i in low(0)..high(data):
+      result.trn.tx.data[i] = data[i]
+  else:
+    # This order is important, copy the seq then take the unsafe addr
+    result.tx_data = data
+    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
 # proc spiWrite*(spi: spi_device_handle_t, data: seq[uint8]) =
 #   var ret: esp_err_t
