@@ -21,10 +21,10 @@ type
     buscfg*: spi_bus_config_t
 
   SpiDev* = object
-    dev*: spi_device_handle_t
+    handle*: spi_device_handle_t
 
   SpiTrans* = ref object
-    dev*: spi_device_handle_t
+    handle*: spi_device_handle_t
     trn*: spi_transaction_t
     tx_data*: seq[uint8]
     rx_data*: seq[uint8]
@@ -142,7 +142,7 @@ proc newSpiDevice*(
   for flg in flags:
     devcfg.flags = flg.uint32 or devcfg.flags 
 
-  let ret = spi_bus_add_device(bus.host, unsafeAddr(devcfg), addr(result.dev))
+  let ret = spi_bus_add_device(bus.host, unsafeAddr(devcfg), addr(result.handle))
 
   if (ret != ESP_OK):
     raise newSpiError("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
@@ -156,7 +156,7 @@ proc newSpiTrans*(spi: SpiDev;
                      rxlen: bits = bits(9),
                      len: bits = bits(-1),
                      ): SpiTrans =
-  result.dev = spi.dev
+  result.handle = spi.handle
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
@@ -179,7 +179,7 @@ proc newSpiTrans*(spi: SpiDev;
                   rxlen: bits = bits(0),
                   len: bits = bits(-1),
                   ): SpiTrans =
-  result.dev = spi.dev
+  result.handle = spi.handle
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
@@ -195,4 +195,19 @@ proc newSpiTrans*(spi: SpiDev;
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = data
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+
+proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t) = 
+  let ret = spi_device_polling_start(trn.handle, addr(trn.trn), ticks_to_wait)
+  if (ret != ESP_OK):
+    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+
+proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t) = 
+  let ret = spi_device_polling_end(dev.handle, ticks_to_wait)
+  if (ret != ESP_OK):
+    raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
+
+proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t) = 
+  let ret: esp_err_t = spi_device_polling_transmit(trn.handle, addr(trn.trn))
+  if (ret != ESP_OK):
+    raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
