@@ -24,11 +24,13 @@ let trn1 = dev.newSpiTrans([byte 1, 2])
 let trn2 = dev.newSpiTrans([byte 1, 2, 3])
 let trn3 = dev.newSpiTrans([byte 1, 2, 3, 4, 5])
 let trn4 = dev.newSpiTrans(@[1'u8, 2, 3])
+let trn5 = dev.newSpiTrans(@[1'u8, 2, 3, 4, 5])
 
 echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
 echo "trn3: " & repr(trn3)
 echo "trn4: " & repr(trn4)
+echo "trn5: " & repr(trn5)
 
 # Example: spi poll transmission
 trn1.poll()
@@ -41,3 +43,5 @@ withSpiBus(dev):
   trn3.poll()
   trn4.poll()
 
+# Regular spi transmit
+trn5.transmit()
