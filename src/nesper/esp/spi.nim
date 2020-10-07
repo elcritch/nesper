@@ -78,14 +78,14 @@ proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", head
 type 
 
   SpiBusFlag* {.size: sizeof(uint32).} = enum
-    BUSFLAG_SLAVE = (0)
-    BUSFLAG_MASTER = (1 shl 0) ## /< Initialize I/O in master mode
-    BUSFLAG_IOMUX_PINS = (1 shl 1) ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
-    BUSFLAG_SCLK = (1 shl 2) ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
-    BUSFLAG_MISO = (1 shl 3) ## /< Check existing of MISO pin. Or indicates MISO line initialized.
-    BUSFLAG_MOSI = (1 shl 4) ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
-    BUSFLAG_DUAL = (1 shl 5) ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
-    BUSFLAG_WPHD = (1 shl 6) ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
+    BUSFLAG_SLAVE = (0),
+    BUSFLAG_MASTER = (1 shl 0), ## /< Initialize I/O in master mode
+    BUSFLAG_IOMUX_PINS = (1 shl 1), ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
+    BUSFLAG_SCLK = (1 shl 2), ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
+    BUSFLAG_MISO = (1 shl 3), ## /< Check existing of MISO pin. Or indicates MISO line initialized.
+    BUSFLAG_MOSI = (1 shl 4), ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
+    BUSFLAG_DUAL = (1 shl 5), ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
+    BUSFLAG_WPHD = (1 shl 6), ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
     BUSFLAG_QUAD = (BUSFLAG_DUAL.uint32 or BUSFLAG_WPHD.uint32) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
     # SPICOMMON_BUSFLAG_NATIVE_PINS = SPICOMMON_BUSFLAG_IOMUX_PINS
 

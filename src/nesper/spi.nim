@@ -7,7 +7,8 @@ import nesper
 import esp/spi
 import sequtils
 
-export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
+# export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
+export spi
 
 type
 
