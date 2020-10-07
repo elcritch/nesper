@@ -238,3 +238,11 @@ proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): ptr spi_
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
+proc transmit*(trn: SpiTrans) {.inline.} = 
+  let ret: esp_err_t =
+    spi_device_transmit(trn.dev.handle, addr(trn.trn))
+
+  if (ret != ESP_OK):
+    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+
+
