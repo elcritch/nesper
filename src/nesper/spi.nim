@@ -207,7 +207,7 @@ proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t) {.inline.} =
     raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
-  let ret: esp_err_t = spi_device_polling_transmit(trn.handle, addr(trn.trn))
+  let ret: esp_err_t = spi_device_polling_transmit(trn.dev.handle, addr(trn.trn))
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
@@ -223,3 +223,10 @@ template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
   dev.acquireBus()
   blk
   dev.releaseBus()
+
+proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
+  let ret: esp_err_t =
+    spi_device_queue_trans(trn.dev.handle, addr(trn.trn), ticks_to_wait)
+
+  if (ret != ESP_OK):
+    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
