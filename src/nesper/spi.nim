@@ -24,7 +24,7 @@ type
     handle*: spi_device_handle_t
 
   SpiTrans* = ref object
-    handle*: spi_device_handle_t
+    dev*: SpiDev
     trn*: spi_transaction_t
     tx_data*: seq[uint8]
     rx_data*: seq[uint8]
@@ -151,12 +151,12 @@ proc newSpiDevice*(
 # TODO: setup cmd/addr
 # TODO: setup cmd/addr custom sizes
 
-proc newSpiTrans*(spi: SpiDev;
+proc newSpiTrans*(dev: SpiDev;
                      data: openArray[uint8],
                      rxlen: bits = bits(9),
                      len: bits = bits(-1),
                      ): SpiTrans =
-  result.handle = spi.handle
+  result.dev = dev
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
@@ -174,12 +174,12 @@ proc newSpiTrans*(spi: SpiDev;
     result.tx_data = data.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-proc newSpiTrans*(spi: SpiDev;
+proc newSpiTrans*(dev: SpiDev;
                   data: seq[uint8],
                   rxlen: bits = bits(0),
                   len: bits = bits(-1),
                   ): SpiTrans =
-  result.handle = spi.handle
+  result.dev = dev
   if len.int < 0:
     result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
   else:
@@ -196,18 +196,30 @@ proc newSpiTrans*(spi: SpiDev;
     result.tx_data = data
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t) = 
-  let ret = spi_device_polling_start(trn.handle, addr(trn.trn), ticks_to_wait)
+proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
+  let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t) = 
+proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t) {.inline.} = 
   let ret = spi_device_polling_end(dev.handle, ticks_to_wait)
   if (ret != ESP_OK):
     raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t) = 
+proc pollingTransmit*(trn: SpiTrans, ticks_to_wait: TickType_t) {.inline.} = 
   let ret: esp_err_t = spi_device_polling_transmit(trn.handle, addr(trn.trn))
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
+proc acquireBus*(trn: SpiDev, wait: TickType_t) {.inline.} = 
+  let ret: esp_err_t = spi_device_acquire_bus(trn.handle, wait)
+  if (ret != ESP_OK):
+    raise newSpiError("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
+
+proc releaseBus*(dev: SpiDev) {.inline.} = 
+  spi_device_release_bus(dev.handle)
+
+template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
+  dev.acquireBus()
+  blk
+  dev.releaseBus()
