@@ -51,8 +51,11 @@
 ##
 ##
 
-import
-  esp_err, esp_wifi_types, esp_event, esp_private/esp_wifi_private
+import ../../consts
+import ../../general
+
+# import
+  # esp_err, esp_wifi_types, esp_event, esp_private/esp_wifi_private
 
 const
   ESP_ERR_WIFI_NOT_INIT* = (ESP_ERR_WIFI_BASE + 1) ## !< WiFi driver was not installed by esp_wifi_init

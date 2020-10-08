@@ -11,8 +11,9 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import ../consts
-import ../general
+import ../../consts
+import ../../net_utils
+import esp_wifi_types
 
 # import
   # sys/queue, esp_wifi_types, sdkconfig
@@ -48,16 +49,16 @@ import ../general
 type
   tcpip_adapter_ip_info_t* {.importc: "tcpip_adapter_ip_info_t",
                             header: "tcpip_adapter.h", bycopy.} = object
-    ip* {.importc: "ip".}: ip4_addr ## *< Interface IPV4 address
-    netmask* {.importc: "netmask".}: ip4_addr ## *< Interface IPV4 netmask
-    gw* {.importc: "gw".}: ip4_addr ## *< Interface IPV4 gateway address
+    ip* {.importc: "ip".}: ip4_addr_t ## *< Interface IPV4 address
+    netmask* {.importc: "netmask".}: ip4_addr_t ## *< Interface IPV4 netmask
+    gw* {.importc: "gw".}: ip4_addr_t ## *< Interface IPV4 gateway address
 
 ## * @brief IPV6 IP address information
 ##
 type
   tcpip_adapter_ip6_info_t* {.importc: "tcpip_adapter_ip6_info_t",
                               header: "tcpip_adapter.h", bycopy.} = object
-    ip* {.importc: "ip".}: ip6_addr ## *< Interface IPV6 address
+    ip* {.importc: "ip".}: ip6_addr_t ## *< Interface IPV6 address
 
 ## * @brief IP address info of station connected to WLAN AP
 ##
@@ -67,7 +68,7 @@ type
   tcpip_adapter_sta_info_t* {.importc: "tcpip_adapter_sta_info_t",
                               header: "tcpip_adapter.h", bycopy.} = object
     mac* {.importc: "mac".}: array[6, uint8] ## *< Station MAC address
-    ip* {.importc: "ip".}: ip4_addr ## *< Station assigned IP address
+    ip* {.importc: "ip".}: ip4_addr_t ## *< Station assigned IP address
 
 ## * @brief WLAN AP: Connected stations list
 ##
@@ -175,7 +176,7 @@ type
 
 ## * @brief IP event base declaration
 
-ESP_EVENT_DECLARE_BASE(IP_EVENT)
+# ESP_EVENT_DECLARE_BASE(IP_EVENT)
 ## * Event structure for IP_EVENT_STA_GOT_IP, IP_EVENT_ETH_GOT_IP events
 
 type
@@ -200,7 +201,7 @@ type
 type
   ip_event_ap_staipassigned_t* {.importc: "ip_event_ap_staipassigned_t",
                                 header: "tcpip_adapter.h", bycopy.} = object
-    ip* {.importc: "ip".}: ip4_addr ## !< IP address which was assigned to the station
+    ip* {.importc: "ip".}: ip4_addr_t ## !< IP address which was assigned to the station
 
 
 ## *
@@ -489,7 +490,7 @@ proc tcpip_adapter_create_ip6_linklocal*(tcpip_if: tcpip_adapter_if_t): esp_err_
 ##
 
 proc tcpip_adapter_get_ip6_linklocal*(tcpip_if: tcpip_adapter_if_t;
-                                     if_ip6: ptr ip6_addr): esp_err_t {.
+                                     if_ip6: ptr ip6_addr_t): esp_err_t {.
     importc: "tcpip_adapter_get_ip6_linklocal", header: "tcpip_adapter.h".}
 ## *
 ##  @brief  Get interface global IPv6 address
@@ -506,13 +507,13 @@ proc tcpip_adapter_get_ip6_linklocal*(tcpip_if: tcpip_adapter_if_t;
 ##
 
 proc tcpip_adapter_get_ip6_global*(tcpip_if: tcpip_adapter_if_t;
-                                  if_ip6: ptr ip6_addr): esp_err_t {.
+                                  if_ip6: ptr ip6_addr_t): esp_err_t {.
     importc: "tcpip_adapter_get_ip6_global", header: "tcpip_adapter.h".}
-when 0:
-  proc tcpip_adapter_get_mac*(tcpip_if: tcpip_adapter_if_t; mac: ptr uint8): esp_err_t {.
-      importc: "tcpip_adapter_get_mac", header: "tcpip_adapter.h".}
-  proc tcpip_adapter_set_mac*(tcpip_if: tcpip_adapter_if_t; mac: ptr uint8): esp_err_t {.
-      importc: "tcpip_adapter_set_mac", header: "tcpip_adapter.h".}
+proc tcpip_adapter_get_mac*(tcpip_if: tcpip_adapter_if_t; mac: ptr uint8): esp_err_t {.
+    importc: "tcpip_adapter_get_mac", header: "tcpip_adapter.h".}
+proc tcpip_adapter_set_mac*(tcpip_if: tcpip_adapter_if_t; mac: ptr uint8): esp_err_t {.
+    importc: "tcpip_adapter_set_mac", header: "tcpip_adapter.h".}
+
 ## *
 ##  @brief  Get DHCP Server status
 ##
@@ -543,7 +544,7 @@ proc tcpip_adapter_dhcps_get_status*(tcpip_if: tcpip_adapter_if_t;
 
 proc tcpip_adapter_dhcps_option*(opt_op: tcpip_adapter_dhcp_option_mode_t;
                                 opt_id: tcpip_adapter_dhcp_option_id_t;
-                                opt_val: pointer; opt_len: uint32_t): esp_err_t {.
+                                opt_val: pointer; opt_len: uint32): esp_err_t {.
     importc: "tcpip_adapter_dhcps_option", header: "tcpip_adapter.h".}
 ## *
 ##  @brief  Start DHCP server
@@ -605,7 +606,7 @@ proc tcpip_adapter_dhcpc_get_status*(tcpip_if: tcpip_adapter_if_t;
 
 proc tcpip_adapter_dhcpc_option*(opt_op: tcpip_adapter_dhcp_option_mode_t;
                                 opt_id: tcpip_adapter_dhcp_option_id_t;
-                                opt_val: pointer; opt_len: uint32_t): esp_err_t {.
+                                opt_val: pointer; opt_len: uint32): esp_err_t {.
     importc: "tcpip_adapter_dhcpc_option", header: "tcpip_adapter.h".}
 ## *
 ##  @brief Start DHCP client
@@ -658,7 +659,7 @@ proc tcpip_adapter_dhcpc_stop*(tcpip_if: tcpip_adapter_if_t): esp_err_t {.
 ##          - ESP_OK
 ##
 
-proc tcpip_adapter_eth_input*(buffer: pointer; len: uint16_t; eb: pointer): esp_err_t {.
+proc tcpip_adapter_eth_input*(buffer: pointer; len: uint16; eb: pointer): esp_err_t {.
     importc: "tcpip_adapter_eth_input", header: "tcpip_adapter.h".}
 ## *
 ##  @brief  Receive an 802.11 data frame from the Wi-Fi Station interface
@@ -677,7 +678,7 @@ proc tcpip_adapter_eth_input*(buffer: pointer; len: uint16_t; eb: pointer): esp_
 ##          - ESP_OK
 ##
 
-proc tcpip_adapter_sta_input*(buffer: pointer; len: uint16_t; eb: pointer): esp_err_t {.
+proc tcpip_adapter_sta_input*(buffer: pointer; len: uint16; eb: pointer): esp_err_t {.
     importc: "tcpip_adapter_sta_input", header: "tcpip_adapter.h".}
 ## *
 ##  @brief  Receive an 802.11 data frame from the Wi-Fi AP interface
@@ -696,7 +697,7 @@ proc tcpip_adapter_sta_input*(buffer: pointer; len: uint16_t; eb: pointer): esp_
 ##          - ESP_OK
 ##
 
-proc tcpip_adapter_ap_input*(buffer: pointer; len: uint16_t; eb: pointer): esp_err_t {.
+proc tcpip_adapter_ap_input*(buffer: pointer; len: uint16; eb: pointer): esp_err_t {.
     importc: "tcpip_adapter_ap_input", header: "tcpip_adapter.h".}
 ## *
 ##  @brief  Get network interface index

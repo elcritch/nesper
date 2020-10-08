@@ -1,7 +1,7 @@
 import nesper
 import nesper/net_utils
 import nesper/esp/event_groups
-import nesper/esp/tcpip_adapter
+import nesper/esp/net/tcpip_adapter
 
 const
   GOT_IPV4_BIT* = BIT(0)

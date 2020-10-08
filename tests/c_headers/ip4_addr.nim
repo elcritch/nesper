@@ -41,16 +41,16 @@ when LWIP_IPV4:
   ## * This is the aligned version of ip4_addr_t,
   ##    used as local variable, on the stack, etc.
   type
-    ip4_addr* {.importc: "ip4_addr", header: "ip4_addr.h", bycopy.} = object
+    ip4_addr_t* {.importc: "ip4_addr_t", header: "ip4_addr_t.h", bycopy.} = object
       `addr`* {.importc: "addr".}: u32_t
 
   ## * ip4_addr_t uses a struct for convenience only, so that the same defines can
   ##  operate both on ip4_addr_t as well as on ip4_addr_p_t.
   type
-    ip4_addr_t* = ip4_addr
+    ip4_addr_t* = ip4_addr_t
   ##  Forward declaration to not include netif.h
   type
-    netif* {.importc: "netif", header: "ip4_addr.h", bycopy.} = object
+    netif* {.importc: "netif", header: "ip4_addr_t.h", bycopy.} = object
 
   ## * 255.255.255.255
   const
@@ -182,12 +182,12 @@ when LWIP_IPV4:
     ip4_addr_isbroadcast_u32((addr1).`addr`, netif)
 
   proc ip4_addr_isbroadcast_u32*(`addr`: u32_t; netif: ptr netif): u8_t {.
-      importc: "ip4_addr_isbroadcast_u32", header: "ip4_addr.h".}
+      importc: "ip4_addr_isbroadcast_u32", header: "ip4_addr_t.h".}
   template ip_addr_netmask_valid*(netmask: untyped): untyped =
     ip4_addr_netmask_valid((netmask).`addr`)
 
   proc ip4_addr_netmask_valid*(netmask: u32_t): u8_t {.
-      importc: "ip4_addr_netmask_valid", header: "ip4_addr.h".}
+      importc: "ip4_addr_netmask_valid", header: "ip4_addr_t.h".}
   template ip4_addr_ismulticast*(addr1: untyped): untyped =
     (((addr1).`addr` and PP_HTONL(0xF0000000)) == PP_HTONL(0xE0000000))
 
@@ -273,11 +273,11 @@ when LWIP_IPV4:
   template ip_ntoa*(ipaddr: untyped): untyped =
     ipaddr_ntoa(ipaddr)
 
-  proc ipaddr_addr*(cp: cstring): u32_t {.importc: "ipaddr_addr", header: "ip4_addr.h".}
+  proc ipaddr_addr*(cp: cstring): u32_t {.importc: "ipaddr_addr", header: "ip4_addr_t.h".}
   proc ip4addr_aton*(cp: cstring; `addr`: ptr ip4_addr_t): cint {.
-      importc: "ip4addr_aton", header: "ip4_addr.h".}
+      importc: "ip4addr_aton", header: "ip4_addr_t.h".}
   ## * returns ptr to static buffer; not reentrant!
   proc ip4addr_ntoa*(`addr`: ptr ip4_addr_t): cstring {.importc: "ip4addr_ntoa",
-      header: "ip4_addr.h".}
+      header: "ip4_addr_t.h".}
   proc ip4addr_ntoa_r*(`addr`: ptr ip4_addr_t; buf: cstring; buflen: cint): cstring {.
-      importc: "ip4addr_ntoa_r", header: "ip4_addr.h".}
+      importc: "ip4addr_ntoa_r", header: "ip4_addr_t.h".}
