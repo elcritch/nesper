@@ -87,3 +87,22 @@ type
     shared_vector_desc* {.importc: "shared_vector_desc".}: ptr shared_vector_desc_t
 
   intr_handle_t* = ptr intr_handle_data_t
+
+type
+  esp_event_base_t* = cstring
+
+type
+  ## *< unique pointer to a subsystem that exposes events
+  esp_event_loop_handle_t* = pointer
+
+  ## *< a number that identifies an event with respect to a base
+  esp_event_handler_t* = proc (event_handler_arg: pointer;
+                            event_base: esp_event_base_t; event_id: int32;
+                            event_data: pointer)
+
+## *< function called when an event is posted to the queue
+##  Defines for registering/unregistering event handlers
+
+const
+  ESP_EVENT_ANY_BASE* = nil
+  ESP_EVENT_ANY_ID* = -1

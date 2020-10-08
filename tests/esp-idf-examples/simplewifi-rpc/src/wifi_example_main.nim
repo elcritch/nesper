@@ -1,5 +1,6 @@
 import nesper
 import nesper/net_utils
+import nesper/esp/esp_event
 import nesper/esp/event_groups
 import nesper/esp/net/tcpip_adapter
 
