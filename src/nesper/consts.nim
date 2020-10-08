@@ -64,6 +64,9 @@ type
     next* {.importc: "next".}: ptr shared_vector_desc_t
 
 
+template BIT*(x: untyped): untyped =
+  (1U shl x)
+
 ## Pack using bitfields for better memory use
 
 type

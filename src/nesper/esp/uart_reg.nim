@@ -23,9 +23,6 @@ template UART_FIFO_AHB_REG*(i: untyped): untyped =
 template UART_FIFO_REG*(i: untyped): untyped =
   (REG_UART_BASE(i) + 0x00000000)
 
-template BIT*(x: untyped): untyped =
-  (1U shl x)
-
 ##  UART_RXFIFO_RD_BYTE : RO ;bitpos:[7:0] ;default: 8'b0 ;
 ## description: This register stores one byte data  read by rx fifo.
 
