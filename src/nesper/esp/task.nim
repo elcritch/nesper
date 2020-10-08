@@ -68,21 +68,69 @@
 ##
 
 import ../consts
+import FreeRTOS
+
+type
+  portMUX_TYPE* {.importc: "portMUX_TYPE", header: "projdefs.h", bycopy.} = object
+    owner* {.importc: "owner".}: uint32 ##  owner field values:
+                                      ##  0                - Uninitialized (invalid)
+                                      ##  portMUX_FREE_VAL - Mux is free, can be locked by either CPU
+                                      ##  CORE_ID_PRO / CORE_ID_APP - Mux is locked to the particular core
+                                      ##
+                                      ##  Any value other than portMUX_FREE_VAL, CORE_ID_PRO, CORE_ID_APP indicates corruption
+                                      ##
+    ##  count field:
+    ##  If mux is unlocked, count should be zero.
+    ##  If mux is locked, count is non-zero & represents the number of recursive locks on the mux.
+    ##
+    count* {.importc: "count".}: uint32 ##  #ifdef CONFIG_FREERTOS_PORTMUX_DEBUG
+                                      ##  const char *lastLockedFn;
+                                      ##  int lastLockedLine;
+                                      ##  #endif
+
+
+type
+  TaskFunction_t* = proc (a1: pointer)
+
+##  Converts a time in milliseconds to a time in ticks.
+
+template pdMS_TO_TICKS*(xTimeInMs: untyped): untyped =
+  (((TickType_t)(xTimeInMs) * configTICK_RATE_HZ) div cast[TickType_t](1000))
+
+const
+  pdFALSE* = BaseType_t(0)
+  pdTRUE* = BaseType_t(1)
+  pdPASS* = pdTRUE
+  pdFAIL* = pdFALSE
+  errQUEUE_EMPTY* = BaseType_t(0)
+  errQUEUE_FULL* = BaseType_t(0)
+  portNUM_CONFIGURABLE_REGIONS* = 1
+
+##  Error definitions.
+
+var errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY* {.importc: "errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY", header: "task.h".}: cint
+var errQUEUE_BLOCKED* {.importc: "errQUEUE_BLOCKED", header: "task.h".}: cint
+var errQUEUE_YIELD* {.importc: "errQUEUE_YIELD", header: "task.h".}: cint
+
+##  Macros used for basic data corruption checks.
+
+var configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES* {.importc: "configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES", header: "task.h".}: cint
+var pdINTEGRITY_CHECK_VALUE* {.importc: "pdINTEGRITY_CHECK_VALUE", header: "task.h".}: cint
 
 ## -----------------------------------------------------------
 ##  MACROS AND DEFINITIONS
 ## ----------------------------------------------------------
 
-var tskKERNEL_VERSION_NUMBER*: cstring {.importc: "tskKERNEL_VERSION_NUMBER", header: "task.h".}
-var tskKERNEL_VERSION_MAJOR*: cint {.importc: "tskKERNEL_VERSION_MAJOR", header: "task.h".}
-var tskKERNEL_VERSION_MINOR*: cint {.importc: "tskKERNEL_VERSION_MINOR", header: "task.h".}
-var tskKERNEL_VERSION_BUILD*: cint {.importc: "tskKERNEL_VERSION_BUILD", header: "task.h".}
+var tskKERNEL_VERSION_NUMBER* {.importc: "tskKERNEL_VERSION_NUMBER", header: "task.h".}: cstring
+var tskKERNEL_VERSION_MAJOR* {.importc: "tskKERNEL_VERSION_MAJOR", header: "task.h".}: cint
+var tskKERNEL_VERSION_MINOR* {.importc: "tskKERNEL_VERSION_MINOR", header: "task.h".}: cint
+var tskKERNEL_VERSION_BUILD* {.importc: "tskKERNEL_VERSION_BUILD", header: "task.h".}: cint
 
 ## *
 ##  @brief Argument of xTaskCreatePinnedToCore indicating that task has no affinity
 ##
 
-var tskNO_AFFINITY*: cint {.importc: "tskNO_AFFINITY", header: "task.h".}
+var tskNO_AFFINITY* {.importc: "tskNO_AFFINITY", header: "task.h".}: cint
 
 ## *
 ##  task. h
@@ -145,8 +193,8 @@ type
 type
   MemoryRegion_t* {.importc: "MemoryRegion_t", header: "task.h", bycopy.} = object
     pvBaseAddress* {.importc: "pvBaseAddress".}: pointer
-    ulLengthInBytes* {.importc: "ulLengthInBytes".}: uint32_t
-    ulParameters* {.importc: "ulParameters".}: uint32_t
+    ulLengthInBytes* {.importc: "ulLengthInBytes".}: uint32
+    ulParameters* {.importc: "ulParameters".}: uint32
 
 
 ## *
@@ -157,12 +205,11 @@ type
   TaskParameters_t* {.importc: "TaskParameters_t", header: "task.h", bycopy.} = object
     pvTaskCode* {.importc: "pvTaskCode".}: TaskFunction_t
     pcName* {.importc: "pcName".}: cstring ## lint !e971 Unqualified char types are allowed for strings and single characters only.
-    usStackDepth* {.importc: "usStackDepth".}: uint32_t
+    usStackDepth* {.importc: "usStackDepth".}: uint32
     pvParameters* {.importc: "pvParameters".}: pointer
     uxPriority* {.importc: "uxPriority".}: UBaseType_t
     puxStackBuffer* {.importc: "puxStackBuffer".}: ptr StackType_t
-    xRegions* {.importc: "xRegions".}: array[portNUM_CONFIGURABLE_REGIONS,
-        MemoryRegion_t]
+    xRegions* {.importc: "xRegions".}: array[portNUM_CONFIGURABLE_REGIONS, MemoryRegion_t]
 
 
 ## * @endcond
@@ -179,11 +226,11 @@ type
     eCurrentState* {.importc: "eCurrentState".}: eTaskState ## !< The state in which the task existed when the structure was populated.
     uxCurrentPriority* {.importc: "uxCurrentPriority".}: UBaseType_t ## !< The priority at which the task was running (may be inherited) when the structure was populated.
     uxBasePriority* {.importc: "uxBasePriority".}: UBaseType_t ## !< The priority to which the task will return if the task's current priority has been inherited to avoid unbounded priority inversion when obtaining a mutex.  Only valid if configUSE_MUTEXES is defined as 1 in FreeRTOSConfig.h.
-    ulRunTimeCounter* {.importc: "ulRunTimeCounter".}: uint32_t ## !< The total run time allocated to the task so far, as defined by the run time stats clock.  See http://www.freertos.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h.
+    ulRunTimeCounter* {.importc: "ulRunTimeCounter".}: uint32 ## !< The total run time allocated to the task so far, as defined by the run time stats clock.  See http://www.freertos.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h.
     pxStackBase* {.importc: "pxStackBase".}: ptr StackType_t ## !< Points to the lowest address of the task's stack area.
-    usStackHighWaterMark* {.importc: "usStackHighWaterMark".}: uint32_t ## !< The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack.
-    when configTASKLIST_INCLUDE_COREID:
-      var xCoreID* {.importc: "xCoreID", header: "task.h".}: BaseType_t
+    usStackHighWaterMark* {.importc: "usStackHighWaterMark".}: uint32 ## !< The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack.
+
+var xCoreID* {.importc: "xCoreID", header: "task.h".}: BaseType_t
       ## !< Core this task is pinned to. This field is present if CONFIG_FREERTOS_VTASKLIST_INCLUDE_COREID is set.
 
 
@@ -228,7 +275,7 @@ const
 ##  \ingroup SchedulerControl
 ##
 
-proc taskYIELD*(): cint {.importc: "taskYIELD", header: "task.h".}
+proc taskYIELD*() {.importc: "taskYIELD", header: "task.h".}
 
 ## *
 ##  task. h
@@ -242,7 +289,7 @@ proc taskYIELD*(): cint {.importc: "taskYIELD", header: "task.h".}
 ##  \ingroup SchedulerControl
 ##
 
-proc taskENTER_CRITICAL*(mux: untyped): cint {.importc: "taskENTER_CRITICAL", header: "task.h".}
+proc taskENTER_CRITICAL*(mux: portMUX_TYPE) {.importc: "taskENTER_CRITICAL", header: "task.h".}
 
 ## *
 ##  task. h
@@ -256,8 +303,7 @@ proc taskENTER_CRITICAL*(mux: untyped): cint {.importc: "taskENTER_CRITICAL", he
 ##  \ingroup SchedulerControl
 ##
 
-template taskEXIT_CRITICAL*(mux: untyped): untyped =
-  portEXIT_CRITICAL(mux)
+proc taskEXIT_CRITICAL*() {.importc: "taskEXIT_CRITICAL", header: "task.h".}
 
 ## *
 ##  task. h
@@ -267,8 +313,7 @@ template taskEXIT_CRITICAL*(mux: untyped): untyped =
 ##  \ingroup SchedulerControl
 ##
 
-template taskDISABLE_INTERRUPTS*(): untyped =
-  portDISABLE_INTERRUPTS()
+proc taskDISABLE_INTERRUPTS*() {.importc: "taskDISABLE_INTERRUPTS", header: "task.h".}
 
 ## *
 ##  task. h
@@ -278,17 +323,16 @@ template taskDISABLE_INTERRUPTS*(): untyped =
 ##  \ingroup SchedulerControl
 ##
 
-template taskENABLE_INTERRUPTS*(): untyped =
-  portENABLE_INTERRUPTS()
+proc taskENABLE_INTERRUPTS*() {.importc: "taskENABLE_INTERRUPTS", header: "task.h".}
 
 ##  Definitions returned by xTaskGetSchedulerState().  taskSCHEDULER_SUSPENDED is
 ## 0 to generate more optimal code when configASSERT() is defined as the constant
 ## is used in assert() statements.
 
 const
-  taskSCHEDULER_SUSPENDED* = (cast[BaseType_t](0))
-  taskSCHEDULER_NOT_STARTED* = (cast[BaseType_t](1))
-  taskSCHEDULER_RUNNING* = (cast[BaseType_t](2))
+  taskSCHEDULER_SUSPENDED* = BaseType_t(0)
+  taskSCHEDULER_NOT_STARTED* = BaseType_t(1)
+  taskSCHEDULER_RUNNING* = BaseType_t(2)
 
 ## -----------------------------------------------------------
 ##  TASK CREATION API
@@ -334,7 +378,7 @@ const
 ##
 
 proc xTaskCreatePinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
-                             usStackDepth: uint32_t; pvParameters: pointer;
+                             usStackDepth: uint32; pvParameters: pointer;
                              uxPriority: UBaseType_t;
                              pvCreatedTask: ptr TaskHandle_t; xCoreID: BaseType_t): BaseType_t {.
     importc: "xTaskCreatePinnedToCore", header: "task.h".}
@@ -401,7 +445,7 @@ proc xTaskCreatePinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
 ##   // Function that creates a task.
 ##   void vOtherFunction( void )
 ##   {
-##   static uint8_t ucParameterToPass;
+##   static uint8 ucParameterToPass;
 ##   TaskHandle_t xHandle = NULL;
 ##
 ##    // Create the task, storing the handle.  Note that the passed parameter ucParameterToPass
@@ -422,7 +466,7 @@ proc xTaskCreatePinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
 ##
 
 proc xTaskCreate*(pvTaskCode: TaskFunction_t; pcName: cstring;
-                 usStackDepth: uint32_t; pvParameters: pointer;
+                 usStackDepth: uint32; pvParameters: pointer;
                  uxPriority: UBaseType_t; pvCreatedTask: ptr TaskHandle_t): BaseType_t {.
     inline.} =
   return xTaskCreatePinnedToCore(pvTaskCode, pcName, usStackDepth, pvParameters,
@@ -472,7 +516,7 @@ proc xTaskCreate*(pvTaskCode: TaskFunction_t; pcName: cstring;
 ##
 
 proc xTaskCreateStaticPinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
-                                   ulStackDepth: uint32_t; pvParameters: pointer;
+                                   ulStackDepth: uint32; pvParameters: pointer;
                                    uxPriority: UBaseType_t;
                                    pxStackBuffer: ptr StackType_t;
                                    pxTaskBuffer: ptr StaticTask_t;
@@ -543,7 +587,7 @@ proc xTaskCreateStaticPinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
 ##      {
 ##          // The parameter value is expected to be 1 as 1 is passed in the
 ##          // pvParameters value in the call to xTaskCreateStatic().
-##          configASSERT( ( uint32_t ) pvParameters == 1UL );
+##          configASSERT( ( uint32 ) pvParameters == 1UL );
 ##
 ##          for( ;; )
 ##          {
@@ -576,7 +620,7 @@ proc xTaskCreateStaticPinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
 ##
 
 proc xTaskCreateStatic*(pvTaskCode: TaskFunction_t; pcName: cstring;
-                       ulStackDepth: uint32_t; pvParameters: pointer;
+                       ulStackDepth: uint32; pvParameters: pointer;
                        uxPriority: UBaseType_t; pxStackBuffer: ptr StackType_t;
                        pxTaskBuffer: ptr StaticTask_t): TaskHandle_t {.inline.} =
   return xTaskCreateStaticPinnedToCore(pvTaskCode, pcName, ulStackDepth,
@@ -1347,7 +1391,7 @@ proc uxTaskGetStackHighWaterMark*(xTask: TaskHandle_t): UBaseType_t {.
 ##  @return A pointer to the start of the stack.
 ##
 
-proc pxTaskGetStackStart*(xTask: TaskHandle_t): ptr uint8_t {.
+proc pxTaskGetStackStart*(xTask: TaskHandle_t): ptr uint8 {.
     importc: "pxTaskGetStackStart", header: "task.h".}
 ##  When using trace macros it is sometimes necessary to include task.h before
 ## FreeRTOS.h.  When this is done TaskHookFunction_t will not yet have been defined,
@@ -1527,7 +1571,7 @@ proc xTaskGetIdleTaskHandleForCPU*(cpuid: UBaseType_t): TaskHandle_t {.
 ##  {
 ##  TaskStatus_t *pxTaskStatusArray;
 ##  volatile UBaseType_t uxArraySize, x;
-##  uint32_t ulTotalRunTime, ulStatsAsPercentage;
+##  uint32 ulTotalRunTime, ulStatsAsPercentage;
 ##
 ##   // Make sure the write buffer does not contain a string.
 ##   *pcWriteBuffer = 0x00;
@@ -1583,7 +1627,7 @@ proc xTaskGetIdleTaskHandleForCPU*(cpuid: UBaseType_t): TaskHandle_t {.
 ##
 
 proc uxTaskGetSystemState*(pxTaskStatusArray: ptr TaskStatus_t;
-                          uxArraySize: UBaseType_t; pulTotalRunTime: ptr uint32_t): UBaseType_t {.
+                          uxArraySize: UBaseType_t; pulTotalRunTime: ptr uint32): UBaseType_t {.
     importc: "uxTaskGetSystemState", header: "task.h".}
 ## *
 ##  List all the current tasks.
@@ -1688,7 +1732,7 @@ proc vTaskGetRunTimeStats*(pcWriteBuffer: cstring) {.
 ##  function to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  Events can be sent to a task using an intermediary object.  Examples of such
 ##  objects are queues, semaphores, mutexes and event groups.  Task notifications
@@ -1754,7 +1798,7 @@ proc vTaskGetRunTimeStats*(pcWriteBuffer: cstring) {.
 ##  \ingroup TaskNotifications
 ##
 
-proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
+proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
                  eAction: eNotifyAction): BaseType_t {.importc: "xTaskNotify",
     header: "task.h".}
 ## *
@@ -1764,7 +1808,7 @@ proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
 ##  function to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  A version of xTaskNotify() that can be used from an interrupt service routine
 ##  (ISR).
@@ -1842,7 +1886,7 @@ proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
 ##  \ingroup TaskNotifications
 ##
 
-proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
+proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
                         eAction: eNotifyAction;
                         pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
     importc: "xTaskNotifyFromISR", header: "task.h".}
@@ -1853,7 +1897,7 @@ proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
 ##  function to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  Events can be sent to a task using an intermediary object.  Examples of such
 ##  objects are queues, semaphores, mutexes and event groups.  Task notifications
@@ -1918,9 +1962,9 @@ proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32_t;
 ##  \ingroup TaskNotifications
 ##
 
-proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32_t;
-                     ulBitsToClearOnExit: uint32_t;
-                     pulNotificationValue: ptr uint32_t; xTicksToWait: TickType_t): BaseType_t {.
+proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32;
+                     ulBitsToClearOnExit: uint32;
+                     pulNotificationValue: ptr uint32; xTicksToWait: TickType_t): BaseType_t {.
     importc: "xTaskNotifyWait", header: "task.h".}
 ## *
 ##  Simplified macro for sending task notification.
@@ -1929,7 +1973,7 @@ proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32_t;
 ##  to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  Events can be sent to a task using an intermediary object.  Examples of such
 ##  objects are queues, semaphores, mutexes and event groups.  Task notifications
@@ -1965,8 +2009,8 @@ proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32_t;
 ##  \ingroup TaskNotifications
 ##
 
-template xTaskNotifyGive*(xTaskToNotify: untyped): untyped =
-  xTaskNotify((xTaskToNotify), 0, eIncrement)
+proc xTaskNotifyGive*(xTaskToNotify: TaskHandle_t): BaseType_t {.
+    importc: "xTaskNotifyGive", header: "task.h".}
 
 ## *
 ##  Simplified macro for sending task notification from ISR.
@@ -1975,7 +2019,7 @@ template xTaskNotifyGive*(xTaskToNotify: untyped): untyped =
 ##  to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  A version of xTaskNotifyGive() that can be called from an interrupt service
 ##  routine (ISR).
@@ -2030,7 +2074,7 @@ proc vTaskNotifyGiveFromISR*(xTaskToNotify: TaskHandle_t;
 ##  function to be available.
 ##
 ##  When configUSE_TASK_NOTIFICATIONS is set to one each task has its own private
-##  "notification value", which is a 32-bit unsigned integer (uint32_t).
+##  "notification value", which is a 32-bit unsigned integer (uint32).
 ##
 ##  Events can be sent to a task using an intermediary object.  Examples of such
 ##  objects are queues, semaphores, mutexes and event groups.  Task notifications
@@ -2089,7 +2133,7 @@ proc vTaskNotifyGiveFromISR*(xTaskToNotify: TaskHandle_t;
 ##  \ingroup TaskNotifications
 ##
 
-proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t): uint32_t {.
+proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t): uint32 {.
     importc: "ulTaskNotifyTake", header: "task.h".}
 ## -----------------------------------------------------------
 ##  SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES

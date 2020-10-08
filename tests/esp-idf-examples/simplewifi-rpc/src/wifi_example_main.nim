@@ -4,6 +4,7 @@ import nesper/net_utils
 import nesper/events
 import nesper/wifi
 import nesper/nvs
+import nesper/esp/task
 
 
 #  array[33, uint8]
