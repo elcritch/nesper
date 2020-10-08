@@ -146,8 +146,7 @@ type
 ##  \ingroup LinkedList
 ##
 
-template listSET_LIST_ITEM_OWNER*(pxListItem, pxOwner: untyped): untyped =
-  ((pxListItem).pvOwner = cast[pointer]((pxOwner)))
+proc listSET_LIST_ITEM_OWNER(pxListItem, pxOwner: untyped): cint {.importc: "listSET_LIST_ITEM_OWNER", header: "list.h".}
 
 ##
 ##  Access macro to get the owner of a list item.  The owner of a list item
@@ -157,8 +156,7 @@ template listSET_LIST_ITEM_OWNER*(pxListItem, pxOwner: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_LIST_ITEM_OWNER*(pxListItem: untyped): untyped =
-  ((pxListItem).pvOwner)
+proc listGET_LIST_ITEM_OWNER(pxListItem: untyped): cint {.importc: "listGET_LIST_ITEM_OWNER", header: "list.h".}
 
 ##
 ##  Access macro to set the value of the list item.  In most cases the value is
@@ -168,8 +166,7 @@ template listGET_LIST_ITEM_OWNER*(pxListItem: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listSET_LIST_ITEM_VALUE*(pxListItem, xValue: untyped): untyped =
-  ((pxListItem).xItemValue = (xValue))
+proc listSET_LIST_ITEM_VALUE(pxListItem, xValue: untyped): cint {.importc: "listSET_LIST_ITEM_VALUE", header: "list.h".}
 
 ##
 ##  Access macro to retrieve the value of the list item.  The value can
@@ -180,8 +177,7 @@ template listSET_LIST_ITEM_VALUE*(pxListItem, xValue: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_LIST_ITEM_VALUE*(pxListItem: untyped): untyped =
-  ((pxListItem).xItemValue)
+proc listGET_LIST_ITEM_VALUE(pxListItem: untyped): cint {.importc: "listGET_LIST_ITEM_VALUE", header: "list.h".}
 
 ##
 ##  Access macro to retrieve the value of the list item at the head of a given
@@ -191,8 +187,7 @@ template listGET_LIST_ITEM_VALUE*(pxListItem: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_ITEM_VALUE_OF_HEAD_ENTRY*(pxList: untyped): untyped =
-  (((pxList).xListEnd).pxNext.xItemValue)
+proc listGET_ITEM_VALUE_OF_HEAD_ENTRY(pxList: untyped): cint {.importc: "listGET_ITEM_VALUE_OF_HEAD_ENTRY", header: "list.h".}
 
 ##
 ##  Return the list item at the head of the list.
@@ -201,8 +196,7 @@ template listGET_ITEM_VALUE_OF_HEAD_ENTRY*(pxList: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_HEAD_ENTRY*(pxList: untyped): untyped =
-  (((pxList).xListEnd).pxNext)
+proc listGET_HEAD_ENTRY(pxList: untyped): cint {.importc: "listGET_HEAD_ENTRY", header: "list.h".}
 
 ##
 ##  Return the list item at the head of the list.
@@ -211,8 +205,7 @@ template listGET_HEAD_ENTRY*(pxList: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_NEXT*(pxListItem: untyped): untyped =
-  ((pxListItem).pxNext)
+proc listGET_NEXT(pxListItem: untyped): cint {.importc: "listGET_NEXT", header: "list.h".}
 
 ##
 ##  Return the list item that marks the end of the list
@@ -221,8 +214,7 @@ template listGET_NEXT*(pxListItem: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listGET_END_MARKER*(pxList: untyped): untyped =
-  (cast[ptr ListItem_t]((addr(((pxList).xListEnd)))))
+proc listGET_END_MARKER(pxList: untyped): cint {.importc: "listGET_END_MARKER", header: "list.h".}
 
 ##
 ##  Access macro to determine if a list contains any items.  The macro will
@@ -232,15 +224,13 @@ template listGET_END_MARKER*(pxList: untyped): untyped =
 ##  \ingroup LinkedList
 ##
 
-template listLIST_IS_EMPTY*(pxList: untyped): untyped =
-  ((BaseType_t)((pxList).uxNumberOfItems == cast[UBaseType_t](0)))
+proc listLIST_IS_EMPTY(pxList: untyped): cint {.importc: "listLIST_IS_EMPTY", header: "list.h".}
 
 ##
 ##  Access macro to return the number of items in the list.
 ##
 
-template listCURRENT_LIST_LENGTH*(pxList: untyped): untyped =
-  ((pxList).uxNumberOfItems)
+proc listCURRENT_LIST_LENGTH(pxList: untyped): cint {.importc: "listCURRENT_LIST_LENGTH", header: "list.h".}
 
 ##
 ##  Access function to obtain the owner of the next entry in a list.
@@ -290,8 +280,7 @@ template listGET_OWNER_OF_NEXT_ENTRY*(pxTCB, pxList: untyped): void =
 ##  \ingroup LinkedList
 ##
 
-template listGET_OWNER_OF_HEAD_ENTRY*(pxList: untyped): untyped =
-  ((addr(((pxList).xListEnd))).pxNext.pvOwner)
+proc listGET_OWNER_OF_HEAD_ENTRY(pxList: untyped): cint {.importc: "listGET_OWNER_OF_HEAD_ENTRY", header: "list.h".}
 
 ##
 ##  Check to see if a list item is within a list.  The list item maintains a
@@ -303,8 +292,7 @@ template listGET_OWNER_OF_HEAD_ENTRY*(pxList: untyped): untyped =
 ##  @return pdTRUE if the list item is in the list, otherwise pdFALSE.
 ##
 
-template listIS_CONTAINED_WITHIN*(pxList, pxListItem: untyped): untyped =
-  ((BaseType_t)((pxListItem).pvContainer == cast[pointer]((pxList))))
+proc listIS_CONTAINED_WITHIN(pxList, pxListItem: untyped): cint {.importc: "listIS_CONTAINED_WITHIN", header: "list.h".}
 
 ##
 ##  Return the list a list item is contained within (referenced from).
@@ -313,8 +301,7 @@ template listIS_CONTAINED_WITHIN*(pxList, pxListItem: untyped): untyped =
 ##  @return A pointer to the List_t object that references the pxListItem
 ##
 
-template listLIST_ITEM_CONTAINER*(pxListItem: untyped): untyped =
-  ((pxListItem).pvContainer)
+proc listLIST_ITEM_CONTAINER(pxListItem: untyped): cint {.importc: "listLIST_ITEM_CONTAINER", header: "list.h".}
 
 ##
 ##  This provides a crude means of knowing if a list has been initialised, as
@@ -322,8 +309,7 @@ template listLIST_ITEM_CONTAINER*(pxListItem: untyped): untyped =
 ##  function.
 ##
 
-template listLIST_IS_INITIALISED*(pxList: untyped): untyped =
-  ((pxList).xListEnd.xItemValue == portMAX_DELAY)
+proc listLIST_IS_INITIALISED(pxList: untyped): cint {.importc: "listLIST_IS_INITIALISED", header: "list.h".}
 
 ##
 ##  Must be called before a list is used!  This initialises all the members

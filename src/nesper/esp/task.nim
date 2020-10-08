@@ -70,6 +70,7 @@
 import ../consts
 import FreeRTOS
 
+
 type
   portMUX_TYPE* {.importc: "portMUX_TYPE", header: "projdefs.h", bycopy.} = object
     owner* {.importc: "owner".}: uint32 ##  owner field values:
@@ -2135,128 +2136,135 @@ proc vTaskNotifyGiveFromISR*(xTaskToNotify: TaskHandle_t;
 
 proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t): uint32 {.
     importc: "ulTaskNotifyTake", header: "task.h".}
-## -----------------------------------------------------------
-##  SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
-## ----------------------------------------------------------
-## * @cond
-##
-##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
-##  INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
-##  AN INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
-##
-##  Called from the real time kernel tick (either preemptive or cooperative),
-##  this increments the tick count and checks if any tasks that are blocked
-##  for a finite period required removing from a blocked list and placing on
-##  a ready list.  If a non-zero value is returned then a context switch is
-##  required because either:
-##    + A task was removed from a blocked list because its timeout had expired,
-##      or
-##    + Time slicing is in use and there is a task of equal priority to the
-##      currently running task.
-##
 
-proc xTaskIncrementTick*(): BaseType_t {.importc: "xTaskIncrementTick",
-                                      header: "task.h".}
-##
-##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
-##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
-##
-##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
-##
-##  Removes the calling task from the ready list and places it both
-##  on the list of tasks waiting for a particular event, and the
-##  list of delayed tasks.  The task will be removed from both lists
-##  and replaced on the ready list should either the event occur (and
-##  there be no higher priority tasks waiting on the same event) or
-##  the delay period expires.
-##
-##  The 'unordered' version replaces the event list item value with the
-##  xItemValue value, and inserts the list item at the end of the list.
-##
-##  The 'ordered' version uses the existing event list item value (which is the
-##  owning tasks priority) to insert the list item into the event list is task
-##  priority order.
-##
-##  @param pxEventList The list containing tasks that are blocked waiting
-##  for the event to occur.
-##
-##  @param xItemValue The item value to use for the event list item when the
-##  event list is not ordered by task priority.
-##
-##  @param xTicksToWait The maximum amount of time that the task should wait
-##  for the event to occur.  This is specified in kernel ticks,the constant
-##  portTICK_PERIOD_MS can be used to convert kernel ticks into a real time
-##  period.
-##
+# ## -----------------------------------------------------------
+# ##  SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
+# ## ----------------------------------------------------------
+# ## * @cond
+# ##
+# ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
+# ##  INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
+# ##  AN INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+# ##
+# ##  Called from the real time kernel tick (either preemptive or cooperative),
+# ##  this increments the tick count and checks if any tasks that are blocked
+# ##  for a finite period required removing from a blocked list and placing on
+# ##  a ready list.  If a non-zero value is returned then a context switch is
+# ##  required because either:
+# ##    + A task was removed from a blocked list because its timeout had expired,
+# ##      or
+# ##    + Time slicing is in use and there is a task of equal priority to the
+# ##      currently running task.
+# ##
 
-proc vTaskPlaceOnEventList*(pxEventList: ptr List_t; xTicksToWait: TickType_t) {.
-    importc: "vTaskPlaceOnEventList", header: "task.h".}
-proc vTaskPlaceOnUnorderedEventList*(pxEventList: ptr List_t;
-                                    xItemValue: TickType_t;
-                                    xTicksToWait: TickType_t) {.
-    importc: "vTaskPlaceOnUnorderedEventList", header: "task.h".}
-##
-##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
-##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
-##
-##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
-##
-##  This function performs nearly the same function as vTaskPlaceOnEventList().
-##  The difference being that this function does not permit tasks to block
-##  indefinitely, whereas vTaskPlaceOnEventList() does.
-##
-##
+# proc xTaskIncrementTick*(): BaseType_t {.importc: "xTaskIncrementTick",
+#                                       header: "task.h".}
 
-proc vTaskPlaceOnEventListRestricted*(pxEventList: ptr List_t;
-                                     xTicksToWait: TickType_t) {.
-    importc: "vTaskPlaceOnEventListRestricted", header: "task.h".}
-##
-##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
-##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
-##
-##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
-##
-##  Removes a task from both the specified event list and the list of blocked
-##  tasks, and places it on a ready queue.
-##
-##  xTaskRemoveFromEventList()/xTaskRemoveFromUnorderedEventList() will be called
-##  if either an event occurs to unblock a task, or the block timeout period
-##  expires.
-##
-##  xTaskRemoveFromEventList() is used when the event list is in task priority
-##  order.  It removes the list item from the head of the event list as that will
-##  have the highest priority owning task of all the tasks on the event list.
-##  xTaskRemoveFromUnorderedEventList() is used when the event list is not
-##  ordered and the event list items hold something other than the owning tasks
-##  priority.  In this case the event list item value is updated to the value
-##  passed in the xItemValue parameter.
-##
-##  @return pdTRUE if the task being removed has a higher priority than the task
-##  making the call, otherwise pdFALSE.
-##
+# ##
+# ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
+# ##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+# ##
+# ##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
+# ##
+# ##  Removes the calling task from the ready list and places it both
+# ##  on the list of tasks waiting for a particular event, and the
+# ##  list of delayed tasks.  The task will be removed from both lists
+# ##  and replaced on the ready list should either the event occur (and
+# ##  there be no higher priority tasks waiting on the same event) or
+# ##  the delay period expires.
+# ##
+# ##  The 'unordered' version replaces the event list item value with the
+# ##  xItemValue value, and inserts the list item at the end of the list.
+# ##
+# ##  The 'ordered' version uses the existing event list item value (which is the
+# ##  owning tasks priority) to insert the list item into the event list is task
+# ##  priority order.
+# ##
+# ##  @param pxEventList The list containing tasks that are blocked waiting
+# ##  for the event to occur.
+# ##
+# ##  @param xItemValue The item value to use for the event list item when the
+# ##  event list is not ordered by task priority.
+# ##
+# ##  @param xTicksToWait The maximum amount of time that the task should wait
+# ##  for the event to occur.  This is specified in kernel ticks,the constant
+# ##  portTICK_PERIOD_MS can be used to convert kernel ticks into a real time
+# ##  period.
+# ##
 
-proc xTaskRemoveFromEventList*(pxEventList: ptr List_t): BaseType_t {.
-    importc: "xTaskRemoveFromEventList", header: "task.h".}
-proc xTaskRemoveFromUnorderedEventList*(pxEventListItem: ptr ListItem_t;
-                                       xItemValue: TickType_t): BaseType_t {.
-    importc: "xTaskRemoveFromUnorderedEventList", header: "task.h".}
-##
-##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
-##  INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
-##  AN INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
-##
-##  Sets the pointer to the current TCB to the TCB of the highest priority task
-##  that is ready to run.
-##
+# proc vTaskPlaceOnEventList*(pxEventList: ptr List_t; xTicksToWait: TickType_t) {.
+#     importc: "vTaskPlaceOnEventList", header: "task.h".}
+# proc vTaskPlaceOnUnorderedEventList*(pxEventList: ptr List_t;
+#                                     xItemValue: TickType_t;
+#                                     xTicksToWait: TickType_t) {.
+#     importc: "vTaskPlaceOnUnorderedEventList", header: "task.h".}
 
-proc vTaskSwitchContext*() {.importc: "vTaskSwitchContext", header: "task.h".}
-##
-##  THESE FUNCTIONS MUST NOT BE USED FROM APPLICATION CODE.  THEY ARE USED BY
-##  THE EVENT BITS MODULE.
-##
+# ##
+# ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
+# ##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+# ##
+# ##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
+# ##
+# ##  This function performs nearly the same function as vTaskPlaceOnEventList().
+# ##  The difference being that this function does not permit tasks to block
+# ##  indefinitely, whereas vTaskPlaceOnEventList() does.
+# ##
+# ##
 
-proc uxTaskResetEventItemValue*(): TickType_t {.
-    importc: "uxTaskResetEventItemValue", header: "task.h".}
+# proc vTaskPlaceOnEventListRestricted*(pxEventList: ptr List_t;
+#                                      xTicksToWait: TickType_t) {.
+#     importc: "vTaskPlaceOnEventListRestricted", header: "task.h".}
+
+# ##
+# ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
+# ##  INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+# ##
+# ##  THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
+# ##
+# ##  Removes a task from both the specified event list and the list of blocked
+# ##  tasks, and places it on a ready queue.
+# ##
+# ##  xTaskRemoveFromEventList()/xTaskRemoveFromUnorderedEventList() will be called
+# ##  if either an event occurs to unblock a task, or the block timeout period
+# ##  expires.
+# ##
+# ##  xTaskRemoveFromEventList() is used when the event list is in task priority
+# ##  order.  It removes the list item from the head of the event list as that will
+# ##  have the highest priority owning task of all the tasks on the event list.
+# ##  xTaskRemoveFromUnorderedEventList() is used when the event list is not
+# ##  ordered and the event list items hold something other than the owning tasks
+# ##  priority.  In this case the event list item value is updated to the value
+# ##  passed in the xItemValue parameter.
+# ##
+# ##  @return pdTRUE if the task being removed has a higher priority than the task
+# ##  making the call, otherwise pdFALSE.
+# ##
+
+# proc xTaskRemoveFromEventList*(pxEventList: ptr List_t): BaseType_t {.
+#     importc: "xTaskRemoveFromEventList", header: "task.h".}
+# proc xTaskRemoveFromUnorderedEventList*(pxEventListItem: ptr ListItem_t;
+#                                        xItemValue: TickType_t): BaseType_t {.
+#     importc: "xTaskRemoveFromUnorderedEventList", header: "task.h".}
+
+# ##
+# ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
+# ##  INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
+# ##  AN INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+# ##
+# ##  Sets the pointer to the current TCB to the TCB of the highest priority task
+# ##  that is ready to run.
+# ##
+
+# proc vTaskSwitchContext*() {.importc: "vTaskSwitchContext", header: "task.h".}
+
+# ##
+# ##  THESE FUNCTIONS MUST NOT BE USED FROM APPLICATION CODE.  THEY ARE USED BY
+# ##  THE EVENT BITS MODULE.
+# ##
+
+# proc uxTaskResetEventItemValue*(): TickType_t {.
+#     importc: "uxTaskResetEventItemValue", header: "task.h".}
+
 ##
 ##  Return the handle of the calling task.
 ##
