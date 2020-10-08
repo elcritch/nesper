@@ -113,11 +113,8 @@ proc app_main*() =
   ESP_ERROR_CHECK WIFI_EVENT_STA_DISCONNECTED.eventRegister(on_wifi_disconnect,nil)
 
   echo("wifi setup!\n")
-
+  echo("Wait for wifi\n")
   vTaskDelay(10000 div portTICK_PERIOD_MS)
 
-  echo("Wait for wifi\n")
-  NimMain()
-  echo("NimMain!\n")
   # run_http_server()
   echo("run_http_server\n")
