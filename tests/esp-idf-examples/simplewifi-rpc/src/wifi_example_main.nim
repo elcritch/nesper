@@ -5,12 +5,12 @@ import nesper/esp/event_groups
 import nesper/esp/net/tcpip_adapter
 
 const
-  GOT_IPV4_BIT* = BIT(0)
+  GOT_IPV4_BIT* = EventBits_t(BIT(0))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
 var s_connect_event_group*: EventGroupHandle_t
 
-var s_ip_addr*: ip4_addr_t
+var s_ip_addr*: IpAddress
 
 var s_connection_name*: cstring
 
@@ -22,11 +22,13 @@ proc start*()
 ##  tear down connection, release resources
 
 proc stop*()
-proc on_got_ip*(arg: pointer; event_base: esp_event_base_t; event_id: int32_t;
+proc on_got_ip*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
                event_data: pointer) =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
-  memcpy(addr(s_ip_addr), addr(event.ip_info.ip), sizeof((s_ip_addr)))
-  xEventGroupSetBits(s_connect_event_group, GOT_IPV4_BIT)
+
+  s_ip_addr = toIpAddress(event.ip_info.ip)
+  # memcpy(addr(s_ip_addr), addr(event.ip_info.ip), sizeof((s_ip_addr)))
+  discard xEventGroupSetBits(s_connect_event_group, GOT_IPV4_BIT)
 
 proc example_connect*(): esp_err_t =
   if s_connect_event_group != nil:
