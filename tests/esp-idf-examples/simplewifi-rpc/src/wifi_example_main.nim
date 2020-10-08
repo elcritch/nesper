@@ -78,10 +78,10 @@ proc start*() =
   ESP_ERROR_CHECK esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
   var wifi_config: wifi_config_t
-  copyMem(addr(wifi_config.sta.ssid[0]), CONFIG_EXAMPLE_WIFI_SSID, len(CONFIG_EXAMPLE_WIFI_SSID))
-  copyMem(addr(wifi_config.sta.password[0]), CONFIG_EXAMPLE_WIFI_PASSWORD, len(CONFIG_EXAMPLE_WIFI_PASSWORD))
-  # wifi_config.sta.ssid = CONFIG_EXAMPLE_WIFI_SSID
-  # wifi_config.sta.password = CONFIG_EXAMPLE_WIFI_PASSWORD
+  # copyMem(addr(wifi_config.sta.ssid[0]), CONFIG_EXAMPLE_WIFI_SSID, len(CONFIG_EXAMPLE_WIFI_SSID))
+  # copyMem(addr(wifi_config.sta.password[0]), CONFIG_EXAMPLE_WIFI_PASSWORD, len(CONFIG_EXAMPLE_WIFI_PASSWORD))
+  wifi_config.sta.ssid.setFromString(CONFIG_EXAMPLE_WIFI_SSID)
+  wifi_config.sta.password.setFromString(CONFIG_EXAMPLE_WIFI_PASSWORD)
 
   ESP_LOGI(TAG, "Connecting to %s...", wifi_config.sta.ssid)
   ESP_ERROR_CHECK esp_wifi_set_mode(WIFI_MODE_STA)
