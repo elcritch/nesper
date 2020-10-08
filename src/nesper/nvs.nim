@@ -23,9 +23,10 @@ proc newNvsError(msg: string, error: esp_err_t): ref NvsError =
   result.msg = msg
   result.code = error
 
-proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
+proc initNvs*() =
   # // Initialize NVS
   var nvs_error = nvs_flash_init()
+
 
   if nvs_error == ESP_ERR_NVS_NO_FREE_PAGES or nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND:
     echo("NVS partition was truncated and needs to be erased")
@@ -37,11 +38,15 @@ proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
     if ESP_OK != nvs_error:
       raise newNvsError("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS", nvs_error)
 
+proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
+  # // Initialize NVS
+  initNvs()
+
   #// Open
   echo("Opening Non-Volatile Storage (NVS) handle... ")
 
   # Set NVS handle
-  nvs_error = nvs_open(name, mode, addr(result.handle))
+  var nvs_error = nvs_open(name, mode, addr(result.handle))
 
   if nvs_error != ESP_OK:
     echo("Error (%s) opening NVS handle!", esp_err_to_name(nvs_error))

@@ -15,9 +15,7 @@ const
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
 var s_connect_event_group*: EventGroupHandle_t
-
 var s_ip_addr*: IpAddress
-
 var s_connection_name*: cstring
 
 var TAG*: cstring = "example"
@@ -99,19 +97,24 @@ proc stop*() =
   ESP_ERROR_CHECK esp_wifi_deinit()
 
 proc app_main*() =
-  ESP_ERROR_CHECK(nvs_flash_init())
+
+  initNvs()
   tcpip_adapter_init()
-  ESP_ERROR_CHECK(esp_event_loop_create_default())
-  ESP_ERROR_CHECK(example_connect())
+
+  ESP_ERROR_CHECK esp_event_loop_create_default()
+  ESP_ERROR_CHECK example_connect()
+
   ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
   ##  and re-start it upon connection.
   ##
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
-      addr(on_got_ip), nil))
-  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT,
-      WIFI_EVENT_STA_DISCONNECTED, addr(on_wifi_disconnect), nil))
+  ESP_ERROR_CHECK IP_EVENT_STA_GOT_IP.eventRegister(on_got_ip, nil)
+
+  ESP_ERROR_CHECK WIFI_EVENT_STA_DISCONNECTED.eventRegister(on_wifi_disconnect,nil)
+
   echo("wifi setup!\n")
+
   vTaskDelay(10000 div portTICK_PERIOD_MS)
+
   echo("Wait for wifi\n")
   NimMain()
   echo("NimMain!\n")
