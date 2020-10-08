@@ -1,6 +1,6 @@
 import json, tables, strutils, macros, options
 
-import nesper/utils/router
+import nesper/rpc/router
 
 type
     MyObject = object
