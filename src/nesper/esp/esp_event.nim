@@ -13,6 +13,8 @@
 ##  limitations under the License.
 
 import ../consts
+import net/tcpip_adapter
+import net/esp_wifi_types
 import esp_event_legacy
 
 export esp_event_legacy
@@ -148,12 +150,46 @@ proc esp_event_loop_run*(event_loop: esp_event_loop_handle_t;
 #                                 event_handler: esp_event_handler_t;
 #                                 event_handler_arg: pointer): esp_err_t {.
 #     importc: "esp_event_handler_register", header: "esp_event.h".}
-proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32;
-                                event_handler: (proc (event_handler_arg: pointer;
-                            event_base: esp_event_base_t; event_id: int32;
-                            event_data: pointer));
-                                event_handler_arg: pointer): esp_err_t {.
-    importc: "esp_event_handler_register", header: "esp_event.h".}
+proc esp_event_handler_register*(
+        event_base: esp_event_base_t;
+        event_id: cint;
+        event_handler: (proc (event_handler_arg: pointer;
+                              event_base: esp_event_base_t;
+                              event_id: int32;
+                              event_data: pointer) {.cdecl.});
+        event_handler_arg: pointer
+    ): esp_err_t {.importc: "esp_event_handler_register", header: "esp_event.h".}
+
+proc eventRegister*(
+            event_id: wifi_event_t;
+            event_handler: (proc (event_handler_arg: pointer;
+                                    event_base: esp_event_base_t;
+                                    event_id: int32;
+                                    event_data: pointer) {.cdecl.});
+            event_handler_arg: pointer
+        ): esp_err_t =
+
+    esp_event_handler_register(
+        event_base = WIFI_EVENT,
+        event_id = event_id.cint,
+        event_handler = event_handler,
+        event_handler_arg = event_handler_arg)
+
+proc eventRegister*(
+            event_id: ip_event_t;
+            event_handler: (proc (event_handler_arg: pointer;
+                                    event_base: esp_event_base_t;
+                                    event_id: int32;
+                                    event_data: pointer) {.cdecl.});
+            event_handler_arg: pointer
+        ): esp_err_t =
+
+    esp_event_handler_register(
+        event_base = IP_EVENT,
+        event_id = event_id.cint,
+        event_handler = event_handler,
+        event_handler_arg = event_handler_arg)
+
 ## *
 ##  @brief Register an event handler to a specific loop (legacy).
 ##

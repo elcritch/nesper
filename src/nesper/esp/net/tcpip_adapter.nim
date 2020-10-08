@@ -177,6 +177,7 @@ type
 ## * @brief IP event base declaration
 
 # ESP_EVENT_DECLARE_BASE(IP_EVENT)
+var IP_EVENT* {.importc: "IP_EVENT", header: "tcpip_adapter.h".}: esp_event_base_t 
 ## * Event structure for IP_EVENT_STA_GOT_IP, IP_EVENT_ETH_GOT_IP events
 
 type

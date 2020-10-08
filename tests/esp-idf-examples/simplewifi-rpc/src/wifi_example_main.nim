@@ -20,13 +20,13 @@ var s_connection_name*: cstring
 var TAG*: cstring = "example"
 
 ##  set up connection, Wi-Fi or Ethernet
-
 proc start*()
-##  tear down connection, release resources
 
+##  tear down connection, release resources
 proc stop*()
+
 proc on_got_ip*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
-               event_data: pointer) =
+               event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
 
   s_ip_addr = toIpAddress(event.ip_info.ip)
@@ -65,40 +65,37 @@ proc on_wifi_disconnect*(arg: pointer; event_base: esp_event_base_t;
 proc start*() =
   var cfg: wifi_init_config_t = wifi_init_config_default()
 
-  let on_wifi_disconnect_ptr: (proc (arg: pointer; event_base: esp_event_base_t;
-            event_id: int32; event_data: pointer)) =
-      proc (arg: pointer; event_base: esp_event_base_t;
-            event_id: int32; event_data: pointer) =
-        ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...")
-        ESP_ERROR_CHECK(esp_wifi_connect())
+  ESP_ERROR_CHECK esp_wifi_init(addr(cfg))
+  ESP_ERROR_CHECK WIFI_EVENT_STA_DISCONNECTED.eventRegister( on_wifi_disconnect, nil)
+  ESP_ERROR_CHECK IP_EVENT_STA_GOT_IP.eventRegister(on_got_ip, nil)
 
-  ESP_ERROR_CHECK(esp_wifi_init(addr(cfg)))
-  ESP_ERROR_CHECK(esp_event_handler_register(
-    WIFI_EVENT,
-    WIFI_EVENT_STA_DISCONNECTED.int32,
-    on_wifi_disconnect_ptr,
-    nil))
+  ESP_ERROR_CHECK esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
-      addr(on_got_ip), nil))
-  ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM))
   var wifi_config: wifi_config_t
   wifi_config.sta.ssid = CONFIG_EXAMPLE_WIFI_SSID
   wifi_config.sta.password = CONFIG_EXAMPLE_WIFI_PASSWORD
+
   ESP_LOGI(TAG, "Connecting to %s...", wifi_config.sta.ssid)
-  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA))
-  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, addr(wifi_config)))
-  ESP_ERROR_CHECK(esp_wifi_start())
-  ESP_ERROR_CHECK(esp_wifi_connect())
+  ESP_ERROR_CHECK esp_wifi_set_mode(WIFI_MODE_STA)
+  ESP_ERROR_CHECK esp_wifi_set_config(ESP_IF_WIFI_STA, addr(wifi_config))
+  ESP_ERROR_CHECK esp_wifi_start()
+  ESP_ERROR_CHECK esp_wifi_connect()
+
   s_connection_name = CONFIG_EXAMPLE_WIFI_SSID
 
 proc stop*() =
-  ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT,
-      WIFI_EVENT_STA_DISCONNECTED, addr(on_wifi_disconnect)))
-  ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP,
-      addr(on_got_ip)))
-  ESP_ERROR_CHECK(esp_wifi_stop())
-  ESP_ERROR_CHECK(esp_wifi_deinit())
+  ESP_ERROR_CHECK esp_event_handler_unregister(
+      WIFI_EVENT,
+      WIFI_EVENT_STA_DISCONNECTED,
+      on_wifi_disconnect)
+
+  ESP_ERROR_CHECK esp_event_handler_unregister(
+      IP_EVENT,
+      IP_EVENT_STA_GOT_IP,
+      on_got_ip)
+
+  ESP_ERROR_CHECK esp_wifi_stop()
+  ESP_ERROR_CHECK esp_wifi_deinit()
 
 proc app_main*() =
   ESP_ERROR_CHECK(nvs_flash_init())
