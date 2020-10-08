@@ -144,8 +144,14 @@ proc esp_event_loop_run*(event_loop: esp_event_loop_handle_t;
 ##   - Others: Fail
 ##
 
+# proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32;
+#                                 event_handler: esp_event_handler_t;
+#                                 event_handler_arg: pointer): esp_err_t {.
+#     importc: "esp_event_handler_register", header: "esp_event.h".}
 proc esp_event_handler_register*(event_base: esp_event_base_t; event_id: int32;
-                                event_handler: esp_event_handler_t;
+                                event_handler: (proc (event_handler_arg: pointer;
+                            event_base: esp_event_base_t; event_id: int32;
+                            event_data: pointer));
                                 event_handler_arg: pointer): esp_err_t {.
     importc: "esp_event_handler_register", header: "esp_event.h".}
 ## *

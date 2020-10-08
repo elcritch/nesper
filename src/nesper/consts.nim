@@ -95,10 +95,11 @@ type
   ## *< unique pointer to a subsystem that exposes events
   esp_event_loop_handle_t* = pointer
 
+type
   ## *< a number that identifies an event with respect to a base
-  esp_event_handler_t* = proc (event_handler_arg: pointer;
+  esp_event_handler_t* = (proc (event_handler_arg: pointer;
                             event_base: esp_event_base_t; event_id: int32;
-                            event_data: pointer)
+                            event_data: pointer))
 
 ## *< function called when an event is posted to the queue
 ##  Defines for registering/unregistering event handlers
