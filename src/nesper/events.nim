@@ -1,4 +1,5 @@
 import consts
+import general
 
 import esp/net/tcpip_adapter
 import esp/net/esp_wifi_types
@@ -9,6 +10,10 @@ export tcpip_adapter
 export esp_wifi_types
 export esp_event
 export event_groups
+
+type
+  EventError* = object of OSError
+    code*: esp_err_t
 
 proc eventRegister*(
             event_id: wifi_event_t;
@@ -28,11 +33,14 @@ proc eventRegister*(
             event_handler_arg: pointer
         ): esp_err_t {.inline.} =
 
-    return esp_event_handler_register(
+    let ret = esp_event_handler_register(
         event_base = IP_EVENT,
         event_id = event_id.cint,
         event_handler = event_handler,
         event_handler_arg = event_handler_arg)
+
+    if ret != ESP_OK:
+      raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
 proc eventUnregister*(
             event_id: wifi_event_t;
