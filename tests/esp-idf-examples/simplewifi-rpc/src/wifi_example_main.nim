@@ -33,12 +33,15 @@ proc on_got_ip*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
 proc example_connect*(): esp_err_t =
   if s_connect_event_group != nil:
     return ESP_ERR_INVALID_STATE
+
   s_connect_event_group = xEventGroupCreate()
+
   start()
-  xEventGroupWaitBits(s_connect_event_group, CONNECTED_BITS, true, true,
-                      portMAX_DELAY)
+  discard xEventGroupWaitBits(s_connect_event_group, CONNECTED_BITS, 1, 1, portMAX_DELAY)
+
   ESP_LOGI(TAG, "Connected to %s", s_connection_name)
-  ESP_LOGI(TAG, "IPv4 address: ", IPSTR, IP2STR(addr(s_ip_addr)))
+  ESP_LOGI(TAG, "IPv4 address: ", $s_ip_addr)
+
   return ESP_OK
 
 proc example_disconnect*(): esp_err_t =
