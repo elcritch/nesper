@@ -2,12 +2,9 @@ import nesper
 import nesper/consts
 import nesper/net_utils
 import nesper/events
+import nesper/wifi
+import nesper/nvs
 
-import nesper/esp/esp_event
-import nesper/esp/event_groups
-import nesper/esp/net/tcpip_adapter
-import nesper/esp/net/esp_wifi
-import nesper/esp/net/esp_wifi_types
 
 #  array[33, uint8]
 var CONFIG_EXAMPLE_WIFI_SSID {.importc: "CONFIG_EXAMPLE_WIFI_SSID".}: cstring 
@@ -78,8 +75,6 @@ proc start*() =
   ESP_ERROR_CHECK esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
   var wifi_config: wifi_config_t
-  # copyMem(addr(wifi_config.sta.ssid[0]), CONFIG_EXAMPLE_WIFI_SSID, len(CONFIG_EXAMPLE_WIFI_SSID))
-  # copyMem(addr(wifi_config.sta.password[0]), CONFIG_EXAMPLE_WIFI_PASSWORD, len(CONFIG_EXAMPLE_WIFI_PASSWORD))
   wifi_config.sta.ssid.setFromString(CONFIG_EXAMPLE_WIFI_SSID)
   wifi_config.sta.password.setFromString(CONFIG_EXAMPLE_WIFI_PASSWORD)
 

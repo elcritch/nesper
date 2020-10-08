@@ -3,10 +3,12 @@ import consts
 import esp/net/tcpip_adapter
 import esp/net/esp_wifi_types
 import esp/esp_event
+import esp/event_groups
 
 export tcpip_adapter
 export esp_wifi_types
 export esp_event
+export event_groups
 
 proc eventRegister*(
             event_id: wifi_event_t;
