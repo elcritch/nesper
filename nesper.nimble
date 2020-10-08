@@ -18,5 +18,5 @@ task test, "Runs the test suite":
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tgeneral.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tnvs.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tspi.nim"
-  exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/trouter.nim"
+  exec "nim c -r tests/trouter.nim"
 

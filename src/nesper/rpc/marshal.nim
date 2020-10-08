@@ -1,5 +1,5 @@
 import macros, json, options, typetraits
-# import stew/byteutils
+import stew/byteutils
 
 ## Code copied from: status-im/nim-json-rpc is licensed under the Apache License 2.0
 

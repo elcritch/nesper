@@ -141,7 +141,7 @@ proc route*(router: RpcRouter, node: JsonNode): JsonNode {.gcsafe.} =
       let res = rpcProc(jParams)
       result = wrapReply(id, res)
     except CatchableError as err:
-      echo "Error occurred within RPC", " methodName: ", methodName, "errorMessage = ", err.msg
+      # echo "Error occurred within RPC", " methodName: ", methodName, "errorMessage = ", err.msg
       let error = wrapError(SERVER_ERROR, methodName & " raised an exception",
                             id, newJString(err.msg))
       result = wrapReplyError(id, error)
