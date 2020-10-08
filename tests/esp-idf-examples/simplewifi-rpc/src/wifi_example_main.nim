@@ -3,6 +3,8 @@ import nesper/net_utils
 import nesper/esp/esp_event
 import nesper/esp/event_groups
 import nesper/esp/net/tcpip_adapter
+import nesper/esp/net/esp_wifi
+import nesper/esp/net/esp_wifi_types
 
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(0))
@@ -55,15 +57,16 @@ proc example_disconnect*(): esp_err_t =
   return ESP_OK
 
 proc on_wifi_disconnect*(arg: pointer; event_base: esp_event_base_t;
-                        event_id: int32_t; event_data: pointer) =
+                        event_id: int32; event_data: pointer) {.exportc.} =
   ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...")
   ESP_ERROR_CHECK(esp_wifi_connect())
 
 proc start*() =
-  var cfg: wifi_init_config_t = WIFI_INIT_CONFIG_DEFAULT()
+  var cfg: wifi_init_config_t = wifi_init_config_default()
+
   ESP_ERROR_CHECK(esp_wifi_init(addr(cfg)))
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT,
-      WIFI_EVENT_STA_DISCONNECTED, addr(on_wifi_disconnect), nil))
+      WIFI_EVENT_STA_DISCONNECTED, on_wifi_disconnect, nil))
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
       addr(on_got_ip), nil))
   ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM))

@@ -13,6 +13,10 @@
 ##  limitations under the License.
 
 import ../consts
+import esp_event_legacy
+
+export esp_event_legacy
+
 
 ## / Configuration for creating event loops
 

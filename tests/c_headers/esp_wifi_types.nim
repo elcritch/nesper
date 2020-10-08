@@ -11,8 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import ../../consts
-import ../../net_utils
+import
+  esp_private/esp_wifi_types_private
 
 type
   wifi_mode_t* {.size: sizeof(cint).} = enum
@@ -39,9 +39,9 @@ type
 type
   wifi_country_t* {.importc: "wifi_country_t", header: "esp_wifi_types.h", bycopy.} = object
     cc* {.importc: "cc".}: array[3, char] ## *< country code string
-    schan* {.importc: "schan".}: uint8 ## *< start channel
-    nchan* {.importc: "nchan".}: uint8 ## *< total channel number
-    max_tx_power* {.importc: "max_tx_power".}: int8 ## *< This field is used for getting WiFi maximum transmitting power, call esp_wifi_set_max_tx_power to set the maximum transmitting power.
+    schan* {.importc: "schan".}: uint8_t ## *< start channel
+    nchan* {.importc: "nchan".}: uint8_t ## *< total channel number
+    max_tx_power* {.importc: "max_tx_power".}: int8_t ## *< This field is used for getting WiFi maximum transmitting power, call esp_wifi_set_max_tx_power to set the maximum transmitting power.
     policy* {.importc: "policy".}: wifi_country_policy_t ## *< country policy
 
   wifi_auth_mode_t* {.size: sizeof(cint).} = enum
@@ -88,8 +88,8 @@ type
 type
   wifi_active_scan_time_t* {.importc: "wifi_active_scan_time_t",
                             header: "esp_wifi_types.h", bycopy.} = object
-    min* {.importc: "min".}: uint32 ## *< minimum active scan time per channel, units: millisecond
-    max* {.importc: "max".}: uint32 ## *< maximum active scan time per channel, units: millisecond, values above 1500ms may
+    min* {.importc: "min".}: uint32_t ## *< minimum active scan time per channel, units: millisecond
+    max* {.importc: "max".}: uint32_t ## *< maximum active scan time per channel, units: millisecond, values above 1500ms may
                                   ##                                           cause station to disconnect from AP and are not recommended.
 
 
@@ -99,7 +99,7 @@ type
   wifi_scan_time_t* {.importc: "wifi_scan_time_t", header: "esp_wifi_types.h", bycopy.} = object {.
       union.}
     active* {.importc: "active".}: wifi_active_scan_time_t ## *< active scan time per channel, units: millisecond.
-    passive* {.importc: "passive".}: uint32 ## *< passive scan time per channel, units: millisecond, values above 1500ms may
+    passive* {.importc: "passive".}: uint32_t ## *< passive scan time per channel, units: millisecond, values above 1500ms may
                                           ##                                           cause station to disconnect from AP and are not recommended.
 
 
@@ -108,9 +108,9 @@ type
 type
   wifi_scan_config_t* {.importc: "wifi_scan_config_t", header: "esp_wifi_types.h",
                        bycopy.} = object
-    ssid* {.importc: "ssid".}: ptr uint8 ## *< SSID of AP
-    bssid* {.importc: "bssid".}: ptr uint8 ## *< MAC address of AP
-    channel* {.importc: "channel".}: uint8 ## *< channel, scan the specific channel
+    ssid* {.importc: "ssid".}: ptr uint8_t ## *< SSID of AP
+    bssid* {.importc: "bssid".}: ptr uint8_t ## *< MAC address of AP
+    channel* {.importc: "channel".}: uint8_t ## *< channel, scan the specific channel
     show_hidden* {.importc: "show_hidden".}: bool ## *< enable to scan AP whose SSID is hidden
     scan_type* {.importc: "scan_type".}: wifi_scan_type_t ## *< scan type, active or passive
     scan_time* {.importc: "scan_time".}: wifi_scan_time_t ## *< scan time per channel
@@ -142,21 +142,21 @@ type
 
 type
   wifi_ap_record_t* {.importc: "wifi_ap_record_t", header: "esp_wifi_types.h", bycopy.} = object
-    bssid* {.importc: "bssid".}: array[6, uint8] ## *< MAC address of AP
-    ssid* {.importc: "ssid".}: array[33, uint8] ## *< SSID of AP
-    primary* {.importc: "primary".}: uint8 ## *< channel of AP
+    bssid* {.importc: "bssid".}: array[6, uint8_t] ## *< MAC address of AP
+    ssid* {.importc: "ssid".}: array[33, uint8_t] ## *< SSID of AP
+    primary* {.importc: "primary".}: uint8_t ## *< channel of AP
     second* {.importc: "second".}: wifi_second_chan_t ## *< secondary channel of AP
-    rssi* {.importc: "rssi".}: int8 ## *< signal strength of AP
+    rssi* {.importc: "rssi".}: int8_t ## *< signal strength of AP
     authmode* {.importc: "authmode".}: wifi_auth_mode_t ## *< authmode of AP
     pairwise_cipher* {.importc: "pairwise_cipher".}: wifi_cipher_type_t ## *< pairwise cipher of AP
     group_cipher* {.importc: "group_cipher".}: wifi_cipher_type_t ## *< group cipher of AP
     ant* {.importc: "ant".}: wifi_ant_t ## *< antenna used to receive beacon from AP
-    phy_11b* {.importc: "phy_11b", bitsize: 1.}: uint32 ## *< bit: 0 flag to identify if 11b mode is enabled or not
-    phy_11g* {.importc: "phy_11g", bitsize: 1.}: uint32 ## *< bit: 1 flag to identify if 11g mode is enabled or not
-    phy_11n* {.importc: "phy_11n", bitsize: 1.}: uint32 ## *< bit: 2 flag to identify if 11n mode is enabled or not
-    phy_lr* {.importc: "phy_lr", bitsize: 1.}: uint32 ## *< bit: 3 flag to identify if low rate is enabled or not
-    wps* {.importc: "wps", bitsize: 1.}: uint32 ## *< bit: 4 flag to identify if WPS is supported or not
-    reserved* {.importc: "reserved", bitsize: 27.}: uint32 ## *< bit: 5..31 reserved
+    phy_11b* {.importc: "phy_11b".} {.bitsize: 1.}: uint32_t ## *< bit: 0 flag to identify if 11b mode is enabled or not
+    phy_11g* {.importc: "phy_11g".} {.bitsize: 1.}: uint32_t ## *< bit: 1 flag to identify if 11g mode is enabled or not
+    phy_11n* {.importc: "phy_11n".} {.bitsize: 1.}: uint32_t ## *< bit: 2 flag to identify if 11n mode is enabled or not
+    phy_lr* {.importc: "phy_lr".} {.bitsize: 1.}: uint32_t ## *< bit: 3 flag to identify if low rate is enabled or not
+    wps* {.importc: "wps".} {.bitsize: 1.}: uint32_t ## *< bit: 4 flag to identify if WPS is supported or not
+    reserved* {.importc: "reserved".} {.bitsize: 27.}: uint32_t ## *< bit: 5..31 reserved
     country* {.importc: "country".}: wifi_country_t ## *< country information of AP
 
   wifi_scan_method_t* {.size: sizeof(cint).} = enum
@@ -173,7 +173,7 @@ type
 type
   wifi_scan_threshold_t* {.importc: "wifi_scan_threshold_t",
                           header: "esp_wifi_types.h", bycopy.} = object
-    rssi* {.importc: "rssi".}: int8 ## *< The minimum rssi to accept in the fast scan mode
+    rssi* {.importc: "rssi".}: int8_t ## *< The minimum rssi to accept in the fast scan mode
     authmode* {.importc: "authmode".}: wifi_auth_mode_t ## *< The weakest authmode to accept in the fast scan mode
 
   wifi_ps_type_t* {.size: sizeof(cint).} = enum
@@ -207,14 +207,14 @@ type
 
 type
   wifi_ap_config_t* {.importc: "wifi_ap_config_t", header: "esp_wifi_types.h", bycopy.} = object
-    ssid* {.importc: "ssid".}: array[32, uint8] ## *< SSID of ESP32 soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len.
-    password* {.importc: "password".}: array[64, uint8] ## *< Password of ESP32 soft-AP. Null terminated string.
-    ssid_len* {.importc: "ssid_len".}: uint8 ## *< Optional length of SSID field.
-    channel* {.importc: "channel".}: uint8 ## *< Channel of ESP32 soft-AP
+    ssid* {.importc: "ssid".}: array[32, uint8_t] ## *< SSID of ESP32 soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len.
+    password* {.importc: "password".}: array[64, uint8_t] ## *< Password of ESP32 soft-AP. Null terminated string.
+    ssid_len* {.importc: "ssid_len".}: uint8_t ## *< Optional length of SSID field.
+    channel* {.importc: "channel".}: uint8_t ## *< Channel of ESP32 soft-AP
     authmode* {.importc: "authmode".}: wifi_auth_mode_t ## *< Auth mode of ESP32 soft-AP. Do not support AUTH_WEP in soft-AP mode
-    ssid_hidden* {.importc: "ssid_hidden".}: uint8 ## *< Broadcast SSID or not, default 0, broadcast the SSID
-    max_connection* {.importc: "max_connection".}: uint8 ## *< Max number of stations allowed to connect in, default 4, max 10
-    beacon_interval* {.importc: "beacon_interval".}: uint16 ## *< Beacon interval, 100 ~ 60000 ms, default 100 ms
+    ssid_hidden* {.importc: "ssid_hidden".}: uint8_t ## *< Broadcast SSID or not, default 0, broadcast the SSID
+    max_connection* {.importc: "max_connection".}: uint8_t ## *< Max number of stations allowed to connect in, default 4, max 10
+    beacon_interval* {.importc: "beacon_interval".}: uint16_t ## *< Beacon interval, 100 ~ 60000 ms, default 100 ms
 
 
 ## * @brief STA configuration settings for the ESP32
@@ -222,13 +222,13 @@ type
 type
   wifi_sta_config_t* {.importc: "wifi_sta_config_t", header: "esp_wifi_types.h",
                       bycopy.} = object
-    ssid* {.importc: "ssid".}: array[32, uint8] ## *< SSID of target AP. Null terminated string.
-    password* {.importc: "password".}: array[64, uint8] ## *< Password of target AP. Null terminated string.
+    ssid* {.importc: "ssid".}: array[32, uint8_t] ## *< SSID of target AP. Null terminated string.
+    password* {.importc: "password".}: array[64, uint8_t] ## *< Password of target AP. Null terminated string.
     scan_method* {.importc: "scan_method".}: wifi_scan_method_t ## *< do all channel scan or fast scan
     bssid_set* {.importc: "bssid_set".}: bool ## *< whether set MAC address of target AP or not. Generally, station_config.bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.
-    bssid* {.importc: "bssid".}: array[6, uint8] ## *< MAC address of target AP
-    channel* {.importc: "channel".}: uint8 ## *< channel of target AP. Set to 1~13 to scan starting from the specified channel before connecting to AP. If the channel of AP is unknown, set it to 0.
-    listen_interval* {.importc: "listen_interval".}: uint16 ## *< Listen interval for ESP32 station to receive beacon when WIFI_PS_MAX_MODEM is set. Units: AP beacon intervals. Defaults to 3 if set to 0.
+    bssid* {.importc: "bssid".}: array[6, uint8_t] ## *< MAC address of target AP
+    channel* {.importc: "channel".}: uint8_t ## *< channel of target AP. Set to 1~13 to scan starting from the specified channel before connecting to AP. If the channel of AP is unknown, set it to 0.
+    listen_interval* {.importc: "listen_interval".}: uint16_t ## *< Listen interval for ESP32 station to receive beacon when WIFI_PS_MAX_MODEM is set. Units: AP beacon intervals. Defaults to 3 if set to 0.
     sort_method* {.importc: "sort_method".}: wifi_sort_method_t ## *< sort the connect AP in the list by rssi or security mode
     threshold* {.importc: "threshold".}: wifi_scan_threshold_t ## *< When sort_method is set, only APs which have an auth mode that is more secure than the selected auth mode and a signal stronger than the minimum RSSI will be used.
     pmf_cfg* {.importc: "pmf_cfg".}: wifi_pmf_config_t ## *< Configuration for Protected Management Frame. Will be advertized in RSN Capabilities in RSN IE.
@@ -252,13 +252,13 @@ type
 
 type
   wifi_sta_info_t* {.importc: "wifi_sta_info_t", header: "esp_wifi_types.h", bycopy.} = object
-    mac* {.importc: "mac".}: array[6, uint8] ## *< mac address
-    rssi* {.importc: "rssi".}: int8 ## *< current average rssi of sta connected
-    phy_11b* {.importc: "phy_11b", bitsize: 1.}: uint32 ## *< bit: 0 flag to identify if 11b mode is enabled or not
-    phy_11g* {.importc: "phy_11g", bitsize: 1.}: uint32 ## *< bit: 1 flag to identify if 11g mode is enabled or not
-    phy_11n* {.importc: "phy_11n", bitsize: 1.}: uint32 ## *< bit: 2 flag to identify if 11n mode is enabled or not
-    phy_lr* {.importc: "phy_lr", bitsize: 1.}: uint32 ## *< bit: 3 flag to identify if low rate is enabled or not
-    reserved* {.importc: "reserved", bitsize: 28.}: uint32 ## *< bit: 4..31 reserved
+    mac* {.importc: "mac".}: array[6, uint8_t] ## *< mac address
+    rssi* {.importc: "rssi".}: int8_t ## *< current average rssi of sta connected
+    phy_11b* {.importc: "phy_11b".} {.bitsize: 1.}: uint32_t ## *< bit: 0 flag to identify if 11b mode is enabled or not
+    phy_11g* {.importc: "phy_11g".} {.bitsize: 1.}: uint32_t ## *< bit: 1 flag to identify if 11g mode is enabled or not
+    phy_11n* {.importc: "phy_11n".} {.bitsize: 1.}: uint32_t ## *< bit: 2 flag to identify if 11n mode is enabled or not
+    phy_lr* {.importc: "phy_lr".} {.bitsize: 1.}: uint32_t ## *< bit: 3 flag to identify if low rate is enabled or not
+    reserved* {.importc: "reserved".} {.bitsize: 28.}: uint32_t ## *< bit: 4..31 reserved
 
 
 const
@@ -311,42 +311,65 @@ const
 
 type
   vendor_ie_data_t* {.importc: "vendor_ie_data_t", header: "esp_wifi_types.h", bycopy.} = object
-    element_id* {.importc: "element_id".}: uint8 ## *< Should be set to WIFI_VENDOR_IE_ELEMENT_ID (0xDD)
-    length* {.importc: "length".}: uint8 ## *< Length of all bytes in the element data following this field. Minimum 4.
-    vendor_oui* {.importc: "vendor_oui".}: array[3, uint8] ## *< Vendor identifier (OUI).
-    vendor_oui_type* {.importc: "vendor_oui_type".}: uint8 ## *< Vendor-specific OUI type.
-    payload* {.importc: "payload".}: UncheckedArray[uint8] ## *< Payload. Length is equal to value in 'length' field, minus 4.
+    element_id* {.importc: "element_id".}: uint8_t ## *< Should be set to WIFI_VENDOR_IE_ELEMENT_ID (0xDD)
+    length* {.importc: "length".}: uint8_t ## *< Length of all bytes in the element data following this field. Minimum 4.
+    vendor_oui* {.importc: "vendor_oui".}: array[3, uint8_t] ## *< Vendor identifier (OUI).
+    vendor_oui_type* {.importc: "vendor_oui_type".}: uint8_t ## *< Vendor-specific OUI type.
+    payload* {.importc: "payload".}: UncheckedArray[uint8_t] ## *< Payload. Length is equal to value in 'length' field, minus 4.
 
+
+## * @brief Received packet radio metadata header, this is the common header at the beginning of all promiscuous mode RX callback buffers
+
+type
   wifi_pkt_rx_ctrl_t* {.importc: "wifi_pkt_rx_ctrl_t", header: "esp_wifi_types.h",
                        bycopy.} = object
-    rssi* {.importc: "rssi", bitsize: 8.}: cint ## *< Received Signal Strength Indicator(RSSI) of packet. unit: dBm
-    rate* {.importc: "rate", bitsize: 5.}: cuint ## *< PHY rate encoding of the packet. Only valid for non HT(11bg) packet
-    r1* {.importc: "r1", bitsize: 1.}: cuint ## *< reserve
-    sig_mode* {.importc: "sig_mode", bitsize: 2.}: cuint ## *< 0: non HT(11bg) packet; 1: HT(11n) packet; 3: VHT(11ac) packet
-    r2* {.importc: "r2", bitsize: 16.}: cuint ## *< reserve
-    mcs* {.importc: "mcs", bitsize: 7.}: cuint ## *< Modulation Coding Scheme. If is HT(11n) packet, shows the modulation, range from 0 to 76(MSC0 ~ MCS76)
-    cwb* {.importc: "cwb", bitsize: 1.}: cuint ## *< Channel Bandwidth of the packet. 0: 20MHz; 1: 40MHz
-    r3* {.importc: "r3", bitsize: 16.}: cuint ## *< reserve
-    smoothing* {.importc: "smoothing", bitsize: 1.}: cuint ## *< reserve
-    not_sounding* {.importc: "not_sounding", bitsize: 1.}: cuint ## *< reserve
-    r4* {.importc: "r4", bitsize: 1.}: cuint ## *< reserve
-    aggregation* {.importc: "aggregation", bitsize: 1.}: cuint ## *< Aggregation. 0: MPDU packet; 1: AMPDU packet
-    stbc* {.importc: "stbc", bitsize: 2.}: cuint ## *< Space Time Block Code(STBC). 0: non STBC packet; 1: STBC packet
-    fec_coding* {.importc: "fec_coding", bitsize: 1.}: cuint ## *< Flag is set for 11n packets which are LDPC
-    sgi* {.importc: "sgi", bitsize: 1.}: cuint ## *< Short Guide Interval(SGI). 0: Long GI; 1: Short GI
-    noise_floor* {.importc: "noise_floor", bitsize: 8.}: cint ## *< noise floor of Radio Frequency Module(RF). unit: 0.25dBm
-    ampdu_cnt* {.importc: "ampdu_cnt", bitsize: 8.}: cuint ## *< ampdu cnt
-    channel* {.importc: "channel", bitsize: 4.}: cuint ## *< primary channel on which this packet is received
-    secondary_channel* {.importc: "secondary_channel", bitsize: 4.}: cuint ## *< secondary channel on which this packet is received. 0: none; 1: above; 2: below
-    r5* {.importc: "r5", bitsize: 8.}: cuint ## *< reserve
-    timestamp* {.importc: "timestamp", bitsize: 32.}: cuint ## *< timestamp. The local time when this packet is received. It is precise only if modem sleep or light sleep is not enabled. unit: microsecond
-    r6* {.importc: "r6", bitsize: 32.}: cuint ## *< reserve
-    r7* {.importc: "r7", bitsize: 31.}: cuint ## *< reserve
-    ant* {.importc: "ant", bitsize: 1.}: cuint ## *< antenna number from which this packet is received. 0: WiFi antenna 0; 1: WiFi antenna 1
-    sig_len* {.importc: "sig_len", bitsize: 12.}: cuint ## *< length of packet including Frame Check Sequence(FCS)
-    r8* {.importc: "r8", bitsize: 12.}: cuint ## *< reserve
-    rx_state* {.importc: "rx_state", bitsize: 8.}: cuint ## *< state of the packet. 0: no error; others: error numbers which are not public
+    rssi* {.importc: "rssi".} {.bitsize: 8.}: cint ## *< Received Signal Strength Indicator(RSSI) of packet. unit: dBm
+    rate* {.importc: "rate".} {.bitsize: 5.}: cuint ## *< PHY rate encoding of the packet. Only valid for non HT(11bg) packet
+    r1* {.importc: "r1".} {.bitsize: 1.}: cuint ## *< reserve
+    sig_mode* {.importc: "sig_mode".} {.bitsize: 2.}: cuint ## *< 0: non HT(11bg) packet; 1: HT(11n) packet; 3: VHT(11ac) packet
+    r2* {.importc: "r2".} {.bitsize: 16.}: cuint ## *< reserve
+    mcs* {.importc: "mcs".} {.bitsize: 7.}: cuint ## *< Modulation Coding Scheme. If is HT(11n) packet, shows the modulation, range from 0 to 76(MSC0 ~ MCS76)
+    cwb* {.importc: "cwb".} {.bitsize: 1.}: cuint ## *< Channel Bandwidth of the packet. 0: 20MHz; 1: 40MHz
+    r3* {.importc: "r3".} {.bitsize: 16.}: cuint ## *< reserve
+    smoothing* {.importc: "smoothing".} {.bitsize: 1.}: cuint ## *< reserve
+    not_sounding* {.importc: "not_sounding".} {.bitsize: 1.}: cuint ## *< reserve
+    r4* {.importc: "r4".} {.bitsize: 1.}: cuint ## *< reserve
+    aggregation* {.importc: "aggregation".} {.bitsize: 1.}: cuint ## *< Aggregation. 0: MPDU packet; 1: AMPDU packet
+    stbc* {.importc: "stbc".} {.bitsize: 2.}: cuint ## *< Space Time Block Code(STBC). 0: non STBC packet; 1: STBC packet
+    fec_coding* {.importc: "fec_coding".} {.bitsize: 1.}: cuint ## *< Flag is set for 11n packets which are LDPC
+    sgi* {.importc: "sgi".} {.bitsize: 1.}: cuint ## *< Short Guide Interval(SGI). 0: Long GI; 1: Short GI
+    noise_floor* {.importc: "noise_floor".} {.bitsize: 8.}: cint ## *< noise floor of Radio Frequency Module(RF). unit: 0.25dBm
+    ampdu_cnt* {.importc: "ampdu_cnt".} {.bitsize: 8.}: cuint ## *< ampdu cnt
+    channel* {.importc: "channel".} {.bitsize: 4.}: cuint ## *< primary channel on which this packet is received
+    secondary_channel* {.importc: "secondary_channel".} {.bitsize: 4.}: cuint ## *< secondary channel on which this packet is received. 0: none; 1: above; 2: below
+    r5* {.importc: "r5".} {.bitsize: 8.}: cuint ## *< reserve
+    timestamp* {.importc: "timestamp".} {.bitsize: 32.}: cuint ## *< timestamp. The local time when this packet is received. It is precise only if modem sleep or light sleep is not enabled. unit: microsecond
+    r6* {.importc: "r6".} {.bitsize: 32.}: cuint ## *< reserve
+    r7* {.importc: "r7".} {.bitsize: 31.}: cuint ## *< reserve
+    ant* {.importc: "ant".} {.bitsize: 1.}: cuint ## *< antenna number from which this packet is received. 0: WiFi antenna 0; 1: WiFi antenna 1
+    sig_len* {.importc: "sig_len".} {.bitsize: 12.}: cuint ## *< length of packet including Frame Check Sequence(FCS)
+    r8* {.importc: "r8".} {.bitsize: 12.}: cuint ## *< reserve
+    rx_state* {.importc: "rx_state".} {.bitsize: 8.}: cuint ## *< state of the packet. 0: no error; others: error numbers which are not public
 
+
+## * @brief Payload passed to 'buf' parameter of promiscuous mode RX callback.
+##
+
+type
+  wifi_promiscuous_pkt_t* {.importc: "wifi_promiscuous_pkt_t",
+                           header: "esp_wifi_types.h", bycopy.} = object
+    rx_ctrl* {.importc: "rx_ctrl".}: wifi_pkt_rx_ctrl_t ## *< metadata header
+    payload* {.importc: "payload".}: UncheckedArray[uint8_t] ## *< Data or management payload. Length of payload is described by rx_ctrl.sig_len. Type of content determined by packet type argument of callback.
+
+
+## *
+##  @brief Promiscuous frame type
+##
+##  Passed to promiscuous mode RX callback to indicate the type of parameter in the buffer.
+##
+##
+
+type
   wifi_promiscuous_pkt_type_t* {.size: sizeof(cint).} = enum
     WIFI_PKT_MGMT,            ## *< Management frame, indicates 'buf' argument is wifi_promiscuous_pkt_t
     WIFI_PKT_CTRL,            ## *< Control frame, indicates 'buf' argument is wifi_promiscuous_pkt_t
@@ -378,7 +401,7 @@ const
 type
   wifi_promiscuous_filter_t* {.importc: "wifi_promiscuous_filter_t",
                               header: "esp_wifi_types.h", bycopy.} = object
-    filter_mask* {.importc: "filter_mask".}: uint32 ## *< OR of one or more filter values WIFI_PROMIS_FILTER_*
+    filter_mask* {.importc: "filter_mask".}: uint32_t ## *< OR of one or more filter values WIFI_PROMIS_FILTER_*
 
 
 const
@@ -400,7 +423,7 @@ type
     ltf_merge_en* {.importc: "ltf_merge_en".}: bool ## *< enable to generate htlft data by averaging lltf and ht_ltf data when receiving HT packet. Otherwise, use ht_ltf data directly. Default enabled
     channel_filter_en* {.importc: "channel_filter_en".}: bool ## *< enable to turn on channel filter to smooth adjacent sub-carrier. Disable it to keep independence of adjacent sub-carrier. Default enabled
     manu_scale* {.importc: "manu_scale".}: bool ## *< manually scale the CSI data by left shifting or automatically scale the CSI data. If set true, please set the shift bits. false: automatically. true: manually. Default false
-    shift* {.importc: "shift".}: uint8 ## *< manually left shift bits of the scale of the CSI data. The range of the left shift bits is 0~15
+    shift* {.importc: "shift".}: uint8_t ## *< manually left shift bits of the scale of the CSI data. The range of the left shift bits is 0~15
 
 
 ## *
@@ -411,10 +434,10 @@ type
 type
   wifi_csi_info_t* {.importc: "wifi_csi_info_t", header: "esp_wifi_types.h", bycopy.} = object
     rx_ctrl* {.importc: "rx_ctrl".}: wifi_pkt_rx_ctrl_t ## *< received packet radio metadata header of the CSI data
-    mac* {.importc: "mac".}: array[6, uint8] ## *< source MAC address of the CSI data
+    mac* {.importc: "mac".}: array[6, uint8_t] ## *< source MAC address of the CSI data
     first_word_invalid* {.importc: "first_word_invalid".}: bool ## *< first four bytes of the CSI data is invalid or not
-    buf* {.importc: "buf".}: ptr int8 ## *< buffer of CSI data
-    len* {.importc: "len".}: uint16 ## *< length of CSI data
+    buf* {.importc: "buf".}: ptr int8_t ## *< buffer of CSI data
+    len* {.importc: "len".}: uint16_t ## *< length of CSI data
 
 
 ## *
@@ -424,8 +447,8 @@ type
 
 type
   wifi_ant_gpio_t* {.importc: "wifi_ant_gpio_t", header: "esp_wifi_types.h", bycopy.} = object
-    gpio_select* {.importc: "gpio_select", bitsize: 1.}: uint8 ## *< Whether this GPIO is connected to external antenna switch
-    gpio_num* {.importc: "gpio_num", bitsize: 7.}: uint8 ## *< The GPIO number that connects to external antenna switch
+    gpio_select* {.importc: "gpio_select".} {.bitsize: 1.}: uint8_t ## *< Whether this GPIO is connected to external antenna switch
+    gpio_num* {.importc: "gpio_num".} {.bitsize: 7.}: uint8_t ## *< The GPIO number that connects to external antenna switch
 
 
 ## *
@@ -463,8 +486,8 @@ type
     rx_ant_mode* {.importc: "rx_ant_mode".}: wifi_ant_mode_t ## *< WiFi antenna mode for receiving
     rx_ant_default* {.importc: "rx_ant_default".}: wifi_ant_t ## *< Default antenna mode for receiving, it's ignored if rx_ant_mode is not WIFI_ANT_MODE_AUTO
     tx_ant_mode* {.importc: "tx_ant_mode".}: wifi_ant_mode_t ## *< WiFi antenna mode for transmission, it can be set to WIFI_ANT_MODE_AUTO only if rx_ant_mode is set to WIFI_ANT_MODE_AUTO
-    enabled_ant0* {.importc: "enabled_ant0", bitsize: 4.}: uint8 ## *< Index (in antenna GPIO configuration) of enabled WIFI_ANT_MODE_ANT0
-    enabled_ant1* {.importc: "enabled_ant1", bitsize: 4.}: uint8 ## *< Index (in antenna GPIO configuration) of enabled WIFI_ANT_MODE_ANT1
+    enabled_ant0* {.importc: "enabled_ant0".} {.bitsize: 4.}: uint8_t ## *< Index (in antenna GPIO configuration) of enabled WIFI_ANT_MODE_ANT0
+    enabled_ant1* {.importc: "enabled_ant1".} {.bitsize: 4.}: uint8_t ## *< Index (in antenna GPIO configuration) of enabled WIFI_ANT_MODE_ANT1
 
 
 ## *
@@ -536,18 +559,16 @@ type
 ## * @cond *
 ## * @brief WiFi event base declaration
 
-# ESP_EVENT_DECLARE_BASE(WIFI_EVENT)
-var WIFI_EVENT* {.importc: "WIFI_EVENT", header: "esp_wifi_types.h".}: esp_event_base_t 
-
+ESP_EVENT_DECLARE_BASE(WIFI_EVENT)
 ## * @endcond *
 ## * Argument structure for WIFI_EVENT_SCAN_DONE event
 
 type
   wifi_event_sta_scan_done_t* {.importc: "wifi_event_sta_scan_done_t",
                                header: "esp_wifi_types.h", bycopy.} = object
-    status* {.importc: "status".}: uint32 ## *< status of scanning APs: 0 — success, 1 - failure
-    number* {.importc: "number".}: uint8 ## *< number of scan results
-    scan_id* {.importc: "scan_id".}: uint8 ## *< scan sequence number, used for block scan
+    status* {.importc: "status".}: uint32_t ## *< status of scanning APs: 0 — success, 1 - failure
+    number* {.importc: "number".}: uint8_t ## *< number of scan results
+    scan_id* {.importc: "scan_id".}: uint8_t ## *< scan sequence number, used for block scan
 
 
 ## * Argument structure for WIFI_EVENT_STA_CONNECTED event
@@ -555,10 +576,10 @@ type
 type
   wifi_event_sta_connected_t* {.importc: "wifi_event_sta_connected_t",
                                header: "esp_wifi_types.h", bycopy.} = object
-    ssid* {.importc: "ssid".}: array[32, uint8] ## *< SSID of connected AP
-    ssid_len* {.importc: "ssid_len".}: uint8 ## *< SSID length of connected AP
-    bssid* {.importc: "bssid".}: array[6, uint8] ## *< BSSID of connected AP
-    channel* {.importc: "channel".}: uint8 ## *< channel of connected AP
+    ssid* {.importc: "ssid".}: array[32, uint8_t] ## *< SSID of connected AP
+    ssid_len* {.importc: "ssid_len".}: uint8_t ## *< SSID length of connected AP
+    bssid* {.importc: "bssid".}: array[6, uint8_t] ## *< BSSID of connected AP
+    channel* {.importc: "channel".}: uint8_t ## *< channel of connected AP
     authmode* {.importc: "authmode".}: wifi_auth_mode_t ## *< authentication mode used by AP
 
 
@@ -567,10 +588,10 @@ type
 type
   wifi_event_sta_disconnected_t* {.importc: "wifi_event_sta_disconnected_t",
                                   header: "esp_wifi_types.h", bycopy.} = object
-    ssid* {.importc: "ssid".}: array[32, uint8] ## *< SSID of disconnected AP
-    ssid_len* {.importc: "ssid_len".}: uint8 ## *< SSID length of disconnected AP
-    bssid* {.importc: "bssid".}: array[6, uint8] ## *< BSSID of disconnected AP
-    reason* {.importc: "reason".}: uint8 ## *< reason of disconnection
+    ssid* {.importc: "ssid".}: array[32, uint8_t] ## *< SSID of disconnected AP
+    ssid_len* {.importc: "ssid_len".}: uint8_t ## *< SSID length of disconnected AP
+    bssid* {.importc: "bssid".}: array[6, uint8_t] ## *< BSSID of disconnected AP
+    reason* {.importc: "reason".}: uint8_t ## *< reason of disconnection
 
 
 ## * Argument structure for WIFI_EVENT_STA_AUTHMODE_CHANGE event
@@ -587,7 +608,7 @@ type
 type
   wifi_event_sta_wps_er_pin_t* {.importc: "wifi_event_sta_wps_er_pin_t",
                                 header: "esp_wifi_types.h", bycopy.} = object
-    pin_code* {.importc: "pin_code".}: array[8, uint8] ## *< PIN code of station in enrollee mode
+    pin_code* {.importc: "pin_code".}: array[8, uint8_t] ## *< PIN code of station in enrollee mode
 
 
 ## * Argument structure for WIFI_EVENT_STA_WPS_ER_FAILED event
@@ -604,8 +625,8 @@ type
 type
   wifi_event_ap_staconnected_t* {.importc: "wifi_event_ap_staconnected_t",
                                  header: "esp_wifi_types.h", bycopy.} = object
-    mac* {.importc: "mac".}: array[6, uint8] ## *< MAC address of the station connected to ESP32 soft-AP
-    aid* {.importc: "aid".}: uint8 ## *< the aid that ESP32 soft-AP gives to the station connected to
+    mac* {.importc: "mac".}: array[6, uint8_t] ## *< MAC address of the station connected to ESP32 soft-AP
+    aid* {.importc: "aid".}: uint8_t ## *< the aid that ESP32 soft-AP gives to the station connected to
 
 
 ## * Argument structure for WIFI_EVENT_AP_STADISCONNECTED event
@@ -613,8 +634,8 @@ type
 type
   wifi_event_ap_stadisconnected_t* {.importc: "wifi_event_ap_stadisconnected_t",
                                     header: "esp_wifi_types.h", bycopy.} = object
-    mac* {.importc: "mac".}: array[6, uint8] ## *< MAC address of the station disconnects to ESP32 soft-AP
-    aid* {.importc: "aid".}: uint8 ## *< the aid that ESP32 soft-AP gave to the station disconnects to
+    mac* {.importc: "mac".}: array[6, uint8_t] ## *< MAC address of the station disconnects to ESP32 soft-AP
+    aid* {.importc: "aid".}: uint8_t ## *< the aid that ESP32 soft-AP gave to the station disconnects to
 
 
 ## * Argument structure for WIFI_EVENT_AP_PROBEREQRECVED event
@@ -623,5 +644,5 @@ type
   wifi_event_ap_probe_req_rx_t* {.importc: "wifi_event_ap_probe_req_rx_t",
                                  header: "esp_wifi_types.h", bycopy.} = object
     rssi* {.importc: "rssi".}: cint ## *< Received probe request signal strength
-    mac* {.importc: "mac".}: array[6, uint8] ## *< MAC address of the station which send probe request
+    mac* {.importc: "mac".}: array[6, uint8_t] ## *< MAC address of the station which send probe request
 

@@ -53,6 +53,12 @@
 
 import ../../consts
 import ../../general
+import ../esp_event_legacy
+import esp_wifi_types
+
+type 
+  wifi_osi_funcs_t* {.importc: "wifi_osi_funcs_t", header: "esp_wifi.h", bycopy.} = object
+  wpa_crypto_funcs_t* {.importc: "wpa_crypto_funcs_t", header: "esp_wifi.h", bycopy.} = object
 
 # import
   # esp_err, esp_wifi_types, esp_event, esp_private/esp_wifi_private
@@ -101,92 +107,101 @@ type
     wifi_task_core_id* {.importc: "wifi_task_core_id".}: cint ## *< WiFi Task Core ID
     beacon_max_len* {.importc: "beacon_max_len".}: cint ## *< WiFi softAP maximum length of the beacon
     mgmt_sbuf_num* {.importc: "mgmt_sbuf_num".}: cint ## *< WiFi management short buffer number, the minimum value is 6, the maximum value is 32
-    feature_caps* {.importc: "feature_caps".}: uint64_t ## *< Enables additional WiFi features and capabilities
+    feature_caps* {.importc: "feature_caps".}: uint64 ## *< Enables additional WiFi features and capabilities
     magic* {.importc: "magic".}: cint ## *< WiFi init magic number, it should be the last field
 
 
-when defined(CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM):
-  const
-    WIFI_STATIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM
-else:
-  const
-    WIFI_STATIC_TX_BUFFER_NUM* = 0
-when defined(CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM):
-  const
-    WIFI_DYNAMIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM
-else:
-  const
-    WIFI_DYNAMIC_TX_BUFFER_NUM* = 0
-when CONFIG_ESP32_WIFI_CSI_ENABLED:
-  const
-    WIFI_CSI_ENABLED* = 1
-else:
-  const
-    WIFI_CSI_ENABLED* = 0
-when CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED:
-  const
-    WIFI_AMPDU_RX_ENABLED* = 1
-else:
-  const
-    WIFI_AMPDU_RX_ENABLED* = 0
-when CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED:
-  const
-    WIFI_AMPDU_TX_ENABLED* = 1
-else:
-  const
-    WIFI_AMPDU_TX_ENABLED* = 0
-when CONFIG_ESP32_WIFI_NVS_ENABLED:
-  const
-    WIFI_NVS_ENABLED* = 1
-else:
-  const
-    WIFI_NVS_ENABLED* = 0
-when CONFIG_NEWLIB_NANO_FORMAT:
-  const
-    WIFI_NANO_FORMAT_ENABLED* = 1
-else:
-  const
-    WIFI_NANO_FORMAT_ENABLED* = 0
+proc wifi_init_config_default*(): wifi_init_config_t {.importc:"$1".}
+{.emit: """
+NIM_EXTERNC
+wifi_init_config_t _wifi_init_config_default_() {
+  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+  return cfg;
+}
+""".}
+
+# when defined(CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM):
+#   const
+#     WIFI_STATIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM
+# else:
+#   const
+#     WIFI_STATIC_TX_BUFFER_NUM* = 0
+# when defined(CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM):
+#   const
+#     WIFI_DYNAMIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM
+# else:
+#   const
+#     WIFI_DYNAMIC_TX_BUFFER_NUM* = 0
+# when CONFIG_ESP32_WIFI_CSI_ENABLED:
+#   const
+#     WIFI_CSI_ENABLED* = 1
+# else:
+#   const
+#     WIFI_CSI_ENABLED* = 0
+# when CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED:
+#   const
+#     WIFI_AMPDU_RX_ENABLED* = 1
+# else:
+#   const
+#     WIFI_AMPDU_RX_ENABLED* = 0
+# when CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED:
+#   const
+#     WIFI_AMPDU_TX_ENABLED* = 1
+# else:
+#   const
+#     WIFI_AMPDU_TX_ENABLED* = 0
+# when CONFIG_ESP32_WIFI_NVS_ENABLED:
+#   const
+#     WIFI_NVS_ENABLED* = 1
+# else:
+#   const
+#     WIFI_NVS_ENABLED* = 0
+# when CONFIG_NEWLIB_NANO_FORMAT:
+#   const
+#     WIFI_NANO_FORMAT_ENABLED* = 1
+# else:
+#   const
+#     WIFI_NANO_FORMAT_ENABLED* = 0
 var g_wifi_default_wpa_crypto_funcs* {.importc: "g_wifi_default_wpa_crypto_funcs",
                                      header: "esp_wifi.h".}: wpa_crypto_funcs_t
 
-var g_wifi_feature_caps* {.importc: "g_wifi_feature_caps", header: "esp_wifi.h".}: uint64_t
+var g_wifi_feature_caps* {.importc: "g_wifi_feature_caps", header: "esp_wifi.h".}: uint64
 
 const
   WIFI_INIT_CONFIG_MAGIC* = 0x1F2F3F4F
 
-when defined(CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED):
-  const
-    WIFI_DEFAULT_TX_BA_WIN* = CONFIG_ESP32_WIFI_TX_BA_WIN
-else:
-  const
-    WIFI_DEFAULT_TX_BA_WIN* = 0
-when defined(CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED):
-  const
-    WIFI_DEFAULT_RX_BA_WIN* = CONFIG_ESP32_WIFI_RX_BA_WIN
-else:
-  const
-    WIFI_DEFAULT_RX_BA_WIN* = 0
-when CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1:
-  const
-    WIFI_TASK_CORE_ID* = 1
-else:
-  const
-    WIFI_TASK_CORE_ID* = 0
-when defined(CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN):
-  const
-    WIFI_SOFTAP_BEACON_MAX_LEN* = CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN
-else:
-  const
-    WIFI_SOFTAP_BEACON_MAX_LEN* = 752
-when defined(CONFIG_ESP32_WIFI_MGMT_SBUF_NUM):
-  const
-    WIFI_MGMT_SBUF_NUM* = CONFIG_ESP32_WIFI_MGMT_SBUF_NUM
-else:
-  const
-    WIFI_MGMT_SBUF_NUM* = 32
-const
-  CONFIG_FEATURE_WPA3_SAE_BIT* = (1 shl 0)
+# when defined(CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED):
+#   const
+#     WIFI_DEFAULT_TX_BA_WIN* = CONFIG_ESP32_WIFI_TX_BA_WIN
+# else:
+#   const
+#     WIFI_DEFAULT_TX_BA_WIN* = 0
+# when defined(CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED):
+#   const
+#     WIFI_DEFAULT_RX_BA_WIN* = CONFIG_ESP32_WIFI_RX_BA_WIN
+# else:
+#   const
+#     WIFI_DEFAULT_RX_BA_WIN* = 0
+# when CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1:
+#   const
+#     WIFI_TASK_CORE_ID* = 1
+# else:
+#   const
+#     WIFI_TASK_CORE_ID* = 0
+# when defined(CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN):
+#   const
+#     WIFI_SOFTAP_BEACON_MAX_LEN* = CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN
+# else:
+#   const
+#     WIFI_SOFTAP_BEACON_MAX_LEN* = 752
+# when defined(CONFIG_ESP32_WIFI_MGMT_SBUF_NUM):
+#   const
+#     WIFI_MGMT_SBUF_NUM* = CONFIG_ESP32_WIFI_MGMT_SBUF_NUM
+# else:
+#   const
+#     WIFI_MGMT_SBUF_NUM* = 32
+# const
+#   CONFIG_FEATURE_WPA3_SAE_BIT* = (1 shl 0)
 
 ##  #define WIFI_INIT_CONFIG_DEFAULT() { \
 ##      .event_handler = &esp_event_send, \
@@ -376,7 +391,7 @@ proc esp_wifi_clear_fast_connect*(): esp_err_t {.
 ##     - ESP_ERR_WIFI_MODE: WiFi mode is wrong
 ##
 
-proc esp_wifi_deauth_sta*(aid: uint16_t): esp_err_t {.
+proc esp_wifi_deauth_sta*(aid: uint16): esp_err_t {.
     importc: "esp_wifi_deauth_sta", header: "esp_wifi.h".}
 ## *
 ##  @brief     Scan all available APs.
@@ -427,7 +442,7 @@ proc esp_wifi_scan_stop*(): esp_err_t {.importc: "esp_wifi_scan_stop",
 ##     - ESP_ERR_INVALID_ARG: invalid argument
 ##
 
-proc esp_wifi_scan_get_ap_num*(number: ptr uint16_t): esp_err_t {.
+proc esp_wifi_scan_get_ap_num*(number: ptr uint16): esp_err_t {.
     importc: "esp_wifi_scan_get_ap_num", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get AP list found in last scan
@@ -444,7 +459,7 @@ proc esp_wifi_scan_get_ap_num*(number: ptr uint16_t): esp_err_t {.
 ##     - ESP_ERR_NO_MEM: out of memory
 ##
 
-proc esp_wifi_scan_get_ap_records*(number: ptr uint16_t;
+proc esp_wifi_scan_get_ap_records*(number: ptr uint16;
                                   ap_records: ptr wifi_ap_record_t): esp_err_t {.
     importc: "esp_wifi_scan_get_ap_records", header: "esp_wifi.h".}
 ## *
@@ -503,7 +518,7 @@ proc esp_wifi_get_ps*(`type`: ptr wifi_ps_type_t): esp_err_t {.
 ##     - others: refer to error codes in esp_err.h
 ##
 
-proc esp_wifi_set_protocol*(ifx: wifi_interface_t; protocol_bitmap: uint8_t): esp_err_t {.
+proc esp_wifi_set_protocol*(ifx: wifi_interface_t; protocol_bitmap: uint8): esp_err_t {.
     importc: "esp_wifi_set_protocol", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get the current protocol bitmap of the specified interface
@@ -519,7 +534,7 @@ proc esp_wifi_set_protocol*(ifx: wifi_interface_t; protocol_bitmap: uint8_t): es
 ##     - others: refer to error codes in esp_err.h
 ##
 
-proc esp_wifi_get_protocol*(ifx: wifi_interface_t; protocol_bitmap: ptr uint8_t): esp_err_t {.
+proc esp_wifi_get_protocol*(ifx: wifi_interface_t; protocol_bitmap: ptr uint8): esp_err_t {.
     importc: "esp_wifi_get_protocol", header: "esp_wifi.h".}
 ## *
 ##  @brief     Set the bandwidth of ESP32 specified interface
@@ -575,7 +590,7 @@ proc esp_wifi_get_bandwidth*(ifx: wifi_interface_t; bw: ptr wifi_bandwidth_t): e
 ##     - ESP_ERR_INVALID_ARG: invalid argument
 ##
 
-proc esp_wifi_set_channel*(primary: uint8_t; second: wifi_second_chan_t): esp_err_t {.
+proc esp_wifi_set_channel*(primary: uint8; second: wifi_second_chan_t): esp_err_t {.
     importc: "esp_wifi_set_channel", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get the primary/secondary channel of ESP32
@@ -591,7 +606,7 @@ proc esp_wifi_set_channel*(primary: uint8_t; second: wifi_second_chan_t): esp_er
 ##     - ESP_ERR_INVALID_ARG: invalid argument
 ##
 
-proc esp_wifi_get_channel*(primary: ptr uint8_t; second: ptr wifi_second_chan_t): esp_err_t {.
+proc esp_wifi_get_channel*(primary: ptr uint8; second: ptr wifi_second_chan_t): esp_err_t {.
     importc: "esp_wifi_get_channel", header: "esp_wifi.h".}
 ## *
 ##  @brief     configure country info
@@ -654,7 +669,7 @@ proc esp_wifi_get_country*(country: ptr wifi_country_t): esp_err_t {.
 ##     - others: refer to error codes in esp_err.h
 ##
 
-proc esp_wifi_set_mac*(ifx: wifi_interface_t; mac: array[6, uint8_t]): esp_err_t {.
+proc esp_wifi_set_mac*(ifx: wifi_interface_t; mac: array[6, uint8]): esp_err_t {.
     importc: "esp_wifi_set_mac", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get mac of specified interface
@@ -669,7 +684,7 @@ proc esp_wifi_set_mac*(ifx: wifi_interface_t; mac: array[6, uint8_t]): esp_err_t
 ##     - ESP_ERR_WIFI_IF: invalid interface
 ##
 
-proc esp_wifi_get_mac*(ifx: wifi_interface_t; mac: array[6, uint8_t]): esp_err_t {.
+proc esp_wifi_get_mac*(ifx: wifi_interface_t; mac: array[6, uint8]): esp_err_t {.
     importc: "esp_wifi_get_mac", header: "esp_wifi.h".}
 ## *
 ##  @brief The RX callback function in the promiscuous mode.
@@ -861,7 +876,7 @@ proc esp_wifi_set_storage*(storage: wifi_storage_t): esp_err_t {.
 
 type
   esp_vendor_ie_cb_t* = proc (ctx: pointer; `type`: wifi_vendor_ie_type_t;
-                           sa: array[6, uint8_t]; vnd_ie: ptr vendor_ie_data_t;
+                           sa: array[6, uint8]; vnd_ie: ptr vendor_ie_data_t;
                            rssi: cint)
 
 ## *
@@ -909,7 +924,7 @@ proc esp_wifi_set_vendor_ie_cb*(cb: esp_vendor_ie_cb_t; ctx: pointer): esp_err_t
 ##     - ESP_ERR_WIFI_NOT_ARG: invalid argument
 ##
 
-proc esp_wifi_set_max_tx_power*(power: int8_t): esp_err_t {.
+proc esp_wifi_set_max_tx_power*(power: int8): esp_err_t {.
     importc: "esp_wifi_set_max_tx_power", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get maximum WiFi transmiting power
@@ -923,7 +938,7 @@ proc esp_wifi_set_max_tx_power*(power: int8_t): esp_err_t {.
 ##     - ESP_ERR_INVALID_ARG: invalid argument
 ##
 
-proc esp_wifi_get_max_tx_power*(power: ptr int8_t): esp_err_t {.
+proc esp_wifi_get_max_tx_power*(power: ptr int8): esp_err_t {.
     importc: "esp_wifi_get_max_tx_power", header: "esp_wifi.h".}
 ## *
 ##  @brief     Set mask to enable or disable some WiFi events
@@ -941,7 +956,7 @@ proc esp_wifi_get_max_tx_power*(power: ptr int8_t): esp_err_t {.
 ##     - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
 ##
 
-proc esp_wifi_set_event_mask*(mask: uint32_t): esp_err_t {.
+proc esp_wifi_set_event_mask*(mask: uint32): esp_err_t {.
     importc: "esp_wifi_set_event_mask", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get mask of WiFi events
@@ -954,7 +969,7 @@ proc esp_wifi_set_event_mask*(mask: uint32_t): esp_err_t {.
 ##     - ESP_ERR_WIFI_ARG: invalid argument
 ##
 
-proc esp_wifi_get_event_mask*(mask: ptr uint32_t): esp_err_t {.
+proc esp_wifi_get_event_mask*(mask: ptr uint32): esp_err_t {.
     importc: "esp_wifi_get_event_mask", header: "esp_wifi.h".}
 ## *
 ##  @brief     Send raw ieee80211 data
