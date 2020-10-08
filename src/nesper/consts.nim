@@ -87,3 +87,12 @@ type
     shared_vector_desc* {.importc: "shared_vector_desc".}: ptr shared_vector_desc_t
 
   intr_handle_t* = ptr intr_handle_data_t
+
+## * This is the aligned version of ip4_addr_t,
+##    used as local variable, on the stack, etc.
+type
+  ip4_addr* {.importc: "ip4_addr", header: "ip4_addr.h", bycopy.} = object
+    address* {.importc: "addr".}: uint32
+
+  ip6_addr* {.importc: "ip6_addr", header: "ip6_addr.h", bycopy.} = object
+    address* {.importc: "addr".}: uint32
