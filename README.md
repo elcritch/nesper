@@ -2,6 +2,19 @@
 
 Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP API support in Nim. 
 
+## Updates 
+
+**Version 0.2.0**
+- Wrote compilation tests for several important modules 
+- My internal esp32 project has been switched over to using Nesper
+- It's possible to write a full Nim only esp32 app
+- There are now Nim wrappers for esp_wifi, tcpip_adapter, event_groups, tasks, and more esp-idf modules
+- More Nim friendly API's have been added for NVS, SPI (untested), I2C (untested), wifi, & events
+
+
+**Version 0.1.0**
+- Initial framework layout
+
 ## Status
 
 TLDR; Real reason? It's a bit of fun in a sometimes tricky field. 
@@ -38,26 +51,29 @@ Things I'm not planning on (PR's welcome!)
 
 ## General Usage
 
-1. Install Nim 1.4+ (currently only the `devel` branch works) with `asdf` or `choosenim`.
+1. Install Nim 1.4+ (currently only the `devel` branch works) with `asdf` or `choosenim`
 2. nimble install https://github.com/elcritch/nesper
-3. Copy or create a Nim program to generate C code for esp-idf (see examples)
-4. Configure esp-idf to import Nim generated C code (see examples)
-5. Import Nesper API's into Nim code using `import nesper/xyz` as desired
-6. Or just use Nim network api's directly like in the `simplewifi` example 
+3. Nesper wrapper API names generally match the C names directly, usually in snake case
+  + FreeRTOS functions usually are camel case and start with an `x`, e.g. `xTaskDelay`
+  + These api's are found under `nesper/esp/*` or `nesper/esp/net/*`, e.g. `nesper/esp/nvs`
+4. Nesper Nim friendly api, usually in camel case
+  + These api's are found under `nesper/*`, e.g. `nesper/nvs`
 
 
-## Example on a ESP32-CAM board
+## Example Async server on a ESP32-CAM (or other Esp32 Wifi board)
 
 Copy one the example wifi:
 
 ```shell
 git clone https://github.com/elcritch/nesper
-cp -Rv nesper/tests/esp-idf-examples/simplewifi/ mysimplewifi/
-cd mysimplewifi/
-nim prepare ./src/server.nim
+cd nesper/esp-idf-examples/simplewifi/ 
+export WIFI_SSID=[ssid]
+export WIFI_PASSWORD=[password]
+nim prepare ./main/wifi_example_main.nim 
 idf.py reconfigure # sometimes required if new Nim C files are generated
-idf.py build
 ```
+
+Then do the standard idf build and flash steps:
 
 ```shell
 idf.py build
@@ -65,7 +81,7 @@ idf.py -p [port] flash
 idf.py -p [port] monitor
 ```
 
-## Why Nim?
+## Why Nim for Embedded?
 
 Nim is a flexible language which compiles to a variety of backend "host" languages, including C and C++. Like many hosted languages, it has excellent facilities to interact with the host language natively. In the embedded world this means full compatability with pre-existing libraries and toolchains, which are often complex and difficult to interface with from an "external language" like Rust or even C++. They often also require oddball compilers, ruling out LLVM based lanugages for many projects (including the ESP32 which defaults to a variant of GCC).  
 
@@ -100,10 +116,3 @@ There are a few cons of Nim:
 - Small community (e.g. lack of some libraries)
 - You likely won't get to use it at XYZ Megacorp 
 - It will require some pioneering!
-
-## Nim ARC/ORC - Embeeded friendly Garbage Collector
-
-Nesper capitalizes on the new ARC garbage collector (GC) for Nim which has a few benefits over other GC's for embedded usage. Primarily, the ARC garbage collector uses a non-locking reference counting which significantly reduces the reference counting overhead. Locking is slow! ARC also does not rely on scanning the stack. This means you allocate large objects or arrays on the stack without worrying about GC collector efficiency. ARC is integrated in Nim and includes the ability to do C++ style move semantics which can greatly improve memory efficiency. The Nim compiler automatically tries to optimize moves, but the user can provide hints to help.   
-
-ORC is the ARC garbage collect but with a cycle detection. It's fast and efficient and enables `async` and lambda function style programming without worrying about cycles. However, if you program your data structures without cycles you can use ARC which will be faster. 
-
