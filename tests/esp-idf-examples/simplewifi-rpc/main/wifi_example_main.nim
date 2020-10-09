@@ -38,7 +38,7 @@ proc onWifiDisconnect*(arg: pointer;
                           event_base: esp_event_base_t;
                           event_id: int32;
                           event_data: pointer) {.cdecl.} =
-  ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...")
+  logi(TAG, "Wi-Fi disconnected, trying to reconnect...")
   check: esp_wifi_connect()
 
 proc wifi_start*() =
@@ -56,7 +56,7 @@ proc wifi_start*() =
   wifi_config.sta.ssid.setFromString(WIFI_SSID)
   wifi_config.sta.password.setFromString(WIFI_PASSWORD)
 
-  ESP_LOGI(TAG, "Connecting to %s...", wifi_config.sta.ssid)
+  logi(TAG, "Connecting to %s...", wifi_config.sta.ssid)
   check: esp_wifi_set_mode(WIFI_MODE_STA)
   check: esp_wifi_set_config(ESP_IF_WIFI_STA, addr(wifi_config))
   check: esp_wifi_start()
@@ -81,8 +81,8 @@ proc exampleConnect*(): esp_err_t =
   wifi_start()
   discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
-  ESP_LOGI(TAG, "Connected to %s", sConnectionName)
-  ESP_LOGI(TAG, "IPv4 address: %s", $sIpAddr)
+  logi(TAG, "Connected to %s", sConnectionName)
+  logi(TAG, "IPv4 address: %s", $sIpAddr)
 
   echo("run_http_server\n")
   run_http_server()
@@ -97,7 +97,7 @@ proc exampleDisconnect*(): esp_err_t =
   sConnectEventGroup = nil
 
   wifiStop()
-  ESP_LOGI(TAG, "Disconnected from %s", sConnectionName)
+  logi(TAG, "Disconnected from %s", sConnectionName)
   sConnectionName = nil
 
   return ESP_OK

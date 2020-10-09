@@ -21,10 +21,10 @@ proc esp_log_timestamp*(): uint32 {.importc: "esp_log_timestamp", header: "esp_l
 proc esp_log_write*(level: esp_log_level_t, tag: cstring, format: cstring) {.
   importc: "esp_log_write", varargs, header: "esp_log.h".}
 
-proc ESP_LOGE*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGE", varargs, header: "esp_log.h".}
-proc ESP_LOGW*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGW", varargs, header: "esp_log.h".}
-proc ESP_LOGI*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGI", varargs, header: "esp_log.h".}
-proc ESP_LOGD*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGD", varargs, header: "esp_log.h".}
-proc ESP_LOGV*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, header: "esp_log.h".}
+proc loge*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGE", varargs, header: "esp_log.h".}
+proc logw*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGW", varargs, header: "esp_log.h".}
+proc logi*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGI", varargs, header: "esp_log.h".}
+proc logd*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGD", varargs, header: "esp_log.h".}
+proc logv*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, header: "esp_log.h".}
 
-proc ESP_LOG_TIMESTAMP*(): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
+proc log_timestamp*(): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
