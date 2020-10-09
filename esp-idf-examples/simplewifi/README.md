@@ -4,24 +4,28 @@ Simple example in Nim with wifi on ESP32 on FreeRTOS & LwIP.
 
 ## Building
 
-- checkout this repo and move to the `simplewifi` directory
-- move to `nim` directory and compile nim parts
-- configure wifi SSID and password with idf.py
-- build project with idf.py
+- checkout this repo and move to this directory `esp-idf-examples/simplewifi/` 
+- set `WIFI_SSID` and `WIFI_PASSWORD` environmental variables
+- prepare Nim code
+- build idf project 
 - connect esp32 to pc
-- run flash with idf.py
-- run monitor with idf.py
+- flash with idf.py
+- monitory with idf.py
+- run http request on `curl 192.168.1.XX:8181`
 
 ## Example on a ESP32-CAM board
 
 ```shell
-git clone https://github.com/elcritch/esp32_nim_net_example
-cd simplewifi
-nim prepare ./src/server.nim
-idf.py menuconfig
+git clone https://github.com/elcritch/nesper
+cd esp-idf-examples/simplewifi/
+export WIFI_SSID="[SSID]"
+export WIFI_PASSWORD="[PASSWORD]"
+nim prepare ./main/wifi_example_main.nim
+idf.py reconfigure
+idf.py build
 ```
-a config menu appear, go to `Wifi Example Configuration` and set ssid and password.
-Remember to save.
+
+This will build the project. Next use idf.py to flash and monitor:
 
 ```shell
 idf.py build
