@@ -19,7 +19,7 @@ task prepare, "Compile to C code":
       ""
 
   let
-    cmd = "nim c --os:freertos --cpu:esp --nomain --nimcache:$1 --compileOnly $4 $3 $2 " %
+    cmd = "nim c --os:freertos --cpu:esp --nomain --nimcache:$1 --compileOnly -d:NimAppMain $4 $3 $2 " %
               [nimcachepath, file, rest, wifidefs]
 
   echo("cmd: " & cmd)
