@@ -10,8 +10,11 @@ import os
 import server
 
 # Get Password
-const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
-const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
+const WIFI_SSID {.strdefine.}: string = "NOSSID"
+const WIFI_PASSWORD  {.strdefine.}: string = "" 
+
+# const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
+# const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
 
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(0))
@@ -50,8 +53,8 @@ proc wifi_start*() =
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
   var wifi_config: wifi_config_t
-  wifi_config.sta.ssid.setFromString(CONFIG_EXAMPLE_WIFI_SSID)
-  wifi_config.sta.password.setFromString(CONFIG_EXAMPLE_WIFI_PASSWORD)
+  wifi_config.sta.ssid.setFromString(WIFI_SSID)
+  wifi_config.sta.password.setFromString(WIFI_PASSWORD)
 
   ESP_LOGI(TAG, "Connecting to %s...", wifi_config.sta.ssid)
   check: esp_wifi_set_mode(WIFI_MODE_STA)
@@ -59,7 +62,7 @@ proc wifi_start*() =
   check: esp_wifi_start()
   check: esp_wifi_connect()
 
-  sConnectionName = CONFIG_EXAMPLE_WIFI_SSID
+  sConnectionName = WIFI_SSID 
 
 proc wifiStop*() =
   ##  tear down connection, release resources
