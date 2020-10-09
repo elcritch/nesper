@@ -54,7 +54,7 @@ proc toIpAddress*(ip: ip4_addr_t): IpAddress =
   # copyMem(addr result.address_v4[0], unsafeAddr cast[uint32](ip.address), 4)
 
   for i in 0..3:
-    result.address_v5[i] = uint8(ip.address shr (i*8))
+    result.address_v6[i] = uint8(ip.address shr (i*8))
 
 proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv6)
