@@ -79,8 +79,8 @@ proc example_connect*(): esp_err_t =
   ESP_LOGI(TAG, "Connected to %s", s_connection_name)
   ESP_LOGI(TAG, "IPv4 address: ", $s_ip_addr)
 
-  run_http_server()
   echo("run_http_server\n")
+  run_http_server()
 
   return ESP_OK
 
