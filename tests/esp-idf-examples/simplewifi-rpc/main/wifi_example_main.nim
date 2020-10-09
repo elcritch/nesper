@@ -76,7 +76,7 @@ proc exampleConnect*(): esp_err_t =
   sConnectEventGroup = xEventGroupCreate()
 
   wifi_start()
-  discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
+  check: xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
   ESP_LOGI(TAG, "Connected to %s", sConnectionName)
   ESP_LOGI(TAG, "IPv4 address: %s", $sIpAddr)
