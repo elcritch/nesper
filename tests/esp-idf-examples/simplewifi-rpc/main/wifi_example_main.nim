@@ -30,6 +30,7 @@ proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: in
                event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
 
+  # echo "event.ip_info.ip: " & repr(event.ip_info.ip)
   sIpAddr = toIpAddress(event.ip_info.ip)
   # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
   discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)

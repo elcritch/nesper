@@ -12,7 +12,8 @@ type
     address* {.importc: "addr".}: uint32
 
   ip6_addr_t* {.importc: "ip6_addr_t", header: "lwip/ip6_addr.h", bycopy.} = object
-    address* {.importc: "addr".}: uint32
+    address* {.importc: "addr".}: array[4, uint32]
+
 type
   lwip_ip_addr_type* {.size: sizeof(cint).} = enum ## * IPv4
     IPADDR_TYPE_V4 = 0,         ## * IPv6
@@ -50,12 +51,16 @@ type
 
 proc toIpAddress*(ip: ip4_addr_t): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv4)
-  let address = ip.address
+  # copyMem(addr result.address_v4[0], unsafeAddr cast[uint32](ip.address), 4)
+
   for i in 0..3:
-    result.address_v4[i] = uint8(address shl i*8)
+    result.address_v5[i] = uint8(ip.address shr (i*8))
 
 proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv6)
-  let address = ip.address
-  for i in 0..15:
-    result.address_v4[i] = uint8(address shl i*8)
+  for i in 0..3:
+    # result.address_v6[i] = address[i]
+    for i in 0..3:
+      result.address_v4[i] = uint8(ip.address[i] shr (i*8))
+  # for i in 0..15:
+    # result.address_v6[i] = uint8(address shr (i*8))
