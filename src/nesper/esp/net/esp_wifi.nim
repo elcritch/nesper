@@ -121,7 +121,8 @@ type
 # proc wifi_init_config_default*(): wifi_init_config_t {.importc:"_wifi_init_config_default", header: "esp_wifi.h".}
 
 proc wifi_init_config_default*(): wifi_init_config_t =
-  {.emit: ["result = WIFI_INIT_CONFIG_DEFAULT(); "].}
+  {.emit: ["wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT(); "].}
+  {.emit: ["result = cfg; "].}
 
 # when defined(CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM):
 #   const

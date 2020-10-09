@@ -79,7 +79,7 @@ proc exampleConnect*(): esp_err_t =
   discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
   ESP_LOGI(TAG, "Connected to %s", sConnectionName)
-  ESP_LOGI(TAG, "IPv4 address: ", $sIpAddr)
+  ESP_LOGI(TAG, "IPv4 address: %s", $sIpAddr)
 
   echo("run_http_server\n")
   run_http_server()
