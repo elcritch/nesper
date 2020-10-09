@@ -94,7 +94,7 @@ type
 ##
 
 type
-  TaskFunction_t* = proc (a1: pointer)
+  TaskFunction_t* = proc (a1: pointer) {.cdecl.}
 
 ##  Converts a time in milliseconds to a time in ticks.
 

@@ -5,6 +5,7 @@ import nesper/events
 import nesper/wifi
 import nesper/nvs
 import nesper/tasks
+import os
 
 import server
 
@@ -39,9 +40,9 @@ proc onWifiDisconnect*(arg: pointer;
 
 proc wifi_start*() =
   ##  set up connection, Wi-Fi or Ethernet
-  var cfg: wifi_init_config_t = wifi_init_config_default()
+  let wcfg: wifi_init_config_t = wifi_init_config_default()
 
-  check: esp_wifi_init(addr(cfg))
+  discard esp_wifi_init(unsafeAddr(wcfg))
 
   WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect, nil)
   IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)

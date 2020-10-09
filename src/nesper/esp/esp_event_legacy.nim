@@ -144,7 +144,7 @@ type
 ## * Event handler function type
 
 type
-  system_event_handler_t* = proc (event: ptr system_event_t): esp_err_t
+  system_event_handler_t* = proc (event: ptr system_event_t): esp_err_t {.cdecl.}
 
 ## *
 ##  @brief  Send a event to event task
@@ -211,7 +211,7 @@ proc esp_event_set_default_wifi_handlers*() {.
 ##
 
 type
-  system_event_cb_t* = proc (ctx: pointer; event: ptr system_event_t): esp_err_t
+  system_event_cb_t* = proc (ctx: pointer; event: ptr system_event_t): esp_err_t {.cdecl.}
 
 ## *
 ##  @brief  Initialize event loop

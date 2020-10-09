@@ -53,7 +53,7 @@ const
   SPI_DEVICE_NO_DUMMY* = (1 shl 6)
 
 type
-  transaction_cb_t* = proc (trans: ptr spi_transaction_t)
+  transaction_cb_t* = proc (trans: ptr spi_transaction_t) {.cdecl.}
 
 ## *
 ##  @brief This is a configuration for a SPI slave device that is connected to one of the SPI buses.

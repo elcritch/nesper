@@ -88,7 +88,7 @@ const
 ##
 
 type
-  wifi_init_config_t* {.importc: "wifi_init_config_t", header: "esp_wifi.h", bycopy.} = object
+  wifi_init_config_t* {.importc: "wifi_init_config_t", header: "esp_wifi.h".} = object
     event_handler* {.importc: "event_handler".}: system_event_handler_t ## *< WiFi event handler
     osi_funcs* {.importc: "osi_funcs".}: ptr wifi_osi_funcs_t ## *< WiFi OS functions
     wpa_crypto_funcs* {.importc: "wpa_crypto_funcs".}: wpa_crypto_funcs_t ## *< WiFi station crypto functions when connect
@@ -111,14 +111,17 @@ type
     magic* {.importc: "magic".}: cint ## *< WiFi init magic number, it should be the last field
 
 
-proc wifi_init_config_default*(): wifi_init_config_t {.importc:"$1", header: "esp_wifi.h".}
-{.emit: """
-NIM_EXTERNC
-wifi_init_config_t _wifi_init_config_default_() {
-  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-  return cfg;
-}
-""".}
+# {.emit: """
+# wifi_init_config_t _wifi_init_config_default() {
+#   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+#   return cfg;
+# }
+# """.}
+
+# proc wifi_init_config_default*(): wifi_init_config_t {.importc:"_wifi_init_config_default", header: "esp_wifi.h".}
+
+proc wifi_init_config_default*(): wifi_init_config_t =
+  {.emit: ["result = WIFI_INIT_CONFIG_DEFAULT(); "].}
 
 # when defined(CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM):
 #   const
@@ -696,7 +699,7 @@ proc esp_wifi_get_mac*(ifx: wifi_interface_t; mac: array[6, uint8]): esp_err_t {
 ##
 
 type
-  wifi_promiscuous_cb_t* = proc (buf: pointer; `type`: wifi_promiscuous_pkt_type_t)
+  wifi_promiscuous_cb_t* = proc (buf: pointer; `type`: wifi_promiscuous_pkt_type_t) {.cdecl.}
 
 ## *
 ##  @brief Register the RX callback function in the promiscuous mode.
@@ -877,7 +880,7 @@ proc esp_wifi_set_storage*(storage: wifi_storage_t): esp_err_t {.
 type
   esp_vendor_ie_cb_t* = proc (ctx: pointer; `type`: wifi_vendor_ie_type_t;
                            sa: array[6, uint8]; vnd_ie: ptr vendor_ie_data_t;
-                           rssi: cint)
+                           rssi: cint) {.cdecl.}
 
 ## *
 ##  @brief     Set 802.11 Vendor-Specific Information Element
@@ -1010,7 +1013,7 @@ proc esp_wifi_80211_tx*(ifx: wifi_interface_t; buffer: pointer; len: cint;
 ##
 
 type
-  wifi_csi_cb_t* = proc (ctx: pointer; data: ptr wifi_csi_info_t)
+  wifi_csi_cb_t* = proc (ctx: pointer; data: ptr wifi_csi_info_t) {.cdecl.}
 
 ## *
 ##  @brief Register the RX callback function of CSI data.

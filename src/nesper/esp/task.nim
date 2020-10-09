@@ -91,7 +91,7 @@ type
 
 
 type
-  TaskFunction_t* = proc (a1: pointer)
+  TaskFunction_t* = proc (a1: pointer) {.cdecl.}
 
 ##  Converts a time in milliseconds to a time in ticks.
 
@@ -152,7 +152,7 @@ type
 ##
 
 type
-  TaskHookFunction_t* = proc (a1: pointer): BaseType_t
+  TaskHookFunction_t* = proc (a1: pointer): BaseType_t {.cdecl.}
 
 ## * Task states returned by eTaskGetState.
 
@@ -1460,7 +1460,7 @@ proc pvTaskGetThreadLocalStoragePointer*(xTaskToQuery: TaskHandle_t;
 ##
 
 type
-  TlsDeleteCallbackFunction_t* = proc (a1: cint; a2: pointer)
+  TlsDeleteCallbackFunction_t* = proc (a1: cint; a2: pointer) {.cdecl.}
 
 ## *
 ##  Set local storage pointer and deletion callback.
