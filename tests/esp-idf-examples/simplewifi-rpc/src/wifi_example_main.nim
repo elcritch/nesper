@@ -98,8 +98,7 @@ proc exampleDisconnect*(): esp_err_t =
 
   return ESP_OK
 
-proc app_main*() {.exportc.} =
-
+proc nim_app_main*() {.exportc.} =
   initNvs()
   tcpip_adapter_init()
 
@@ -115,4 +114,3 @@ proc app_main*() {.exportc.} =
   echo("wifi setup!\n")
   echo("Wait for wifi\n")
   # vTaskDelay(10000 div portTICK_PERIOD_MS)
-

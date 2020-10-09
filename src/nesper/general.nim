@@ -4,6 +4,14 @@ import macros
 var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: uint32
 
+proc NimMain() {.importc.}
+proc nim_app_main*() {.importc.}
+
+proc app_main*() {.exportc.} =
+  ## Setup the standard main app
+  NimMain() # initialize garbage collector memory, types and stack
+  nim_app_main()
+
 proc delay*( milsecs: cint ) {.cdecl, importc: "delay".}
 proc esp_restart*() {.cdecl, importc: "esp_restart".}
 
