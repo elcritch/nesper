@@ -16,9 +16,9 @@ const
   GOT_IPV4_BIT* = EventBits_t(BIT(0))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
-var s_connect_event_group*: EventGroupHandle_t
-var s_ip_addr*: IpAddress
-var s_connection_name*: cstring
+var sConnectEventGroup*: EventGroupHandle_t
+var sIpAddr*: IpAddress
+var sConnectionName*: cstring
 
 var TAG*: cstring = "example"
 
@@ -27,9 +27,9 @@ proc got_ip_handler*(arg: pointer; event_base: esp_event_base_t; event_id: int32
                event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
 
-  s_ip_addr = toIpAddress(event.ip_info.ip)
-  # memcpy(addr(s_ip_addr), addr(event.ip_info.ip), sizeof((s_ip_addr)))
-  discard xEventGroupSetBits(s_connect_event_group, GOT_IPV4_BIT)
+  sIpAddr = toIpAddress(event.ip_info.ip)
+  # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
+  discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)
 
 proc on_wifi_disconnect*(arg: pointer;
                           event_base: esp_event_base_t;
@@ -59,7 +59,7 @@ proc wifi_start*() =
   check: esp_wifi_start()
   check: esp_wifi_connect()
 
-  s_connection_name = CONFIG_EXAMPLE_WIFI_SSID
+  sConnectionName = CONFIG_EXAMPLE_WIFI_SSID
 
 proc wifi_stop*() =
   ##  tear down connection, release resources
@@ -70,16 +70,16 @@ proc wifi_stop*() =
   check: esp_wifi_deinit()
 
 proc example_connect*(): esp_err_t =
-  if s_connect_event_group != nil:
+  if sConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
-  s_connect_event_group = xEventGroupCreate()
+  sConnectEventGroup = xEventGroupCreate()
 
   wifi_start()
-  discard xEventGroupWaitBits(s_connect_event_group, CONNECTED_BITS, 1, 1, portMAX_DELAY)
+  discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
-  ESP_LOGI(TAG, "Connected to %s", s_connection_name)
-  ESP_LOGI(TAG, "IPv4 address: ", $s_ip_addr)
+  ESP_LOGI(TAG, "Connected to %s", sConnectionName)
+  ESP_LOGI(TAG, "IPv4 address: ", $sIpAddr)
 
   echo("run_http_server\n")
   run_http_server()
@@ -87,15 +87,15 @@ proc example_connect*(): esp_err_t =
   return ESP_OK
 
 proc example_disconnect*(): esp_err_t =
-  if s_connect_event_group == nil:
+  if sConnectEventGroup == nil:
     return ESP_ERR_INVALID_STATE
 
-  vEventGroupDelete(s_connect_event_group)
-  s_connect_event_group = nil
+  vEventGroupDelete(sConnectEventGroup)
+  sConnectEventGroup = nil
 
   wifi_stop()
-  ESP_LOGI(TAG, "Disconnected from %s", s_connection_name)
-  s_connection_name = nil
+  ESP_LOGI(TAG, "Disconnected from %s", sConnectionName)
+  sConnectionName = nil
 
   return ESP_OK
 
