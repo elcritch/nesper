@@ -8,9 +8,9 @@ import nesper/tasks
 
 import server
 
-#  array[33, uint8]
-var CONFIG_EXAMPLE_WIFI_SSID {.importc: "CONFIG_EXAMPLE_WIFI_SSID".}: cstring 
-var CONFIG_EXAMPLE_WIFI_PASSWORD {.importc: "CONFIG_EXAMPLE_WIFI_PASSWORD".}: cstring 
+# Get Password
+const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
+const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
 
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(0))

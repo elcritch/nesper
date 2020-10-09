@@ -8,10 +8,10 @@ export net
 ## * This is the aligned version of ip4_addr_t,
 ##    used as local variable, on the stack, etc.
 type
-  ip4_addr_t* {.importc: "ip4_addr", header: "ip4_addr.h", bycopy.} = object
+  ip4_addr_t* {.importc: "ip4_addr_t", header: "lwip/ip4_addr.h", bycopy.} = object
     address* {.importc: "addr".}: uint32
 
-  ip6_addr_t* {.importc: "ip6_addr", header: "ip6_addr.h", bycopy.} = object
+  ip6_addr_t* {.importc: "ip6_addr_t", header: "lwip/ip6_addr.h", bycopy.} = object
     address* {.importc: "addr".}: uint32
 type
   lwip_ip_addr_type* {.size: sizeof(cint).} = enum ## * IPv4
@@ -28,17 +28,17 @@ type
 ##
 
 type
-  INNER_C_UNION_ip_addr_71* {.importc: "no_name", header: "ip_addr.h", bycopy.} = object {.
+  INNER_C_UNION_ip_addr_71* {.importc: "no_name", header: "lwip/ip_addr.h", bycopy.} = object {.
       union.}
     ip6* {.importc: "ip6".}: ip6_addr_t
     ip4* {.importc: "ip4".}: ip4_addr_t
 
-  ip_addr_t* {.importc: "ip_addr_t", header: "ip_addr.h", bycopy.} = object
+  ip_addr_t* {.importc: "ip_addr_t", header: "lwip/ip_addr.h", bycopy.} = object
     u_addr* {.importc: "u_addr".}: INNER_C_UNION_ip_addr_71 ## * @ref lwip_ip_addr_type
     `type`* {.importc: "type".}: uint8
 
 
-var ip_addr_any_type* {.importc: "ip_addr_any_type", header: "ip_addr.h".}: ip_addr_t
+var ip_addr_any_type* {.importc: "ip_addr_any_type", header: "lwip/ip_addr.h".}: ip_addr_t
 
 type
   esp_interface_t* {.size: sizeof(cint).} = enum

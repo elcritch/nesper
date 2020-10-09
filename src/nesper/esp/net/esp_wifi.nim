@@ -111,7 +111,7 @@ type
     magic* {.importc: "magic".}: cint ## *< WiFi init magic number, it should be the last field
 
 
-proc wifi_init_config_default*(): wifi_init_config_t {.importc:"$1".}
+proc wifi_init_config_default*(): wifi_init_config_t {.importc:"$1", header: "esp_wifi.h".}
 {.emit: """
 NIM_EXTERNC
 wifi_init_config_t _wifi_init_config_default_() {
