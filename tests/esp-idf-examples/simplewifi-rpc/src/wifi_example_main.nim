@@ -31,8 +31,10 @@ proc got_ip_handler*(arg: pointer; event_base: esp_event_base_t; event_id: int32
   # memcpy(addr(s_ip_addr), addr(event.ip_info.ip), sizeof((s_ip_addr)))
   discard xEventGroupSetBits(s_connect_event_group, GOT_IPV4_BIT)
 
-proc on_wifi_disconnect*(arg: pointer; event_base: esp_event_base_t;
-                        event_id: int32; event_data: pointer) {.cdecl.} =
+proc on_wifi_disconnect*(arg: pointer;
+                          event_base: esp_event_base_t;
+                          event_id: int32;
+                          event_data: pointer) {.cdecl.} =
   ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...")
   check: esp_wifi_connect()
 
