@@ -16,11 +16,10 @@ const
   GOT_IPV4_BIT* = EventBits_t(BIT(0))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
+const TAG*: cstring = "example"
 var sConnectEventGroup*: EventGroupHandle_t
 var sIpAddr*: IpAddress
 var sConnectionName*: cstring
-
-var TAG*: cstring = "example"
 
 
 proc got_ip_handler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
