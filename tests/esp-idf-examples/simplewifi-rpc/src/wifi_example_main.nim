@@ -22,7 +22,7 @@ var sIpAddr*: IpAddress
 var sConnectionName*: cstring
 
 
-proc got_ip_handler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
+proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
                event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
 
@@ -30,7 +30,7 @@ proc got_ip_handler*(arg: pointer; event_base: esp_event_base_t; event_id: int32
   # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
   discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)
 
-proc on_wifi_disconnect*(arg: pointer;
+proc onWifiDisconnect*(arg: pointer;
                           event_base: esp_event_base_t;
                           event_id: int32;
                           event_data: pointer) {.cdecl.} =
@@ -43,8 +43,8 @@ proc wifi_start*() =
 
   check: esp_wifi_init(addr(cfg))
 
-  WIFI_EVENT_STA_DISCONNECTED.eventRegister(on_wifi_disconnect, nil)
-  IP_EVENT_STA_GOT_IP.eventRegister(got_ip_handler, nil)
+  WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect, nil)
+  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
 
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
@@ -60,15 +60,15 @@ proc wifi_start*() =
 
   sConnectionName = CONFIG_EXAMPLE_WIFI_SSID
 
-proc wifi_stop*() =
+proc wifiStop*() =
   ##  tear down connection, release resources
-  WIFI_EVENT_STA_DISCONNECTED.eventUnregister(on_wifi_disconnect) 
-  IP_EVENT_STA_GOT_IP.eventUnregister(got_ip_handler)
+  WIFI_EVENT_STA_DISCONNECTED.eventUnregister(onWifiDisconnect) 
+  IP_EVENT_STA_GOT_IP.eventUnregister(ipReceivedHandler)
 
-  check: esp_wifi_stop()
+  check: esp_wifiStop()
   check: esp_wifi_deinit()
 
-proc example_connect*(): esp_err_t =
+proc exampleConnect*(): esp_err_t =
   if sConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
@@ -85,32 +85,32 @@ proc example_connect*(): esp_err_t =
 
   return ESP_OK
 
-proc example_disconnect*(): esp_err_t =
+proc exampleDisconnect*(): esp_err_t =
   if sConnectEventGroup == nil:
     return ESP_ERR_INVALID_STATE
 
   vEventGroupDelete(sConnectEventGroup)
   sConnectEventGroup = nil
 
-  wifi_stop()
+  wifiStop()
   ESP_LOGI(TAG, "Disconnected from %s", sConnectionName)
   sConnectionName = nil
 
   return ESP_OK
 
-proc app_main*() =
+proc app_main*() {.exportc.} =
 
   initNvs()
   tcpip_adapter_init()
 
   check: esp_event_loop_create_default()
-  check: example_connect()
+  check: exampleConnect()
 
   ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
   ##  and re-start it upon connection.
   ##
-  IP_EVENT_STA_GOT_IP.eventRegister(got_ip_handler, nil)
-  WIFI_EVENT_STA_DISCONNECTED.eventRegister(on_wifi_disconnect,nil)
+  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
+  WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect,nil)
 
   echo("wifi setup!\n")
   echo("Wait for wifi\n")
