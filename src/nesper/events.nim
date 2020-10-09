@@ -19,19 +19,22 @@ proc eventRegister*(
             event_id: wifi_event_t;
             event_handler: esp_event_handler_t;
             event_handler_arg: pointer
-        ): esp_err_t {.inline.} =
+        ) {.inline.} =
 
-    return esp_event_handler_register(
+    let ret = esp_event_handler_register(
         event_base = WIFI_EVENT,
         event_id = event_id.cint,
         event_handler = event_handler,
         event_handler_arg = event_handler_arg)
 
+    if ret != ESP_OK:
+      raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
+
 proc eventRegister*(
             event_id: ip_event_t;
             event_handler: esp_event_handler_t;
             event_handler_arg: pointer
-        ): esp_err_t {.inline.} =
+        ) {.inline.} =
 
     let ret = esp_event_handler_register(
         event_base = IP_EVENT,
@@ -45,19 +48,25 @@ proc eventRegister*(
 proc eventUnregister*(
             event_id: wifi_event_t;
             event_handler: esp_event_handler_t;
-        ): esp_err_t {.inline.} =
+        ) {.inline.} =
 
-    return esp_event_handler_unregister(
+    let ret = esp_event_handler_unregister(
         event_base = WIFI_EVENT,
         event_id = event_id.cint,
         event_handler = event_handler)
 
+    if ret != ESP_OK:
+      raise newEspError[EventError]("unregister: " & $esp_err_to_name(ret), ret)
+
 proc eventUnregister*(
             event_id: ip_event_t;
             event_handler: esp_event_handler_t;
-        ): esp_err_t {.inline.} =
+        ) {.inline.} =
 
-    return esp_event_handler_unregister(
+    let ret = esp_event_handler_unregister(
         event_base = IP_EVENT,
         event_id = event_id.cint,
         event_handler = event_handler)
+
+    if ret != ESP_OK:
+      raise newEspError[EventError]("unregister: " & $esp_err_to_name(ret), ret)

@@ -1,4 +1,5 @@
 import consts
+import macros
 
 var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: uint32
@@ -13,6 +14,14 @@ proc esp_err_to_name*(code: esp_err_t): cstring {.cdecl, importc: "esp_err_to_na
     header: "freertos/FreeRTOS.h".}
 proc esp_err_to_name_r*(code: esp_err_t; buf: cstring; buflen: csize_t): cstring {.cdecl,
     importc: "esp_err_to_name_r", header: "freertos/FreeRTOS.h".}
+
+proc doCheck*(ret: esp_err_t) =
+  if ret != ESP_OK:
+    raise newException(OSError, "error: " & $esp_err_to_name(ret))
+
+template check*(blk: untyped) =
+  doCheck(blk)
+
 proc ESP_ERROR_CHECK*(x: esp_err_t) {.cdecl, importc: "ESP_ERROR_CHECK", header: "freertos/FreeRTOS.h".}
 proc ESP_ERROR_CHECK_WITHOUT_ABORT*(x: esp_err_t) {.cdecl,
   importc: "ESP_ERROR_CHECK_WITHOUT_ABORT", header: "freertos/FreeRTOS.h".}
