@@ -17,10 +17,10 @@ const WIFI_PASSWORD  {.strdefine.}: string = ""
 # const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
 
 const
-  GOT_IPV4_BIT* = EventBits_t(BIT(0))
+  GOT_IPV4_BIT* = EventBits_t(BIT(1))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
-const TAG*: cstring = "example"
+const TAG*: cstring = "simplewifi"
 var sConnectEventGroup*: EventGroupHandle_t
 var sIpAddr*: IpAddress
 var sConnectionName*: cstring
@@ -30,9 +30,11 @@ proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: in
                event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
 
-  # echo "event.ip_info.ip: " & repr(event.ip_info.ip)
+  logi TAG, "event.ip_info.ip: %s", $(event.ip_info.ip)
+
   sIpAddr = toIpAddress(event.ip_info.ip)
   # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
+  logw TAG, "got event ip: %s", $sIpAddr
   discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)
 
 proc onWifiDisconnect*(arg: pointer;
@@ -96,7 +98,6 @@ proc exampleDisconnect*(): esp_err_t =
 
   vEventGroupDelete(sConnectEventGroup)
   sConnectEventGroup = nil
-
   wifiStop()
   logi(TAG, "Disconnected from %s", sConnectionName)
   sConnectionName = nil
@@ -108,14 +109,14 @@ proc nim_app_main*() {.exportc.} =
   tcpip_adapter_init()
 
   check: esp_event_loop_create_default()
+
+  logi(TAG, "wifi setup!\n")
   check: exampleConnect()
 
   ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
   ##  and re-start it upon connection.
   ##
-  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
-  WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect,nil)
+  # IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
 
-  echo("wifi setup!\n")
-  echo("Wait for wifi\n")
+  echo("Wait done\n")
   # vTaskDelay(10000 div portTICK_PERIOD_MS)
