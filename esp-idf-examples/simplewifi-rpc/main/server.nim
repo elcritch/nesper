@@ -27,7 +27,7 @@ when defined(TcpMsgpackRpcServer):
 
 when defined(TcpEchoServer):
   proc run_rpc_server*() =
-      echo "starting rpc server on port 5555"
+      echo "starting echo server on port 5555"
       startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
       # startRpcSocketServer(Port(5555))
 
