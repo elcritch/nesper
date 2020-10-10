@@ -12,6 +12,25 @@ type
     params*: JsonNode
     id*: int
 
+type
+  RpcJsonError* = enum
+    rjeInvalidJson, rjeVersionError, rjeNoMethod, rjeNoId, rjeNoParams, rjeNoJObject
+  RpcJsonErrorContainer* = tuple[err: RpcJsonError, msg: string]
+
+  # Procedure signature accepted as an RPC call by server
+  RpcProc* = proc(input: JsonNode): JsonNode {.gcsafe.}
+
+  RpcProcError* = object of Exception
+    code*: int
+    data*: JsonNode
+
+  RpcBindError* = object of Exception
+  RpcAddressUnresolvableError* = object of Exception
+
+  RpcRouter* = ref object
+    procs*: Table[string, RpcProc]
+    max_buffer*: int
+
 proc wrapResponse*(rpcCall: JsonRpcCall, ret: JsonNode): JsonNode = 
   result = %* {"jsonrpc": "2.0", "result": ret, "id": rpcCall.id}
 
@@ -44,25 +63,6 @@ proc rpcInvalidRequest*(id: int, detail: string): JsonNode =
   }
 
 
-type
-  RpcJsonError* = enum
-    rjeInvalidJson, rjeVersionError, rjeNoMethod, rjeNoId, rjeNoParams, rjeNoJObject
-  RpcJsonErrorContainer* = tuple[err: RpcJsonError, msg: string]
-
-  # Procedure signature accepted as an RPC call by server
-  RpcProc* = proc(input: JsonNode): JsonNode {.gcsafe.}
-
-  RpcProcError* = object of Exception
-    code*: int
-    data*: JsonNode
-
-  RpcBindError* = object of Exception
-  RpcAddressUnresolvableError* = object of Exception
-
-  RpcRouter* = object
-    procs*: TableRef[string, RpcProc]
-    max_buffer*: int
-
 const
   methodField = "method"
   paramsField = "params"
@@ -88,9 +88,11 @@ const
       (INVALID_PARAMS, "Invalid request object")
     ]
 
-proc newRpcRouter*(max_bufer: int): RpcRouter =
-  result.procs = newTable[string, RpcProc]()
+proc createRpcRouter*(max_bufer: int): RpcRouter =
+  result = new(RpcRouter)
+  result.procs = initTable[string, RpcProc]()
   result.max_buffer = max_bufer
+  echo "createRpcRouter: " & $(result.max_buffer)
 
 proc register*(router: var RpcRouter, path: string, call: RpcProc) =
   router.procs.add(path, call)

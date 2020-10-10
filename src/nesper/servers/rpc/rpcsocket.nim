@@ -22,6 +22,8 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
+    logi(TAG, "rpc router: len:  %s", $rt.max_buffer)
+
     var msg: string = newString(rt.max_buffer)
     var count = sourceClient.recv(msg, rt.max_buffer)
 
@@ -38,22 +40,24 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       logi(TAG, "rpc result: %s", $res)
       logi(TAG, "rpc result: %s", repr(rmsg))
 
-      # logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
-      # discard sourceClient.send(addr rmsg[0], rmsg.len)
-      # logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
+      logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
+      discard sourceClient.send(addr rmsg[0], rmsg.len)
+      logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
 
-      for cfd, client in srv.clients:
-        logi(TAG, "sent to client: %s", $(client.getFd().int))
-        discard client.send(addr rmsg[0], rmsg.len)
-        client.send("\r\n")
+      # for cfd, client in srv.clients:
+        # logi(TAG, "sent to client: %s", $(client.getFd().int))
+        # discard client.send(addr rmsg[0], rmsg.len)
+        # client.send("\r\n")
       # srv.tcpMessages.insert(msg, 0)
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
 
 
-proc startRpcSocketServer*(port: Port; router: RpcRouter) =
-  logi(TAG, "starting rpc server")
+proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
+  logi(TAG, "starting rpc server: router: %s", $(router.max_buffer))
+  logi(TAG, "starting rpc server: router: %x", addr(router.procs))
+
   startSocketServer[RpcRouter](
     Port(5555),
     readHandler=rpcMsgPackReadHandler,

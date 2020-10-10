@@ -90,7 +90,7 @@ proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient
         # continue
       client.send(data & message & "\r\L")
 
-proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: T) =
+proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: var T) =
   var server: Socket = newSocket()
   var select: Selector[T] = newSelector[T]()
 

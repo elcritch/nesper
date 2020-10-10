@@ -2,3 +2,4 @@ tests/trouter
 trouter
 mrpc_test
 echosocket_test
+test_repr
