@@ -34,23 +34,6 @@ proc createServerInfo(server: Socket, selector: Selector[int]): ServerInfo =
 proc handleWrites(result: ReadyKey, srv: ServerInfo) = 
   raise newException(OSError, "the request to the OS failed")
 
-proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
-  var message = sourceClient.recvLine()
-
-  if message == "":
-    var client: Socket
-    discard srv.clients.pop(sourceClient.getFd(), client)
-    srv.select.unregister(sourceClient.getFd())
-    logi(TAG, "Server: client disconnected: %s", $(sourceClient.getFd().getSockName()))
-
-  else:
-    logi TAG, "Server: received from client: %s", message
-
-    for cfd, client in srv.clients:
-      # if sourceClient.getFd() == cfd.getFd():
-        # continue
-      client.send(message & "\r\L")
-
 proc handleReads(srv: var ControlServerInfo, selected: ReadyKey) = 
   if selected.fd.SocketHandle == srv.server.getFd():
     var client: Socket = new(Socket)

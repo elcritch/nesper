@@ -12,6 +12,9 @@ export net
 const TAG = "socketrpc"
 
 type 
+  TcpClientDisconnected* = object of OSError
+  TcpClientError* = object of OSError
+
   TcpServerInfo* = ref object 
     select*: Selector[int]
     server*: Socket
@@ -44,25 +47,39 @@ proc processReads(selected: ReadyKey, srv: TcpServerInfo) =
     logi(TAG, "Server: client connected")
 
   elif srv.clients.hasKey(selected.fd.SocketHandle):
-    var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
-    if srv.readHandler != nil:
-      srv.readHandler(srv, selected, sourceClient)
+    let sourceClient: Socket = newSocket(selected.fd.SocketHandle)
+    let sourceFd = selected.fd
+
+    try:
+      if srv.readHandler != nil:
+        srv.readHandler(srv, selected, sourceClient)
+
+    except TcpClientDisconnected as err:
+      var client: Socket
+      discard srv.clients.pop(sourceFd.SocketHandle, client)
+      srv.select.unregister(sourceFd)
+      discard posix.close(sourceFd.cint)
+      logi(TAG, "client disconnected: fd: %s", $sourceFd)
+
+    except TcpClientError as err:
+      srv.clients.del(sourceFd.SocketHandle)
+      srv.select.unregister(sourceFd)
+
+      discard posix.close(sourceFd.cint)
+      logi(TAG, "client read error: %s", $(sourceFd))
 
   else:
-    raise newException(OSError, "control server: error: unknown socket id: " & $selected.fd.int)
+    raise newException(OSError, "unknown socket id: " & $selected.fd.int)
 
 
 proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
   var message = sourceClient.recvLine()
 
   if message == "":
-    var client: Socket
-    discard srv.clients.pop(sourceClient.getFd(), client)
-    srv.select.unregister(sourceClient.getFd())
-    logi(TAG, "Server: client disconnected: %s", $(sourceClient.getFd().getSockName()))
+    raise newException(TcpClientDisconnected, "")
 
   else:
-    logd TAG, "Server: received from client: %s", message
+    logd(TAG, "received from client: %s", message)
 
     for cfd, client in srv.clients:
       # if sourceClient.getFd() == cfd.getFd():
@@ -98,6 +115,5 @@ proc startSocketServer*(port: Port, readHandler: TcpServerHandler, writeHandler:
   select.close()
   server.close()
 
-
 when isMainModule:
-    runTcpServer()
+  startSocketServer(Port(5555), readHandler=echoReadHandler, writeHandler=nil)
