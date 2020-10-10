@@ -47,7 +47,7 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
     srv.clients[client.getFd()] = client
 
     let id: int = client.getFd().int
-    logi(TAG, "Server: client connected: %s", $(id))
+    logi(TAG, "Server: client connected: %d", id)
 
   elif srv.clients.hasKey(SocketHandle(selected.fd)):
     let sourceClient: Socket = newSocket(SocketHandle(selected.fd))

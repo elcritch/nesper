@@ -37,12 +37,12 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 
       var res: JsonNode = rt.route( rcall )
       var rmsg: string = msgpack2json.fromJsonNode(res)
-      logi(TAG, "rpc result: %s", $res)
-      logi(TAG, "rpc result: %s", repr(rmsg))
+      # logi(TAG, "rpc result: %s", $res)
+      # logi(TAG, "rpc result: %s", repr(rmsg))
 
       logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
-      logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
+      # logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
 
       # for cfd, client in srv.clients:
         # logi(TAG, "sent to client: %s", $(client.getFd().int))
