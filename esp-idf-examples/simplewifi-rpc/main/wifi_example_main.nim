@@ -42,7 +42,7 @@ proc onWifiDisconnect*(arg: pointer;
   logi(TAG, "Wi-Fi disconnected, trying to reconnect...")
   check: esp_wifi_connect()
 
-proc wifi_start*() =
+proc wifiStart*() =
   ##  set up connection, Wi-Fi or Ethernet
   let wcfg: wifi_init_config_t = wifi_init_config_default()
 
@@ -79,7 +79,7 @@ proc exampleConnect*(): esp_err_t =
 
   sConnectEventGroup = xEventGroupCreate()
 
-  wifi_start()
+  wifiStart()
   discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
   logi(TAG, "Connected to %s", sConnectionName)
