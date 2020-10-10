@@ -12,6 +12,13 @@ export net
 const TAG = "socketrpc"
 
 type 
+  ControlServerInfo* = ref object 
+    storage*: NvsObject
+    select*: Selector[int]
+    server*: Socket
+    clients*: ref Table[SocketHandle, Socket]
+    tcpMessages*: seq[string]
+
   ServerInfo* = ref object 
     select: Selector[int]
     server: Socket
@@ -27,7 +34,24 @@ proc createServerInfo(server: Socket, selector: Selector[int]): ServerInfo =
 proc handleWrites(result: ReadyKey, srv: ServerInfo) = 
   raise newException(OSError, "the request to the OS failed")
 
-proc handleReads(selected: ReadyKey, srv: ServerInfo) = 
+proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
+  var message = sourceClient.recvLine()
+
+  if message == "":
+    var client: Socket
+    discard srv.clients.pop(sourceClient.getFd(), client)
+    srv.select.unregister(sourceClient.getFd())
+    logi(TAG, "Server: client disconnected: %s", $(sourceClient.getFd().getSockName()))
+
+  else:
+    logi TAG, "Server: received from client: %s", message
+
+    for cfd, client in srv.clients:
+      # if sourceClient.getFd() == cfd.getFd():
+        # continue
+      client.send(message & "\r\L")
+
+proc handleReads(srv: var ControlServerInfo, selected: ReadyKey) = 
   if selected.fd.SocketHandle == srv.server.getFd():
     var client: Socket = new(Socket)
     srv.server.accept(client)
@@ -35,26 +59,40 @@ proc handleReads(selected: ReadyKey, srv: ServerInfo) =
     client.getFd().setBlocking(false)
     srv.select.registerHandle(client.getFd(), {Event.Read}, -1)
     srv.clients[client.getFd()] = client
-    logi(TAG, "Server: client connected")
+    echo("Server: client connected: ", $client.getFd().int)
+
+  elif srv.clients.hasKey(selected.fd.SocketHandle):
+    # echo("server: received socket: ", selected.fd)
+    var sourceFd = selected.fd
+    var sourceClient: Socket = srv.clients[sourceFd.SocketHandle]
+
+    try:
+      var msg: string = newString(BUFF_SZ)
+      var count = sourceClient.recv(msg, BUFF_SZ)
+
+      if count == 0:
+        var client: Socket
+        discard srv.clients.pop(sourceFd.SocketHandle, client)
+        srv.select.unregister(sourceFd)
+        discard posix.close(sourceFd.cint)
+        echo("control server: client disconnected: ", " fd: ", $sourceFd)
+      elif count < 0:
+        srv.clients.del(sourceFd.SocketHandle)
+        srv.select.unregister(sourceFd)
+
+        discard posix.close(sourceFd.cint)
+        echo("control server: client read error: ", $(sourceFd))
+      else:
+        msg.setLen(count)
+        srv.tcpMessages.insert(msg, 0)
+        # echo("server: received from client: `", msg, "`")
+    except TimeoutError:
+      echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
   else:
-    var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
-    var message = sourceClient.recvLine()
+    echo("control server: error: unknown socket id: ", $selected.fd.int)
 
-    if message == "":
 
-      var client: Socket
-      discard srv.clients.pop(sourceClient.getFd(), client)
-      srv.select.unregister(sourceClient.getFd())
-      logi(TAG, "Server: client disconnected: %s", $(sourceClient.getFd().getSockName()))
-
-    else:
-      logi TAG, "Server: received from client: %s", message
-
-      for cfd, client in srv.clients:
-        # if sourceClient.getFd() == cfd.getFd() :
-        #   continue
-        client.send(message & "\r\L")
 
 proc startRpcSocketServer*(port: Port) =
   var server: Socket = newSocket()

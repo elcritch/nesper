@@ -43,10 +43,13 @@ proc processReads(selected: ReadyKey, srv: TcpServerInfo) =
     srv.clients[client.getFd()] = client
     logi(TAG, "Server: client connected")
 
-  else:
+  elif srv.clients.hasKey(selected.fd.SocketHandle):
     var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
     if srv.readHandler != nil:
       srv.readHandler(srv, selected, sourceClient)
+
+  else:
+    raise newException(OSError, "control server: error: unknown socket id: " & $selected.fd.int)
 
 
 proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
@@ -59,7 +62,7 @@ proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket
     logi(TAG, "Server: client disconnected: %s", $(sourceClient.getFd().getSockName()))
 
   else:
-    logi TAG, "Server: received from client: %s", message
+    logd TAG, "Server: received from client: %s", message
 
     for cfd, client in srv.clients:
       # if sourceClient.getFd() == cfd.getFd():
