@@ -29,7 +29,7 @@ type
 
   RpcRouter* = ref object
     procs*: Table[string, RpcProc]
-    max_buffer*: int
+    buffer*: string
 
 proc wrapResponse*(rpcCall: JsonRpcCall, ret: JsonNode): JsonNode = 
   result = %* {"jsonrpc": "2.0", "result": ret, "id": rpcCall.id}
@@ -91,8 +91,8 @@ const
 proc createRpcRouter*(max_bufer: int): RpcRouter =
   result = new(RpcRouter)
   result.procs = initTable[string, RpcProc]()
-  result.max_buffer = max_bufer
-  echo "createRpcRouter: " & $(result.max_buffer)
+  result.buffer = newString(4096)
+  echo "createRpcRouter: " & $(result.buffer.len())
 
 proc register*(router: var RpcRouter, path: string, call: RpcProc) =
   router.procs.add(path, call)

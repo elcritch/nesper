@@ -9,8 +9,6 @@ import ../../general
 import ../tcpsocket
 import router
 import json
-import msgpack4nim
-import msgpack4nim/msgpack2json
 
 export tcpsocket, router
 
@@ -33,22 +31,13 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       raise newException(TcpClientError, "")
     else:
       msg.setLen(count)
-      var rcall = msgpack2json.toJsonNode(msg)
+      var rcall = parseJson(msg)
 
       var res: JsonNode = rt.route( rcall )
-      var rmsg: string = msgpack2json.fromJsonNode(res)
-      # logi(TAG, "rpc result: %s", $res)
-      # logi(TAG, "rpc result: %s", repr(rmsg))
+      var rmsg: string = $res
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
-      # logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
-
-      # for cfd, client in srv.clients:
-        # logi(TAG, "sent to client: %s", $(client.getFd().int))
-        # discard client.send(addr rmsg[0], rmsg.len)
-        # client.send("\r\n")
-      # srv.tcpMessages.insert(msg, 0)
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
