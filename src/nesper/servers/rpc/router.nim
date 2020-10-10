@@ -62,7 +62,6 @@ type
   RpcRouter* = object
     procs*: TableRef[string, RpcProc]
     max_buffer*: int
-    tcpMessages*: seq[string]
 
 const
   methodField = "method"
