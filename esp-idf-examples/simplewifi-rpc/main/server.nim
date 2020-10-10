@@ -4,21 +4,21 @@ import nesper/servers/rpc/rpcsocket
 
 var count = 0
 
+type
+  MyObject = object
+    id: int
+    name: string
+
+# Setup RPC Server #
+var rt = newRpcRouter(4096)
+
+rt.rpc("hello") do(input: string) -> string:
+  result = "Hello " & input
+
+rt.rpc("add") do(a: int, b: int) -> int:
+  result = a + b
+
 when defined(TcpMsgpackRpcServer):
-
-  type
-    MyObject = object
-      id: int
-      name: string
-
-  # Setup RPC Server #
-  var rt = newRpcRouter(4096)
-
-  rt.rpc("hello") do(input: string) -> string:
-    result = "Hello " & input
-
-  rt.rpc("add") do(a: int, b: int) -> int:
-    result = a + b
 
   proc run_rpc_server*() =
       echo "starting rpc server on port 5555"

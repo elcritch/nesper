@@ -45,7 +45,9 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
     client.getFd().setBlocking(false)
     srv.select.registerHandle(client.getFd(), {Event.Read}, data)
     srv.clients[client.getFd()] = client
-    logi(TAG, "Server: client connected")
+
+    let id: int = client.getFd().int
+    logi(TAG, "Server: client connected: %s", $(id))
 
   elif srv.clients.hasKey(SocketHandle(selected.fd)):
     let sourceClient: Socket = newSocket(SocketHandle(selected.fd))
