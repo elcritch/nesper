@@ -75,7 +75,7 @@ proc startSocketServer*(port: Port, readHandler: TcpServerHandler, writeHandler:
   server.bindAddr(port)
   server.listen()
 
-  logi TAG, "Server: started. Listening to new connections on port 5555..."
+  logi TAG, "Server: started. Listening to new connections on port: %s", $port
 
   var srv = createServerInfo(server, select)
   srv.readHandler = readHandler
