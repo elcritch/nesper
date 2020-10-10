@@ -1,21 +1,23 @@
 
-import asynchttpserver, asyncdispatch, net
+# import nesper/servers/rpc/socketrpc
+import nesper/servers/tcpsocket
 
 var count = 0
 
-proc cb*(req: Request) {.async.} =
-    inc count
-    echo "req #", count
-    await req.respond(Http200, "Hello World from nim on ESP32\n")
-    # GC_fullCollect()
+type
+  MyObject = object
+    id: int
+    name: string
 
-proc run_http_server*() {.exportc.} =
-    echo "starting http server on port 8181"
-    var server = newAsyncHttpServer()
+# Setup RPC Server #
+# var rt1 = newRpcRouter()
 
-    waitFor server.serve(Port(8181), cb)
+proc run_rpc_server*() =
+    echo "starting rpc server on port 5555"
+    startSocketServer(Port(5555))
+    # startRpcSocketServer(Port(5555))
 
 when isMainModule:
     echo "running server"
-    run_http_server()
+    run_rpc_server()
 

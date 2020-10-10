@@ -75,7 +75,7 @@ proc wifiStop*() =
   check: esp_wifiStop()
   check: esp_wifi_deinit()
 
-proc exampleConnect*(): esp_err_t =
+proc networkConnect*(): esp_err_t =
   if sConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
@@ -87,12 +87,12 @@ proc exampleConnect*(): esp_err_t =
   logi(TAG, "Connected to %s", sConnectionName)
   logi(TAG, "IPv4 address: %s", $sIpAddr)
 
-  echo("run_http_server\n")
-  run_http_server()
+  echo("run run_rpc_server\n")
+  run_rpc_server()
 
   return ESP_OK
 
-proc exampleDisconnect*(): esp_err_t =
+proc networkDisconnect*(): esp_err_t =
   if sConnectEventGroup == nil:
     return ESP_ERR_INVALID_STATE
 
@@ -111,12 +111,6 @@ proc nim_app_main*() {.exportc.} =
   check: esp_event_loop_create_default()
 
   logi(TAG, "wifi setup!\n")
-  check: exampleConnect()
+  check: networkConnect()
 
-  ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
-  ##  and re-start it upon connection.
-  ##
-  # IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
-
-  echo("Wait done\n")
-  # vTaskDelay(10000 div portTICK_PERIOD_MS)
+  echo("app done\n")
