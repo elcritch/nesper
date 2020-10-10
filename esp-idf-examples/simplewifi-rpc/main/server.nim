@@ -14,7 +14,7 @@ type
 
 proc run_rpc_server*() =
     echo "starting rpc server on port 5555"
-    startSocketServer[uint32](Port(5555), readHandler=echoReadHandler[uint32], writeHandler=nil, data=0)
+    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
     # startRpcSocketServer(Port(5555))
 
 when isMainModule:

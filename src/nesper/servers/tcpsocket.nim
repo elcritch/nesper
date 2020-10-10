@@ -74,7 +74,7 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
     raise newException(OSError, "unknown socket id: " & $selected.fd.int)
 
 
-proc echoReadHandler*[T](srv: TcpServerInfo[T], result: ReadyKey, sourceClient: Socket, data: T) =
+proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient: Socket, data: string) =
   var message = sourceClient.recvLine()
 
   if message == "":
@@ -86,7 +86,7 @@ proc echoReadHandler*[T](srv: TcpServerInfo[T], result: ReadyKey, sourceClient: 
     for cfd, client in srv.clients:
       # if sourceClient.getFd() == cfd.getFd():
         # continue
-      client.send(message & "\r\L")
+      client.send(data & message & "\r\L")
 
 proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: T) =
   var server: Socket = newSocket()
