@@ -24,7 +24,7 @@ os.sleep(500)
 
 let mcall2 = call2.fromJsonNode()
 echo("mcall2: " & repr(mcall2))
-client.send( mcall2 )
+client.send( mcall2 & "\n")
 
 # var msg: string = newString(4096)
 # var count = client.recv(msg, 4095)
