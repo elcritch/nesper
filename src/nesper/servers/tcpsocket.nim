@@ -21,6 +21,7 @@ type
     clients*: ref Table[SocketHandle, Socket]
     writeHandler*: TcpServerHandler[T]
     readHandler*: TcpServerHandler[T]
+    tcpMessages*: seq[string]
 
   TcpServerHandler*[T] = proc (srv: TcpServerInfo[T], selected: ReadyKey, client: Socket, data: T) {.nimcall.}
 
@@ -30,6 +31,11 @@ proc createServerInfo[T](server: Socket, selector: Selector[T]): TcpServerInfo[T
   result.server = server
   result.select = selector
   result.clients = newTable[SocketHandle, Socket]()
+
+proc sendMsgToAllClients[T](srv: TcpServerInfo[T], msg: string) = 
+  for cfd, client in srv.clients:
+    logi(TAG, "sent to client: %s", $(client.getFd().int))
+    discard client.send(unsafeAddr msg[0], msg.len)
 
 proc processWrites[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) = 
   var sourceClient: Socket = newSocket(SocketHandle(selected.fd))
@@ -115,6 +121,11 @@ proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHa
           result.processReads(srv, data)
       if Event.Write in result.events:
           result.processWrites(srv, data)
+
+    while srv.tcpMessages.len > 0:
+      let rmsg = srv.tcpMessages.pop()
+      srv.sendMsgToAllClients(rmsg)
+
   
   select.close()
   server.close()

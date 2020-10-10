@@ -42,11 +42,10 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       # discard sourceClient.send(addr rmsg[0], rmsg.len)
       # logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
 
-      for cfd, client in srv.clients:
-        logi(TAG, "sent to client: %s", $(client.getFd().int))
-        discard client.send(addr rmsg[0], rmsg.len)
-        client.send("\r\n")
-      # srv.tcpMessages.insert(msg, 0)
+      # for cfd, client in srv.clients:
+        # logi(TAG, "sent to client: %s", $(client.getFd().int))
+        # discard client.send(addr rmsg[0], rmsg.len)
+      srv.tcpMessages.insert(msg, 0)
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
