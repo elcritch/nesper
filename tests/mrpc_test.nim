@@ -29,7 +29,8 @@ client.send( mcall2 )
 # var msg: string = newString(4096)
 # var count = client.recv(msg, 4095)
 var msg = client.recv(4095, timeout = -1)
-echo("read: " & $msg.len())
-echo("read: " & repr(msg))
+echo("read bytes: " & $msg.len())
+
+echo("read: " & $(msg.toJsonNode()))
 
 client.close()
