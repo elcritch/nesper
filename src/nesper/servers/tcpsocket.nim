@@ -7,7 +7,7 @@ import posix
 import ../consts
 import ../general
 
-export net
+export net, selectors, tables, posix
 
 const TAG = "socketrpc"
 
@@ -15,44 +15,46 @@ type
   TcpClientDisconnected* = object of OSError
   TcpClientError* = object of OSError
 
-  TcpServerInfo* = ref object 
-    select*: Selector[int]
+  TcpServerInfo*[T] = ref object 
+    select*: Selector[T]
     server*: Socket
     clients*: ref Table[SocketHandle, Socket]
-    writeHandler*: TcpServerHandler
-    readHandler*: TcpServerHandler
+    writeHandler*: TcpServerHandler[T]
+    readHandler*: TcpServerHandler[T]
 
-  TcpServerHandler* = proc (srv: TcpServerInfo, selected: ReadyKey, client: Socket) {.nimcall.}
+  TcpServerHandler*[T] = proc (srv: TcpServerInfo[T], selected: ReadyKey, client: Socket, data: T) {.nimcall.}
 
 
-proc createServerInfo(server: Socket, selector: Selector[int]): TcpServerInfo = 
-  result = new(TcpServerInfo)
+proc createServerInfo[T](server: Socket, selector: Selector[T]): TcpServerInfo[T] = 
+  result = new(TcpServerInfo[T])
   result.server = server
   result.select = selector
   result.clients = newTable[SocketHandle, Socket]()
 
-proc processWrites(selected: ReadyKey, srv: TcpServerInfo) = 
-  var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
+proc processWrites[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) = 
+  var sourceClient: Socket = newSocket(SocketHandle(selected.fd))
+  let data = getData(srv.select, selected.fd)
   if srv.writeHandler != nil:
-    srv.writeHandler(srv, selected, sourceClient)
+    srv.writeHandler(srv, selected, sourceClient, data)
 
-proc processReads(selected: ReadyKey, srv: TcpServerInfo) = 
-  if selected.fd.SocketHandle == srv.server.getFd():
+proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) = 
+  if SocketHandle(selected.fd) == srv.server.getFd():
     var client: Socket = new(Socket)
     srv.server.accept(client)
 
     client.getFd().setBlocking(false)
-    srv.select.registerHandle(client.getFd(), {Event.Read}, -1)
+    srv.select.registerHandle(client.getFd(), {Event.Read}, data)
     srv.clients[client.getFd()] = client
     logi(TAG, "Server: client connected")
 
-  elif srv.clients.hasKey(selected.fd.SocketHandle):
-    let sourceClient: Socket = newSocket(selected.fd.SocketHandle)
+  elif srv.clients.hasKey(SocketHandle(selected.fd)):
+    let sourceClient: Socket = newSocket(SocketHandle(selected.fd))
     let sourceFd = selected.fd
+    let data = getData(srv.select, sourceFd)
 
     try:
       if srv.readHandler != nil:
-        srv.readHandler(srv, selected, sourceClient)
+        srv.readHandler(srv, selected, sourceClient, data)
 
     except TcpClientDisconnected as err:
       var client: Socket
@@ -72,7 +74,7 @@ proc processReads(selected: ReadyKey, srv: TcpServerInfo) =
     raise newException(OSError, "unknown socket id: " & $selected.fd.int)
 
 
-proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
+proc echoReadHandler*[T](srv: TcpServerInfo[T], result: ReadyKey, sourceClient: Socket, data: T) =
   var message = sourceClient.recvLine()
 
   if message == "":
@@ -86,9 +88,9 @@ proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket
         # continue
       client.send(message & "\r\L")
 
-proc startSocketServer*(port: Port, readHandler: TcpServerHandler, writeHandler: TcpServerHandler) =
+proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: T) =
   var server: Socket = newSocket()
-  var select: Selector[int] = newSelector[int]()
+  var select: Selector[T] = newSelector[T]()
 
   server.setSockOpt(OptReuseAddr, true)
   server.getFd().setBlocking(false)
@@ -97,20 +99,20 @@ proc startSocketServer*(port: Port, readHandler: TcpServerHandler, writeHandler:
 
   logi TAG, "Server: started. Listening to new connections on port: %s", $port
 
-  var srv = createServerInfo(server, select)
+  var srv = createServerInfo[T](server, select)
   srv.readHandler = readHandler
   srv.writeHandler = writeHandler
 
-  select.registerHandle(server.getFd(), {Event.Read}, -1)
+  select.registerHandle(server.getFd(), {Event.Read}, data)
   
   while true:
     var results: seq[ReadyKey] = select.select(-1)
   
     for result in results:
       if Event.Read in result.events:
-          result.processReads(srv)
+          result.processReads(srv, data)
       if Event.Write in result.events:
-          result.processWrites(srv)
+          result.processWrites(srv, data)
   
   select.close()
   server.close()
