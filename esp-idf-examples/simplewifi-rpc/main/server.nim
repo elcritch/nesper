@@ -22,6 +22,11 @@ when defined(TcpMsgpackRpcServer):
     rt.rpc("add") do(a: int, b: int) -> int:
       result = a + b
 
+    rt.rpc("addAll") do(vals: seq[int]) -> int:
+      result = 0
+      for x in vals:
+        result += x
+
     echo "starting rpc server on port 5555"
     echo "starting rpc server buffer len: " & $(rt.max_buffer)
     startRpcSocketServer(Port(5555), router=rt)

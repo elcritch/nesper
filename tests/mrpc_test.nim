@@ -42,9 +42,9 @@ template timeBlock(n: string, blk: untyped): untyped =
   blk
 
   let td = getTime() - t0
-  echo "[took: ", $(td.inMilliseconds()), " millis]"
+  echo "[took: ", $(td.inMicroseconds().float() / 1e3), " millis]"
   totalCalls.inc()
-  totalTime = totalTime + td.inMilliseconds()
+  totalTime = totalTime + td.inMicroseconds()
 
 var callDefault = %* { "jsonrpc": "2.0", "id": 1, "method": "add", "params": [1, 2] }
 
@@ -53,11 +53,15 @@ var call: JsonNode
 if jsonArg == "":
   call = callDefault
 else:
-  call = parseJson(jsonArg)
+  call = %* { "jsonrpc": "2.0", "id": 1 }
+  let m = parseJson(jsonArg)
+  for (f,v) in m.pairs():
+    call[f] = v
 
 let client: Socket = newSocket(buffered=false)
 client.connect(ipAddr, Port(5555))
 echo("[connected to server]")
+echo("[call: ", $call, "]")
 
 let mcall = call.fromJsonNode()
 
@@ -74,5 +78,6 @@ for i in 0..<count:
 client.close()
 
 echo("\n")
-echo("[total time: " & $(totalTime) & " millis]")
-echo("[avg time: " & $(float(totalTime)/(1.0 * float(totalCalls))) & " millis]")
+echo("[total time: " & $(totalTime.float() / 1e3) & " millis]")
+echo("[total count: " & $(totalCalls) & " No]")
+echo("[avg time: " & $(float(totalTime.float()/1e3)/(1.0 * float(totalCalls))) & " millis]")

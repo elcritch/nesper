@@ -22,7 +22,7 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
-    logi(TAG, "rpc router: len:  %s", $rt.max_buffer)
+    logd(TAG, "rpc router: len:  %s", $rt.max_buffer)
 
     var msg: string = newString(rt.max_buffer)
     var count = sourceClient.recv(msg, rt.max_buffer)
@@ -40,7 +40,7 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       # logi(TAG, "rpc result: %s", $res)
       # logi(TAG, "rpc result: %s", repr(rmsg))
 
-      logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
+      logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
       # logi(TAG, "sent to client: %s", $(sourceClient.getFd().int))
 
