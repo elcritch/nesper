@@ -30,7 +30,8 @@ proc createServerInfo(server: Socket, selector: Selector[int]): TcpServerInfo =
 
 proc processWrites(selected: ReadyKey, srv: TcpServerInfo) = 
   var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
-  srv.writeHandler(srv, selected, sourceClient)
+  if srv.writeHandler != nil:
+    srv.writeHandler(srv, selected, sourceClient)
 
 proc processReads(selected: ReadyKey, srv: TcpServerInfo) = 
   if selected.fd.SocketHandle == srv.server.getFd():
@@ -44,10 +45,11 @@ proc processReads(selected: ReadyKey, srv: TcpServerInfo) =
 
   else:
     var sourceClient: Socket = newSocket(selected.fd.SocketHandle)
-    srv.readHandler(srv, selected, sourceClient)
+    if srv.readHandler != nil:
+      srv.readHandler(srv, selected, sourceClient)
 
 
-proc echoReadHandler(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
+proc echoReadHandler*(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket) {.nimcall.} =
   var message = sourceClient.recvLine()
 
   if message == "":
@@ -60,11 +62,11 @@ proc echoReadHandler(srv: TcpServerInfo, result: ReadyKey, sourceClient: Socket)
     logi TAG, "Server: received from client: %s", message
 
     for cfd, client in srv.clients:
-      if sourceClient.getFd() == cfd.getFd():
-        continue
+      # if sourceClient.getFd() == cfd.getFd():
+        # continue
       client.send(message & "\r\L")
 
-proc startSocketServer*(port: Port) =
+proc startSocketServer*(port: Port, readHandler: TcpServerHandler, writeHandler: TcpServerHandler) =
   var server: Socket = newSocket()
   var select: Selector[int] = newSelector[int]()
 
@@ -76,6 +78,8 @@ proc startSocketServer*(port: Port) =
   logi TAG, "Server: started. Listening to new connections on port 5555..."
 
   var srv = createServerInfo(server, select)
+  srv.readHandler = readHandler
+  srv.writeHandler = writeHandler
 
   select.registerHandle(server.getFd(), {Event.Read}, -1)
   
