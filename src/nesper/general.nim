@@ -7,6 +7,7 @@ var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/Free
 proc NimMain() {.importc.}
 
 when defined(NimAppMain):
+
   proc nim_app_main*() {.importc.}
 
   proc app_main*() {.exportc.} =

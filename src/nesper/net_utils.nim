@@ -53,14 +53,15 @@ proc toIpAddress*(ip: ip4_addr_t): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv4)
   # copyMem(addr result.address_v4[0], unsafeAddr cast[uint32](ip.address), 4)
 
+  let address = ip.address
   for i in 0..3:
-    result.address_v6[i] = uint8(ip.address shr (i*8))
+    result.address_v4[i] = uint8(address shr (i*8))
 
 proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv6)
   for i in 0..3:
     # result.address_v6[i] = address[i]
     for i in 0..3:
-      result.address_v4[i] = uint8(ip.address[i] shr (i*8))
+      result.address_v6[i] = uint8(ip.address[i] shr (i*8))
   # for i in 0..15:
     # result.address_v6[i] = uint8(address shr (i*8))
