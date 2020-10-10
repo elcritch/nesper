@@ -30,11 +30,7 @@ assert res1["result"].getStr() == "Hello world"
 
 ## Test Call 2 ##
 echo "\n## Call 2 ##"
-var call2 = %* {
-  "jsonrpc": "2.0", "id": 1,
-  "method": "add",
-  "params": [1, 2],
-}
+var call2 = %* { "jsonrpc": "2.0", "id": 1, "method": "add", "params": [1, 2], }
 
 echo "arg call2: " & $call2
 var res2 = rt1.route( call2 )

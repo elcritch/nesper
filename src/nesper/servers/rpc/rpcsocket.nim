@@ -7,21 +7,23 @@ import posix
 import ../../consts
 import ../../general
 import ../tcpsocket
+import router
+import json
+import msgpack4nim
+import msgpack4nim/msgpack2json
 
-export net
+export tcpsocket, router
 
 const TAG = "socketrpc"
 
-proc handleWrites(result: ReadyKey, srv: ServerInfo) = 
+proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
   raise newException(OSError, "the request to the OS failed")
 
-proc rpcMsgPackReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient: Socket, data: string) =
-  var sourceFd = selected.fd
-  var sourceClient: Socket = srv.clients[sourceFd.SocketHandle]
+proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
-    var msg: string = newString(BUFF_SZ)
-    var count = sourceClient.recv(msg, BUFF_SZ)
+    var msg: string = newString(rt.max_buffer)
+    var count = sourceClient.recv(msg, rt.max_buffer)
 
     if count == 0:
       raise newException(TcpClientDisconnected, "")
@@ -29,39 +31,25 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, source
       raise newException(TcpClientError, "")
     else:
       msg.setLen(count)
-      srv.tcpMessages.insert(msg, 0)
+      var rcall = msgpack2json.toJsonNode(msg)
+
+      var res: JsonNode = rt.route( rcall )
+      var rmsg: string = msgpack2json.fromJsonNode(res)
+      # srv.tcpMessages.insert(msg, 0)
       # echo("server: received from client: `", msg, "`")
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
 
 
-proc startRpcSocketServer*(port: Port) =
-  var server: Socket = newSocket()
-  var select: Selector[int] = newSelector[int]()
+proc startRpcSocketServer*(port: Port; router: RpcRouter) =
+  logi(TAG, "starting rpc server")
+  startSocketServer[RpcRouter](
+    Port(5555),
+    readHandler=rpcMsgPackReadHandler,
+    writeHandler=rpcMsgPackWriteHandler,
+    data=router)
 
-  server.setSockOpt(OptReuseAddr, true)
-  server.getFd().setBlocking(false)
-  server.bindAddr(port)
-  server.listen()
-
-  logi TAG, "Server: started. Listening to new connections on port 5555..."
-
-  var srv = createServerInfo(server, select)
-
-  select.registerHandle(server.getFd(), {Event.Read}, -1)
-  
-  while true:
-    var results: seq[ReadyKey] = select.select(-1)
-  
-    for result in results:
-      if Event.Read in result.events:
-          result.handleReads(srv)
-      if Event.Write in result.events:
-          result.handleWrites(srv)
-  
-  select.close()
-  server.close()
 
 
 when isMainModule:

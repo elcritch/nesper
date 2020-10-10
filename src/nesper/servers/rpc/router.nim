@@ -61,6 +61,7 @@ type
 
   RpcRouter* = object
     procs*: TableRef[string, RpcProc]
+    max_buffer*: int
 
 const
   methodField = "method"
@@ -87,8 +88,9 @@ const
       (INVALID_PARAMS, "Invalid request object")
     ]
 
-proc newRpcRouter*: RpcRouter =
+proc newRpcRouter*(max_bufer: int): RpcRouter =
   result.procs = newTable[string, RpcProc]()
+  result.max_buffer = max_bufer
 
 proc register*(router: var RpcRouter, path: string, call: RpcProc) =
   router.procs.add(path, call)
