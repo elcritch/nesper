@@ -23,7 +23,7 @@ when defined(TcpMsgpackRpcServer):
         result += x
 
     echo "starting rpc server on port 5555"
-    logi(TAG,"starting rpc server buffer ptr: %x", $(rt.buffer.cstring()))
+    logi(TAG,"starting rpc server buffer ptr: %x", $(rt.buffer))
     startRpcSocketServer(Port(5555), router=rt)
 
 when defined(TcpJsonRpcServer):

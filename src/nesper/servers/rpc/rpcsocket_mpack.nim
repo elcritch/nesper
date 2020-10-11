@@ -22,17 +22,14 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
-    logi(TAG, "rpc server handler: router: %x", rt.buffer.cstring())
+    logi(TAG, "rpc server handler: router: %x", rt.buffer)
 
-    var count = sourceClient.recv(rt.buffer, rt.buffer.len())
+    let msg = sourceClient.recv(rt.buffer)
 
-    if count == 0:
+    if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
-    elif count < 0:
-      raise newException(TcpClientError, "")
     else:
-      rt.buffer.setLen(count)
-      var rcall = msgpack2json.toJsonNode(rt.buffer)
+      var rcall = msgpack2json.toJsonNode(msg)
 
       var res: JsonNode = rt.route( rcall )
       var rmsg: string = msgpack2json.fromJsonNode(res)
@@ -45,7 +42,7 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 
 
 proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
-  logi(TAG, "starting rpc server: buffer: %x", router.buffer.cstring())
+  logi(TAG, "starting rpc server: buffer: %s", $router.buffer)
 
   startSocketServer[RpcRouter](
     Port(5555),

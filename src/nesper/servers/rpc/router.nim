@@ -29,7 +29,7 @@ type
 
   RpcRouter* = ref object
     procs*: Table[string, RpcProc]
-    buffer*: string
+    buffer*: int
 
 proc wrapResponse*(rpcCall: JsonRpcCall, ret: JsonNode): JsonNode = 
   result = %* {"jsonrpc": "2.0", "result": ret, "id": rpcCall.id}
@@ -88,11 +88,11 @@ const
       (INVALID_PARAMS, "Invalid request object")
     ]
 
-proc createRpcRouter*(max_bufer: int): RpcRouter =
+proc createRpcRouter*(max_buffer: int): RpcRouter =
   result = new(RpcRouter)
   result.procs = initTable[string, RpcProc]()
-  result.buffer = newString(4096)
-  echo "createRpcRouter: " & $(result.buffer.len())
+  result.buffer = max_buffer
+  echo "createRpcRouter: " & $(result.buffer)
 
 proc register*(router: var RpcRouter, path: string, call: RpcProc) =
   router.procs.add(path, call)
