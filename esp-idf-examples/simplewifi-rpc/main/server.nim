@@ -7,14 +7,20 @@ import apps
 const TAG = "server"
 const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
 
-when defined(TcpMpackRpcServer):
-  import nesper/servers/rpc/rpcsocket_mpack
-
 when defined(TcpJsonRpcServer):
   import nesper/servers/rpc/rpcsocket_json
+  # when defined(TcpMpackRpcServer):
+elif not defined(TcpEchoServer):
+  import nesper/servers/rpc/rpcsocket_mpack
 
 
-when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
+when defined(TcpEchoServer):
+  proc run_rpc_server*() =
+    echo "starting server on port 5555"
+    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
+    # startRpcSocketServer(Port(5555))
+
+else:
 
   # Setup RPC Server #
   proc run_rpc_server*() =
