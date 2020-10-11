@@ -3,3 +3,4 @@ trouter
 mrpc_test
 echosocket_test
 test_repr
+rpc_cli_test
