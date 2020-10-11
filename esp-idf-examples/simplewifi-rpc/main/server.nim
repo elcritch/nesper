@@ -16,13 +16,13 @@ when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
 
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
 
-    rt.rpc("hello") do(input: string) -> string:
+    rpc(rt, "hello") do(input: string) -> string:
       result = "Hello " & input
 
-    rt.rpc("add") do(a: int, b: int) -> int:
+    rpc(rt, "add") do(a: int, b: int) -> int:
       result = a + b
 
-    rt.rpc("addAll") do(vals: seq[int]) -> int:
+    rpc(rt, "addAll") do(vals: seq[int]) -> int:
       result = 0
       for x in vals:
         result += x
