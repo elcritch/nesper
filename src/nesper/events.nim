@@ -68,10 +68,25 @@ template eventRegisterWith*[EVT](
         ) =
     ## Register event with a given event loop.
 
-    let ret = esp_event_handler_register_with(event_loop, event_base, event_id.cint, event_handler, event_handler_arg)
+    let ret = esp_event_handler_register_with(
+                event_loop,
+                event_base, cint(event_id),
+                event_handler, event_handler_arg)
 
     if ret != ESP_OK:
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
+
+template eventPostWith*[EVT](
+            event_loop: esp_event_loop_handle_t;
+            event_base: esp_event_base_t;
+            event_id: EVT;
+        ) =
+    ## Register event with a given event loop.
+
+    let ret = esp_event_post_with(event_loop, event_base, cint(event_id))
+
+    if ret != ESP_OK:
+      raise newEspError[EventError]("post: " & $esp_err_to_name(ret), ret)
 
 template eventUnregister*[EVT](
             evt_id: EVT;

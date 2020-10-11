@@ -18,7 +18,6 @@ when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
 
   # Setup RPC Server #
   proc run_rpc_server*() =
-    var loop_handle = setup_task_loop()
 
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
 

@@ -20,7 +20,7 @@ proc add_all*(arg: pointer;
   # var pdata: ptr seq[int] = cast[ptr seq[int]](event_data)
   # var data: seq[int] = pdata[]
 
-proc setup_task_loop*(): esp_event_loop_handle_t =
+proc setup_app_task_loop*(): esp_event_loop_handle_t =
   var loop: esp_event_loop_handle_t
   var loop_args =
         esp_event_loop_args_t(
