@@ -2,6 +2,7 @@ import nesper/general
 # import nesper/servers/rpc/socketrpc
 
 const TAG = "server"
+const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
 
 when defined(TcpMpackRpcServer):
   import nesper/servers/rpc/rpcsocket_mpack
@@ -13,7 +14,7 @@ when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
   # Setup RPC Server #
   proc run_rpc_server*() =
 
-    var rt = createRpcRouter(16*1024)
+    var rt = createRpcRouter(MaxRpcReceiveBuffer)
 
     rt.rpc("hello") do(input: string) -> string:
       result = "Hello " & input
