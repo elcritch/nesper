@@ -47,7 +47,7 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
     srv.clients[client.getFd()] = client
 
     let id: int = client.getFd().int
-    logi(TAG, "Server: client connected: %d", id)
+    logd(TAG, "client connected: %d", id)
 
   elif srv.clients.hasKey(SocketHandle(selected.fd)):
     let sourceClient: Socket = newSocket(SocketHandle(selected.fd))
@@ -63,14 +63,14 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
       discard srv.clients.pop(sourceFd.SocketHandle, client)
       srv.select.unregister(sourceFd)
       discard posix.close(sourceFd.cint)
-      logi(TAG, "client disconnected: fd: %s", $sourceFd)
+      logd(TAG, "client disconnected: fd: %s", $sourceFd)
 
     except TcpClientError as err:
       srv.clients.del(sourceFd.SocketHandle)
       srv.select.unregister(sourceFd)
 
       discard posix.close(sourceFd.cint)
-      logi(TAG, "client read error: %s", $(sourceFd))
+      logd(TAG, "client read error: %s", $(sourceFd))
 
   else:
     raise newException(OSError, "unknown socket id: " & $selected.fd.int)
