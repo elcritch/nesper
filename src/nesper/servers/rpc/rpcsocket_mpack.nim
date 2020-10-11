@@ -22,7 +22,7 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
-    logi(TAG, "rpc server handler: router: %x", rt.buffer)
+    logd(TAG, "rpc server handler: router: %x", rt.buffer)
 
     let msg = sourceClient.recv(rt.buffer)
 
