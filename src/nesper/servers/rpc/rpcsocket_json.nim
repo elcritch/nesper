@@ -20,17 +20,13 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
-    logd(TAG, "rpc router: len:  %s", $rt.max_buffer)
+    logd(TAG, "rpc server handler: router: %x", rt.buffer)
 
-    var msg: string = newString(rt.max_buffer)
-    var count = sourceClient.recv(msg, rt.max_buffer)
+    let msg = sourceClient.recv(rt.buffer, -1)
 
-    if count == 0:
+    if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
-    elif count < 0:
-      raise newException(TcpClientError, "")
     else:
-      msg.setLen(count)
       var rcall = parseJson(msg)
 
       var res: JsonNode = rt.route( rcall )
@@ -38,14 +34,13 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
+
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
 
-
 proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
-  logi(TAG, "starting rpc server: router: %s", $(router.max_buffer))
-  logi(TAG, "starting rpc server: router: %x", addr(router.procs))
+  logi(TAG, "starting json rpc server: buffer: %s", $router.buffer)
 
   startSocketServer[RpcRouter](
     Port(5555),

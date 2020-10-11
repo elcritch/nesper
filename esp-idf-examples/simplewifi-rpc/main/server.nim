@@ -3,36 +3,17 @@ import nesper/general
 
 const TAG = "server"
 
-when defined(TcpMsgpackRpcServer):
+when defined(TcpMpackRpcServer):
   import nesper/servers/rpc/rpcsocket_mpack
-
-  # Setup RPC Server #
-  proc run_rpc_server*() =
-
-    var rt = createRpcRouter(4096)
-
-    rt.rpc("hello") do(input: string) -> string:
-      result = "Hello " & input
-
-    rt.rpc("add") do(a: int, b: int) -> int:
-      result = a + b
-
-    rt.rpc("addAll") do(vals: seq[int]) -> int:
-      result = 0
-      for x in vals:
-        result += x
-
-    echo "starting rpc server on port 5555"
-    logi(TAG,"starting rpc server buffer ptr: %x", $(rt.buffer))
-    startRpcSocketServer(Port(5555), router=rt)
 
 when defined(TcpJsonRpcServer):
   import nesper/servers/rpc/rpcsocket_json
 
+when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
   # Setup RPC Server #
   proc run_rpc_server*() =
 
-    var rt = createRpcRouter(4096)
+    var rt = createRpcRouter(16*1024)
 
     rt.rpc("hello") do(input: string) -> string:
       result = "Hello " & input
@@ -46,7 +27,7 @@ when defined(TcpJsonRpcServer):
         result += x
 
     echo "starting rpc server on port 5555"
-    echo "starting rpc server buffer ptr: " & $(rt.max_buffer)
+    logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
     startRpcSocketServer(Port(5555), router=rt)
 
 

@@ -3,8 +3,10 @@ import net, os
 import times
 
 import nesper/servers/rpc/router
-import msgpack4nim
-import msgpack4nim/msgpack2json
+
+when not defined(TcpJsonRpcServer):
+  import msgpack4nim
+  import msgpack4nim/msgpack2json
 
 import parseopt
 
@@ -54,7 +56,9 @@ if jsonArg == "":
   call = callDefault
 else:
   call = %* { "jsonrpc": "2.0", "id": 1 }
+
   let m = parseJson(jsonArg)
+
   for (f,v) in m.pairs():
     call[f] = v
 
@@ -63,16 +67,22 @@ client.connect(ipAddr, Port(5555))
 echo("[connected to server]")
 echo("[call: ", $call, "]")
 
-let mcall = call.fromJsonNode()
+when defined(TcpJsonRpcServer):
+  let mcall = $call
+else:
+  let mcall = call.fromJsonNode()
 
 for i in 0..<count:
 
   timeBlock("call"):
     client.send( mcall )
-    var msg = client.recv(4095, timeout = -1)
+    var msg = client.recv(16*1024, timeout = -1)
 
   echo("[read bytes: " & $msg.len() & "]")
-  echo($(msg.toJsonNode()))
+  when defined(TcpJsonRpcServer):
+    echo($msg)
+  else:
+    echo($(msg.toJsonNode()))
 
 
 client.close()
