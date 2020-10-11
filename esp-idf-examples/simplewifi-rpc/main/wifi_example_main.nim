@@ -5,9 +5,9 @@ import nesper/events
 import nesper/wifi
 import nesper/nvs
 import nesper/tasks
-import os
 
 import server
+import apps
 
 # Get Password
 const WIFI_SSID {.strdefine.}: string = "NOSSID"
@@ -109,6 +109,15 @@ proc nim_app_main*() {.exportc.} =
   tcpip_adapter_init()
 
   check: esp_event_loop_create_default()
+
+  discard xTaskCreatePinnedToCore(
+              pvTaskCode = run_app,
+              pcName = "APP_CPU Task",
+              usStackDepth = 10000,
+              pvParameters = nil,
+              uxPriority = 10,
+              pvCreatedTask = nil,
+              xCoreID = 1)
 
   logi(TAG, "wifi setup!\n")
   check: networkConnect()

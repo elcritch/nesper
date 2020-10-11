@@ -1,4 +1,6 @@
 import nesper/general
+import nesper/events
+import apps
 # import nesper/servers/rpc/socketrpc
 
 const TAG = "server"
@@ -23,6 +25,8 @@ when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
       result = a + b
 
     rpc(rt, "addAll") do(vals: seq[int]) -> int:
+      check: esp_event_post(APP_EVENT, ADD_ALL.cint, addr(vals), sizeof(vals), 1000)
+
       result = 0
       for x in vals:
         result += x
