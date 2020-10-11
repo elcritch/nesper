@@ -20,17 +20,20 @@ proc add_all*(arg: pointer;
   # var pdata: ptr seq[int] = cast[ptr seq[int]](event_data)
   # var data: seq[int] = pdata[]
 
-proc run_app*(arg: pointer) {.cdecl.} =
-  echo("run_app: running!")
+proc setup_task_loop*(): esp_event_loop_handle_t =
+  var loop: esp_event_loop_handle_t
+  var loop_args =
+        esp_event_loop_args_t(
+          queue_size: 10,
+          task_name: "app loop",
+          task_priority: 1,
+          task_stack_size: 4096,
+          task_core_id: 1)
 
-  let
-    ret = esp_event_handler_register(
-              event_base = APP_EVENT,
-              event_id = ADD_ALL.cint,
-              event_handler = add_all,
-              event_handler_arg = nil)
-
+  let ret = esp_event_loop_create(addr(loop_args), addr(loop))
   if ret != ESP_OK:
-    raise newException(ValueError, "unable to register")
+    raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
-  while true:
+  echo("run_app: running!")
+  loop.eventRegisterWith(APP_EVENT, ADD_ALL, add_all)
+

@@ -1,3 +1,4 @@
+import nesper/consts
 import nesper/general
 import nesper/events
 import apps
@@ -12,9 +13,12 @@ when defined(TcpMpackRpcServer):
 when defined(TcpJsonRpcServer):
   import nesper/servers/rpc/rpcsocket_json
 
+
 when defined(TcpJsonRpcServer) or defined(TcpMpackRpcServer):
+
   # Setup RPC Server #
   proc run_rpc_server*() =
+    var loop_handle = setup_task_loop()
 
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
 

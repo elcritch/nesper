@@ -50,8 +50,8 @@ proc wifiStart*() =
 
   discard esp_wifi_init(unsafeAddr(wcfg))
 
-  WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect, nil)
-  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
+  WIFI_EVENT_STA_DISCONNECTED.eventRegister(onWifiDisconnect)
+  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler)
 
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
 
@@ -107,17 +107,7 @@ proc networkDisconnect*(): esp_err_t =
 proc nim_app_main*() {.exportc.} =
   initNvs()
   tcpip_adapter_init()
-
   check: esp_event_loop_create_default()
-
-  discard xTaskCreatePinnedToCore(
-              pvTaskCode = run_app,
-              pcName = "APP_CPU Task",
-              usStackDepth = 10000,
-              pvParameters = nil,
-              uxPriority = 10,
-              pvCreatedTask = nil,
-              xCoreID = 1)
 
   logi(TAG, "wifi setup!\n")
   check: networkConnect()
