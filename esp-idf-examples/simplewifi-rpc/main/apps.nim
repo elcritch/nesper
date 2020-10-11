@@ -8,8 +8,8 @@ const APP_EVENT*: string = "APP_EVENT"
 
 type 
   app_events_t* {.size: sizeof(cint).} = enum 
-    TEST = 0,
-    ADD_ALL
+    app_test = 0,
+    app_add_all
 
 proc add_all*(arg: pointer;
               event_base: esp_event_base_t;
@@ -35,5 +35,5 @@ proc setup_app_task_loop*(): esp_event_loop_handle_t =
     raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
   echo("run_app: running!")
-  loop.eventRegisterWith(APP_EVENT, ADD_ALL, add_all)
+  loop.eventRegisterWith(APP_EVENT, app_add_all, add_all)
 

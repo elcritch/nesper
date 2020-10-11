@@ -109,8 +109,6 @@ proc nim_app_main*() {.exportc.} =
   tcpip_adapter_init()
   check: esp_event_loop_create_default()
 
-  discard setup_app_task_loop()
-
   logi(TAG, "wifi setup!\n")
   check: networkConnect()
 

@@ -25,6 +25,9 @@ else:
   # Setup RPC Server #
   proc run_rpc_server*() =
 
+    # Setup an app task loop
+    # note: not sure if this is the best place for it or not?
+    let loop = setup_app_task_loop()
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
 
     rpc(rt, "hello") do(input: string) -> string:
@@ -34,7 +37,7 @@ else:
       result = a + b
 
     rpc(rt, "addAll") do(vals: seq[int]) -> int:
-      check: esp_event_post(APP_EVENT, ADD_ALL.cint, addr(vals), sizeof(vals), 1000)
+      loop.eventPost(APP_EVENT, app_add_all, addr(vals), sizeof(vals), 10000)
 
       result = 0
       for x in vals:

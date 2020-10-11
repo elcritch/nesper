@@ -393,6 +393,8 @@ proc esp_event_post*(event_base: esp_event_base_t; event_id: int32;
                     event_data: pointer; event_data_size: csize;
                     ticks_to_wait: TickType_t): esp_err_t {.
     importc: "esp_event_post", header: "esp_event.h".}
+
+
 ## *
 ##  @brief Posts an event to the specified event loop. The event loop library keeps a copy of event_data and manages
 ##  the copy's lifetime automatically (allocation + deletion); this ensures that the data the
@@ -418,7 +420,7 @@ proc esp_event_post*(event_base: esp_event_base_t; event_id: int32;
 
 proc esp_event_post_to*(event_loop: esp_event_loop_handle_t;
                        event_base: esp_event_base_t; event_id: int32;
-                       event_data: pointer; event_data_size: csize;
+                       event_data: pointer; event_data_size: csize_t;
                        ticks_to_wait: TickType_t): esp_err_t {.
     importc: "esp_event_post_to", header: "esp_event.h".}
 
