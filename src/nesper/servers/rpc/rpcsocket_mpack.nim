@@ -24,7 +24,7 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
   try:
     logd(TAG, "rpc server handler: router: %x", rt.buffer)
 
-    let msg = sourceClient.recv(rt.buffer)
+    let msg = sourceClient.recv(rt.buffer, -1)
 
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
