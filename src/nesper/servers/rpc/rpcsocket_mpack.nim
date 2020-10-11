@@ -16,9 +16,6 @@ export tcpsocket, router
 
 const TAG = "socketrpc"
 
-var MALLOC_CAP_DEFAULT {.importc: "MALLOC_CAP_DEFAULT", header: "heap/include/esp_heap_caps.h".}: uint32 
-proc heap_caps_print_heap_info(caps: uint32) {.importc: "heap_caps_print_heap_info", header: "heap/include/esp_heap_caps.h".}
-
 proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
   raise newException(OSError, "the request to the OS failed")
 
@@ -39,7 +36,6 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
-      heap_caps_print_heap_info(MALLOC_CAP_DEFAULT)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
