@@ -67,15 +67,14 @@
 ##     1 tab == 4 spaces!
 ##
 
+import ../consts
+import FreeRTOS
+
 ## *
 ##  Type by which queues are referenced.  For example, a call to xQueueCreate()
 ##  returns an QueueHandle_t variable that can then be used as a parameter to
 ##  xQueueSend(), xQueueReceive(), etc.
 ##
-
-import ../consts
-import FreeRTOS
-
 type
   QueueHandle_t* = pointer
 
@@ -84,7 +83,6 @@ type
 ##  xQueueCreateSet() returns an xQueueSet variable that can then be used as a
 ##  parameter to xQueueSelectFromSet(), xQueueAddToSet(), etc.
 ##
-
 type
   QueueSetHandle_t* = pointer
 
@@ -93,27 +91,27 @@ type
 ##  QueueSetMemberHandle_t is defined as a type to be used where a parameter or
 ##  return value can be either an QueueHandle_t or an SemaphoreHandle_t.
 ##
-
 type
   QueueSetMemberHandle_t* = pointer
 
-## * @cond
-##  For internal use only.
 
-const
-  queueSEND_TO_BACK* = (cast[BaseType_t](0))
-  queueSEND_TO_FRONT* = (cast[BaseType_t](1))
-  queueOVERWRITE* = (cast[BaseType_t](2))
+# ## * @cond
+# ##  For internal use only.
+
+# const
+#   queueSEND_TO_BACK* = (cast[BaseType_t](0))
+#   queueSEND_TO_FRONT* = (cast[BaseType_t](1))
+#   queueOVERWRITE* = (cast[BaseType_t](2))
 
 ##  For internal use only.  These definitions *must* match those in queue.c.
 
-const
-  queueQUEUE_TYPE_BASE* = (cast[uint8](0))
-  queueQUEUE_TYPE_SET* = (cast[uint8](0))
-  queueQUEUE_TYPE_MUTEX* = (cast[uint8](1))
-  queueQUEUE_TYPE_COUNTING_SEMAPHORE* = (cast[uint8](2))
-  queueQUEUE_TYPE_BINARY_SEMAPHORE* = (cast[uint8](3))
-  queueQUEUE_TYPE_RECURSIVE_MUTEX* = (cast[uint8](4))
+# const
+#   queueQUEUE_TYPE_BASE* = (cast[uint8](0))
+#   queueQUEUE_TYPE_SET* = (cast[uint8](0))
+#   queueQUEUE_TYPE_MUTEX* = (cast[uint8](1))
+#   queueQUEUE_TYPE_COUNTING_SEMAPHORE* = (cast[uint8](2))
+#   queueQUEUE_TYPE_BINARY_SEMAPHORE* = (cast[uint8](3))
+#   queueQUEUE_TYPE_RECURSIVE_MUTEX* = (cast[uint8](4))
 
 ## * @endcond
 ## *
@@ -164,8 +162,7 @@ const
 ##  \ingroup QueueManagement
 ##
 
-template xQueueCreate*(uxQueueLength, uxItemSize: untyped): untyped =
-  xQueueGenericCreate((uxQueueLength), (uxItemSize), (queueQUEUE_TYPE_BASE))
+proc xQueueCreate*(uxQueueLength, uxItemSize: UBaseType_t): QueueHandle_t {.importc: "$1", header: "queue.h".}
 
 ## *
 ##  Creates a new queue instance, and returns a handle by which the new queue
@@ -239,10 +236,9 @@ template xQueueCreate*(uxQueueLength, uxItemSize: untyped): untyped =
 ##  \ingroup QueueManagement
 ##
 
-template xQueueCreateStatic*(uxQueueLength, uxItemSize, pucQueueStorage,
-                            pxQueueBuffer: untyped): untyped =
-  xQueueGenericCreateStatic((uxQueueLength), (uxItemSize), (pucQueueStorage),
-                            (pxQueueBuffer), (queueQUEUE_TYPE_BASE))
+proc xQueueCreateStatic*(uxQueueLength: UBaseType_t, uxItemSize: UBaseType_t, pucQueueStorage: pointer,
+                            pxQueueBuffer: ptr StaticQueue_t): QueueHandle_t {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  This is a macro that calls xQueueGenericSend().
@@ -315,8 +311,8 @@ template xQueueCreateStatic*(uxQueueLength, uxItemSize, pucQueueStorage,
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSendToFront*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
-  xQueueGenericSend((xQueue), (pvItemToQueue), (xTicksToWait), queueSEND_TO_FRONT)
+proc xQueueSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): untyped {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  This is a macro that calls xQueueGenericSend().
@@ -389,8 +385,8 @@ template xQueueSendToFront*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyp
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSendToBack*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
-  xQueueGenericSend((xQueue), (pvItemToQueue), (xTicksToWait), queueSEND_TO_BACK)
+proc xQueueSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  This is a macro that calls xQueueGenericSend().  It is included for
@@ -465,8 +461,8 @@ template xQueueSendToBack*(xQueue, pvItemToQueue, xTicksToWait: untyped): untype
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSend*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
-  xQueueGenericSend((xQueue), (pvItemToQueue), (xTicksToWait), queueSEND_TO_BACK)
+proc xQueueSend*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  Only for use with queues that have a length of one - so the queue is either
@@ -541,8 +537,8 @@ template xQueueSend*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
 ##  \ingroup QueueManagement
 ##
 
-template xQueueOverwrite*(xQueue, pvItemToQueue: untyped): untyped =
-  xQueueGenericSend((xQueue), (pvItemToQueue), 0, queueOVERWRITE)
+proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  It is preferred that the macros xQueueSend(), xQueueSendToFront() and
@@ -622,7 +618,9 @@ template xQueueOverwrite*(xQueue, pvItemToQueue: untyped): untyped =
 proc xQueueGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                        xTicksToWait: TickType_t; xCopyPosition: BaseType_t): BaseType_t {.
     cdecl, importcpp: "xQueueGenericSend(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+
+
+
 ## *
 ##  This is a macro that calls the xQueueGenericReceive() function.
 ##
@@ -709,8 +707,8 @@ proc xQueueGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
 ##  \ingroup QueueManagement
 ##
 
-template xQueuePeek*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
-  xQueueGenericReceive((xQueue), (pvBuffer), (xTicksToWait), pdTRUE)
+proc xQueuePeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
 
 ## *
 ##  A version of xQueuePeek() that can be called from an interrupt service
@@ -736,9 +734,10 @@ template xQueuePeek*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
 ##  \ingroup QueueManagement
 ##
 
-proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.cdecl,
-    importcpp: "xQueuePeekFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.importc: "$1", header: "queue.h".}
+
+
+
 ## *
 ##  queue. h
 ##  <pre>
@@ -830,8 +829,9 @@ proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.
 ##  \ingroup QueueManagement
 ##
 
-template xQueueReceive*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
-  xQueueGenericReceive((xQueue), (pvBuffer), (xTicksToWait), pdFALSE)
+proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
+
 
 ## *
 ##  It is preferred that the macro xQueueReceive() be used rather than calling
@@ -923,7 +923,8 @@ template xQueueReceive*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
 proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           xTicksToWait: TickType_t; xJustPeek: BaseType_t): BaseType_t {.
     cdecl, importcpp: "xQueueGenericReceive(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+
+
 ## *
 ##  Return the number of messages stored in a queue.
 ##
@@ -934,9 +935,9 @@ proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
 ##  \ingroup QueueManagement
 ##
 
-proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
-    importcpp: "uxQueueMessagesWaiting(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQueueMessagesWaiting", header: "queue.h".}
+
+
 ## *
 ##  Return the number of free spaces available in a queue.  This is equal to the
 ##  number of items that can be sent to the queue before the queue becomes full
@@ -949,9 +950,10 @@ proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
 ##  \ingroup QueueManagement
 ##
 
-proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
-    importcpp: "uxQueueSpacesAvailable(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.cdecl, importc: "uxQueueSpacesAvailable", header: "queue.h".}
+
+
+
 ## *
 ##  Delete a queue - freeing all the memory allocated for storing of items
 ##  placed on the queue.
@@ -961,9 +963,10 @@ proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
 ##  \ingroup QueueManagement
 ##
 
-proc vQueueDelete*(xQueue: QueueHandle_t) {.cdecl, importcpp: "vQueueDelete(@)",
-    header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+proc vQueueDelete*(xQueue: QueueHandle_t) {.importc: "vQueueDelete", header: "queue.h".}
+
+
+
 ## *
 ##  This is a macro that calls xQueueGenericSendFromISR().
 ##
@@ -1022,9 +1025,9 @@ proc vQueueDelete*(xQueue: QueueHandle_t) {.cdecl, importcpp: "vQueueDelete(@)",
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSendToFrontFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken: untyped): untyped =
-  xQueueGenericSendFromISR((xQueue), (pvItemToQueue), (pxHigherPriorityTaskWoken),
-                           queueSEND_TO_FRONT)
+proc xQueueSendToFrontFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
+
 
 ## *
 ##  This is a macro that calls xQueueGenericSendFromISR().
@@ -1084,9 +1087,9 @@ template xQueueSendToFrontFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWo
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSendToBackFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken: untyped): untyped =
-  xQueueGenericSendFromISR((xQueue), (pvItemToQueue), (pxHigherPriorityTaskWoken),
-                           queueSEND_TO_BACK)
+proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): untyped {.importc: "$1", header: "queue.h".}
+
+
 
 ## *
 ##  A version of xQueueOverwrite() that can be used in an interrupt service
@@ -1163,9 +1166,9 @@ template xQueueSendToBackFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWok
 ##  \ingroup QueueManagement
 ##
 
-template xQueueOverwriteFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken: untyped): untyped =
-  xQueueGenericSendFromISR((xQueue), (pvItemToQueue), (pxHigherPriorityTaskWoken),
-                           queueOVERWRITE)
+proc xQueueOverwriteFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
+
 
 ## *
 ##  This is a macro that calls xQueueGenericSendFromISR().  It is included
@@ -1230,9 +1233,10 @@ template xQueueOverwriteFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoke
 ##  \ingroup QueueManagement
 ##
 
-template xQueueSendFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken: untyped): untyped =
-  xQueueGenericSendFromISR((xQueue), (pvItemToQueue), (pxHigherPriorityTaskWoken),
-                           queueSEND_TO_BACK)
+
+proc xQueueSendFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "queue.h".}
+
+
 
 ## *@{
 ## *
@@ -1304,14 +1308,13 @@ template xQueueSendFromISR*(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken: un
 proc xQueueGenericSendFromISR*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                               pxHigherPriorityTaskWoken: ptr BaseType_t;
                               xCopyPosition: BaseType_t): BaseType_t {.cdecl,
-    importcpp: "xQueueGenericSendFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueGiveFromISR*(xQueue: QueueHandle_t;
-                       pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueGiveFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## *@}
-## *
+    importc: "xQueueGenericSendFromISR", header: "queue.h".}
+
+
+proc xQueueGiveFromISR*(xQueue: QueueHandle_t; pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
+    importc: "xQueueGiveFromISR", header: "queue.h".}
+
+
 ##  Receive an item from a queue.  It is safe to use this function from within an
 ##  interrupt service routine.
 ##
@@ -1390,25 +1393,24 @@ proc xQueueGiveFromISR*(xQueue: QueueHandle_t;
 
 proc xQueueReceiveFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueReceiveFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## *@{
-## *
+    importc: "xQueueReceiveFromISR", header: "queue.h".}
+
+
 ##  Utilities to query queues that are safe to use from an ISR.  These utilities
 ##  should be used only from witin an ISR, or within a critical section.
 ##
 
-proc xQueueIsQueueEmptyFromISR*(xQueue: QueueHandle_t): BaseType_t {.cdecl,
-    importcpp: "xQueueIsQueueEmptyFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueIsQueueFullFromISR*(xQueue: QueueHandle_t): BaseType_t {.cdecl,
+proc xQueueIsQueueEmptyFromISR*(xQueue: QueueHandle_t): BaseType_t {.
+    importc: "xQueueIsQueueEmptyFromISR", header: "queue.h".}
+
+
+proc xQueueIsQueueFullFromISR*(xQueue: QueueHandle_t): BaseType_t {.
     importcpp: "xQueueIsQueueFullFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
-    importcpp: "uxQueueMessagesWaitingFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## *@}
-## * @cond
+
+
+proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.
+    importc: "uxQueueMessagesWaitingFromISR", header: "queue.h".}
+
 ## *
 ##  xQueueAltGenericSend() is an alternative version of xQueueGenericSend().
 ##  Likewise xQueueAltGenericReceive() is an alternative version of
@@ -1426,22 +1428,20 @@ proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
 
 proc xQueueAltGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                           xTicksToWait: TickType_t; xCopyPosition: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueAltGenericSend(@)", header: "queue.h".}
+    importc: "xQueueAltGenericSend", header: "queue.h".}
+
 proc xQueueAltGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                              xTicksToWait: TickType_t; xJustPeeking: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueAltGenericReceive(@)", header: "queue.h".}
-template xQueueAltSendToFront*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
-  xQueueAltGenericSend((xQueue), (pvItemToQueue), (xTicksToWait),
-                       queueSEND_TO_FRONT)
+    importc: "xQueueAltGenericReceive", header: "queue.h".}
 
-template xQueueAltSendToBack*(xQueue, pvItemToQueue, xTicksToWait: untyped): untyped =
-  xQueueAltGenericSend((xQueue), (pvItemToQueue), (xTicksToWait), queueSEND_TO_BACK)
 
-template xQueueAltReceive*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
-  xQueueAltGenericReceive((xQueue), (pvBuffer), (xTicksToWait), pdFALSE)
+proc xQueueAltSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t =
 
-template xQueueAltPeek*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
-  xQueueAltGenericReceive((xQueue), (pvBuffer), (xTicksToWait), pdTRUE)
+proc xQueueAltSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t =
+
+proc xQueueAltReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t =
+
+proc xQueueAltPeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t =
 
 ##
 ##  The functions defined above are for passing data to and from tasks.  The
@@ -1455,53 +1455,22 @@ template xQueueAltPeek*(xQueue, pvBuffer, xTicksToWait: untyped): untyped =
 
 proc xQueueCRSendFromISR*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                          xCoRoutinePreviouslyWoken: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueCRSendFromISR(@)", header: "queue.h".}
+    importc: "xQueueCRSendFromISR", header: "queue.h".}
+
 proc xQueueCRReceiveFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer;
-                            pxTaskWoken: ptr BaseType_t): BaseType_t {.cdecl,
-    importcpp: "xQueueCRReceiveFromISR(@)", header: "queue.h".}
+                            pxTaskWoken: ptr BaseType_t): BaseType_t {.
+    importc: "xQueueCRReceiveFromISR", header: "queue.h".}
+
 proc xQueueCRSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
-                  xTicksToWait: TickType_t): BaseType_t {.cdecl,
-    importcpp: "xQueueCRSend(@)", header: "queue.h".}
+                  xTicksToWait: TickType_t): BaseType_t {.
+    importc: "xQueueCRSend", header: "queue.h".}
+
 proc xQueueCRReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
-                     xTicksToWait: TickType_t): BaseType_t {.cdecl,
-    importcpp: "xQueueCRReceive(@)", header: "queue.h".}
-##
-##  For internal use only.  Use xSemaphoreCreateMutex(),
-##  xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling
-##  these functions directly.
-##
+                     xTicksToWait: TickType_t): BaseType_t {.
+    importc: "xQueueCRReceive", header: "queue.h".}
 
-proc xQueueCreateMutex*(ucQueueType: uint8): QueueHandle_t {.cdecl,
-    importcpp: "xQueueCreateMutex(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueCreateMutexStatic*(ucQueueType: uint8;
-                             pxStaticQueue: ptr StaticQueue_t): QueueHandle_t {.
-    cdecl, importcpp: "xQueueCreateMutexStatic(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueCreateCountingSemaphore*(uxMaxCount: UBaseType_t;
-                                   uxInitialCount: UBaseType_t): QueueHandle_t {.
-    cdecl, importcpp: "xQueueCreateCountingSemaphore(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueCreateCountingSemaphoreStatic*(uxMaxCount: UBaseType_t;
-    uxInitialCount: UBaseType_t; pxStaticQueue: ptr StaticQueue_t): QueueHandle_t {.
-    cdecl, importcpp: "xQueueCreateCountingSemaphoreStatic(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueGetMutexHolder*(xSemaphore: QueueHandle_t): pointer {.cdecl,
-    importcpp: "xQueueGetMutexHolder(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-##
-##  For internal use only.  Use xSemaphoreTakeMutexRecursive() or
-##  xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
-##
 
-proc xQueueTakeMutexRecursive*(xMutex: QueueHandle_t; xTicksToWait: TickType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueTakeMutexRecursive(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueGiveMutexRecursive*(pxMutex: QueueHandle_t): BaseType_t {.cdecl,
-    importcpp: "xQueueGiveMutexRecursive(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## * @endcond
-## *
+
 ##  Reset a queue back to its original empty state.  pdPASS is returned if the
 ##  queue is successfully reset.  pdFAIL is returned if the queue could not be
 ##  reset because there are tasks blocked on the queue waiting to either
@@ -1511,8 +1480,7 @@ proc xQueueGiveMutexRecursive*(pxMutex: QueueHandle_t): BaseType_t {.cdecl,
 ##  @return always returns pdPASS
 ##
 
-template xQueueReset*(xQueue: untyped): untyped =
-  xQueueGenericReset(xQueue, pdFALSE)
+proc xQueueReset*(xQueue: QueueHandle_t): BaseType_t {.importc: "$1", header: "queue.h".}
 
 ## *
 ##  The registry is provided as a means for kernel aware debuggers to
@@ -1537,10 +1505,10 @@ template xQueueReset*(xQueue: untyped): untyped =
 ##  preferably in ROM/Flash), not on the stack.
 ##
 
-proc vQueueAddToRegistry*(xQueue: QueueHandle_t; pcName: cstring) {.cdecl,
-    importcpp: "vQueueAddToRegistry(@)", header: "queue.h".}
-    ##  PRIVILEGED_FUNCTION
-  ## lint !e971 Unqualified char types are allowed for strings and single characters only.
+proc vQueueAddToRegistry*(xQueue: QueueHandle_t; pcName: cstring) {.
+    import: "vQueueAddToRegistry", header: "queue.h".}
+
+
 ## *
 ##  The registry is provided as a means for kernel aware debuggers to
 ##  locate queues, semaphores and mutexes.  Call vQueueAddToRegistry() add
@@ -1553,8 +1521,9 @@ proc vQueueAddToRegistry*(xQueue: QueueHandle_t; pcName: cstring) {.cdecl,
 ##
 
 proc vQueueUnregisterQueue*(xQueue: QueueHandle_t) {.cdecl,
-    importcpp: "vQueueUnregisterQueue(@)", header: "queue.h".}
-    ##  PRIVILEGED_FUNCTION
+    importc: "vQueueUnregisterQueue", header: "queue.h".}
+
+
 ## *
 ##  @note This function has been back ported from FreeRTOS v9.0.0
 ##
@@ -1570,9 +1539,9 @@ proc vQueueUnregisterQueue*(xQueue: QueueHandle_t) {.cdecl,
 ##
 
 proc pcQueueGetName*(xQueue: QueueHandle_t): cstring {.cdecl,
-    importcpp: "pcQueueGetName(@)", header: "queue.h".}
-    ##  PRIVILEGED_FUNCTION
-  ## lint !e971 Unqualified char types are allowed for strings and single characters only.
+    importc: "pcQueueGetName", header: "queue.h".}
+
+
 ## *
 ##  Generic version of the function used to creaet a queue using dynamic memory
 ##  allocation.  This is called by other functions and macros that create other
@@ -1580,10 +1549,11 @@ proc pcQueueGetName*(xQueue: QueueHandle_t): cstring {.cdecl,
 ##
 
 proc xQueueGenericCreate*(uxQueueLength: UBaseType_t; uxItemSize: UBaseType_t;
-                          ucQueueType: uint8): QueueHandle_t {.cdecl,
-    importcpp: "xQueueGenericCreate(@)", header: "queue.h".}
-    ##  PRIVILEGED_FUNCTION
-## *
+                          ucQueueType: uint8): QueueHandle_t {.
+    importc: "xQueueGenericCreate", header: "queue.h".}
+
+
+
 ##  Generic version of the function used to creaet a queue using dynamic memory
 ##  allocation.  This is called by other functions and macros that create other
 ##  RTOS objects that use the queue structure as their base.
@@ -1593,9 +1563,11 @@ proc xQueueGenericCreateStatic*(uxQueueLength: UBaseType_t;
                                 uxItemSize: UBaseType_t;
                                 pucQueueStorage: ptr uint8;
                                 pxStaticQueue: ptr StaticQueue_t;
-                                ucQueueType: uint8): QueueHandle_t {.cdecl,
-    importcpp: "xQueueGenericCreateStatic(@)", header: "queue.h".}
-    ##  PRIVILEGED_FUNCTION
+                                ucQueueType: uint8): QueueHandle_t {.
+    importc: "xQueueGenericCreateStatic", header: "queue.h".}
+
+
+
 ## *
 ##  Queue sets provide a mechanism to allow a task to block (pend) on a read
 ##  operation from multiple queues or semaphores simultaneously.
@@ -1645,9 +1617,11 @@ proc xQueueGenericCreateStatic*(uxQueueLength: UBaseType_t;
 ##  queue set is returned.  Otherwise NULL is returned.
 ##
 
-proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.cdecl,
-    importcpp: "xQueueCreateSet(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.
+    importc: "xQueueCreateSet", header: "queue.h".}
+
+
+
 ## *
 ##  Adds a queue or semaphore to a queue set that was previously created by a
 ##  call to xQueueCreateSet().
@@ -1674,7 +1648,10 @@ proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.cdecl
 proc xQueueAddToSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
                     xQueueSet: QueueSetHandle_t): BaseType_t {.cdecl,
     importcpp: "xQueueAddToSet(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+
+
+
+
 ## *
 ##  Removes a queue or semaphore from a queue set.  A queue or semaphore can only
 ##  be removed from a set if the queue or semaphore is empty.
@@ -1695,8 +1672,11 @@ proc xQueueAddToSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
 
 proc xQueueRemoveFromSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
                          xQueueSet: QueueSetHandle_t): BaseType_t {.cdecl,
-    importcpp: "xQueueRemoveFromSet(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+    importc: "xQueueRemoveFromSet", header: "queue.h".}
+
+
+
+
 ## *
 ##  xQueueSelectFromSet() selects from the members of a queue set a queue or
 ##  semaphore that either contains data (in the case of a queue) or is available
@@ -1733,32 +1713,34 @@ proc xQueueRemoveFromSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
 ##
 
 proc xQueueSelectFromSet*(xQueueSet: QueueSetHandle_t; xTicksToWait: TickType_t): QueueSetMemberHandle_t {.
-    cdecl, importcpp: "xQueueSelectFromSet(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
+    importc: "xQueueSelectFromSet", header: "queue.h".}
+
+
+
 ## *
 ##  A version of xQueueSelectFromSet() that can be used from an ISR.
 ##
 
 proc xQueueSelectFromSetFromISR*(xQueueSet: QueueSetHandle_t): QueueSetMemberHandle_t {.
-    cdecl, importcpp: "xQueueSelectFromSetFromISR(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## * @cond
-##  Not public API functions.
+    importc: "xQueueSelectFromSetFromISR", header: "queue.h".}
 
-proc vQueueWaitForMessageRestricted*(xQueue: QueueHandle_t;
-                                    xTicksToWait: TickType_t) {.cdecl,
-    importcpp: "vQueueWaitForMessageRestricted(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc xQueueGenericReset*(xQueue: QueueHandle_t; xNewQueue: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueGenericReset(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc vQueueSetQueueNumber*(xQueue: QueueHandle_t; uxQueueNumber: UBaseType_t) {.
-    cdecl, importcpp: "vQueueSetQueueNumber(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc uxQueueGetQueueNumber*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
-    importcpp: "uxQueueGetQueueNumber(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-proc ucQueueGetQueueType*(xQueue: QueueHandle_t): uint8 {.cdecl,
-    importcpp: "ucQueueGetQueueType(@)", header: "queue.h".}
-  ##  PRIVILEGED_FUNCTION
-## * @endcond
+
+# ##  Not public API functions.
+
+# proc vQueueWaitForMessageRestricted*(xQueue: QueueHandle_t;
+#                                     xTicksToWait: TickType_t) {.cdecl,
+#     importcpp: "vQueueWaitForMessageRestricted(@)", header: "queue.h".}
+#   ##  PRIVILEGED_FUNCTION
+# proc xQueueGenericReset*(xQueue: QueueHandle_t; xNewQueue: BaseType_t): BaseType_t {.
+#     cdecl, importcpp: "xQueueGenericReset(@)", header: "queue.h".}
+#   ##  PRIVILEGED_FUNCTION
+# proc vQueueSetQueueNumber*(xQueue: QueueHandle_t; uxQueueNumber: UBaseType_t) {.
+#     cdecl, importcpp: "vQueueSetQueueNumber(@)", header: "queue.h".}
+#   ##  PRIVILEGED_FUNCTION
+# proc uxQueueGetQueueNumber*(xQueue: QueueHandle_t): UBaseType_t {.cdecl,
+#     importcpp: "uxQueueGetQueueNumber(@)", header: "queue.h".}
+#   ##  PRIVILEGED_FUNCTION
+# proc ucQueueGetQueueType*(xQueue: QueueHandle_t): uint8 {.cdecl,
+#     importcpp: "ucQueueGetQueueType(@)", header: "queue.h".}
+#   ##  PRIVILEGED_FUNCTION
+# ## * @endcond
