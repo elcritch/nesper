@@ -1,12 +1,9 @@
-import nativesockets
-import net
-import selectors
-import tables
-import posix
+import nativesockets, net, selectors, tables, posix
 
 import ../../consts
 import ../../general
 import ../tcpsocket
+
 import router
 import json
 import msgpack4nim
