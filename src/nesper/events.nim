@@ -59,19 +59,18 @@ template eventRegister*[EVT](
     if ret != ESP_OK:
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
-template eventRegisterWith*[EVT](
+template eventRegisterWith*[EVT, TP](
             event_loop: esp_event_loop_handle_t;
             event_base: esp_event_base_t;
             event_id: EVT;
-            event_handler: esp_event_handler_t;
+            event_handler: TP;
             event_handler_arg: pointer = nil
         ) =
     ## Register event with a given event loop.
-
     let ret = esp_event_handler_register_with(
                 event_loop,
                 event_base, cint(event_id),
-                event_handler, event_handler_arg)
+                cast[esp_event_handler_t](event_handler), event_handler_arg)
 
     if ret != ESP_OK:
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
@@ -80,19 +79,28 @@ template eventPost*[EVT](
             evt_loop: esp_event_loop_handle_t;
             evt_base: esp_event_base_t;
             evt_id: EVT;
-            evt_data: pointer;
+            evt_data: pointer,
             evt_data_size: int;
             ticks_to_wait: TickType_t = 1000
         ) =
     ## Register event with a given event loop.
+    let ret = esp_event_post_to(evt_loop, evt_base, cint(evt_id), evt_data, csize_t(evt_data_size), ticks_to_wait)
 
-    let ret = esp_event_post_to(
-                evt_loop,
-                evt_base,
-                cint(evt_id),
-                evt_data,
-                csize_t(evt_data_size),
-                ticks_to_wait)
+    if ret != ESP_OK:
+      raise newEspError[EventError]("post: " & $esp_err_to_name(ret), ret)
+
+template eventPostSendPtr*[EVT, DT](
+            evt_loop: esp_event_loop_handle_t;
+            evt_base: esp_event_base_t;
+            evt_id: EVT;
+            evt_data: pointer,
+            evt_data_size: int;
+            ticks_to_wait: TickType_t = 1000
+        ) =
+    ## Register event with a given event loop.
+    var evt_data_ptr: pointer = evt_data
+
+    let ret = esp_event_post_to(evt_loop, evt_base, cint(evt_id), addr(evt_data_ptr), csize_t(evt_data_size), ticks_to_wait)
 
     if ret != ESP_OK:
       raise newEspError[EventError]("post: " & $esp_err_to_name(ret), ret)

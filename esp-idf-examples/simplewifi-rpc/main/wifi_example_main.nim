@@ -15,6 +15,9 @@ const WIFI_PASSWORD  {.strdefine.}: string = ""
 
 # const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
 # const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
+# {.emit: """
+# volatile void *apploop = NULL;
+# """.}
 
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(1))
