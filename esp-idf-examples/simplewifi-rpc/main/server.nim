@@ -44,6 +44,7 @@ else:
 
     rpc(rt, "addAll") do(vals: seq[int]) -> int:
       apploop.eventPost(APP_EVENT, app_add_all, addr(vals), sizeof(vals), 10000)
+
       echo("run_rpc_server: done: " & repr(addr(vals)))
       result = 0
       for x in vals:
