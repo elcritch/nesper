@@ -22,12 +22,38 @@ when defined(TcpEchoServer):
     startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
     # startRpcSocketServer(Port(5555))
 
+elif defined(TcpMpackRpcServer):
+
+  # Setup RPC Server #
+  proc run_rpc_server*() =
+
+
+    # Setup an app task apploop
+    # note: not sure if this is the best place for it or not?
+    var rt = createRpcRouter(MaxRpcReceiveBuffer)
+
+    rpc(rt, "hello") do(input: string) -> string:
+      result = "Hello " & input
+
+    rpc(rt, "add") do(a: int, b: int) -> int:
+      result = a + b
+
+    rpc(rt, "addAll") do(vals: seq[int]) -> int:
+
+      echo("run_rpc_server: done: " & repr(addr(vals)))
+      result = 0
+      for x in vals:
+        result += x
+
+    echo "starting rpc server on port 5555"
+    logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
+    startRpcSocketServer(Port(5555), router=rt)
+
 else:
 
   # Setup RPC Server #
   proc run_rpc_server*() =
 
-    echo("run_rpc_server: apploop handle: ptr: " & $repr(apploop))
 
     # Setup an app task apploop
     # note: not sure if this is the best place for it or not?

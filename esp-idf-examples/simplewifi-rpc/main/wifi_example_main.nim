@@ -28,10 +28,12 @@ var sConnectEventGroup*: EventGroupHandle_t
 var sIpAddr*: IpAddress
 var sConnectionName*: cstring
 
+# Main App Functions
 proc networkConnect(): esp_err_t
 proc networkDisconnect(): esp_err_t
 proc wifiStop()
 proc wifiStart()
+
 
 proc nim_app_main*() {.exportc.} =
   ## Main app entry - callback from `general.nim` that sets up Nim runtime.
