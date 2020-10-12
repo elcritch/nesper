@@ -27,8 +27,6 @@ else:
   # Setup RPC Server #
   proc run_rpc_server*() =
 
-    echo("run_rpc_server: apploop handle: ptr: " & $repr(apploop))
-
     # Setup an app task apploop
     # note: not sure if this is the best place for it or not?
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
