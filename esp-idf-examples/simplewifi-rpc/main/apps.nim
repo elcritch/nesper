@@ -22,6 +22,9 @@ proc add_all*(arg: pointer;
   echo("app: `add_all` data: " & $data)
   # echo("app: `add_all` event[]: " & repr(cast[ptr pointer](event_data)))
   echo("")
+
+  # apploop.eventPost(APP_EVENT, app_add_all, addr(vals), sizeof(vals), 10000)
+
   # var pdata: ptr seq[int] = cast[ptr seq[int]](event_data)
   # echo("app: `add_all` event: ptr: " & repr(pdata))
   # var data: seq[int] = pdata[]
