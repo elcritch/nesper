@@ -923,7 +923,7 @@ proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: Tick
 
 proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           xTicksToWait: TickType_t; xJustPeek: BaseType_t): BaseType_t {.
-    import: "xQueueGenericReceive", header: "queue.h".}
+    importc: "xQueueGenericReceive", header: "queue.h".}
 
 
 ## *
