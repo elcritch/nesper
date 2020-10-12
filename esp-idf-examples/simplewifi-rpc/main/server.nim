@@ -24,11 +24,8 @@ when defined(TcpEchoServer):
 
 else:
 
-  var apploop*: esp_event_loop_handle_t
-
   # Setup RPC Server #
   proc run_rpc_server*() =
-    apploop = setup_app_task_loop()
 
     echo("run_rpc_server: apploop handle: ptr: " & $repr(apploop))
 
@@ -43,7 +40,6 @@ else:
       result = a + b
 
     rpc(rt, "addAll") do(vals: seq[int]) -> int:
-      apploop.eventPost(APP_EVENT, app_add_all, addr(vals), sizeof(vals), 10000)
 
       echo("run_rpc_server: done: " & repr(addr(vals)))
       result = 0
