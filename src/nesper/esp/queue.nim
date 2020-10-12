@@ -77,6 +77,7 @@ import FreeRTOS
 ##
 type
   QueueHandle_t* = pointer
+  StaticQueue_t* = pointer
 
 ## *
 ##  Type by which queue sets are referenced.  For example, a call to
@@ -311,7 +312,7 @@ proc xQueueCreateStatic*(uxQueueLength: UBaseType_t, uxItemSize: UBaseType_t, pu
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): untyped {.importc: "$1", header: "queue.h".}
+proc xQueueSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "queue.h".}
 
 
 ## *
@@ -617,7 +618,7 @@ proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t
 
 proc xQueueGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                        xTicksToWait: TickType_t; xCopyPosition: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueGenericSend(@)", header: "queue.h".}
+    importc: "xQueueGenericSend", header: "queue.h".}
 
 
 
@@ -922,7 +923,7 @@ proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: Tick
 
 proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           xTicksToWait: TickType_t; xJustPeek: BaseType_t): BaseType_t {.
-    cdecl, importcpp: "xQueueGenericReceive(@)", header: "queue.h".}
+    import: "xQueueGenericReceive", header: "queue.h".}
 
 
 ## *
@@ -1087,7 +1088,7 @@ proc xQueueSendToFrontFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, px
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): untyped {.importc: "$1", header: "queue.h".}
+proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "queue.h".}
 
 
 
@@ -1405,7 +1406,7 @@ proc xQueueIsQueueEmptyFromISR*(xQueue: QueueHandle_t): BaseType_t {.
 
 
 proc xQueueIsQueueFullFromISR*(xQueue: QueueHandle_t): BaseType_t {.
-    importcpp: "xQueueIsQueueFullFromISR(@)", header: "queue.h".}
+    import: "xQueueIsQueueFullFromISR", header: "queue.h".}
 
 
 proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.
@@ -1647,7 +1648,7 @@ proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.
 
 proc xQueueAddToSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
                     xQueueSet: QueueSetHandle_t): BaseType_t {.cdecl,
-    importcpp: "xQueueAddToSet(@)", header: "queue.h".}
+    importc: "xQueueAddToSet", header: "queue.h".}
 
 
 

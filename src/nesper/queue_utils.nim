@@ -1,9 +1,17 @@
+import consts
+import general
+
+type
+  QueueHandle_t* = pointer
+  StaticQueue_t* = pointer
+  QueueSetHandle_t* = pointer
+  QueueSetMemberHandle_t* = pointer
 
 # Forward Declare FreeRTOS/ESP-IDF Queue API's for a concise overview:
 proc xQueueCreate*(uxQueueLength, uxItemSize: UBaseType_t): QueueHandle_t
 proc xQueueCreateStatic*(uxQueueLength: UBaseType_t, uxItemSize: UBaseType_t, pucQueueStorage: pointer, pxQueueBuffer: ptr StaticQueue_t): QueueHandle_t
 
-proc xQueueSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): untyped
+proc xQueueSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t
 proc xQueueSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t
 proc xQueueSend*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t
 proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t
@@ -37,7 +45,7 @@ proc xQueueRemoveFromSet*(xQueueOrSemaphore: QueueSetMemberHandle_t; xQueueSet: 
 proc xQueueSelectFromSet*(xQueueSet: QueueSetHandle_t; xTicksToWait: TickType_t): QueueSetMemberHandle_t
 proc xQueueSelectFromSetFromISR*(xQueueSet: QueueSetHandle_t): QueueSetMemberHandle_t
 
-import esp/queue.nim
+import esp/queue
 export queue
 
 type

@@ -2,6 +2,7 @@ import nativesockets, net, selectors, tables, posix
 
 import ../../consts
 import ../../general
+import ../../queue_utils
 import ../tcpsocket
 
 import router
@@ -26,9 +27,12 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
+
       var rcall = msgpack2json.toJsonNode(msg)
 
-      var res: JsonNode = rt.route( rcall )
+      var res: JsonNode
+      xQueueReceive(resultQueue, addr(res), 1000.ms_to_ticks ) 
+
       var rmsg: string = msgpack2json.fromJsonNode(res)
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
@@ -37,6 +41,15 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
+
+proc runRpcQueueClient*(port: Port; router: var RpcRouter) =
+  var rcall = msgpack2json.toJsonNode(msg)
+
+  var res: JsonNode = rt.route( rcall )
+  var rmsg: string = msgpack2json.fromJsonNode(res)
+
+  logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
+  discard sourceClient.send(addr rmsg[0], rmsg.len)
 
 proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
   logi(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
