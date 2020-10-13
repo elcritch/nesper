@@ -55,5 +55,5 @@ proc setFromString*(val: var openArray[uint8], str: cstring) =
 
   copyMem(addr(val), str, lstr)
 
-template ms_to_ticks*(ms: untyped): TickType_t =
-      TickType_t(ms / portTICK_PERIOD_MS )
+proc ms_to_ticks*(ms: int): TickType_t =
+      TickType_t(uint32(ms) div portTICK_PERIOD_MS )

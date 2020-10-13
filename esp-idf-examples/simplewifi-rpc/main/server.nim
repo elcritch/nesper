@@ -4,6 +4,7 @@ import nesper/events
 import apps
 import volatile
 import strutils
+import json
 # import nesper/servers/rpc/socketrpc
 
 const TAG = "server"
@@ -29,6 +30,7 @@ else:
   # Setup RPC Server #
   proc run_rpc_server*() =
 
+    var rpcRouter: RpcRouter 
 
     # Setup an app task apploop
     # note: not sure if this is the best place for it or not?
@@ -51,14 +53,9 @@ else:
       echo "starting rpc server on port 5555"
       logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
       startRpcSocketServer(Port(5555), router=rt)
-
     else:
 
-      echo "starting rpc server on port 5555"
-      logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
-
-      startRpcSocketServer(Port(5555), router=rt)
-
+      startRpcQueueSocketServer(Port(5555), router=rt) 
 
 
 

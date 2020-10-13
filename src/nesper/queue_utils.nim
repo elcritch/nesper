@@ -41,6 +41,8 @@ export queue
 type
   XQueue*[N] = pointer
 
+proc xQueueCreate*(uxQueueLength, uxItemSize: int): QueueHandle_t {.inline.} =
+  xQueueCreate(UBaseType_t(uxQueueLength), UBaseType_t(uxItemSize))
 
 template createXQueue[N](depth: int, itemSize: N): QueueHandle_t =
     let q: QueueHandle_t = xQueueCreate(20,sizeof(uint32))
