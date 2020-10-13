@@ -37,16 +37,17 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
       raise newException(TcpClientDisconnected, "")
     else:
       var rcall = msgpack2json.toJsonNode(msg)
-      logi(TAG, "rpc socket sent result: %s", repr(rcall))
+      logd(TAG, "rpc socket sent result: %s", repr(rcall))
       GC_ref(rcall)
       discard xQueueSend(rpcInQueue, addr rcall, TickType_t(1000)) 
 
       var res: JsonNode
       while xQueueReceive(rpcOutQueue, addr(res), 1_000) == 0: 
-        logi(TAG, "rpc socket waiting for result")
+        # logd(TAG, "rpc socket waiting for result")
+        continue
 
       var rmsg: string = msgpack2json.fromJsonNode(res)
-      logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
+      logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr(rmsg[0]), rmsg.len)
 
   except TimeoutError:
@@ -59,14 +60,14 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
 
   while true:
     try:
-      logi(TAG,"exec rpc task wait: ")
+      logd(TAG,"exec rpc task wait: ")
       var rcall: JsonNode
       if xQueueReceive(rpcInQueue, addr(rcall), portMAX_DELAY) != 0: 
-        logi(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
+        logd(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
   
         var res: JsonNode = rpcRouter.route( rcall )
   
-        logi(TAG,"exec rpc task send: %s", $(res))
+        logd(TAG,"exec rpc task send: %s", $(res))
         GC_ref(res)
         discard xQueueSend(rpcOutQueue, addr(res), TickType_t(1_000)) 
     except:
