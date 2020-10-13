@@ -54,3 +54,6 @@ proc setFromString*(val: var openArray[uint8], str: cstring) =
     raise newException(ValueError, "string to large for array")
 
   copyMem(addr(val), str, lstr)
+
+proc ms_to_ticks*(ms: int): TickType_t =
+      TickType_t(uint32(ms) div portTICK_PERIOD_MS )

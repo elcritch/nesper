@@ -4,6 +4,7 @@ import nesper/events
 import apps
 import volatile
 import strutils
+import json
 # import nesper/servers/rpc/socketrpc
 
 const TAG = "server"
@@ -12,6 +13,8 @@ const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
 when defined(TcpJsonRpcServer):
   import nesper/servers/rpc/rpcsocket_json
   # when defined(TcpMpackRpcServer):
+when defined(TcpMpackRpcQueueServer):
+  import nesper/servers/rpc/rpcsocket_queue_mpack
 elif not defined(TcpEchoServer):
   import nesper/servers/rpc/rpcsocket_mpack
 
@@ -27,6 +30,11 @@ else:
   # Setup RPC Server #
   proc run_rpc_server*() =
 
+<<<<<<< HEAD
+=======
+    var rpcRouter: RpcRouter 
+
+>>>>>>> adding-queue-for-rpc
     # Setup an app task apploop
     # note: not sure if this is the best place for it or not?
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
@@ -44,9 +52,13 @@ else:
       for x in vals:
         result += x
 
-    echo "starting rpc server on port 5555"
-    logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
-    startRpcSocketServer(Port(5555), router=rt)
+    when not defined(TcpMpackRpcQueueServer):
+      echo "starting rpc server on port 5555"
+      logi(TAG,"starting rpc server buffer size: %s", $(rt.buffer))
+      startRpcSocketServer(Port(5555), router=rt)
+    else:
+
+      startRpcQueueSocketServer(Port(5555), router=rt) 
 
 
 
