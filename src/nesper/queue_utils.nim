@@ -35,6 +35,11 @@ import consts
 # proc xQueueSelectFromSet*(xQueueSet: QueueSetHandle_t; xTicksToWait: TickType_t): QueueSetMemberHandle_t
 # proc xQueueSelectFromSetFromISR*(xQueueSet: QueueSetHandle_t): QueueSetMemberHandle_t
 
+{.emit: """/*INCLUDESECTION*/
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+""".}
+
 import esp/queue
 export queue
 
@@ -45,6 +50,6 @@ proc xQueueCreate*(uxQueueLength, uxItemSize: int): QueueHandle_t {.inline.} =
   xQueueCreate(UBaseType_t(uxQueueLength), UBaseType_t(uxItemSize))
 
 template createXQueue[N](depth: int, itemSize: N): QueueHandle_t =
-    let q: QueueHandle_t = xQueueCreate(20,sizeof(uint32))
-    cast[XQueue[N]](q)
+  let q: QueueHandle_t = xQueueCreate(20,sizeof(uint32))
+  cast[XQueue[N]](q)
 

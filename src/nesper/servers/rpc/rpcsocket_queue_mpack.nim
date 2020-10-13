@@ -13,6 +13,10 @@ import msgpack4nim/msgpack2json
 
 export tcpsocket, router
 
+{.emit: """/*INCLUDESECTION*/
+#include "freertos/FreeRTOS.h"
+""".}
+
 const TAG = "socketrpc"
 
 var rpcRouter: RpcRouter
@@ -51,18 +55,27 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
 
 # Execute RPC Server #
 proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
-  logi(TAG,"exec rpc task rpcInQueue: %s", repr(addr(rpcInQueue)))
-  logi(TAG,"exec rpc task rpcOutQueue: %s", repr(addr(rpcOutQueue)))
-  logi(TAG,"exec rpc task rpcRouter: %s", repr(addr(rpcRouter)))
+  logi(TAG,"exec rpc task rpcInQueue: %s", repr(addr(rpcInQueue).pointer))
+  logi(TAG,"exec rpc task rpcOutQueue: %s", repr(addr(rpcOutQueue).pointer))
+  # logi(TAG,"exec rpc task rpcRouter: %s", repr(addr(rpcRouter)))
 
-  var rcall: JsonNode
-  discard xQueueReceive(rpcInQueue, addr(rcall), 1_000.ms_to_ticks()) 
-  logi(TAG,"exec rpc task got: %s", repr(rcall))
+  while true:
+    try:
+      logi(TAG,"exec rpc task wait: ")
+      var rcall: JsonNode
+      if xQueueReceive(rpcInQueue, addr(rcall), portMAX_DELAY) != 0: 
+        logi(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
+  
+        var res: JsonNode = rpcRouter.route( rcall )
+  
+        logi(TAG,"exec rpc task send: %s", $(res))
+        discard xQueueSend(rpcOutQueue, addr(res), TickType_t(1_000)) 
+    except:
+      let
+        e = getCurrentException()
+        msg = getCurrentExceptionMsg()
+      echo "Got exception ", repr(e), " with message ", msg
 
-  var res: JsonNode = rpcRouter.route( rcall )
-
-  logi(TAG,"exec rpc task send: %s", repr(res))
-  discard xQueueSend(rpcOutQueue, addr(res), TickType_t(1_000)) 
 
 
 proc startRpcQueueSocketServer*(port: Port; router: var RpcRouter) =
