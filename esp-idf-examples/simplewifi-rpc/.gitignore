@@ -3,3 +3,4 @@ src/nimcache/
 src/server
 src/localnim/
 .env
+results.json
