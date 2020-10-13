@@ -85,12 +85,14 @@ proc startRpcQueueSocketServer*(port: Port; router: var RpcRouter) =
   rpcOutQueue = xQueueCreate(1, sizeof(JsonNode))
 
   var rpcTask: TaskHandle_t
-  discard xTaskCreate(execRpcSocketTask,
-                      pcName="rpc task",
-                      usStackDepth=8128,
-                      pvParameters=addr(router),
-                      uxPriority=1,
-                      pvCreatedTask=addr(rpcTask))
+  discard xTaskCreatePinnedToCore(
+                  execRpcSocketTask,
+                  pcName="rpc task",
+                  usStackDepth=8128,
+                  pvParameters=addr(router),
+                  uxPriority=1,
+                  pvCreatedTask=addr(rpcTask),
+                  xCoreID=1)
 
   startSocketServer[RpcRouter](
     Port(5555),
