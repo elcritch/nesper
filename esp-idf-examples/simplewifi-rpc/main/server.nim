@@ -30,11 +30,8 @@ else:
   # Setup RPC Server #
   proc run_rpc_server*() =
 
-<<<<<<< HEAD
-=======
     var rpcRouter: RpcRouter 
 
->>>>>>> adding-queue-for-rpc
     # Setup an app task apploop
     # note: not sure if this is the best place for it or not?
     var rt = createRpcRouter(MaxRpcReceiveBuffer)
