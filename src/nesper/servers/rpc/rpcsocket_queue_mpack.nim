@@ -4,6 +4,7 @@ import ../../consts
 import ../../general
 import ../../queue_utils
 import ../../tasks
+import ../../timer_utils
 import ../tcpsocket
 
 import router
@@ -60,16 +61,18 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
 
   while true:
     try:
-      logd(TAG,"exec rpc task wait: ")
-      var rcall: JsonNode
-      if xQueueReceive(rpcInQueue, addr(rcall), portMAX_DELAY) != 0: 
-        logd(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
-  
-        var res: JsonNode = rpcRouter.route( rcall )
-  
-        logd(TAG,"exec rpc task send: %s", $(res))
-        GC_ref(res)
-        discard xQueueSend(rpcOutQueue, addr(res), TickType_t(1_000)) 
+      timeBlock("rpcSocket"):
+        logd(TAG,"exec rpc task wait: ")
+        var rcall: JsonNode
+        if xQueueReceive(rpcInQueue, addr(rcall), portMAX_DELAY) != 0: 
+          logd(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
+    
+          var res: JsonNode = rpcRouter.route( rcall )
+    
+          logd(TAG,"exec rpc task send: %s", $(res))
+          GC_ref(res)
+          discard xQueueSend(rpcOutQueue, addr(res), TickType_t(1_000)) 
+
     except:
       let
         e = getCurrentException()
