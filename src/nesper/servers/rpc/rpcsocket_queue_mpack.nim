@@ -42,7 +42,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
       discard xQueueSend(rpcInQueue, addr rcall, TickType_t(1000)) 
 
       var res: JsonNode
-      while xQueueReceive(rpcOutQueue, addr(res), 1_000) == 0: 
+      while xQueueReceive(rpcOutQueue, addr(res), 0) == 0: 
         # logd(TAG, "rpc socket waiting for result")
         continue
 
