@@ -56,7 +56,6 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
 proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
   logi(TAG,"exec rpc task rpcInQueue: %s", repr(addr(rpcInQueue).pointer))
   logi(TAG,"exec rpc task rpcOutQueue: %s", repr(addr(rpcOutQueue).pointer))
-  # logi(TAG,"exec rpc task rpcRouter: %s", repr(addr(rpcRouter)))
 
   while true:
     try:
