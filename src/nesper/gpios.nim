@@ -12,20 +12,20 @@ type
 
 proc configure*(pins: set[gpio_num_t],
     mode: gpio_mode_t, ## !< GPIO mode: set input/output mode
-    pull_up_en: gpio_pullup_t = GPIO_PULLUP_DISABLE, ## !< GPIO pull-up
-    pull_down_en: gpio_pulldown_t = GPIO_PULLDOWN_DISABLE, ## !< GPIO pull-down
-    intr_type: gpio_int_type_t = GPIO_INTR_DISABLE, ## !< GPIO interrupt type
+    pull_up: bool = false, ## !< GPIO pull-up
+    pull_down: bool = false, ## !< GPIO pull-down
+    interrupt: gpio_int_type_t = GPIO_INTR_DISABLE, ## !< GPIO interrupt type
 ) =
   var pin_mask: uint64 
   for pin in pins:
     pin_mask = pin_mask or BIT(pin.int())
 
   var io_conf: gpio_config_t
-  io_conf.intr_type = intr_type
   io_conf.mode = mode
   io_conf.pin_bit_mask = pin_mask
-  io_conf.pull_down_en = pull_down_en
-  io_conf.pull_up_en = pull_up_en
+  io_conf.pull_up_en = if pull_down: GPIO_PULLUP_ENABLE else: GPIO_PULLUP_DISABLE
+  io_conf.pull_down_en  = if pull_down: GPIO_PULLDOWN_ENABLE else: GPIO_PULLDOWN_DISABLE
+  io_conf.intr_type = interrupt
   
   var ret: esp_err_t
   
