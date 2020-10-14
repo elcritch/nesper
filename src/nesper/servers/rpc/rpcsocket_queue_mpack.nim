@@ -37,7 +37,9 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
-      var rcall = msgpack2json.toJsonNode(msg)
+      timeBlockDebug("rpcSocketDecode"):
+        var rcall = msgpack2json.toJsonNode(msg)
+      
       logd(TAG, "rpc socket sent result: %s", repr(rcall))
       GC_ref(rcall)
       discard xQueueSend(rpcInQueue, addr rcall, TickType_t(1000)) 
@@ -47,7 +49,8 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey
         # logd(TAG, "rpc socket waiting for result")
         continue
 
-      var rmsg: string = msgpack2json.fromJsonNode(res)
+      timeBlockDebug("rpcSocketEncode"):
+        var rmsg: string = msgpack2json.fromJsonNode(res)
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr(rmsg[0]), rmsg.len)
 
@@ -61,7 +64,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
 
   while true:
     try:
-      timeBlock("rpcSocket"):
+      timeBlockDebug("rpcTask"):
         logd(TAG,"exec rpc task wait: ")
         var rcall: JsonNode
         if xQueueReceive(rpcInQueue, addr(rcall), portMAX_DELAY) != 0: 

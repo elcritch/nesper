@@ -34,3 +34,11 @@ template timeBlock*(n: string, blk: untyped): untyped =
   let t0 = micros()
   blk
   echo n & " took: ", $(micros() - t0), " micros "
+
+template timeBlockDebug*(n: string, blk: untyped): untyped =
+  when defined(debug):
+    let t0 = micros()
+    blk
+    echo n & " took: ", $(micros() - t0), " micros "
+  else:
+    blk

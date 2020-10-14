@@ -1,6 +1,8 @@
 import json, tables, strutils, macros, options
 import net, os
 import times
+import stats
+import sequtils
 
 import nesper/servers/rpc/router
 
@@ -47,6 +49,8 @@ template timeBlock(n: string, blk: untyped): untyped =
   echo "[took: ", $(td.inMicroseconds().float() / 1e3), " millis]"
   totalCalls.inc()
   totalTime = totalTime + td.inMicroseconds()
+  allTimes.add(td.inMicroseconds())
+  
 
 var callDefault = %* { "jsonrpc": "2.0", "id": 1, "method": "add", "params": [1, 2] }
 
@@ -72,6 +76,8 @@ when defined(TcpJsonRpcServer):
 else:
   let mcall = call.fromJsonNode()
 
+
+var allTimes = newSeqOfCap[int64](count)
 for i in 0..<count:
 
   timeBlock("call"):
@@ -91,3 +97,9 @@ echo("\n")
 echo("[total time: " & $(totalTime.float() / 1e3) & " millis]")
 echo("[total count: " & $(totalCalls) & " No]")
 echo("[avg time: " & $(float(totalTime.float()/1e3)/(1.0 * float(totalCalls))) & " millis]")
+
+var ss: RunningStat ## Must be "var"
+ss.push(allTimes.mapIt(float(it)/1000.0))
+
+echo("[mean time: " & $(ss.mean()) & " millis]")
+echo("[variance time: " & $(ss.variance()) & " millis]")
