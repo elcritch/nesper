@@ -33,6 +33,9 @@ template ESP_INTR_ENABLE*(inum: untyped): untyped =
 template ESP_INTR_DISABLE*(inum: untyped): untyped =
   xt_ints_off((1 shl inum))
 
+template BIT*(inum: untyped): untyped =
+  1 shl inum
+
 type
   TickType_t* = uint32
 #   INNER_C_UNION_consts_39* {.importcpp: "no_name", header: "freertos/FreeRTOS.h", bycopy.} = object {.

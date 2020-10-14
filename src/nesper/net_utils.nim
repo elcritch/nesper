@@ -65,3 +65,27 @@ proc toIpAddress*(ip: ip6_addr_t): IpAddress =
       result.address_v6[i] = uint8(ip.address[i] shr (i*8))
   # for i in 0..15:
     # result.address_v6[i] = uint8(address shr (i*8))
+
+## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
+proc generate_hostname*(): string =
+  ##  return strdup(MDNS_HOSTNAME);
+  var mac: array[6, uint8]
+  var sensor_id: cstring
+  esp_read_mac(mac, ESP_MAC_WIFI_STA)
+  if -1 ==
+      asprintf(addr(sensor_id), "%s-%02X%02X%02X", MDNS_HOSTNAME, mac[3], mac[4],
+               mac[5]):
+    abort()
+  return sensor_id
+
+
+## * Generate sensor id (based on mac address)
+proc generate_sensor_id*(): cstring =
+  var mac: array[6, uint8]
+  var sensor_id: cstring
+  esp_read_mac(mac, ESP_MAC_WIFI_STA)
+  if -1 ==
+      asprintf(addr(sensor_id), "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
+               mac[2], mac[3], mac[4], mac[5]):
+    abort()
+  return sensor_id
