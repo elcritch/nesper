@@ -87,7 +87,7 @@ proc generate_hostname*(hostname: string): string =
 
 
 ## * Generate sensor id (based on mac address)
-proc generate_sensor_id*(): cstring =
+proc generate_sensor_id*(): string =
   var mac: string = newStringOfCap(6)
   var sensor_id: cstring
   check: esp_read_mac(cast[ptr uint8](mac.cstring()), ESP_MAC_WIFI_STA)
