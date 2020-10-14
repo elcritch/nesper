@@ -84,7 +84,7 @@ type
 ##  @brief Default configuration for Ethernet driver
 ##
 ##
-proc ETH_DEFAULT_CONFIG*(
+proc eth_default_config*(
           emac: var esp_eth_mac_t,
           ephy: var esp_eth_phy_t,
           check_link_period_ms = 2000'u32,
