@@ -23,18 +23,33 @@ type
 ## / Mask of interrupts sending to the host.
 
 type
-  sdio_slave_hostint_t* {.size: sizeof(cint).} = enum
-    SDIO_SLAVE_HOSTINT_SEND_NEW_PACKET = HOST_SLC0_RX_NEW_PACKET_INT_ENA, ## /< New packet available
-    SDIO_SLAVE_HOSTINT_RECV_OVF = HOST_SLC0_TX_OVF_INT_ENA, ## /< Slave receive buffer overflow
-    SDIO_SLAVE_HOSTINT_SEND_UDF = HOST_SLC0_RX_UDF_INT_ENA, ## /< Slave sending buffer underflow (this case only happen when the host do not request for packet according to the packet len).
-    SDIO_SLAVE_HOSTINT_BIT7 = HOST_SLC0_TOHOST_BIT7_INT_ENA, ## /< General purpose interrupt bits that can be used by the user.
-    SDIO_SLAVE_HOSTINT_BIT6 = HOST_SLC0_TOHOST_BIT6_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT5 = HOST_SLC0_TOHOST_BIT5_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT4 = HOST_SLC0_TOHOST_BIT4_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT3 = HOST_SLC0_TOHOST_BIT3_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT2 = HOST_SLC0_TOHOST_BIT2_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT1 = HOST_SLC0_TOHOST_BIT1_INT_ENA,
-    SDIO_SLAVE_HOSTINT_BIT0 = HOST_SLC0_TOHOST_BIT0_INT_ENA
+  sdio_slave_hostint_t* = distinct cint
+
+var
+  SDIO_SLAVE_HOSTINT_SEND_NEW_PACKET* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_RECV_OVF* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_SEND_UDF* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT7* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT6* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT5* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT4* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT3* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT2* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT1* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+  SDIO_SLAVE_HOSTINT_BIT0* {.importc: "$1", header: "sdio_slave.h".}: sdio_slave_hostint_t 
+
+#   sdio_slave_hostint_t* {.size: sizeof(cint).} = enum
+#     SDIO_SLAVE_HOSTINT_SEND_NEW_PACKET = HOST_SLC0_RX_NEW_PACKET_INT_ENA, ## /< New packet available
+#     SDIO_SLAVE_HOSTINT_RECV_OVF = HOST_SLC0_TX_OVF_INT_ENA, ## /< Slave receive buffer overflow
+#     SDIO_SLAVE_HOSTINT_SEND_UDF = HOST_SLC0_RX_UDF_INT_ENA, ## /< Slave sending buffer underflow (this case only happen when the host do not request for packet according to the packet len).
+#     SDIO_SLAVE_HOSTINT_BIT7 = HOST_SLC0_TOHOST_BIT7_INT_ENA, ## /< General purpose interrupt bits that can be used by the user.
+#     SDIO_SLAVE_HOSTINT_BIT6 = HOST_SLC0_TOHOST_BIT6_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT5 = HOST_SLC0_TOHOST_BIT5_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT4 = HOST_SLC0_TOHOST_BIT4_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT3 = HOST_SLC0_TOHOST_BIT3_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT2 = HOST_SLC0_TOHOST_BIT2_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT1 = HOST_SLC0_TOHOST_BIT1_INT_ENA,
+#     SDIO_SLAVE_HOSTINT_BIT0 = HOST_SLC0_TOHOST_BIT0_INT_ENA
 
 
 ## / Timing of SDIO slave

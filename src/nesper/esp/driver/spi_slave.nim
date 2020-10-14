@@ -20,13 +20,9 @@ const
   SPI_SLAVE_BIT_LSBFIRST* = (SPI_SLAVE_TXBIT_LSBFIRST or SPI_SLAVE_RXBIT_LSBFIRST) ## /< Transmit and receive LSB first
 
 type
-  slave_transaction_cb_t* = proc (trans: ptr spi_slave_transaction_t)
+  slave_transaction_cb_t* = proc (trans: ptr spi_slave_transaction_t) {.cdecl.}
 
-## *
-##  @brief This is a configuration for a SPI host acting as a slave device.
-##
-
-type
+  ##  @brief This is a configuration for a SPI host acting as a slave device.
   spi_slave_interface_config_t* {.importc: "spi_slave_interface_config_t",
                                  header: "spi_slave.h", bycopy.} = object
     spics_io_num* {.importc: "spics_io_num".}: cint ## /< CS GPIO pin for this device
@@ -55,11 +51,7 @@ type
                                                                     ##
 
 
-## *
-##  This structure describes one SPI transaction
-##
-
-type
+  ##  This structure describes one SPI transaction
   spi_slave_transaction_t* {.importc: "spi_slave_transaction_t",
                             header: "spi_slave.h", bycopy.} = object
     length* {.importc: "length".}: csize_t ## /< Total data length, in bits

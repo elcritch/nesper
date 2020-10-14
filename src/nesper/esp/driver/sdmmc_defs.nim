@@ -17,6 +17,7 @@
 
 ##  MMC commands
 ##  response type
+import ../../consts
 
 const
   MMC_GO_IDLE_STATE* = 0
