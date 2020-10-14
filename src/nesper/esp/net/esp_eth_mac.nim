@@ -14,7 +14,7 @@
 
 import ../../consts
 import ../../general
-import ../spi
+import ../driver/spi
 import esp_eth_com
 
 const
