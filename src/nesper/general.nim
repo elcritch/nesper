@@ -1,6 +1,7 @@
 import consts
 import macros
 import esp/esp_log
+import tasks
 
 export esp_log
 
@@ -18,7 +19,6 @@ when defined(NimAppMain):
     NimMain() # initialize garbage collector memory, types and stack
     nim_app_main()
 
-proc delay*( milsecs: cint ) {.cdecl, importc: "delay".}
 proc esp_restart*() {.cdecl, importc: "esp_restart".}
 
 proc vTaskDelete*( handle: any )
@@ -57,3 +57,6 @@ proc setFromString*(val: var openArray[uint8], str: cstring) =
 
 proc ms_to_ticks*(ms: int): TickType_t =
       TickType_t(uint32(ms) div portTICK_PERIOD_MS )
+
+proc delayMillis*( milsecs: int ) =
+  vTaskDelay(milsecs.ms_to_ticks())

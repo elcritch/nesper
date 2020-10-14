@@ -13,10 +13,13 @@ requires "nim >= 1.2.0"
 
 
 # Tasks
+import os
+
 task test, "Runs the test suite":
   exec "nim c --os:freertos tests/tconsts.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tgeneral.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tnvs.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tspi.nim"
   exec "nim c -r tests/trouter.nim"
+
 

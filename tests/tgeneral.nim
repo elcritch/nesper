@@ -12,7 +12,7 @@ echo ""
 
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: cint
 
-delay(100)
+delayMillis(100)
 esp_restart()
 
 # vTaskDelete*( handle: any )
