@@ -12,12 +12,13 @@
 ##  limitations under the License.
 
 import ../../consts
+import io_mux_reg
 
 when defined(CONFIG_LEGACY_INCLUDE_COMMON_HEADERS):
   import
     soc/rtc_io_reg
 
-const
+var
   GPIO_SEL_0* = (BIT(0))        ## !< Pin 0 selected
   GPIO_SEL_1* = (BIT(1))        ## !< Pin 1 selected
   GPIO_SEL_2* = (BIT(2)) ## !< Pin 2 selected
@@ -29,7 +30,7 @@ const
 
 ## * @cond
 
-const
+var
   GPIO_SEL_3* = (BIT(3))        ## !< Pin 3 selected
   GPIO_SEL_4* = (BIT(4))        ## !< Pin 4 selected
   GPIO_SEL_5* = (BIT(5))        ## !< Pin 5 selected
@@ -96,15 +97,17 @@ const
   GPIO_PIN_REG_37* = IO_MUX_GPIO37_REG
   GPIO_PIN_REG_38* = IO_MUX_GPIO38_REG
   GPIO_PIN_REG_39* = IO_MUX_GPIO39_REG
-  GPIO_APP_CPU_INTR_ENA* = (BIT(0))
-  GPIO_APP_CPU_NMI_INTR_ENA* = (BIT(1))
-  GPIO_PRO_CPU_INTR_ENA* = (BIT(2))
-  GPIO_PRO_CPU_NMI_INTR_ENA* = (BIT(3))
-  GPIO_SDIO_EXT_INTR_ENA* = (BIT(4))
-  GPIO_MODE_DEF_DISABLE* = (0)
-  GPIO_MODE_DEF_INPUT* = (BIT0)
-  GPIO_MODE_DEF_OUTPUT* = (BIT1)
-  GPIO_MODE_DEF_OD* = (BIT2)
+
+const
+  GPIO_APP_CPU_INTR_ENA* = BIT(0)
+  GPIO_APP_CPU_NMI_INTR_ENA* = BIT(1)
+  GPIO_PRO_CPU_INTR_ENA* = BIT(2)
+  GPIO_PRO_CPU_NMI_INTR_ENA* = BIT(3)
+  GPIO_SDIO_EXT_INTR_ENA* = BIT(4)
+  GPIO_MODE_DEF_DISABLE* = 0
+  GPIO_MODE_DEF_INPUT* = NBIT(0)
+  GPIO_MODE_DEF_OUTPUT* = NBIT(1)
+  GPIO_MODE_DEF_OD* = NBIT(2)
 
 ## * @endcond
 
@@ -157,6 +160,7 @@ type
     GPIO_NUM_38 = 38,           ## !< GPIO38, input mode only
     GPIO_NUM_39 = 39,           ## !< GPIO39, input mode only
     GPIO_NUM_MAX = 40           ## * @endcond
+
   gpio_int_type_t* {.size: sizeof(cint).} = enum
     GPIO_INTR_DISABLE = 0,      ## !< Disable GPIO interrupt
     GPIO_INTR_POSEDGE = 1,      ## !< GPIO interrupt type : rising edge
@@ -165,17 +169,19 @@ type
     GPIO_INTR_LOW_LEVEL = 4,    ## !< GPIO interrupt type : input low level trigger
     GPIO_INTR_HIGH_LEVEL = 5,   ## !< GPIO interrupt type : input high level trigger
     GPIO_INTR_MAX
+
   gpio_mode_t* {.size: sizeof(cint).} = enum
     GPIO_MODE_DISABLE = GPIO_MODE_DEF_DISABLE, ## !< GPIO mode : disable input and output
     GPIO_MODE_INPUT = GPIO_MODE_DEF_INPUT, ## !< GPIO mode : input only
     GPIO_MODE_OUTPUT = GPIO_MODE_DEF_OUTPUT, ## !< GPIO mode : output only mode
-    GPIO_MODE_OUTPUT_OD = ((GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)), ## !< GPIO mode : output only with open-drain mode
-    GPIO_MODE_INPUT_OUTPUT_OD = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT) or
-        (GPIO_MODE_DEF_OD)),  ## !< GPIO mode : output and input with open-drain mode
     GPIO_MODE_INPUT_OUTPUT = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT)) ## !< GPIO mode : output and input mode
+    GPIO_MODE_OUTPUT_OD = ((GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)), ## !< GPIO mode : output only with open-drain mode
+    GPIO_MODE_INPUT_OUTPUT_OD = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)),  ## !< GPIO mode : output and input with open-drain mode
+
   gpio_pullup_t* {.size: sizeof(cint).} = enum
     GPIO_PULLUP_DISABLE = 0x00000000, ## !< Disable GPIO pull-up resistor
     GPIO_PULLUP_ENABLE = 0x00000001 ## !< Enable GPIO pull-up resistor
+
   gpio_pulldown_t* {.size: sizeof(cint).} = enum
     GPIO_PULLDOWN_DISABLE = 0x00000000, ## !< Disable GPIO pull-down resistor
     GPIO_PULLDOWN_ENABLE = 0x00000001 ## !< Enable GPIO pull-down resistor
@@ -212,7 +218,7 @@ type
   gpio_isr_handle_t* = intr_handle_t
 
 
-const
+var
   GPIO_DRIVE_CAP_DEFAULT = GPIO_DRIVE_CAP_2
 
 ## *

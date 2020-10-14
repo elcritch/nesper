@@ -1,1 +1,2 @@
-import nesper/esp/driver/tadc
+import nesper/esp/driver/adc
+
