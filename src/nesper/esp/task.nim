@@ -144,7 +144,7 @@ var tskNO_AFFINITY* {.importc: "tskNO_AFFINITY", header: "freertos/task.h".}: ci
 ##
 
 type
-  TaskHandle_t* = pointer
+  TaskHandle_t* {.importc: "TaskHandle_t", header: "freertos/FreeRTOS.h".} = pointer
 
 ## *
 ##  Defines the prototype to which the application task hook function must

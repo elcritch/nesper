@@ -75,8 +75,8 @@ import ../consts
 ##  xQueueSend(), xQueueReceive(), etc.
 ##
 type
-  QueueHandle_t* = pointer
-  StaticQueue_t* = pointer
+  QueueHandle_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
+  StaticQueue_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
 
 ## *
 ##  Type by which queue sets are referenced.  For example, a call to
@@ -84,7 +84,7 @@ type
 ##  parameter to xQueueSelectFromSet(), xQueueAddToSet(), etc.
 ##
 type
-  QueueSetHandle_t* = pointer
+  QueueSetHandle_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
 
 ## *
 ##  Queue sets can contain both queues and semaphores, so the
@@ -92,7 +92,7 @@ type
 ##  return value can be either an QueueHandle_t or an SemaphoreHandle_t.
 ##
 type
-  QueueSetMemberHandle_t* = pointer
+  QueueSetMemberHandle_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
 
 
 # ## * @cond

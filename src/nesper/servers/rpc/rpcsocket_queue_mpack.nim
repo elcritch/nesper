@@ -14,10 +14,6 @@ import msgpack4nim/msgpack2json
 
 export tcpsocket, router
 
-{.emit: """/*INCLUDESECTION*/
-#include "freertos/FreeRTOS.h"
-""".}
-
 const TAG = "socketrpc"
 
 var rpcRouter: RpcRouter
