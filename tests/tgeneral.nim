@@ -4,8 +4,8 @@ import nesper
 
 const TAG = "main"
 
-ESP_LOGI(TAG, "Initializing device...")
-ESP_LOGD(TAG, "Initializing device: %d", 23)
+logi(TAG, "Initializing device...")
+logd(TAG, "Initializing device: %d", 23)
     
 echo "ESP_OK: " & $ESP_OK
 echo ""

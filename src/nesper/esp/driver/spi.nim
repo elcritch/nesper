@@ -12,7 +12,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import ../consts
+import ../../consts
 
 ## for spi_bus_initialization funcions. to be back-compatible
 

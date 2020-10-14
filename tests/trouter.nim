@@ -1,6 +1,6 @@
 import json, tables, strutils, macros, options
 
-import nesper/rpc/router
+import nesper/servers/rpc/router
 
 type
   MyObject = object
@@ -8,7 +8,7 @@ type
     name: string
 
 # Setup RPC Server #
-var rt1 = newRpcRouter()
+var rt1 = createRpcRouter(4096)
 
 rt1.rpc("hello") do(input: string) -> string:
   result = "Hello " & input
