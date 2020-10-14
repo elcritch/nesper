@@ -85,8 +85,8 @@ type
 ##
 ##
 proc eth_default_config*(
-          emac: var esp_eth_mac_t,
-          ephy: var esp_eth_phy_t,
+          emac: ptr esp_eth_mac_t,
+          ephy: ptr esp_eth_phy_t,
           check_link_period_ms = 2000'u32,
           stack_input: stack_input_cb_t = nil,
           on_lowlevel_init_done: on_lowlevel_init_done_cb_t = nil,
@@ -94,8 +94,8 @@ proc eth_default_config*(
         ): esp_eth_config_t {.inline.} =
   
   return esp_eth_config_t(
-            mac: addr(emac),
-            phy: addr(ephy),
+            mac: emac,
+            phy: ephy,
             check_link_period_ms: check_link_period_ms,
             stack_input: stack_input,
             on_lowlevel_init_done: on_lowlevel_init_done,
