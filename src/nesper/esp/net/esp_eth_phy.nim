@@ -131,13 +131,18 @@ type
 ##  @brief Default configuration for Ethernet PHY object
 ##
 ##
-##  #define ETH_PHY_DEFAULT_CONFIG()     \
-##      {                                \
-##          .phy_addr = 1,               \
-##          .reset_timeout_ms = 100,     \
-##          .autonego_timeout_ms = 4000, \
-##          .reset_gpio_num = 5,         \
-##      }
+proc ETH_PHY_DEFAULT_CONFIG*(                                
+         phy_addr = 1,               
+         reset_timeout_ms = 100,     
+         autonego_timeout_ms = 4000, 
+         reset_gpio_num = 5,         
+     ): eth_phy_config_t = 
+     return eth_phy_config_t(                                
+         phy_addr: phy_addr.uint32(),
+         reset_timeout_ms: reset_timeout_ms.uint32(),
+         autonego_timeout_ms: autonego_timeout_ms.uint32(),
+         reset_gpio_num: reset_gpio_num.uint32(),
+     )
 ## *
 ##  @brief Create a PHY instance of IP101
 ##
