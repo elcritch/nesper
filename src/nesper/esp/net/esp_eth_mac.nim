@@ -191,14 +191,14 @@ proc ETH_MAC_DEFAULT_CONFIG*(
           rx_task_prio = 15,
           smi_mdc_gpio_num = 23,
           smi_mdio_gpio_num = 18,
-          flags = 0): eth_mac_config_t {.inline.} =
+          flags: uint32 = 0): eth_mac_config_t {.inline.} =
     return eth_mac_config_t(
          sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
          rx_task_stack_size: rx_task_stack_size.uint32(), 
          rx_task_prio: rx_task_prio.uint32(),         
          smi_mdc_gpio_num: smi_mdc_gpio_num.cint(),     
          smi_mdio_gpio_num: smi_mdio_gpio_num.cint(),    
-         flags: flags.cint())
+         flags: flags))
 
 ##  @brief Default configuration for Ethernet MAC object
 ##  #define ETH_MAC_DEFAULT_CONFIG()    \
