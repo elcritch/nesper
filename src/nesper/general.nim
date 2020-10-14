@@ -19,6 +19,10 @@ when defined(NimAppMain):
     NimMain() # initialize garbage collector memory, types and stack
     nim_app_main()
 
+type
+  EspError* = object of OSError
+    code*: esp_err_t
+
 proc esp_restart*() {.cdecl, importc: "esp_restart".}
 
 proc vTaskDelete*( handle: any )
