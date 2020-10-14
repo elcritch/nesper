@@ -186,13 +186,13 @@ typedef struct {
  * @brief Default configuration for Ethernet PHY object
  *
  */
-#define ETH_PHY_DEFAULT_CONFIG()     \
-    {                                \
-        .phy_addr = 1,               \
-        .reset_timeout_ms = 100,     \
-        .autonego_timeout_ms = 4000, \
-        .reset_gpio_num = 5,         \
-    }
+// #define ETH_PHY_DEFAULT_CONFIG()     \
+//     {                                \
+//         .phy_addr = 1,               \
+//         .reset_timeout_ms = 100,     \
+//         .autonego_timeout_ms = 4000, \
+//         .reset_gpio_num = 5,         \
+//     }
 
 /**
 * @brief Create a PHY instance of IP101
