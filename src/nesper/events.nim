@@ -41,16 +41,13 @@ template eventRegister*[EVT](
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
 template eventRegister*[EVT](
-            event_loop: esp_event_loop_handle_t;
             event_base: esp_event_base_t;
             event_id: EVT;
             event_handler: esp_event_handler_t;
             event_handler_arg: pointer = nil
         ) =
     ## Register event for an event base on the default loop.
-
-    let ret = esp_event_handler_register_with(
-        event_loop,
+    let ret = esp_event_handler_register(
         event_base,
         event_id.cint,
         event_handler,
