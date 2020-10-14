@@ -13,7 +13,7 @@
 
 import ../../consts
 import ../../general
-import gpio
+import gpio_driver
 
 type
   rtc_gpio_mode_t* {.size: sizeof(cint).} = enum

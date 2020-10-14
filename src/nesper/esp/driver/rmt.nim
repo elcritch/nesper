@@ -13,7 +13,7 @@
 
 import ../../consts
 import ../../general
-import gpio
+import gpio_driver
 import rmt_struct
 
 const

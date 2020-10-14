@@ -2,11 +2,9 @@ import nesper/consts
 import nesper/general
 
 # import esp/driver/gpio
-import esp/driver/gpio_consts
 import esp/gpio
 
 export gpio
-export gpio_consts
 
 type
   GpioError* = object of OSError
@@ -27,19 +25,17 @@ proc setupGpios(pins: set[gpio_num_t]) =
   ## disable pull-up mode
   io_conf.pull_up_en = GPIO_PULLUP_DISABLE
   ## configure GPIO with the given settings
-  let ret: esp_err_t
+  var ret: esp_err_t
   
   ret = gpio_config(addr(io_conf))
   if ret != ESP_OK:
-    raise newEspError[GpioError]("gpio config:" $esp_err_to_name(nvs_error) )
+    raise newEspError[GpioError]("gpio config:" & $esp_err_to_name(ret), ret )
 
-  ret = gpio_set_level(GPIO_PHY_CLK_EN, 1)
+proc set(pin: gpio_num_t, value: bool) =
+  var ret: esp_err_t
+
+  ret = gpio_set_level(pin, value.uint32())
   if ret != ESP_OK:
-    raise newEspError[GpioError]("gpio set level:" $esp_err_to_name(nvs_error) )
-
-  ret = gpio_set_level(GPIO_ITSY_RST, 0)
-  if ret != ESP_OK:
-    raise newEspError[GpioError]("gpio set level:" $esp_err_to_name(nvs_error) )
-
+    raise newEspError[GpioError]("gpio set level:" & $esp_err_to_name(ret), ret )
 
 

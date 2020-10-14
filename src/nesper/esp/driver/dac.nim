@@ -13,7 +13,7 @@
 
 import ../../consts
 import ../../general
-import gpio
+import gpio_driver
 
 type
   dac_channel_t* {.size: sizeof(cint).} = enum
