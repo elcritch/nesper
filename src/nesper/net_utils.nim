@@ -98,4 +98,4 @@ proc generate_sensor_id*(): string =
   if ret == -1:
     raise newException(OSError, "hostname")
 
-  return sensor_id
+  return $sensor_id
