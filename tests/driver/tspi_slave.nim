@@ -1,1 +1,1 @@
-import nesper/esp/driver/tspi_slave
+import nesper/esp/driver/spi_slave

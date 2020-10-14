@@ -1,1 +1,1 @@
-import nesper/esp/driver/tsdmmc_defs
+import nesper/esp/driver/sdmmc_defs

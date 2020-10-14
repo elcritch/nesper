@@ -1,1 +1,1 @@
-import nesper/esp/driver/trtc_cntl
+import nesper/esp/driver/rtc_cntl

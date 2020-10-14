@@ -1,1 +1,1 @@
-import nesper/esp/driver/tsdio_slave
+import nesper/esp/driver/sdio_slave

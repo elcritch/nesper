@@ -13,6 +13,7 @@
 
 import ../../consts
 import ../../general
+import gpio
 
 type
   rtc_gpio_mode_t* {.size: sizeof(cint).} = enum
@@ -29,8 +30,7 @@ type
 ##  @return true if GPIO is valid for RTC GPIO use. false otherwise.
 ##
 
-proc rtc_gpio_is_valid_gpio*(gpio_num: gpio_num_t): bool {.inline.} =
-  return gpio_num < GPIO_PIN_COUNT and rtc_gpio_desc[gpio_num].reg != 0
+proc rtc_gpio_is_valid_gpio*(gpio_num: gpio_num_t): bool {.importc: "rtc_gpio_is_valid_gpio", header: "rtc_io.h".}
 
 template RTC_GPIO_IS_VALID_GPIO*(gpio_num: untyped): untyped =
   rtc_gpio_is_valid_gpio(gpio_num) ##  Deprecated, use rtc_gpio_is_valid_gpio()

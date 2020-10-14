@@ -14,11 +14,7 @@
 import ../../consts
 import io_mux_reg
 
-when defined(CONFIG_LEGACY_INCLUDE_COMMON_HEADERS):
-  import
-    soc/rtc_io_reg
-
-var
+const
   GPIO_SEL_0* = (BIT(0))        ## !< Pin 0 selected
   GPIO_SEL_1* = (BIT(1))        ## !< Pin 1 selected
   GPIO_SEL_2* = (BIT(2)) ## !< Pin 2 selected
@@ -30,7 +26,7 @@ var
 
 ## * @cond
 
-var
+const
   GPIO_SEL_3* = (BIT(3))        ## !< Pin 3 selected
   GPIO_SEL_4* = (BIT(4))        ## !< Pin 4 selected
   GPIO_SEL_5* = (BIT(5))        ## !< Pin 5 selected
@@ -62,6 +58,8 @@ var
   GPIO_SEL_37* = ((uint64)((cast[uint64](1)) shl 37)) ## !< Pin 37 selected
   GPIO_SEL_38* = ((uint64)((cast[uint64](1)) shl 38)) ## !< Pin 38 selected
   GPIO_SEL_39* = ((uint64)((cast[uint64](1)) shl 39)) ## !< Pin 39 selected
+
+var
   GPIO_PIN_REG_0* = IO_MUX_GPIO0_REG
   GPIO_PIN_REG_1* = IO_MUX_GPIO1_REG
   GPIO_PIN_REG_2* = IO_MUX_GPIO2_REG
@@ -110,6 +108,8 @@ const
   GPIO_MODE_DEF_OD* = NBIT(2)
 
 ## * @endcond
+
+var GPIO_PIN_COUNT* {.importc: "GPIO_PIN_COUNT", header: "gpio_pins.h".}: int
 
 template GPIO_IS_VALID_GPIO*(gpio_num: untyped): untyped =
   ((gpio_num < GPIO_PIN_COUNT and GPIO_PIN_MUX_REG[gpio_num] != 0)) ## !< Check whether it is a valid GPIO number
