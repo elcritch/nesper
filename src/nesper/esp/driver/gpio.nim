@@ -54,14 +54,14 @@ const
   GPIO_SEL_25* = (BIT(25))      ## !< Pin 25 selected
   GPIO_SEL_26* = (BIT(26))      ## !< Pin 26 selected
   GPIO_SEL_27* = (BIT(27))      ## !< Pin 27 selected
-  GPIO_SEL_32* = ((uint64_t)((cast[uint64_t](1)) shl 32)) ## !< Pin 32 selected
-  GPIO_SEL_33* = ((uint64_t)((cast[uint64_t](1)) shl 33)) ## !< Pin 33 selected
-  GPIO_SEL_34* = ((uint64_t)((cast[uint64_t](1)) shl 34)) ## !< Pin 34 selected
-  GPIO_SEL_35* = ((uint64_t)((cast[uint64_t](1)) shl 35)) ## !< Pin 35 selected
-  GPIO_SEL_36* = ((uint64_t)((cast[uint64_t](1)) shl 36)) ## !< Pin 36 selected
-  GPIO_SEL_37* = ((uint64_t)((cast[uint64_t](1)) shl 37)) ## !< Pin 37 selected
-  GPIO_SEL_38* = ((uint64_t)((cast[uint64_t](1)) shl 38)) ## !< Pin 38 selected
-  GPIO_SEL_39* = ((uint64_t)((cast[uint64_t](1)) shl 39)) ## !< Pin 39 selected
+  GPIO_SEL_32* = ((uint64)((cast[uint64](1)) shl 32)) ## !< Pin 32 selected
+  GPIO_SEL_33* = ((uint64)((cast[uint64](1)) shl 33)) ## !< Pin 33 selected
+  GPIO_SEL_34* = ((uint64)((cast[uint64](1)) shl 34)) ## !< Pin 34 selected
+  GPIO_SEL_35* = ((uint64)((cast[uint64](1)) shl 35)) ## !< Pin 35 selected
+  GPIO_SEL_36* = ((uint64)((cast[uint64](1)) shl 36)) ## !< Pin 36 selected
+  GPIO_SEL_37* = ((uint64)((cast[uint64](1)) shl 37)) ## !< Pin 37 selected
+  GPIO_SEL_38* = ((uint64)((cast[uint64](1)) shl 38)) ## !< Pin 38 selected
+  GPIO_SEL_39* = ((uint64)((cast[uint64](1)) shl 39)) ## !< Pin 39 selected
   GPIO_PIN_REG_0* = IO_MUX_GPIO0_REG
   GPIO_PIN_REG_1* = IO_MUX_GPIO1_REG
   GPIO_PIN_REG_2* = IO_MUX_GPIO2_REG
@@ -192,7 +192,7 @@ type
 
 type
   gpio_config_t* {.importc: "gpio_config_t", header: "gpio.h", bycopy.} = object
-    pin_bit_mask* {.importc: "pin_bit_mask".}: uint64_t ## !< GPIO pin: set with bit mask, each bit maps to a GPIO
+    pin_bit_mask* {.importc: "pin_bit_mask".}: uint64 ## !< GPIO pin: set with bit mask, each bit maps to a GPIO
     mode* {.importc: "mode".}: gpio_mode_t ## !< GPIO mode: set input/output mode
     pull_up_en* {.importc: "pull_up_en".}: gpio_pullup_t ## !< GPIO pull-up
     pull_down_en* {.importc: "pull_down_en".}: gpio_pulldown_t ## !< GPIO pull-down
@@ -301,7 +301,7 @@ proc gpio_intr_disable*(gpio_num: gpio_num_t): esp_err_t {.
 ##
 ##
 
-proc gpio_set_level*(gpio_num: gpio_num_t; level: uint32_t): esp_err_t {.
+proc gpio_set_level*(gpio_num: gpio_num_t; level: uint32): esp_err_t {.
     importc: "gpio_set_level", header: "gpio.h".}
 ## *
 ##  @brief  GPIO get input level
@@ -612,7 +612,7 @@ proc gpio_deep_sleep_hold_dis*() {.importc: "gpio_deep_sleep_hold_dis",
 ##  @param signal_idx Peripheral signal id to input. One of the ``*_IN_IDX`` signals in ``soc/gpio_sig_map.h``.
 ##
 
-proc gpio_iomux_in*(gpio_num: uint32_t; signal_idx: uint32_t) {.
+proc gpio_iomux_in*(gpio_num: uint32; signal_idx: uint32) {.
     importc: "gpio_iomux_in", header: "gpio.h".}
 ## *
 ##  @brief Set peripheral output to an GPIO pad through the IOMUX.
@@ -622,5 +622,5 @@ proc gpio_iomux_in*(gpio_num: uint32_t; signal_idx: uint32_t) {.
 ##  @param oen_inv True if the output enable needs to be inversed, otherwise False.
 ##
 
-proc gpio_iomux_out*(gpio_num: uint8_t; `func`: cint; oen_inv: bool) {.
+proc gpio_iomux_out*(gpio_num: uint8; `func`: cint; oen_inv: bool) {.
     importc: "gpio_iomux_out", header: "gpio.h".}

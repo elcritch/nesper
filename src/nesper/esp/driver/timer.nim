@@ -104,7 +104,7 @@ type
     intr_type* {.importc: "intr_type".}: timer_intr_mode_t ## !< Interrupt mode
     counter_dir* {.importc: "counter_dir".}: timer_count_dir_t ## !< Counter direction
     auto_reload* {.importc: "auto_reload".}: bool ## !< Timer auto-reload
-    divider* {.importc: "divider".}: uint32_t ## !< Counter clock divider. The divider's range is from from 2 to 65536.
+    divider* {.importc: "divider".}: uint32 ## !< Counter clock divider. The divider's range is from from 2 to 65536.
 
 
 ## *
@@ -128,7 +128,7 @@ type
 ##
 
 proc timer_get_counter_value*(group_num: timer_group_t; timer_num: timer_idx_t;
-                             timer_val: ptr uint64_t): esp_err_t {.
+                             timer_val: ptr uint64): esp_err_t {.
     importc: "timer_get_counter_value", header: "timer.h".}
 ## *
 ##  @brief Read the counter value of hardware timer, in unit of a given scale.
@@ -158,7 +158,7 @@ proc timer_get_counter_time_sec*(group_num: timer_group_t; timer_num: timer_idx_
 ##
 
 proc timer_set_counter_value*(group_num: timer_group_t; timer_num: timer_idx_t;
-                             load_val: uint64_t): esp_err_t {.
+                             load_val: uint64): esp_err_t {.
     importc: "timer_set_counter_value", header: "timer.h".}
 ## *
 ##  @brief Start the counter of hardware timer.
@@ -229,7 +229,7 @@ proc timer_set_auto_reload*(group_num: timer_group_t; timer_num: timer_idx_t;
 ##
 
 proc timer_set_divider*(group_num: timer_group_t; timer_num: timer_idx_t;
-                       divider: uint32_t): esp_err_t {.
+                       divider: uint32): esp_err_t {.
     importc: "timer_set_divider", header: "timer.h".}
 ## *
 ##  @brief Set timer alarm value.
@@ -244,7 +244,7 @@ proc timer_set_divider*(group_num: timer_group_t; timer_num: timer_idx_t;
 ##
 
 proc timer_set_alarm_value*(group_num: timer_group_t; timer_num: timer_idx_t;
-                           alarm_value: uint64_t): esp_err_t {.
+                           alarm_value: uint64): esp_err_t {.
     importc: "timer_set_alarm_value", header: "timer.h".}
 ## *
 ##  @brief Get timer alarm value.
@@ -259,7 +259,7 @@ proc timer_set_alarm_value*(group_num: timer_group_t; timer_num: timer_idx_t;
 ##
 
 proc timer_get_alarm_value*(group_num: timer_group_t; timer_num: timer_idx_t;
-                           alarm_value: ptr uint64_t): esp_err_t {.
+                           alarm_value: ptr uint64): esp_err_t {.
     importc: "timer_get_alarm_value", header: "timer.h".}
 ## *
 ##  @brief Enable or disable generation of timer alarm events.
@@ -343,7 +343,7 @@ proc timer_get_config*(group_num: timer_group_t; timer_num: timer_idx_t;
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc timer_group_intr_enable*(group_num: timer_group_t; en_mask: uint32_t): esp_err_t {.
+proc timer_group_intr_enable*(group_num: timer_group_t; en_mask: uint32): esp_err_t {.
     importc: "timer_group_intr_enable", header: "timer.h".}
 ## * @brief Disable timer group interrupt, by disable mask
 ##
@@ -357,7 +357,7 @@ proc timer_group_intr_enable*(group_num: timer_group_t; en_mask: uint32_t): esp_
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc timer_group_intr_disable*(group_num: timer_group_t; disable_mask: uint32_t): esp_err_t {.
+proc timer_group_intr_disable*(group_num: timer_group_t; disable_mask: uint32): esp_err_t {.
     importc: "timer_group_intr_disable", header: "timer.h".}
 ## * @brief Enable timer interrupt
 ##

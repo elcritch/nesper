@@ -85,8 +85,8 @@ type
     hctrl_mode* {.importc: "hctrl_mode".}: pcnt_ctrl_mode_t ## !< PCNT high control mode
     pos_mode* {.importc: "pos_mode".}: pcnt_count_mode_t ## !< PCNT positive edge count mode
     neg_mode* {.importc: "neg_mode".}: pcnt_count_mode_t ## !< PCNT negative edge count mode
-    counter_h_lim* {.importc: "counter_h_lim".}: int16_t ## !< Maximum counter value
-    counter_l_lim* {.importc: "counter_l_lim".}: int16_t ## !< Minimum counter value
+    counter_h_lim* {.importc: "counter_h_lim".}: int16 ## !< Maximum counter value
+    counter_l_lim* {.importc: "counter_l_lim".}: int16 ## !< Minimum counter value
     unit* {.importc: "unit".}: pcnt_unit_t ## !< PCNT unit number
     channel* {.importc: "channel".}: pcnt_channel_t ## !< the PCNT channel
 
@@ -117,7 +117,7 @@ proc pcnt_unit_config*(pcnt_config: ptr pcnt_config_t): esp_err_t {.
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc pcnt_get_counter_value*(pcnt_unit: pcnt_unit_t; count: ptr int16_t): esp_err_t {.
+proc pcnt_get_counter_value*(pcnt_unit: pcnt_unit_t; count: ptr int16): esp_err_t {.
     importc: "pcnt_get_counter_value", header: "pcnt.h".}
 ## *
 ##  @brief Pause PCNT counter of PCNT unit
@@ -223,7 +223,7 @@ proc pcnt_event_disable*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t): esp_err_
 ##
 
 proc pcnt_set_event_value*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t;
-                          value: int16_t): esp_err_t {.
+                          value: int16): esp_err_t {.
     importc: "pcnt_set_event_value", header: "pcnt.h".}
 ## *
 ##  @brief Get PCNT event value of PCNT unit
@@ -239,7 +239,7 @@ proc pcnt_set_event_value*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t;
 ##
 
 proc pcnt_get_event_value*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t;
-                          value: ptr int16_t): esp_err_t {.
+                          value: ptr int16): esp_err_t {.
     importc: "pcnt_get_event_value", header: "pcnt.h".}
 ## *
 ##  @brief Register PCNT interrupt handler, the handler is an ISR.
@@ -319,7 +319,7 @@ proc pcnt_filter_disable*(unit: pcnt_unit_t): esp_err_t {.
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc pcnt_set_filter_value*(unit: pcnt_unit_t; filter_val: uint16_t): esp_err_t {.
+proc pcnt_set_filter_value*(unit: pcnt_unit_t; filter_val: uint16): esp_err_t {.
     importc: "pcnt_set_filter_value", header: "pcnt.h".}
 ## *
 ##  @brief Get PCNT filter value
@@ -332,7 +332,7 @@ proc pcnt_set_filter_value*(unit: pcnt_unit_t; filter_val: uint16_t): esp_err_t 
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc pcnt_get_filter_value*(unit: pcnt_unit_t; filter_val: ptr uint16_t): esp_err_t {.
+proc pcnt_get_filter_value*(unit: pcnt_unit_t; filter_val: ptr uint16): esp_err_t {.
     importc: "pcnt_get_filter_value", header: "pcnt.h".}
 ## *
 ##  @brief Set PCNT counter mode

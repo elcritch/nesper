@@ -33,7 +33,7 @@ import
 ##
 
 proc rtc_isr_register*(handler: intr_handler_t; handler_arg: pointer;
-                      rtc_intr_mask: uint32_t): esp_err_t {.
+                      rtc_intr_mask: uint32): esp_err_t {.
     importc: "rtc_isr_register", header: "rtc_cntl.h".}
 ## *
 ##  @brief Deregister the handler previously registered using rtc_isr_register

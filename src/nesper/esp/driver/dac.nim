@@ -51,7 +51,7 @@ proc dac_pad_get_io_num*(channel: dac_channel_t; gpio_num: ptr gpio_num_t): esp_
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc dac_output_voltage*(channel: dac_channel_t; dac_value: uint8_t): esp_err_t {.
+proc dac_output_voltage*(channel: dac_channel_t; dac_value: uint8): esp_err_t {.
     importc: "dac_output_voltage", header: "dac.h".}
 ## *
 ##  @brief DAC pad output enable

@@ -26,26 +26,26 @@ const
 ##
 ##  E.g. to send 9 bits of data, you can:
 ##
-##       uint16_t data = SPI_SWAP_DATA_TX(0x145, 9);
+##       uint16 data = SPI_SWAP_DATA_TX(0x145, 9);
 ##
 ##  Then points tx_buffer to ``&data``.
 ##
-##  @param DATA Data to be sent, can be uint8_t, uint16_t or uint32_t.
+##  @param DATA Data to be sent, can be uint8, uint16 or uint32.
 ##  @param LEN Length of data to be sent, since the SPI peripheral sends from
 ##       the MSB, this helps to shift the data to the MSB.
 ##
 
 template SPI_SWAP_DATA_TX*(DATA, LEN: untyped): untyped =
-  __builtin_bswap32((uint32_t)(DATA) shl (32 - (LEN)))
+  __builtin_bswap32((uint32)(DATA) shl (32 - (LEN)))
 
 ## *
 ##  Transform received data of length <= 32 bits to the format of an unsigned integer.
 ##
 ##  E.g. to transform the data of 15 bits placed in a 4-byte array to integer:
 ##
-##       uint16_t data = SPI_SWAP_DATA_RX(*(uint32_t*)t->rx_data, 15);
+##       uint16 data = SPI_SWAP_DATA_RX(*(uint32*)t->rx_data, 15);
 ##
-##  @param DATA Data to be rearranged, can be uint8_t, uint16_t or uint32_t.
+##  @param DATA Data to be rearranged, can be uint8, uint16 or uint32.
 ##  @param LEN Length of data received, since the SPI peripheral writes from
 ##       the MSB, this helps to shift the data to the LSB.
 ##
@@ -83,7 +83,7 @@ type
     quadwp_io_num* {.importc: "quadwp_io_num".}: cint ## /< GPIO pin for WP (Write Protect) signal which is used as D2 in 4-bit communication modes, or -1 if not used.
     quadhd_io_num* {.importc: "quadhd_io_num".}: cint ## /< GPIO pin for HD (HolD) signal which is used as D3 in 4-bit communication modes, or -1 if not used.
     max_transfer_sz* {.importc: "max_transfer_sz".}: cint ## /< Maximum transfer size, in bytes. Defaults to 4094 if 0.
-    flags* {.importc: "flags".}: uint32_t ## /< Abilities of bus to be checked by the driver. Or-ed value of ``SPICOMMON_BUSFLAG_*`` flags.
+    flags* {.importc: "flags".}: uint32 ## /< Abilities of bus to be checked by the driver. Or-ed value of ``SPICOMMON_BUSFLAG_*`` flags.
     intr_flags* {.importc: "intr_flags".}: cint ## *< Interrupt flag for the bus to set the priority, and IRAM attribute, see
                                             ##   ``esp_intr_alloc.h``. Note that the EDGE, INTRDISABLED attribute are ignored
                                             ##   by the driver. Note that if ESP_INTR_FLAG_IRAM is set, ALL the callbacks of

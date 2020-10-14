@@ -243,7 +243,7 @@ type
 
 type
   mcpwm_config_t* {.importc: "mcpwm_config_t", header: "mcpwm.h", bycopy.} = object
-    frequency* {.importc: "frequency".}: uint32_t ## !<Set frequency of MCPWM in Hz
+    frequency* {.importc: "frequency".}: uint32 ## !<Set frequency of MCPWM in Hz
     cmpr_a* {.importc: "cmpr_a".}: cfloat ## !<Set % duty cycle for operator a(MCPWMXA), i.e for 62.3% duty cycle, duty_a = 62.3
     cmpr_b* {.importc: "cmpr_b".}: cfloat ## !<Set % duty cycle for operator b(MCPWMXB), i.e for 48% duty cycle, duty_b = 48.0
     duty_mode* {.importc: "duty_mode".}: mcpwm_duty_type_t ## !<Set type of duty cycle
@@ -257,9 +257,9 @@ type
 type
   mcpwm_carrier_config_t* {.importc: "mcpwm_carrier_config_t", header: "mcpwm.h",
                            bycopy.} = object
-    carrier_period* {.importc: "carrier_period".}: uint8_t ## !<Set carrier period = (carrier_period + 1)*800ns, carrier_period should be < 16
-    carrier_duty* {.importc: "carrier_duty".}: uint8_t ## !<Set carrier duty cycle, carrier_duty should be less than 8 (increment every 12.5%)
-    pulse_width_in_os* {.importc: "pulse_width_in_os".}: uint8_t ## !<Set pulse width of first pulse in one shot mode = (carrier period)*(pulse_width_in_os + 1), should be less then 16
+    carrier_period* {.importc: "carrier_period".}: uint8 ## !<Set carrier period = (carrier_period + 1)*800ns, carrier_period should be < 16
+    carrier_duty* {.importc: "carrier_duty".}: uint8 ## !<Set carrier duty cycle, carrier_duty should be less than 8 (increment every 12.5%)
+    pulse_width_in_os* {.importc: "pulse_width_in_os".}: uint8 ## !<Set pulse width of first pulse in one shot mode = (carrier period)*(pulse_width_in_os + 1), should be less then 16
     carrier_os_mode* {.importc: "carrier_os_mode".}: mcpwm_carrier_os_t ## !<Enable or disable carrier oneshot mode
     carrier_ivt_mode* {.importc: "carrier_ivt_mode".}: mcpwm_carrier_out_ivt_t ## !<Invert output of carrier
 
@@ -325,7 +325,7 @@ proc mcpwm_init*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
 ##
 
 proc mcpwm_set_frequency*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
-                         frequency: uint32_t): esp_err_t {.
+                         frequency: uint32): esp_err_t {.
     importc: "mcpwm_set_frequency", header: "mcpwm.h".}
 ## *
 ##  @brief Set duty cycle of each operator(MCPWMXA/MCPWMXB)
@@ -357,7 +357,7 @@ proc mcpwm_set_duty*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
 ##
 
 proc mcpwm_set_duty_in_us*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
-                          op_num: mcpwm_operator_t; duty: uint32_t): esp_err_t {.
+                          op_num: mcpwm_operator_t; duty: uint32): esp_err_t {.
     importc: "mcpwm_set_duty_in_us", header: "mcpwm.h".}
 ## *
 ##  @brief Set duty either active high or active low(out of phase/inverted)
@@ -387,7 +387,7 @@ proc mcpwm_set_duty_type*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
 ##      - frequency of timer
 ##
 
-proc mcpwm_get_frequency*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t): uint32_t {.
+proc mcpwm_get_frequency*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t): uint32 {.
     importc: "mcpwm_get_frequency", header: "mcpwm.h".}
 ## *
 ##  @brief Get duty cycle of each operator
@@ -516,7 +516,7 @@ proc mcpwm_carrier_disable*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t): 
 ##
 
 proc mcpwm_carrier_set_period*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
-                              carrier_period: uint8_t): esp_err_t {.
+                              carrier_period: uint8): esp_err_t {.
     importc: "mcpwm_carrier_set_period", header: "mcpwm.h".}
 ## *
 ##  @brief Set duty_cycle of carrier
@@ -532,7 +532,7 @@ proc mcpwm_carrier_set_period*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t
 ##
 
 proc mcpwm_carrier_set_duty_cycle*(mcpwm_num: mcpwm_unit_t;
-                                  timer_num: mcpwm_timer_t; carrier_duty: uint8_t): esp_err_t {.
+                                  timer_num: mcpwm_timer_t; carrier_duty: uint8): esp_err_t {.
     importc: "mcpwm_carrier_set_duty_cycle", header: "mcpwm.h".}
 ## *
 ##  @brief Enable and set width of first pulse in carrier oneshot mode
@@ -549,7 +549,7 @@ proc mcpwm_carrier_set_duty_cycle*(mcpwm_num: mcpwm_unit_t;
 
 proc mcpwm_carrier_oneshot_mode_enable*(mcpwm_num: mcpwm_unit_t;
                                        timer_num: mcpwm_timer_t;
-                                       pulse_width: uint8_t): esp_err_t {.
+                                       pulse_width: uint8): esp_err_t {.
     importc: "mcpwm_carrier_oneshot_mode_enable", header: "mcpwm.h".}
 ## *
 ##  @brief Disable oneshot mode, width of first pulse = carrier period
@@ -596,8 +596,8 @@ proc mcpwm_carrier_output_invert*(mcpwm_num: mcpwm_unit_t;
 ##
 
 proc mcpwm_deadtime_enable*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
-                           dt_mode: mcpwm_deadtime_type_t; red: uint32_t;
-                           fed: uint32_t): esp_err_t {.
+                           dt_mode: mcpwm_deadtime_type_t; red: uint32;
+                           fed: uint32): esp_err_t {.
     importc: "mcpwm_deadtime_enable", header: "mcpwm.h".}
 ## *
 ##  @brief Disable deadtime on MCPWM timer
@@ -700,7 +700,7 @@ proc mcpwm_fault_deinit*(mcpwm_num: mcpwm_unit_t; fault_sig: mcpwm_fault_signal_
 proc mcpwm_capture_enable*(mcpwm_num: mcpwm_unit_t;
                           cap_sig: mcpwm_capture_signal_t;
                           cap_edge: mcpwm_capture_on_edge_t;
-                          num_of_pulse: uint32_t): esp_err_t {.
+                          num_of_pulse: uint32): esp_err_t {.
     importc: "mcpwm_capture_enable", header: "mcpwm.h".}
 ## *
 ##  @brief Disable capture signal
@@ -727,7 +727,7 @@ proc mcpwm_capture_disable*(mcpwm_num: mcpwm_unit_t;
 ##
 
 proc mcpwm_capture_signal_get_value*(mcpwm_num: mcpwm_unit_t;
-                                    cap_sig: mcpwm_capture_signal_t): uint32_t {.
+                                    cap_sig: mcpwm_capture_signal_t): uint32 {.
     importc: "mcpwm_capture_signal_get_value", header: "mcpwm.h".}
 ## *
 ##  @brief Get edge of capture signal
@@ -740,7 +740,7 @@ proc mcpwm_capture_signal_get_value*(mcpwm_num: mcpwm_unit_t;
 ##
 
 proc mcpwm_capture_signal_get_edge*(mcpwm_num: mcpwm_unit_t;
-                                   cap_sig: mcpwm_capture_signal_t): uint32_t {.
+                                   cap_sig: mcpwm_capture_signal_t): uint32 {.
     importc: "mcpwm_capture_signal_get_edge", header: "mcpwm.h".}
 ## *
 ##  @brief Initialize sync submodule
@@ -756,7 +756,7 @@ proc mcpwm_capture_signal_get_edge*(mcpwm_num: mcpwm_unit_t;
 ##
 
 proc mcpwm_sync_enable*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t;
-                       sync_sig: mcpwm_sync_signal_t; phase_val: uint32_t): esp_err_t {.
+                       sync_sig: mcpwm_sync_signal_t; phase_val: uint32): esp_err_t {.
     importc: "mcpwm_sync_enable", header: "mcpwm.h".}
 ## *
 ##  @brief Disable sync submodule on given timer

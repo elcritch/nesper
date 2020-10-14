@@ -30,9 +30,9 @@ type
   spi_slave_interface_config_t* {.importc: "spi_slave_interface_config_t",
                                  header: "spi_slave.h", bycopy.} = object
     spics_io_num* {.importc: "spics_io_num".}: cint ## /< CS GPIO pin for this device
-    flags* {.importc: "flags".}: uint32_t ## /< Bitwise OR of SPI_SLAVE_* flags
+    flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_SLAVE_* flags
     queue_size* {.importc: "queue_size".}: cint ## /< Transaction queue size. This sets how many transactions can be 'in the air' (queued using spi_slave_queue_trans but not yet finished using spi_slave_get_trans_result) at the same time
-    mode* {.importc: "mode".}: uint8_t ## /< SPI mode (0-3)
+    mode* {.importc: "mode".}: uint8 ## /< SPI mode (0-3)
     post_setup_cb* {.importc: "post_setup_cb".}: slave_transaction_cb_t ## *< Callback called after the SPI registers are loaded with new data.
                                                                     ##
                                                                     ##   This callback is called within interrupt

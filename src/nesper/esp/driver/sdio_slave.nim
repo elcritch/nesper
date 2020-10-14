@@ -18,7 +18,7 @@ const
   SDIO_SLAVE_RECV_MAX_BUFFER* = (4096 - 4)
 
 type
-  sdio_event_cb_t* = proc (event: uint8_t)
+  sdio_event_cb_t* = proc (event: uint8)
 
 ## / Mask of interrupts sending to the host.
 
@@ -89,7 +89,7 @@ type
                                                            ## /< All data that do not fully fill a buffer is still counted as one buffer. E.g. 10 bytes data costs 2 buffers if the size is 8 bytes per buffer.
                                                            ## /< Buffer size of the slave pre-defined between host and slave before communication. All receive buffer given to the driver should be larger than this.
     event_cb* {.importc: "event_cb".}: sdio_event_cb_t ## /< when the host interrupts slave, this callback will be called with interrupt number (0-7).
-    flags* {.importc: "flags".}: uint32_t ## /< Features to be enabled for the slave, combinations of ``SDIO_SLAVE_FLAG_*``.
+    flags* {.importc: "flags".}: uint32 ## /< Features to be enabled for the slave, combinations of ``SDIO_SLAVE_FLAG_*``.
 
 
 ## * Handle of a receive buffer, register a handle by calling ``sdio_slave_recv_register_buf``. Use the handle to load the buffer to the
@@ -154,7 +154,7 @@ proc sdio_slave_reset*(): esp_err_t {.importc: "sdio_slave_reset",
 ##  @return The buffer handle if success, otherwise NULL.
 ##
 
-proc sdio_slave_recv_register_buf*(start: ptr uint8_t): sdio_slave_buf_handle_t {.
+proc sdio_slave_recv_register_buf*(start: ptr uint8): sdio_slave_buf_handle_t {.
     importc: "sdio_slave_recv_register_buf", header: "sdio_slave.h".}
 ## * Unregister buffer from driver, and free the space used by the descriptor pointing to the buffer.
 ##
@@ -195,7 +195,7 @@ proc sdio_slave_recv_load_buf*(handle: sdio_slave_buf_handle_t): esp_err_t {.
 ##
 
 proc sdio_slave_recv*(handle_ret: ptr sdio_slave_buf_handle_t;
-                     out_addr: ptr ptr uint8_t; out_len: ptr csize_t; wait: TickType_t): esp_err_t {.
+                     out_addr: ptr ptr uint8; out_len: ptr csize_t; wait: TickType_t): esp_err_t {.
     importc: "sdio_slave_recv", header: "sdio_slave.h".}
 ## * Retrieve the buffer corresponding to a handle.
 ##
@@ -205,7 +205,7 @@ proc sdio_slave_recv*(handle_ret: ptr sdio_slave_buf_handle_t;
 ##  @return buffer address if success, otherwise NULL.
 ##
 
-proc sdio_slave_recv_get_buf*(handle: sdio_slave_buf_handle_t; len_o: ptr csize_t): ptr uint8_t {.
+proc sdio_slave_recv_get_buf*(handle: sdio_slave_buf_handle_t; len_o: ptr csize_t): ptr uint8 {.
     importc: "sdio_slave_recv_get_buf", header: "sdio_slave.h".}
 ## ---------------------------------------------------------------------------
 ##                   Send
@@ -225,7 +225,7 @@ proc sdio_slave_recv_get_buf*(handle: sdio_slave_buf_handle_t; len_o: ptr csize_
 ##      - ESP_OK if success.
 ##
 
-proc sdio_slave_send_queue*(`addr`: ptr uint8_t; len: csize_t; arg: pointer;
+proc sdio_slave_send_queue*(`addr`: ptr uint8; len: csize_t; arg: pointer;
                            wait: TickType_t): esp_err_t {.
     importc: "sdio_slave_send_queue", header: "sdio_slave.h".}
 ## * Return the ownership of a finished transaction.
@@ -248,7 +248,7 @@ proc sdio_slave_send_get_finished*(out_arg: ptr pointer; wait: TickType_t): esp_
 ##      - ESP_OK if success.
 ##
 
-proc sdio_slave_transmit*(`addr`: ptr uint8_t; len: csize_t): esp_err_t {.
+proc sdio_slave_transmit*(`addr`: ptr uint8; len: csize_t): esp_err_t {.
     importc: "sdio_slave_transmit", header: "sdio_slave.h".}
 ## ---------------------------------------------------------------------------
 ##                   Host
@@ -262,7 +262,7 @@ proc sdio_slave_transmit*(`addr`: ptr uint8_t; len: csize_t): esp_err_t {.
 ##  @return value of the register.
 ##
 
-proc sdio_slave_read_reg*(pos: cint): uint8_t {.importc: "sdio_slave_read_reg",
+proc sdio_slave_read_reg*(pos: cint): uint8 {.importc: "sdio_slave_read_reg",
     header: "sdio_slave.h".}
 ## * Write the spi slave register shared with host.
 ##
@@ -274,7 +274,7 @@ proc sdio_slave_read_reg*(pos: cint): uint8_t {.importc: "sdio_slave_read_reg",
 ##  @return ESP_ERR_INVALID_ARG if address wrong, otherwise ESP_OK.
 ##
 
-proc sdio_slave_write_reg*(pos: cint; reg: uint8_t): esp_err_t {.
+proc sdio_slave_write_reg*(pos: cint; reg: uint8): esp_err_t {.
     importc: "sdio_slave_write_reg", header: "sdio_slave.h".}
 ## * Get the interrupt enable for host.
 ##
@@ -299,14 +299,14 @@ proc sdio_slave_set_host_intena*(ena: sdio_slave_hostint_t) {.
 ##      - ESP_OK otherwise
 ##
 
-proc sdio_slave_send_host_int*(pos: uint8_t): esp_err_t {.
+proc sdio_slave_send_host_int*(pos: uint8): esp_err_t {.
     importc: "sdio_slave_send_host_int", header: "sdio_slave.h".}
 ## * Clear general purpose interrupt to host.
 ##
 ##  @param mask Interrupt bits to clear, by bit mask.
 ##
 
-proc sdio_slave_clear_host_int*(mask: uint8_t) {.
+proc sdio_slave_clear_host_int*(mask: uint8) {.
     importc: "sdio_slave_clear_host_int", header: "sdio_slave.h".}
 ## * Wait for general purpose interrupt from host.
 ##

@@ -393,7 +393,7 @@ proc i2s_read*(i2s_num: i2s_port_t; dest: pointer; size: csize_t;
 ##      - ESP_ERR_NO_MEM      Out of memory
 ##
 
-proc i2s_set_sample_rates*(i2s_num: i2s_port_t; rate: uint32_t): esp_err_t {.
+proc i2s_set_sample_rates*(i2s_num: i2s_port_t; rate: uint32): esp_err_t {.
     importc: "i2s_set_sample_rates", header: "i2s.h".}
 ## *
 ##  @brief Stop I2S driver
@@ -456,7 +456,7 @@ proc i2s_zero_dma_buffer*(i2s_num: i2s_port_t): esp_err_t {.
 ##      - ESP_ERR_NO_MEM      Out of memory
 ##
 
-proc i2s_set_clk*(i2s_num: i2s_port_t; rate: uint32_t; bits: i2s_bits_per_sample_t;
+proc i2s_set_clk*(i2s_num: i2s_port_t; rate: uint32; bits: i2s_bits_per_sample_t;
                  ch: i2s_channel_t): esp_err_t {.importc: "i2s_set_clk",
     header: "i2s.h".}
 ## *

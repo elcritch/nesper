@@ -130,7 +130,7 @@ proc spicommon_dma_chan_free*(dma_chan: cint): bool {.
 
 proc spicommon_bus_initialize_io*(host: spi_host_device_t;
                                  bus_config: ptr spi_bus_config_t; dma_chan: cint;
-                                 flags: uint32_t; flags_o: ptr uint32_t): esp_err_t {.
+                                 flags: uint32; flags_o: ptr uint32): esp_err_t {.
     importc: "spicommon_bus_initialize_io", header: "spi_common_internal.h".}
 ## *
 ##  @brief Free the IO used by a SPI peripheral

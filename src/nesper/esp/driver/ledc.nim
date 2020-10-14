@@ -109,7 +109,7 @@ type
     channel* {.importc: "channel".}: ledc_channel_t ## !< LEDC channel (0 - 7)
     intr_type* {.importc: "intr_type".}: ledc_intr_type_t ## !< configure interrupt, Fade interrupt enable  or Fade interrupt disable
     timer_sel* {.importc: "timer_sel".}: ledc_timer_t ## !< Select the timer source of channel (0 - 3)
-    duty* {.importc: "duty".}: uint32_t ## !< LEDC channel duty, the range of duty setting is [0, (2**duty_resolution)]
+    duty* {.importc: "duty".}: uint32 ## !< LEDC channel duty, the range of duty setting is [0, (2**duty_resolution)]
     hpoint* {.importc: "hpoint".}: cint ## !< LEDC channel hpoint value, the max value is 0xfffff
 
 
@@ -122,7 +122,7 @@ type
     speed_mode* {.importc: "speed_mode".}: ledc_mode_t ## !< LEDC speed speed_mode, high-speed mode or low-speed mode
     duty_resolution* {.importc: "duty_resolution".}: ledc_timer_bit_t ## !< LEDC channel duty resolution
     timer_num* {.importc: "timer_num".}: ledc_timer_t ## !< The timer source of channel (0 - 3)
-    freq_hz* {.importc: "freq_hz".}: uint32_t ## !< LEDC timer frequency (Hz)
+    freq_hz* {.importc: "freq_hz".}: uint32 ## !< LEDC timer frequency (Hz)
     clk_cfg* {.importc: "clk_cfg".}: ledc_clk_cfg_t ## !< Configure LEDC source clock.
                                                 ##                                                 For low speed channels and high speed channels, you can specify the source clock using LEDC_USE_REF_TICK, LEDC_USE_APB_CLK or LEDC_AUTO_CLK.
                                                 ##                                                 For low speed channels, you can also specify the source clock using LEDC_USE_RTC8M_CLK, in this case, all low speed channel's source clock must be RTC8M_CLK
@@ -203,7 +203,7 @@ proc ledc_set_pin*(gpio_num: cint; speed_mode: ledc_mode_t;
 ##
 
 proc ledc_stop*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
-               idle_level: uint32_t): esp_err_t {.importc: "ledc_stop",
+               idle_level: uint32): esp_err_t {.importc: "ledc_stop",
     header: "ledc.h".}
 ## *
 ##  @brief LEDC set channel frequency (Hz)
@@ -219,7 +219,7 @@ proc ledc_stop*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
 ##
 
 proc ledc_set_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t;
-                   freq_hz: uint32_t): esp_err_t {.importc: "ledc_set_freq",
+                   freq_hz: uint32): esp_err_t {.importc: "ledc_set_freq",
     header: "ledc.h".}
 ## *
 ##  @brief      LEDC get channel frequency (Hz)
@@ -232,7 +232,7 @@ proc ledc_set_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t;
 ##      - Others Current LEDC frequency
 ##
 
-proc ledc_get_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t): uint32_t {.
+proc ledc_get_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t): uint32 {.
     importc: "ledc_get_freq", header: "ledc.h".}
 ## *
 ##  @brief LEDC set duty and hpoint value
@@ -253,7 +253,7 @@ proc ledc_get_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t): uint32_t 
 ##
 
 proc ledc_set_duty_with_hpoint*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
-                               duty: uint32_t; hpoint: uint32_t): esp_err_t {.
+                               duty: uint32; hpoint: uint32): esp_err_t {.
     importc: "ledc_set_duty_with_hpoint", header: "ledc.h".}
 ## *
 ##  @brief LEDC get hpoint value, the counter value when the output is set high level.
@@ -285,7 +285,7 @@ proc ledc_get_hpoint*(speed_mode: ledc_mode_t; channel: ledc_channel_t): cint {.
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc ledc_set_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint32_t): esp_err_t {.
+proc ledc_set_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint32): esp_err_t {.
     importc: "ledc_set_duty", header: "ledc.h".}
 ## *
 ##  @brief LEDC get duty
@@ -298,7 +298,7 @@ proc ledc_set_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint
 ##      - Others Current LEDC duty
 ##
 
-proc ledc_get_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t): uint32_t {.
+proc ledc_get_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t): uint32 {.
     importc: "ledc_get_duty", header: "ledc.h".}
 ## *
 ##  @brief LEDC set gradient
@@ -318,9 +318,9 @@ proc ledc_get_duty*(speed_mode: ledc_mode_t; channel: ledc_channel_t): uint32_t 
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc ledc_set_fade*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint32_t;
-                   fade_direction: ledc_duty_direction_t; step_num: uint32_t;
-                   duty_cyle_num: uint32_t; duty_scale: uint32_t): esp_err_t {.
+proc ledc_set_fade*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint32;
+                   fade_direction: ledc_duty_direction_t; step_num: uint32;
+                   duty_cyle_num: uint32; duty_scale: uint32): esp_err_t {.
     importc: "ledc_set_fade", header: "ledc.h".}
 ## *
 ##  @brief Register LEDC interrupt handler, the handler is an ISR.
@@ -357,7 +357,7 @@ proc ledc_isr_register*(fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: 
 ##
 
 proc ledc_timer_set*(speed_mode: ledc_mode_t; timer_sel: ledc_timer_t;
-                    clock_divider: uint32_t; duty_resolution: uint32_t;
+                    clock_divider: uint32; duty_resolution: uint32;
                     clk_src: ledc_clk_src_t): esp_err_t {.
     importc: "ledc_timer_set", header: "ledc.h".}
 ## *
@@ -371,7 +371,7 @@ proc ledc_timer_set*(speed_mode: ledc_mode_t; timer_sel: ledc_timer_t;
 ##      - ESP_OK Success
 ##
 
-proc ledc_timer_rst*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t {.
+proc ledc_timer_rst*(speed_mode: ledc_mode_t; timer_sel: uint32): esp_err_t {.
     importc: "ledc_timer_rst", header: "ledc.h".}
 ## *
 ##  @brief Pause LEDC timer counter
@@ -385,7 +385,7 @@ proc ledc_timer_rst*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t {.
 ##
 ##
 
-proc ledc_timer_pause*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t {.
+proc ledc_timer_pause*(speed_mode: ledc_mode_t; timer_sel: uint32): esp_err_t {.
     importc: "ledc_timer_pause", header: "ledc.h".}
 ## *
 ##  @brief Resume LEDC timer
@@ -398,7 +398,7 @@ proc ledc_timer_pause*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t 
 ##      - ESP_OK Success
 ##
 
-proc ledc_timer_resume*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t {.
+proc ledc_timer_resume*(speed_mode: ledc_mode_t; timer_sel: uint32): esp_err_t {.
     importc: "ledc_timer_resume", header: "ledc.h".}
 ## *
 ##  @brief Bind LEDC channel with the selected timer
@@ -412,8 +412,8 @@ proc ledc_timer_resume*(speed_mode: ledc_mode_t; timer_sel: uint32_t): esp_err_t
 ##      - ESP_OK Success
 ##
 
-proc ledc_bind_channel_timer*(speed_mode: ledc_mode_t; channel: uint32_t;
-                             timer_idx: uint32_t): esp_err_t {.
+proc ledc_bind_channel_timer*(speed_mode: ledc_mode_t; channel: uint32;
+                             timer_idx: uint32): esp_err_t {.
     importc: "ledc_bind_channel_timer", header: "ledc.h".}
 ## *
 ##  @brief Set LEDC fade function.
@@ -438,8 +438,8 @@ proc ledc_bind_channel_timer*(speed_mode: ledc_mode_t; channel: uint32_t;
 ##
 
 proc ledc_set_fade_with_step*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
-                             target_duty: uint32_t; scale: uint32_t;
-                             cycle_num: uint32_t): esp_err_t {.
+                             target_duty: uint32; scale: uint32;
+                             cycle_num: uint32): esp_err_t {.
     importc: "ledc_set_fade_with_step", header: "ledc.h".}
 ## *
 ##  @brief Set LEDC fade function, with a limited time.
@@ -463,7 +463,7 @@ proc ledc_set_fade_with_step*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
 ##
 
 proc ledc_set_fade_with_time*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
-                             target_duty: uint32_t; max_fade_time_ms: cint): esp_err_t {.
+                             target_duty: uint32; max_fade_time_ms: cint): esp_err_t {.
     importc: "ledc_set_fade_with_time", header: "ledc.h".}
 ## *
 ##  @brief Install LEDC fade function. This function will occupy interrupt of LEDC module.
@@ -516,7 +516,7 @@ proc ledc_fade_start*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
 ##
 
 proc ledc_set_duty_and_update*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
-                              duty: uint32_t; hpoint: uint32_t): esp_err_t {.
+                              duty: uint32; hpoint: uint32): esp_err_t {.
     importc: "ledc_set_duty_and_update", header: "ledc.h".}
 ## *
 ##  @brief A thread-safe API to set and start LEDC fade function, with a limited time.
@@ -536,8 +536,8 @@ proc ledc_set_duty_and_update*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
 ##
 
 proc ledc_set_fade_time_and_start*(speed_mode: ledc_mode_t;
-                                  channel: ledc_channel_t; target_duty: uint32_t;
-                                  max_fade_time_ms: uint32_t;
+                                  channel: ledc_channel_t; target_duty: uint32;
+                                  max_fade_time_ms: uint32;
                                   fade_mode: ledc_fade_mode_t): esp_err_t {.
     importc: "ledc_set_fade_time_and_start", header: "ledc.h".}
 ## *
@@ -559,7 +559,7 @@ proc ledc_set_fade_time_and_start*(speed_mode: ledc_mode_t;
 ##
 
 proc ledc_set_fade_step_and_start*(speed_mode: ledc_mode_t;
-                                  channel: ledc_channel_t; target_duty: uint32_t;
-                                  scale: uint32_t; cycle_num: uint32_t;
+                                  channel: ledc_channel_t; target_duty: uint32;
+                                  scale: uint32; cycle_num: uint32;
                                   fade_mode: ledc_fade_mode_t): esp_err_t {.
     importc: "ledc_set_fade_step_and_start", header: "ledc.h".}

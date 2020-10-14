@@ -247,7 +247,7 @@ proc adc_set_data_inv*(adc_unit: adc_unit_t; inv_en: bool): esp_err_t {.
 ##      - ESP_OK success
 ##
 
-proc adc_set_clk_div*(clk_div: uint8_t): esp_err_t {.importc: "adc_set_clk_div",
+proc adc_set_clk_div*(clk_div: uint8): esp_err_t {.importc: "adc_set_clk_div",
     header: "adc.h".}
 ## *
 ##  @brief Set I2S data source

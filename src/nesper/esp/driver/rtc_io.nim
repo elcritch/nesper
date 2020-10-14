@@ -72,7 +72,7 @@ proc rtc_gpio_deinit*(gpio_num: gpio_num_t): esp_err_t {.importc: "rtc_gpio_dein
 ##      - ESP_ERR_INVALID_ARG GPIO is not an RTC IO
 ##
 
-proc rtc_gpio_get_level*(gpio_num: gpio_num_t): uint32_t {.
+proc rtc_gpio_get_level*(gpio_num: gpio_num_t): uint32 {.
     importc: "rtc_gpio_get_level", header: "rtc_io.h".}
 ## *
 ##  @brief Set the RTC IO output level
@@ -85,7 +85,7 @@ proc rtc_gpio_get_level*(gpio_num: gpio_num_t): uint32_t {.
 ##      - ESP_ERR_INVALID_ARG GPIO is not an RTC IO
 ##
 
-proc rtc_gpio_set_level*(gpio_num: gpio_num_t; level: uint32_t): esp_err_t {.
+proc rtc_gpio_set_level*(gpio_num: gpio_num_t; level: uint32): esp_err_t {.
     importc: "rtc_gpio_set_level", header: "rtc_io.h".}
 ## *
 ##  @brief    RTC GPIO set direction

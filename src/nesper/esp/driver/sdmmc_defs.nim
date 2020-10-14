@@ -539,27 +539,27 @@ template SCR_RESERVED2*(scr: untyped): untyped =
 ##  Max supply current in SWITCH_FUNC response (in mA)
 
 template SD_SFUNC_I_MAX*(status: untyped): untyped =
-  (MMC_RSP_BITS(cast[ptr uint32_t]((status)), 496, 16))
+  (MMC_RSP_BITS(cast[ptr uint32]((status)), 496, 16))
 
 ##  Supported flags in SWITCH_FUNC response
 
 template SD_SFUNC_SUPPORTED*(status, group: untyped): untyped =
-  (MMC_RSP_BITS(cast[ptr uint32_t]((status)), 400 + (group - 1) * 16, 16))
+  (MMC_RSP_BITS(cast[ptr uint32]((status)), 400 + (group - 1) * 16, 16))
 
 ##  Selected function in SWITCH_FUNC response
 
 template SD_SFUNC_SELECTED*(status, group: untyped): untyped =
-  (MMC_RSP_BITS(cast[ptr uint32_t]((status)), 376 + (group - 1) * 4, 4))
+  (MMC_RSP_BITS(cast[ptr uint32]((status)), 376 + (group - 1) * 4, 4))
 
 ##  Busy flags in SWITCH_FUNC response
 
 template SD_SFUNC_BUSY*(status, group: untyped): untyped =
-  (MMC_RSP_BITS(cast[ptr uint32_t]((status)), 272 + (group - 1) * 16, 16))
+  (MMC_RSP_BITS(cast[ptr uint32]((status)), 272 + (group - 1) * 16, 16))
 
 ##  Version of SWITCH_FUNC response
 
 template SD_SFUNC_VER*(status: untyped): untyped =
-  (MMC_RSP_BITS(cast[ptr uint32_t]((status)), 368, 8))
+  (MMC_RSP_BITS(cast[ptr uint32]((status)), 368, 8))
 
 const
   SD_SFUNC_GROUP_MAX* = 6
@@ -597,12 +597,12 @@ const
 ##  @return 32-bit word where requested bits start from LSB
 ##
 
-proc MMC_RSP_BITS*(src: ptr uint32_t; start: cint; len: cint): uint32_t {.inline.} =
-  var mask: uint32_t
+proc MMC_RSP_BITS*(src: ptr uint32; start: cint; len: cint): uint32 {.inline.} =
+  var mask: uint32
   var word: csize_t
   var shift: csize_t
-  var right: uint32_t
-  var left: uint32_t
+  var right: uint32
+  var left: uint32
   return (left or right) and mask
 
 ##  SD R4 response (IO OCR)

@@ -84,8 +84,8 @@ type
 type
   rmt_tx_config_t* {.importc: "rmt_tx_config_t", header: "rmt.h", bycopy.} = object
     loop_en* {.importc: "loop_en".}: bool ## !< Enable sending RMT items in a loop
-    carrier_freq_hz* {.importc: "carrier_freq_hz".}: uint32_t ## !< RMT carrier frequency
-    carrier_duty_percent* {.importc: "carrier_duty_percent".}: uint8_t ## !< RMT carrier duty (%)
+    carrier_freq_hz* {.importc: "carrier_freq_hz".}: uint32 ## !< RMT carrier frequency
+    carrier_duty_percent* {.importc: "carrier_duty_percent".}: uint8 ## !< RMT carrier duty (%)
     carrier_level* {.importc: "carrier_level".}: rmt_carrier_level_t ## !< Level of the RMT output, when the carrier is applied
     carrier_en* {.importc: "carrier_en".}: bool ## !< RMT carrier enable
     idle_level* {.importc: "idle_level".}: rmt_idle_level_t ## !< RMT idle level
@@ -99,8 +99,8 @@ type
 type
   rmt_rx_config_t* {.importc: "rmt_rx_config_t", header: "rmt.h", bycopy.} = object
     filter_en* {.importc: "filter_en".}: bool ## !< RMT receiver filter enable
-    filter_ticks_thresh* {.importc: "filter_ticks_thresh".}: uint8_t ## !< RMT filter tick number
-    idle_threshold* {.importc: "idle_threshold".}: uint16_t ## !< RMT RX idle threshold
+    filter_ticks_thresh* {.importc: "filter_ticks_thresh".}: uint8 ## !< RMT filter tick number
+    idle_threshold* {.importc: "idle_threshold".}: uint16 ## !< RMT RX idle threshold
 
 
 ## *
@@ -116,9 +116,9 @@ type
   rmt_config_t* {.importc: "rmt_config_t", header: "rmt.h", bycopy.} = object
     rmt_mode* {.importc: "rmt_mode".}: rmt_mode_t ## !< RMT mode: transmitter or receiver
     channel* {.importc: "channel".}: rmt_channel_t ## !< RMT channel
-    clk_div* {.importc: "clk_div".}: uint8_t ## !< RMT channel counter divider
+    clk_div* {.importc: "clk_div".}: uint8 ## !< RMT channel counter divider
     gpio_num* {.importc: "gpio_num".}: gpio_num_t ## !< RMT GPIO number
-    mem_block_num* {.importc: "mem_block_num".}: uint8_t ## !< RMT memory block number
+    mem_block_num* {.importc: "mem_block_num".}: uint8 ## !< RMT memory block number
     ano_rmt_128* {.importc: "ano_rmt_128".}: INNER_C_UNION_rmt_126
 
   rmt_isr_handle_t* = intr_handle_t
@@ -135,7 +135,7 @@ type
 
 
 ## *
-##  @brief User callback function to convert uint8_t type data to rmt format(rmt_item32_t).
+##  @brief User callback function to convert uint8 type data to rmt format(rmt_item32_t).
 ##
 ##         This function may be called from an ISR, so, the code should be short and efficient.
 ##
@@ -150,7 +150,7 @@ type
 ##
 ##        @note
 ##        In fact, item_num should be a multiple of translated_size, e.g. :
-##        When we convert each byte of uint8_t type data to rmt format data,
+##        When we convert each byte of uint8 type data to rmt format data,
 ##        the relation between item_num and translated_size should be `item_num = translated_size*8`.
 ##
 
@@ -170,7 +170,7 @@ type
 ##      - ESP_OK Success
 ##
 
-proc rmt_set_clk_div*(channel: rmt_channel_t; div_cnt: uint8_t): esp_err_t {.
+proc rmt_set_clk_div*(channel: rmt_channel_t; div_cnt: uint8): esp_err_t {.
     importc: "rmt_set_clk_div", header: "rmt.h".}
 ## *
 ##  @brief Get RMT clock divider, channel clock is divided from source clock.
@@ -183,7 +183,7 @@ proc rmt_set_clk_div*(channel: rmt_channel_t; div_cnt: uint8_t): esp_err_t {.
 ##      - ESP_OK Success
 ##
 
-proc rmt_get_clk_div*(channel: rmt_channel_t; div_cnt: ptr uint8_t): esp_err_t {.
+proc rmt_get_clk_div*(channel: rmt_channel_t; div_cnt: ptr uint8): esp_err_t {.
     importc: "rmt_get_clk_div", header: "rmt.h".}
 ## *
 ##  @brief Set RMT RX idle threshold value
@@ -200,7 +200,7 @@ proc rmt_get_clk_div*(channel: rmt_channel_t; div_cnt: ptr uint8_t): esp_err_t {
 ##      - ESP_OK Success
 ##
 
-proc rmt_set_rx_idle_thresh*(channel: rmt_channel_t; thresh: uint16_t): esp_err_t {.
+proc rmt_set_rx_idle_thresh*(channel: rmt_channel_t; thresh: uint16): esp_err_t {.
     importc: "rmt_set_rx_idle_thresh", header: "rmt.h".}
 ## *
 ##  @brief Get RMT idle threshold value.
@@ -217,7 +217,7 @@ proc rmt_set_rx_idle_thresh*(channel: rmt_channel_t; thresh: uint16_t): esp_err_
 ##      - ESP_OK Success
 ##
 
-proc rmt_get_rx_idle_thresh*(channel: rmt_channel_t; thresh: ptr uint16_t): esp_err_t {.
+proc rmt_get_rx_idle_thresh*(channel: rmt_channel_t; thresh: ptr uint16): esp_err_t {.
     importc: "rmt_get_rx_idle_thresh", header: "rmt.h".}
 ## *
 ##  @brief Set RMT memory block number for RMT channel
@@ -245,7 +245,7 @@ proc rmt_get_rx_idle_thresh*(channel: rmt_channel_t; thresh: ptr uint16_t): esp_
 ##      - ESP_OK Success
 ##
 
-proc rmt_set_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: uint8_t): esp_err_t {.
+proc rmt_set_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: uint8): esp_err_t {.
     importc: "rmt_set_mem_block_num", header: "rmt.h".}
 ## *
 ##  @brief Get RMT memory block number
@@ -258,7 +258,7 @@ proc rmt_set_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: uint8_t): esp_e
 ##      - ESP_OK Success
 ##
 
-proc rmt_get_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: ptr uint8_t): esp_err_t {.
+proc rmt_get_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: ptr uint8): esp_err_t {.
     importc: "rmt_get_mem_block_num", header: "rmt.h".}
 ## *
 ##  @brief Configure RMT carrier for TX signal.
@@ -280,7 +280,7 @@ proc rmt_get_mem_block_num*(channel: rmt_channel_t; rmt_mem_num: ptr uint8_t): e
 ##
 
 proc rmt_set_tx_carrier*(channel: rmt_channel_t; carrier_en: bool;
-                        high_level: uint16_t; low_level: uint16_t;
+                        high_level: uint16; low_level: uint16;
                         carrier_level: rmt_carrier_level_t): esp_err_t {.
     importc: "rmt_set_tx_carrier", header: "rmt.h".}
 ## *
@@ -444,7 +444,7 @@ proc rmt_get_tx_loop_mode*(channel: rmt_channel_t; loop_en: ptr bool): esp_err_t
 ##      - ESP_OK Success
 ##
 
-proc rmt_set_rx_filter*(channel: rmt_channel_t; rx_filter_en: bool; thresh: uint8_t): esp_err_t {.
+proc rmt_set_rx_filter*(channel: rmt_channel_t; rx_filter_en: bool; thresh: uint8): esp_err_t {.
     importc: "rmt_set_rx_filter", header: "rmt.h".}
 ## *
 ##  @brief Set RMT source clock
@@ -522,7 +522,7 @@ proc rmt_get_idle_level*(channel: rmt_channel_t; idle_out_en: ptr bool;
 ##      - ESP_OK Success
 ##
 
-proc rmt_get_status*(channel: rmt_channel_t; status: ptr uint32_t): esp_err_t {.
+proc rmt_get_status*(channel: rmt_channel_t; status: ptr uint32): esp_err_t {.
     importc: "rmt_get_status", header: "rmt.h".}
 ## *
 ##  @brief Set mask value to RMT interrupt enable register.
@@ -531,7 +531,7 @@ proc rmt_get_status*(channel: rmt_channel_t; status: ptr uint32_t): esp_err_t {.
 ##
 ##
 
-proc rmt_set_intr_enable_mask*(mask: uint32_t) {.
+proc rmt_set_intr_enable_mask*(mask: uint32) {.
     importc: "rmt_set_intr_enable_mask", header: "rmt.h".}
 ## *
 ##  @brief Clear mask value to RMT interrupt enable register.
@@ -540,7 +540,7 @@ proc rmt_set_intr_enable_mask*(mask: uint32_t) {.
 ##
 ##
 
-proc rmt_clr_intr_enable_mask*(mask: uint32_t) {.
+proc rmt_clr_intr_enable_mask*(mask: uint32) {.
     importc: "rmt_clr_intr_enable_mask", header: "rmt.h".}
 ## *
 ##  @brief Set RMT RX interrupt enable
@@ -595,7 +595,7 @@ proc rmt_set_tx_intr_en*(channel: rmt_channel_t; en: bool): esp_err_t {.
 ##      - ESP_OK Success
 ##
 
-proc rmt_set_tx_thr_intr_en*(channel: rmt_channel_t; en: bool; evt_thresh: uint16_t): esp_err_t {.
+proc rmt_set_tx_thr_intr_en*(channel: rmt_channel_t; en: bool; evt_thresh: uint16): esp_err_t {.
     importc: "rmt_set_tx_thr_intr_en", header: "rmt.h".}
 ## *
 ##  @brief Set RMT pin
@@ -672,7 +672,7 @@ proc rmt_isr_deregister*(handle: rmt_isr_handle_t): esp_err_t {.
 ##
 
 proc rmt_fill_tx_items*(channel: rmt_channel_t; item: ptr rmt_item32_t;
-                       item_num: uint16_t; mem_offset: uint16_t): esp_err_t {.
+                       item_num: uint16; mem_offset: uint16): esp_err_t {.
     importc: "rmt_fill_tx_items", header: "rmt.h".}
 ## *
 ##  @brief Initialize RMT driver
@@ -795,7 +795,7 @@ proc rmt_get_ringbuf_handle*(channel: rmt_channel_t;
 proc rmt_translator_init*(channel: rmt_channel_t; fn: sample_to_rmt_t): esp_err_t {.
     importc: "rmt_translator_init", header: "rmt.h".}
 ## *
-##  @brief Translate uint8_t type of data into rmt format and send it out.
+##  @brief Translate uint8 type of data into rmt format and send it out.
 ##         Requires rmt_translator_init to init the translator first.
 ##
 ##  @param channel RMT channel (0 - 7).
@@ -808,7 +808,7 @@ proc rmt_translator_init*(channel: rmt_channel_t; fn: sample_to_rmt_t): esp_err_
 ##      - ESP_OK Send success
 ##
 
-proc rmt_write_sample*(channel: rmt_channel_t; src: ptr uint8_t; src_size: csize_t;
+proc rmt_write_sample*(channel: rmt_channel_t; src: ptr uint8; src_size: csize_t;
                       wait_tx_done: bool): esp_err_t {.importc: "rmt_write_sample",
     header: "rmt.h".}
 ## *
@@ -841,7 +841,7 @@ proc rmt_register_tx_end_callback*(function: rmt_tx_end_fn_t; arg: pointer): rmt
 ##  void IRAM_ATTR rmt_isr_handler(void* arg)
 ##  {
 ##     //read RMT interrupt status.
-##     uint32_t intr_st = RMT.int_st.val;
+##     uint32 intr_st = RMT.int_st.val;
 ##
 ##     //you will find which channels have triggered an interrupt here,
 ##     //then, you can post some event to RTOS queue to process the event.
