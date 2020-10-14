@@ -12,9 +12,9 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import ../consts
+import ../../consts
 import uart_reg
-import queue
+import ../queue
 
 const
   UART_FIFO_LEN* = (128)        ## !< Length of the hardware FIFO buffers

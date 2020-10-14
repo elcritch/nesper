@@ -1,1 +1,1 @@
-import nesper/esp/driver/tuart_reg
+import nesper/esp/driver/uart_reg

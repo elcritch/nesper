@@ -11,6 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
+import ../../consts
+
 template REG_UART_BASE*(i: untyped): untyped =
   (DR_REG_UART_BASE + (i) * 0x00010000 + (if (i) > 1: 0x0000E000 else: 0))
 
