@@ -214,7 +214,7 @@ type
     GPIO_DRIVE_CAP_2 = 2,       ## !< Pad drive capability: default value
     GPIO_DRIVE_CAP_3 = 3,       ## !< Pad drive capability: strongest
     GPIO_DRIVE_CAP_MAX
-  gpio_isr_t* = proc (a1: pointer)
+  gpio_isr_t* = proc (a1: pointer) {.cdecl.}
   gpio_isr_handle_t* = intr_handle_t
 
 

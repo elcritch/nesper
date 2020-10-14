@@ -65,7 +65,7 @@ type
   ##  @return
   ##        - ESP_OK: read PHY register successfully
   ##        - ESP_FAIL: read PHY register failed because some error occurred
-  phy_reg_read_cv* = proc (eth: ptr esp_eth_mediator_t; phy_addr: uint32; phy_reg: uint32; reg_value: ptr uint32): esp_err_t {.cdecl.} 
+  phy_reg_read_cv* = proc (eth: ptr esp_eth_mediator_t; phy_addr: uint32; phy_reg: uint32; reg_value: ptr uint32): esp_err_t {.cdecl.}
 
   ##  @brief Write PHY register
   ##  @param[in] eth: mediator of Ethernet driver
@@ -75,7 +75,7 @@ type
   ##  @return
   ##        - ESP_OK: write PHY register successfully
   ##        - ESP_FAIL: write PHY register failed because some error occurred
-  phy_reg_write_cb* = proc (eth: ptr esp_eth_mediator_t; phy_addr: uint32; phy_reg: uint32; reg_value: uint32): esp_err_t {.cdecl.} 
+  phy_reg_write_cb* = proc (eth: ptr esp_eth_mediator_t; phy_addr: uint32; phy_reg: uint32; reg_value: uint32): esp_err_t {.cdecl.}
 
   ##  @brief Deliver packet to upper stack
   ##  @param[in] eth: mediator of Ethernet driver
@@ -84,7 +84,7 @@ type
   ##  @return
   ##        - ESP_OK: deliver packet to upper stack successfully
   ##        - ESP_FAIL: deliver packet failed because some error occurred
-  stack_input_cb* = proc (eth: ptr esp_eth_mediator_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.} 
+  stack_input_cb* = proc (eth: ptr esp_eth_mediator_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.}
 
   on_state_changed_cb* = proc (eth: ptr esp_eth_mediator_t; state: esp_eth_state_t; args: pointer): esp_err_t {.cdecl.}
 

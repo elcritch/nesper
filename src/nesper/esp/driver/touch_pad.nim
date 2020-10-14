@@ -199,7 +199,7 @@ proc touch_pad_read_raw_data*(touch_num: touch_pad_t; touch_value: ptr uint16): 
 ##
 
 type
-  filter_cb_t* = proc (raw_value: ptr uint16; filtered_value: ptr uint16)
+  filter_cb_t* = proc (raw_value: ptr uint16; filtered_value: ptr uint16) {.cdecl.}
 
 ## *
 ##  @brief Register the callback function that is called after each IIR filter calculation.

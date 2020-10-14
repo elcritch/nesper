@@ -102,14 +102,13 @@ type
   ##   @return
   ##        - ESP_OK: get Ethernet PHY address successfully
   ##        - ESP_ERR_INVALID_ARG: get Ethernet PHY address failed because of invalid argument
-  get_addr_cb_t* = proc (phy: ptr esp_eth_phy_t;
-      `addr`: ptr uint32): esp_err_t {.cdecl.}
+  get_addr_cb_t* = proc (phy: ptr esp_eth_phy_t; `addr`: ptr uint32): esp_err_t {.cdecl.}
   ##   @brief Free memory of Ethernet PHY instance
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: free PHY instance successfully
   ##        - ESP_FAIL: free PHY instance failed because some error occurred
-  del_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t
+  del_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
 
   ##  @brief Ethernet PHY
   esp_eth_phy_t* {.importc: "esp_eth_phy_s", header: "esp_eth_phy.h", bycopy.} = object

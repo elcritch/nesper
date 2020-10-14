@@ -43,7 +43,7 @@ type
   ##  @return
   ##       - ESP_OK: set mediator for Ethernet MAC successfully
   ##       - ESP_ERR_INVALID_ARG: set mediator for Ethernet MAC failed because of invalid argument
-  set_mediator_cb_t* = proc (mac: ptr esp_eth_mac_t; eth: ptr esp_eth_mediator_t): esp_err_t {.cdecl.} 
+  set_mediator_cb_t* = proc (mac: ptr esp_eth_mac_t; eth: ptr esp_eth_mediator_t): esp_err_t {.cdecl.}
 
   ##  @brief Initialize Ethernet MAC
   ##  @param[in] mac: Ethernet MAC instance
@@ -51,14 +51,14 @@ type
   ##       - ESP_OK: initialize Ethernet MAC successfully
   ##       - ESP_ERR_TIMEOUT: initialize Ethernet MAC failed because of timeout
   ##       - ESP_FAIL: initialize Ethernet MAC failed because some other error occurred
-  init_cb_t* = proc (mac: ptr esp_eth_mac_t): esp_err_t {.cdecl.} 
+  init_cb_t* = proc (mac: ptr esp_eth_mac_t): esp_err_t {.cdecl.}
 
   ##   @brief Deinitialize Ethernet MAC
   ##   @param[in] mac: Ethernet MAC instance
   ##   @return
   ##        - ESP_OK: deinitialize Ethernet MAC successfully
   ##        - ESP_FAIL: deinitialize Ethernet MAC failed because some error occurred
-  deinit_cb_t* = proc (mac: ptr esp_eth_mac_t): esp_err_t {.cdecl.} ## *
+  deinit_cb_t* = proc (mac: ptr esp_eth_mac_t): esp_err_t {.cdecl.}
 
   ##   @brief Transmit packet from Ethernet MAC
   ##   @param[in] mac: Ethernet MAC instance
@@ -69,7 +69,7 @@ type
   ##        - ESP_ERR_INVALID_ARG: transmit packet failed because of invalid argument
   ##        - ESP_ERR_INVALID_STATE: transmit packet failed because of wrong state of MAC
   ##        - ESP_FAIL: transmit packet failed because some other error occurred
-  transmit_cb_t* = proc (mac: ptr esp_eth_mac_t; buf: ptr uint8; length: uint32): esp_err_t {.cdecl.} ## *
+  transmit_cb_t* = proc (mac: ptr esp_eth_mac_t; buf: ptr uint8; length: uint32): esp_err_t {.cdecl.}
 
   ##   @brief Receive packet from Ethernet MAC
   ##   @param[in] mac: Ethernet MAC instance
@@ -80,7 +80,7 @@ type
   ##        - ESP_OK: receive packet successfully
   ##        - ESP_ERR_INVALID_ARG: receive packet failed because of invalid argument
   ##        - ESP_FAIL: receive packet failed because some other error occurred
-  receive_cb_t* = proc (mac: ptr esp_eth_mac_t; buf: ptr uint8; length: ptr uint32): esp_err_t {.cdecl.} ## *
+  receive_cb_t* = proc (mac: ptr esp_eth_mac_t; buf: ptr uint8; length: ptr uint32): esp_err_t {.cdecl.}
 
   ##   @brief Read PHY register
   ##   @param[in] mac: Ethernet MAC instance
@@ -93,8 +93,7 @@ type
   ##        - ESP_ERR_INVALID_STATE: read PHY register failed because of wrong state of MAC
   ##        - ESP_ERR_TIMEOUT: read PHY register failed because of timeout
   ##        - ESP_FAIL: read PHY register failed because some other error occurred
-  read_phy_reg_cb_t* = proc (mac: ptr esp_eth_mac_t;
-      phy_addr: uint32; phy_reg: uint32; reg_value: ptr uint32): esp_err_t {.cdecl.} ## *
+  read_phy_reg_cb_t* = proc (mac: ptr esp_eth_mac_t; phy_addr: uint32; phy_reg: uint32; reg_value: ptr uint32): esp_err_t {.cdecl.}
 
   ##   @brief Write PHY register
   ##   @param[in] mac: Ethernet MAC instance
@@ -106,8 +105,7 @@ type
   ##        - ESP_ERR_INVALID_STATE: write PHY register failed because of wrong state of MAC
   ##        - ESP_ERR_TIMEOUT: write PHY register failed because of timeout
   ##        - ESP_FAIL: write PHY register failed because some other error occurred
-  write_phy_reg_cb_t* = proc (mac: ptr esp_eth_mac_t;
-      phy_addr: uint32; phy_reg: uint32; reg_value: uint32): esp_err_t {.cdecl.} ## *
+  write_phy_reg_cb_t* = proc (mac: ptr esp_eth_mac_t; phy_addr: uint32; phy_reg: uint32; reg_value: uint32): esp_err_t {.cdecl.}
 
   ##   @brief Set MAC address
   ##   @param[in] mac: Ethernet MAC instance
@@ -126,8 +124,7 @@ type
   ##        - ESP_OK: get MAC address successfully
   ##        - ESP_ERR_INVALID_ARG: get MAC address failed because of invalid argument
   ##        - ESP_FAIL: get MAC address failed because some other error occurred
-  get_addr_cb_t* = proc (mac: ptr esp_eth_mac_t;
-      `addr`: ptr uint8): esp_err_t {.cdecl.} ## *
+  get_addr_cb_t* = proc (mac: ptr esp_eth_mac_t; `addr`: ptr uint8): esp_err_t {.cdecl.}
 
   ##   @brief Set speed of MAC
   ##   @param[in] ma:c Ethernet MAC instance
@@ -136,8 +133,7 @@ type
   ##        - ESP_OK: set MAC speed successfully
   ##        - ESP_ERR_INVALID_ARG: set MAC speed failed because of invalid argument
   ##        - ESP_FAIL: set MAC speed failed because some other error occurred
-  set_speed_cb_t* = proc (mac: ptr esp_eth_mac_t;
-      speed: eth_speed_t): esp_err_t {.cdecl.} ## *
+  set_speed_cb_t* = proc (mac: ptr esp_eth_mac_t; speed: eth_speed_t): esp_err_t {.cdecl.}
 
   ##   @brief Set duplex mode of MAC
   ##   @param[in] mac: Ethernet MAC instance
@@ -146,8 +142,7 @@ type
   ##        - ESP_OK: set MAC duplex mode successfully
   ##        - ESP_ERR_INVALID_ARG: set MAC duplex failed because of invalid argument
   ##        - ESP_FAIL: set MAC duplex failed because some other error occurred
-  set_duplex_cb_t* = proc (mac: ptr esp_eth_mac_t;
-      duplex: eth_duplex_t): esp_err_t {.cdecl.} ## *
+  set_duplex_cb_t* = proc (mac: ptr esp_eth_mac_t; duplex: eth_duplex_t): esp_err_t {.cdecl.}
 
   ##   @brief Set link status of MAC
   ##   @param[in] mac: Ethernet MAC instance
@@ -156,7 +151,7 @@ type
   ##        - ESP_OK: set link status successfully
   ##        - ESP_ERR_INVALID_ARG: set link status failed because of invalid argument
   ##        - ESP_FAIL: set link status failed because some other error occurred
-  set_link_cb_t* = proc (mac: ptr esp_eth_mac_t; link: eth_link_t): esp_err_t {.cdecl.} ## *
+  set_link_cb_t* = proc (mac: ptr esp_eth_mac_t; link: eth_link_t): esp_err_t {.cdecl.}
 
   ##   @brief Set promiscuous of MAC
   ##   @param[in] mac: Ethernet MAC instance

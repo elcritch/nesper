@@ -123,7 +123,7 @@ type
     ano_rmt_128* {.importc: "ano_rmt_128".}: INNER_C_UNION_rmt_126
 
   rmt_isr_handle_t* = intr_handle_t
-  rmt_tx_end_fn_t* = proc (channel: rmt_channel_t; arg: pointer)
+  rmt_tx_end_fn_t* = proc (channel: rmt_channel_t; arg: pointer) {.cdecl.}
 
 ## *
 ##  @brief Structure encapsulating a RMT TX end callback
@@ -158,7 +158,7 @@ type
 type
   sample_to_rmt_t* = proc (src: pointer; dest: ptr rmt_item32_t; src_size: csize_t;
                         wanted_num: csize_t; translated_size: ptr csize_t;
-                        item_num: ptr csize_t)
+                        item_num: ptr csize_t) {.cdecl.}
 
 ## *
 ##  @brief Set RMT clock divider, channel clock is divided from source clock.

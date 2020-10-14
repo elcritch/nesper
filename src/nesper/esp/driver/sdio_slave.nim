@@ -18,7 +18,7 @@ const
   SDIO_SLAVE_RECV_MAX_BUFFER* = (4096 - 4)
 
 type
-  sdio_event_cb_t* = proc (event: uint8)
+  sdio_event_cb_t* = proc (event: uint8) {.cdecl.}
 
 ## / Mask of interrupts sending to the host.
 
