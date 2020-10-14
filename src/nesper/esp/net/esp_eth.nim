@@ -14,6 +14,14 @@
 
 import ../../consts
 import ../../general
+import esp_eth_com
+import esp_eth_mac
+import esp_eth_phy
+
+export esp_eth_com
+export esp_eth_mac
+export esp_eth_phy
+
 # import ../esp_event_legacy
 
 ## *
@@ -43,7 +51,7 @@ type
                                           ##  @brief Period time of checking Ethernet link status
                                           ##
                                           ##
-    check_link_period_ms* {.importc: "check_link_period_ms".}: uint32_t ## *
+    check_link_period_ms* {.importc: "check_link_period_ms".}: uint32 ## *
                                                                     ##  @brief Input frame buffer to user's stack
                                                                     ##
                                                                     ##  @param[in] eth_handle: handle of Ethernet driver
@@ -56,7 +64,7 @@ type
                                                                     ##
                                                                     ##
     stack_input* {.importc: "stack_input".}: proc (eth_handle: esp_eth_handle_t;
-        buffer: ptr uint8_t; length: uint32_t): esp_err_t ## *
+        buffer: ptr uint8; length: uint32): esp_err_t ## *
                                                     ##  @brief Callback function invoked when lowlevel initialization is finished
                                                     ##
                                                     ##  @param[in] eth_handle: handle of Ethernet driver
@@ -169,7 +177,7 @@ proc esp_eth_stop*(hdl: esp_eth_handle_t): esp_err_t {.importc: "esp_eth_stop",
 ##        - ESP_FAIL: transmit frame buffer failed because some other error occurred
 ##
 
-proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8_t; length: uint32_t): esp_err_t {.
+proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8; length: uint32): esp_err_t {.
     importc: "esp_eth_transmit", header: "esp_eth.h".}
 ## *
 ##  @brief General Receive
@@ -184,7 +192,7 @@ proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8_t; length: uint32_t
 ##        - ESP_FAIL: receive frame buffer failed because some other error occurred
 ##
 
-proc esp_eth_receive*(hdl: esp_eth_handle_t; buf: ptr uint8_t; length: ptr uint32_t): esp_err_t {.
+proc esp_eth_receive*(hdl: esp_eth_handle_t; buf: ptr uint8; length: ptr uint32): esp_err_t {.
     importc: "esp_eth_receive", header: "esp_eth.h".}
 ## *
 ##  @brief Misc IO function of Etherent driver

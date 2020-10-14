@@ -13,23 +13,34 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 import esp_eth_com
 
-## *
 ##  @brief Ethernet PHY
+
+## *
+##  @brief Ethernet PHY configuration
 ##
 ##
 
 type
-  ##  @brief Ethernet PHY
-  ##   @brief Set mediator for PHY
-  ##   @param[in] phy: Ethernet PHY instance
-  ##   @param[in] mediator: mediator of Ethernet driver
-  ##   @return
-  ##        - ESP_OK: set mediator for Ethernet PHY instance successfully
-  ##        - ESP_ERR_INVALID_ARG: set mediator for Ethernet PHY instance failed because of some invalid arguments
-  set_mediator*: proc (phy: ptr esp_eth_phy_t; mediator: ptr esp_eth_mediator_t): esp_err_t {.cdecl.}
+  eth_phy_config_t* {.importc: "eth_phy_config_t", header: "esp_eth_phy.h", bycopy.} = object
+    phy_addr* {.importc: "phy_addr".}: uint32 ## !< PHY address
+    reset_timeout_ms* {.importc: "reset_timeout_ms".}: uint32 ## !< Reset timeout value (Unit: ms)
+    autonego_timeout_ms* {.importc: "autonego_timeout_ms".}: uint32 ## !< Auto-negotiation timeout value (Unit: ms)
+    reset_gpio_num* {.importc: "reset_gpio_num".}: cint ## !< Reset GPIO number, -1 means no hardware reset
+
+
+##  @brief Ethernet PHY
+##   @brief Set mediator for PHY
+##   @param[in] phy: Ethernet PHY instance
+##   @param[in] mediator: mediator of Ethernet driver
+##   @return
+##        - ESP_OK: set mediator for Ethernet PHY instance successfully
+##        - ESP_ERR_INVALID_ARG: set mediator for Ethernet PHY instance failed because of some invalid arguments
+
+type
+  set_mediator_cb_t* = proc (phy: ptr esp_eth_phy_t; mediator: ptr esp_eth_mediator_t): esp_err_t {.cdecl.}
+
   ## *
   ##  @brief Software Reset Ethernet PHY
   ##  @param[in] phy: Ethernet PHY instance
@@ -38,66 +49,67 @@ type
   ##       - ESP_FAIL: reset Ethernet PHY failed because some error occurred
   ##
   ##
-  reset_cb_t* {.importc: "reset".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  reset_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+
   ##   @brief Hardware Reset Ethernet PHY
   ##   @note Hardware reset is mostly done by pull down and up PHY's nRST pin
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: reset Ethernet PHY successfully
   ##        - ESP_FAIL: reset Ethernet PHY failed because some error occurred
-  reset_hw_cb_t* {.importc: "reset_hw".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  reset_hw_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
   ##   @brief Initialize Ethernet PHY
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: initialize Ethernet PHY successfully
   ##        - ESP_FAIL: initialize Ethernet PHY failed because some error occurred
-  init_cb_t* {.importc: "init".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  init_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
   ##   @brief Deinitialize Ethernet PHY
   ##   @param[in] phyL Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: deinitialize Ethernet PHY successfully
   ##        - ESP_FAIL: deinitialize Ethernet PHY failed because some error occurred
-  deinit_cb_t* {.importc: "deinit".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  deinit_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
   ##   @brief Start auto negotiation
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: restart auto negotiation successfully
   ##        - ESP_FAIL: restart auto negotiation failed because some error occurred
-  negotiate_cb_t* {.importc: "negotiate".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  negotiate_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
   ##   @brief Get Ethernet PHY link status
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: get Ethernet PHY link status successfully
   ##        - ESP_FAIL: get Ethernet PHY link status failed because some error occurred
-  get_link_cb_t* {.importc: "get_link".}: proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
+  get_link_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
   ##   @brief Power control of Ethernet PHY
   ##   @param[in] phy: Ethernet PHY instance
   ##   @param[in] enable: set true to power on Ethernet PHY; ser false to power off Ethernet PHY
   ##   @return
   ##        - ESP_OK: control Ethernet PHY power successfully
   ##        - ESP_FAIL: control Ethernet PHY power failed because some error occurred
-  pwrctl_cb_t* {.importc: "pwrctl".}: proc (phy: ptr esp_eth_phy_t; enable: bool): esp_err_t {.cdecl.}
+  pwrctl_cb_t* = proc (phy: ptr esp_eth_phy_t; enable: bool): esp_err_t {.cdecl.}
   ##   @brief Set PHY chip address
   ##   @param[in] phy: Ethernet PHY instance
   ##   @param[in] addr: PHY chip address
   ##   @return
   ##        - ESP_OK: set Ethernet PHY address successfully
   ##        - ESP_FAIL: set Ethernet PHY address failed because some error occurred
-  set_addr_cb_t* {.importc: "set_addr".}: proc (phy: ptr esp_eth_phy_t; `addr`: uint32): esp_err_t {.cdecl.}
+  set_addr_cb_t* = proc (phy: ptr esp_eth_phy_t; `addr`: uint32): esp_err_t {.cdecl.}
   ##   @brief Get PHY chip address
   ##   @param[in] phy: Ethernet PHY instance
   ##   @param[out] addr: PHY chip address
   ##   @return
   ##        - ESP_OK: get Ethernet PHY address successfully
   ##        - ESP_ERR_INVALID_ARG: get Ethernet PHY address failed because of invalid argument
-  get_addr_cb_t* {.importc: "get_addr".}: proc (phy: ptr esp_eth_phy_t;
+  get_addr_cb_t* = proc (phy: ptr esp_eth_phy_t;
       `addr`: ptr uint32): esp_err_t {.cdecl.}
   ##   @brief Free memory of Ethernet PHY instance
   ##   @param[in] phy: Ethernet PHY instance
   ##   @return
   ##        - ESP_OK: free PHY instance successfully
   ##        - ESP_FAIL: free PHY instance failed because some error occurred
-  del_cb_t* {.importc: "del".}: proc (phy: ptr esp_eth_phy_t): esp_err_t
+  del_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t
 
   ##  @brief Ethernet PHY
   esp_eth_phy_t* {.importc: "esp_eth_phy_s", header: "esp_eth_phy.h", bycopy.} = object
@@ -114,18 +126,6 @@ type
     del_cb_t* {.importc: "del".}: del_cb_t
 
 
-## *
-##  @brief Ethernet PHY configuration
-##
-##
-
-type
-  eth_phy_config_t* {.importc: "eth_phy_config_t", header: "esp_eth_phy.h", bycopy.} = object
-    phy_addr* {.importc: "phy_addr".}: uint32 ## !< PHY address
-    reset_timeout_ms* {.importc: "reset_timeout_ms".}: uint32 ## !< Reset timeout value (Unit: ms)
-    autonego_timeout_ms* {.importc: "autonego_timeout_ms".}: uint32 ## !< Auto-negotiation timeout value (Unit: ms)
-    reset_gpio_num* {.importc: "reset_gpio_num".}: cint ## !< Reset GPIO number, -1 means no hardware reset
-
 
 ## *
 ##  @brief Default configuration for Ethernet PHY object
@@ -141,7 +141,7 @@ proc ETH_PHY_DEFAULT_CONFIG*(
          phy_addr: phy_addr.uint32(),
          reset_timeout_ms: reset_timeout_ms.uint32(),
          autonego_timeout_ms: autonego_timeout_ms.uint32(),
-         reset_gpio_num: reset_gpio_num.uint32(),
+         reset_gpio_num: reset_gpio_num.int32(),
      )
 ## *
 ##  @brief Create a PHY instance of IP101
