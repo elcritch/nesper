@@ -12,8 +12,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, esp_intr_alloc
+import ../../consts
 
 ## *
 ##  @brief Register a handler for specific RTC_CNTL interrupts

@@ -11,8 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  freertos/FreeRTOS, freertos/portmacro, esp_err, sys/queue, soc/sdio_slave_periph
+import ../../consts
+import ../../general
 
 const
   SDIO_SLAVE_RECV_MAX_BUFFER* = (4096 - 4)

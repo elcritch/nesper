@@ -11,9 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, soc/soc, soc/gpio_periph, soc/i2s_periph, soc/rtc_periph, esp32/rom/gpio,
-  esp_attr, esp_intr_alloc, driver/periph_ctrl, driver/adc, freertos/semphr
+import ../../consts
 
 ## *
 ##  @brief I2S bit width per sample.

@@ -11,8 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, freertos/FreeRTOS, freertos/semphr, driver/spi_common
+import ../../consts
+import spi
 
 const
   SPI_SLAVE_TXBIT_LSBFIRST* = (1 shl 0) ## /< Transmit command/address/data LSB first instead of the default MSB first

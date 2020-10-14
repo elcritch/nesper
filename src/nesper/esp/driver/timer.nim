@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, esp_attr, soc/soc, soc/timer_periph, esp_intr_alloc
+import ../../consts
 
 const
   TIMER_BASE_CLK* = (APB_CLK_FREQ) ## !< Frequency of the clock on the input of the timer groups

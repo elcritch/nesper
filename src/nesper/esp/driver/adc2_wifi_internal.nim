@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err
+import ../../consts
 
 ## *
 ##  @brief For WIFI module to claim the usage of ADC2.

@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, esp_intr_alloc, soc/touch_periph
+import ../../consts
 
 type
   touch_pad_t* {.size: sizeof(cint).} = enum

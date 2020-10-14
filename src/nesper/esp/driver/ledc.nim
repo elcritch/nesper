@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, soc/soc, driver/gpio, driver/periph_ctrl, esp_intr_alloc
+import ../../consts
 
 const
   LEDC_APB_CLK_HZ* = (APB_CLK_FREQ)

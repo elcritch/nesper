@@ -1,6 +1,4 @@
-import
-  esp_intr_alloc, esp_err, freertos/FreeRTOS, freertos/semphr, freertos/xtensa_api,
-  soc/soc, soc/pcnt_periph, driver/gpio
+import ../../consts
 
 const
   PCNT_PIN_NOT_USED* = (-1)     ## !< When selected for a pin, this pin will not be used

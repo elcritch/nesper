@@ -11,8 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, driver/gpio, soc/rtc_periph
+import ../../consts
+import ../../general
 
 type
   rtc_gpio_mode_t* {.size: sizeof(cint).} = enum

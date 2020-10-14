@@ -11,8 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, soc/dac_periph
+import ../../consts
+import ../../general
 
 type
   dac_channel_t* {.size: sizeof(cint).} = enum

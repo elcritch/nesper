@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, esp32/rom/gpio, esp_attr, esp_intr_alloc, soc/gpio_periph, sdkconfig
+import ../../consts
 
 when defined(CONFIG_LEGACY_INCLUDE_COMMON_HEADERS):
   import
