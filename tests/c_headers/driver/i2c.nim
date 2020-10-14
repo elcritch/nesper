@@ -177,7 +177,7 @@ proc i2c_reset_rx_fifo*(i2c_num: i2c_port_t): esp_err_t {.
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc i2c_isr_register*(i2c_num: i2c_port_t; fn: proc (a1: pointer); arg: pointer;
+proc i2c_isr_register*(i2c_num: i2c_port_t; fn: proc (a1: pointer) {.cdecl.}; arg: pointer;
                       intr_alloc_flags: cint; handle: ptr intr_handle_t): esp_err_t {.
     importc: "i2c_isr_register", header: "i2c.h".}
 ## *

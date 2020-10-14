@@ -236,7 +236,7 @@ proc touch_pad_isr_register*(fn: intr_handler_t; arg: pointer): esp_err_t {.
 ##         arg isn't registered
 ##
 
-proc touch_pad_isr_deregister*(fn: proc (a1: pointer); arg: pointer): esp_err_t {.
+proc touch_pad_isr_deregister*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer): esp_err_t {.
     importc: "touch_pad_isr_deregister", header: "touch_pad.h".}
 ## *
 ##  @brief Set touch sensor measurement and sleep time

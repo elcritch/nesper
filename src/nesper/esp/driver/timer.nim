@@ -299,7 +299,7 @@ proc timer_set_alarm*(group_num: timer_group_t; timer_num: timer_idx_t;
 ##
 
 proc timer_isr_register*(group_num: timer_group_t; timer_num: timer_idx_t;
-                        fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: cint;
+                        fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
                         handle: ptr timer_isr_handle_t): esp_err_t {.
     importc: "timer_isr_register", header: "timer.h".}
 ## * @brief Initializes and configure the timer.

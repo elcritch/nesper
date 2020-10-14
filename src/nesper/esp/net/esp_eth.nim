@@ -38,59 +38,69 @@ type
 ##
 
 type
-  esp_eth_config_t* {.importc: "esp_eth_config_t", header: "esp_eth.h", bycopy.} = object
-    mac* {.importc: "mac".}: ptr esp_eth_mac_t ## *
-                                          ##  @brief Ethernet MAC object
-                                          ##
-                                          ##
-    ## *
-    ##  @brief Ethernet PHY object
-    ##
-    ##
-    phy* {.importc: "phy".}: ptr esp_eth_phy_t ## *
-                                          ##  @brief Period time of checking Ethernet link status
-                                          ##
-                                          ##
-    check_link_period_ms* {.importc: "check_link_period_ms".}: uint32 ## *
-                                                                    ##  @brief Input frame buffer to user's stack
-                                                                    ##
-                                                                    ##  @param[in] eth_handle: handle of Ethernet driver
-                                                                    ##  @param[in] buffer: frame buffer that will get input to upper stack
-                                                                    ##  @param[in] length: length of the frame buffer
-                                                                    ##
-                                                                    ##  @return
-                                                                    ##       - ESP_OK: input frame buffer to upper stack successfully
-                                                                    ##       - ESP_FAIL: error occurred when inputting buffer to upper stack
-                                                                    ##
-                                                                    ##
-    stack_input* {.importc: "stack_input".}: proc (eth_handle: esp_eth_handle_t;
-        buffer: ptr uint8; length: uint32): esp_err_t ## *
-                                                    ##  @brief Callback function invoked when lowlevel initialization is finished
-                                                    ##
-                                                    ##  @param[in] eth_handle: handle of Ethernet driver
-                                                    ##
-                                                    ##  @return
-                                                    ##        - ESP_OK: process extra lowlevel initialization successfully
-                                                    ##        - ESP_FAIL: error occurred when processing extra lowlevel initialization
-                                                    ##
-    on_lowlevel_init_done* {.importc: "on_lowlevel_init_done".}: proc (
-        eth_handle: esp_eth_handle_t): esp_err_t ## *
-                                              ##  @brief Callback function invoked when lowlevel deinitialization is finished
-                                              ##
-                                              ##  @param[in] eth_handle: handle of Ethernet driver
-                                              ##
-                                              ##  @return
-                                              ##        - ESP_OK: process extra lowlevel deinitialization successfully
-                                              ##        - ESP_FAIL: error occurred when processing extra lowlevel deinitialization
-                                              ##
-    on_lowlevel_deinit_done* {.importc: "on_lowlevel_deinit_done".}: proc (
-        eth_handle: esp_eth_handle_t): esp_err_t
+  
+  ##  @brief Input frame buffer to user's stack
+  ##
+  ##  @param[in] eth_handle: handle of Ethernet driver
+  ##  @param[in] buffer: frame buffer that will get input to upper stack
+  ##  @param[in] length: length of the frame buffer
+  ##
+  ##  @return
+  ##       - ESP_OK: input frame buffer to upper stack successfully
+  ##       - ESP_FAIL: error occurred when inputting buffer to upper stack
+  ##
+  ##
+  stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.}
 
+  ##  @brief Callback function invoked when lowlevel initialization is finished
+  ##
+  ##  @param[in] eth_handle: handle of Ethernet driver
+  ##
+  ##  @return
+  ##        - ESP_OK: process extra lowlevel initialization successfully
+  ##        - ESP_FAIL: error occurred when processing extra lowlevel initialization
+  ##
+  on_lowlevel_init_done_cb_t* = proc ( eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.} ## *
+
+  ##  @brief Callback function invoked when lowlevel deinitialization is finished
+  ##
+  ##  @param[in] eth_handle: handle of Ethernet driver
+  ##
+  ##  @return
+  ##        - ESP_OK: process extra lowlevel deinitialization successfully
+  ##        - ESP_FAIL: error occurred when processing extra lowlevel deinitialization
+  ##
+  on_lowlevel_deinit_done_cb_t* = proc ( eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.}
+
+  esp_eth_config_t* {.importc: "esp_eth_config_t", header: "esp_eth.h", bycopy.} = object
+    mac* {.importc: "mac".}: ptr esp_eth_mac_t ##  @brief Ethernet MAC object
+    phy* {.importc: "phy".}: ptr esp_eth_phy_t ##  @brief Ethernet PHY object
+    check_link_period_ms* {.importc: "check_link_period_ms".}: uint32 ##  @brief Period time of checking Ethernet link status
+    stack_input* {.importc: "stack_input".}: stack_input_cb_t
+    on_lowlevel_init_done* {.importc: "on_lowlevel_init_done".}: on_lowlevel_init_done_cb_t
+    on_lowlevel_deinit_done* {.importc: "on_lowlevel_deinit_done".}: on_lowlevel_deinit_done_cb_t
 
 ## *
 ##  @brief Default configuration for Ethernet driver
 ##
 ##
+proc ETH_DEFAULT_CONFIG*(
+          emac: var esp_eth_mac_t,
+          ephy: var esp_eth_phy_t,
+          check_link_period_ms = 2000'u32,
+          stack_input: stack_input_cb_t = nil,
+          on_lowlevel_init_done: on_lowlevel_init_done_cb_t = nil,
+          on_lowlevel_deinit_done: on_lowlevel_deinit_done_cb_t = nil,
+        ): esp_eth_config_t {.inline.} =
+  
+  return esp_eth_config_t(
+            mac: addr(emac),
+            phy: addr(ephy),
+            check_link_period_ms: check_link_period_ms,
+            stack_input: stack_input,
+            on_lowlevel_init_done: on_lowlevel_init_done,
+            on_lowlevel_deinit_done: on_lowlevel_deinit_done)
+
 ##  #define ETH_DEFAULT_CONFIG(emac, ephy)   \
 ##      {                                    \
 ##          .mac = emac,                     \

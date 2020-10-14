@@ -258,7 +258,7 @@ proc pcnt_get_event_value*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t;
 ##      - ESP_ERR_INVALID_ARG Function pointer error.
 ##
 
-proc pcnt_isr_register*(fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: cint;
+proc pcnt_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
                        handle: ptr pcnt_isr_handle_t): esp_err_t {.
     importc: "pcnt_isr_register", header: "pcnt.h".}
 ## *
@@ -375,7 +375,7 @@ proc pcnt_set_mode*(unit: pcnt_unit_t; channel: pcnt_channel_t;
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc pcnt_isr_handler_add*(unit: pcnt_unit_t; isr_handler: proc (a1: pointer);
+proc pcnt_isr_handler_add*(unit: pcnt_unit_t; isr_handler: proc (a1: pointer) {.cdecl.};
                           args: pointer): esp_err_t {.
     importc: "pcnt_isr_handler_add", header: "pcnt.h".}
 ## *

@@ -398,7 +398,7 @@ proc gpio_wakeup_disable*(gpio_num: gpio_num_t): esp_err_t {.
 ##      - ESP_ERR_NOT_FOUND No free interrupt found with the specified flags
 ##
 
-proc gpio_isr_register*(fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: cint;
+proc gpio_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
                        handle: ptr gpio_isr_handle_t): esp_err_t {.
     importc: "gpio_isr_register", header: "gpio.h".}
 ## *
