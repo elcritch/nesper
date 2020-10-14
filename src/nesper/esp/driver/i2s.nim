@@ -12,6 +12,7 @@
 ##  limitations under the License.
 
 import ../../consts
+import adc
 
 ## *
 ##  @brief I2S bit width per sample.

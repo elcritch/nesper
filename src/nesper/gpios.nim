@@ -3,7 +3,11 @@ import esp/driver/gpio
 
 export gpio
 
-proc setupPins() =
+proc setupGpios(pins: set[gpio_num_t]) =
+  var pin_mux: uint64 
+  for pin in pins:
+    pin_mux = pin_mux | BITS(pin)
+
   var io_conf: gpio_config_t
   io_conf.intr_type = GPIO_PIN_INTR_DISABLE
   ## set as output mode
@@ -17,8 +21,6 @@ proc setupPins() =
   gpio_config(addr(io_conf))
   gpio_set_level(GPIO_PHY_CLK_EN, 1)
   gpio_set_level(GPIO_ITSY_RST, 0)
-  ## gpio_set_level(GPIO_OUTPUT_IO_5, 0);
-  vTaskDelay(100)
 
 
 

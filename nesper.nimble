@@ -13,7 +13,7 @@ requires "nim >= 1.2.0"
 
 
 # Tasks
-import os
+import os, strutils
 
 task test, "Runs the test suite":
   exec "nim c --os:freertos tests/tconsts.nim"
@@ -21,5 +21,9 @@ task test, "Runs the test suite":
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tnvs.nim"
   exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tspi.nim"
   exec "nim c -r tests/trouter.nim"
+
+  for dtest in listFiles("tests/driver/"):
+    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+      exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
 
