@@ -1,5 +1,6 @@
 import consts
 import general
+import esp/esp_system
 
 import net
 
@@ -66,16 +67,22 @@ proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   # for i in 0..15:
     # result.address_v6[i] = uint8(address shr (i*8))
 
+proc c_asprintf(buf, frmt: cstring): cint {.
+  importc: "asprintf", header: "<stdio.h>", varargs, noSideEffect.}
+
 ## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
-proc generate_hostname*(): string =
+proc generate_hostname*(hostname: string): string =
   ##  return strdup(MDNS_HOSTNAME);
-  var mac: array[6, uint8]
-  var sensor_id: cstring
-  esp_read_mac(mac, ESP_MAC_WIFI_STA)
-  if -1 ==
-      asprintf(addr(sensor_id), "%s-%02X%02X%02X", MDNS_HOSTNAME, mac[3], mac[4],
-               mac[5]):
-    abort()
+  # var mac: array[6, uint8]
+  var mac: string = newStringOfCap(6)
+  var sensor_id: string = newStringOfCap(len(hostname)+3+1)
+  check: esp_read_mac(cast[ptr uint8](mac.cstring()), ESP_MAC_WIFI_STA)
+
+  let ret =
+    c_asprintf(sensor_id, "%s-%02X%02X%02X", hostname, mac[3], mac[4], mac[5])
+  if ret == -1:
+    raise newException(OSError, "hostname")
+
   return sensor_id
 
 
@@ -84,8 +91,10 @@ proc generate_sensor_id*(): cstring =
   var mac: array[6, uint8]
   var sensor_id: cstring
   esp_read_mac(mac, ESP_MAC_WIFI_STA)
-  if -1 ==
-      asprintf(addr(sensor_id), "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
+  let ret =
+      c_asprintf(sensor_id, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
                mac[2], mac[3], mac[4], mac[5]):
-    abort()
+  if ret == -1:
+    raise newException(OSError, "hostname")
+
   return sensor_id
