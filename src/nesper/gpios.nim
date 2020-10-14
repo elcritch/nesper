@@ -10,7 +10,7 @@ type
   GpioError* = object of OSError
     code*: esp_err_t
 
-proc config(pins: set[gpio_num_t],
+proc configure*(pins: set[gpio_num_t],
     mode: gpio_mode_t, ## !< GPIO mode: set input/output mode
     pull_up_en: gpio_pullup_t = GPIO_PULLUP_DISABLE, ## !< GPIO pull-up
     pull_down_en: gpio_pulldown_t = GPIO_PULLDOWN_DISABLE, ## !< GPIO pull-down
@@ -33,11 +33,20 @@ proc config(pins: set[gpio_num_t],
   if ret != ESP_OK:
     raise newEspError[GpioError]("gpio config:" & $esp_err_to_name(ret), ret )
 
-proc set(pin: gpio_num_t, value: bool) =
+proc set*(pin: gpio_num_t, value: bool) =
   var ret: esp_err_t
 
   ret = gpio_set_level(pin, value.uint32())
   if ret != ESP_OK:
     raise newEspError[GpioError]("gpio set level:" & $esp_err_to_name(ret), ret )
+
+proc get*(pin: gpio_num_t): bool =
+  var ret: cint = gpio_get_level(pin)
+
+  return
+    if ret == 0:
+      false
+    else:
+      true
 
 
