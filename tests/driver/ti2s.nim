@@ -1,1 +1,1 @@
-import nesper/esp/driver/ti2s
+import nesper/esp/driver/i2s

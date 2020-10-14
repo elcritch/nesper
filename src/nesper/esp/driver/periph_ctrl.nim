@@ -12,7 +12,7 @@
 ##  limitations under the License.
 
 import ../../consts
-# import soc/periph_defs
+import periph_defs
 
 ## *
 ##  @brief      enable peripheral module

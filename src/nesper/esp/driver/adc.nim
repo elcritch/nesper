@@ -12,6 +12,7 @@
 ##  limitations under the License.
 
 import ../../consts
+import gpio
 
 type
   adc_atten_t* {.size: sizeof(cint).} = enum

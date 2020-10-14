@@ -13,6 +13,8 @@
 
 import ../../consts
 import ../../general
+import gpio
+import rmt_struct
 
 const
   RMT_MEM_BLOCK_BYTE_NUM* = (256)

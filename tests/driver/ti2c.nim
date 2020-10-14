@@ -1,1 +1,1 @@
-import nesper/esp/driver/ti2c
+import nesper/esp/driver/i2c

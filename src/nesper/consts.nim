@@ -92,6 +92,9 @@ type
   intr_handle_t* = ptr intr_handle_data_t
 
 type
+  RingbufHandle_t* {.importc: "ringbuf.h".} = pointer
+
+type
   esp_event_base_t* = cstring
 
 type

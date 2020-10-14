@@ -1,1 +1,1 @@
-import nesper/esp/driver/tperiph_ctrl
+import nesper/esp/driver/periph_ctrl
