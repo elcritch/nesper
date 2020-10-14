@@ -3,7 +3,7 @@ import net
 import selectors
 import tables
 import posix
-import ../src/general
+import nesper/general
 
 type 
   ServerInfo = ref object 
