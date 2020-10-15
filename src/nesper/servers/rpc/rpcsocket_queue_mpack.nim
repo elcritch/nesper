@@ -2,9 +2,9 @@ import nativesockets, net, selectors, tables, posix
 
 import ../../consts
 import ../../general
-import ../../queue_utils
+import ../../queues
 import ../../tasks
-import ../../timer_utils
+import ../../timers
 import ../tcpsocket
 
 import router
