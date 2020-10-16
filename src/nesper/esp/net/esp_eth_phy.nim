@@ -111,7 +111,7 @@ type
   del_cb_t* = proc (phy: ptr esp_eth_phy_t): esp_err_t {.cdecl.}
 
   ##  @brief Ethernet PHY
-  esp_eth_phy_t* {.importc: "esp_eth_phy_s", header: "esp_eth_phy.h", bycopy.} = object
+  esp_eth_phy_t* {.importc: "esp_eth_phy_t", header: "esp_eth_phy.h", bycopy.} = object
     set_mediator_cb_t* {.importc: "set_mediator".}: set_mediator_cb_t
     reset_cb_t* {.importc: "reset".}: reset_cb_t
     reset_hw_cb_t* {.importc: "reset_hw".}: reset_hw_cb_t
