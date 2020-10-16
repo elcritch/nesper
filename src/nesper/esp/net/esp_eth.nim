@@ -91,9 +91,9 @@ proc eth_default_config*(
           stack_input: stack_input_cb_t = nil,
           on_lowlevel_init_done: on_lowlevel_init_done_cb_t = nil,
           on_lowlevel_deinit_done: on_lowlevel_deinit_done_cb_t = nil,
-        ): esp_eth_config_t {.inline.} =
+        ): esp_eth_config_t =
   
-  return esp_eth_config_t(
+  result = esp_eth_config_t(
             mac: emac,
             phy: ephy,
             check_link_period_ms: check_link_period_ms,
