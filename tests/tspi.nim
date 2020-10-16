@@ -7,7 +7,7 @@ import nesper/spi
 #  define PIN_NUM_CS   34
 
 let
-  bus = SPI2_HOST.newSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={MASTER})
+  bus = HSPI.newSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={MASTER})
 
 var
   dev: SpiDev =
@@ -20,17 +20,17 @@ var
 
 
 let tdata1 = [byte 1, 2]
-let trn1 = dev.raw_trans(tdata1)
+let trn1 = dev.trans(tdata1)
 
 var tdata2 = [byte 1, 2, 3]
-let trn2 = dev.raw_trans(tdata2)
+let trn2 = dev.trans(tdata2)
 
-let trn3 = dev.raw_trans([byte 1, 2, 3, 4, 5])
+let trn3 = dev.trans([byte 1, 2, 3, 4, 5])
 
 let tdata4 = @[1'u8, 2, 3]
-let trn4 = dev.raw_trans(tdata4)
+let trn4 = dev.trans(tdata4)
 
-let trn5 = dev.raw_trans(@[1'u8, 2, 3, 4, 5])
+let trn5 = dev.trans(@[1'u8, 2, 3, 4, 5])
 
 echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
