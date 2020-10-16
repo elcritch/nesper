@@ -167,7 +167,7 @@ proc addDevice*(
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
 
-proc raw_trans*(dev: SpiDev;
+proc rawTtrans*(dev: SpiDev;
                      cmd: uint16 = 0,
                      cmdaddr: uint64 = 0,
                      txdata: openArray[uint8],
@@ -225,7 +225,7 @@ proc raw_trans*(dev: SpiDev;
     result.trn.flags = flg.uint32 or result.trn.flags 
 
 
-proc tx_trans*(dev: SpiDev;
+proc txTrans*(dev: SpiDev;
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
                   data: seq[uint8],
@@ -233,9 +233,9 @@ proc tx_trans*(dev: SpiDev;
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_RXDATA in flags)
-  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = blen, rxbits = bits(0), flags = flags)
+  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = blen, rxbits = bits(0), flags = flags)
 
-proc rx_trans*(dev: SpiDev;
+proc rxTtrans*(dev: SpiDev;
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
                   data: seq[uint8],
@@ -243,16 +243,17 @@ proc rx_trans*(dev: SpiDev;
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_RXDATA in flags)
-  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
+  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
 
-proc rw_trans*(dev: SpiDev;
+proc rwTtrans*(dev: SpiDev;
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
                   data: seq[uint8],
                   blen: bits = bits(-1),
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
-  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
+  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
+
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
