@@ -1,3 +1,5 @@
+import strutils 
+
 import consts
 import general
 import esp/esp_system
@@ -72,30 +74,24 @@ proc c_sprintf(buf, frmt: cstring): cint {.
 
 ## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
 proc generate_hostname*(hostname: string): string =
-  ##  return strdup(MDNS_HOSTNAME);
-  # var mac: array[6, uint8]
-  var mac: string = newStringOfCap(6)
-  var sensor_id: string = newStringOfCap(len(hostname)+3+1)
-  check: esp_read_mac(cast[ptr uint8](mac.cstring()), ESP_MAC_WIFI_STA)
+  var mac: array[6, uint8]
+  check: esp_read_mac(cast[ptr uint8](addr(mac)), ESP_MAC_WIFI_STA)
 
-  let ret =
-    c_sprintf(sensor_id, "%s-%02X%02X%02X", hostname, mac[3], mac[4], mac[5])
-  if ret == -1:
-    raise newException(OSError, "hostname")
+  var sensor_id = $hostname
+  for i in 3..5:
+    sensor_id.add(mac[i].toHex(2))
 
   return sensor_id
 
 
 ## * Generate sensor id (based on mac address)
 proc generate_sensor_id*(): string =
-  var mac: string = newStringOfCap(6)
-  var sensor_id: cstring
-  check: esp_read_mac(cast[ptr uint8](mac.cstring()), ESP_MAC_WIFI_STA)
+  var mac: array[6, uint8]
+  check: esp_read_mac(cast[ptr uint8](addr(mac)), ESP_MAC_WIFI_STA)
 
-  let ret =
-      c_sprintf(sensor_id, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
-               mac[2], mac[3], mac[4], mac[5])
-  if ret == -1:
-    raise newException(OSError, "hostname")
+  var sensor_id = ""
+  for i in 0..5:
+    sensor_id.add(mac[i].toHex(2))
+    sensor_id.add(":")
 
-  return $sensor_id
+  return sensor_id
