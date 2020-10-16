@@ -20,10 +20,17 @@ var
                      flags={})
 
 
-let trn1 = dev.newSpiTrans([byte 1, 2])
-let trn2 = dev.newSpiTrans([byte 1, 2, 3])
+let tdata1 = [byte 1, 2]
+let trn1 = dev.newSpiTrans(tdata1)
+
+var tdata2 = [byte 1, 2, 3]
+let trn2 = dev.newSpiTrans(tdata2)
+
 let trn3 = dev.newSpiTrans([byte 1, 2, 3, 4, 5])
-let trn4 = dev.newSpiTrans(@[1'u8, 2, 3])
+
+let tdata4 = @[1'u8, 2, 3]
+let trn4 = dev.newSpiTrans(tdata4)
+
 let trn5 = dev.newSpiTrans(@[1'u8, 2, 3, 4, 5])
 
 echo "trn1: " & repr(trn1)
@@ -45,3 +52,4 @@ withSpiBus(dev):
 
 # Regular spi transmit
 trn5.transmit()
+

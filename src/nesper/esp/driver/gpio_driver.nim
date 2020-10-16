@@ -154,31 +154,52 @@ template GPIO_IS_VALID_OUTPUT_GPIO*(gpio_num: untyped): untyped =
 
 type
   gpio_int_type_t* {.size: sizeof(cint).} = enum
-    GPIO_INTR_DISABLE = 0,      ## !< Disable GPIO interrupt
-    GPIO_INTR_POSEDGE = 1,      ## !< GPIO interrupt type : rising edge
-    GPIO_INTR_NEGEDGE = 2,      ## !< GPIO interrupt type : falling edge
-    GPIO_INTR_ANYEDGE = 3,      ## !< GPIO interrupt type : both rising and falling edge
-    GPIO_INTR_LOW_LEVEL = 4,    ## !< GPIO interrupt type : input low level trigger
-    GPIO_INTR_HIGH_LEVEL = 5,   ## !< GPIO interrupt type : input high level trigger
-    GPIO_INTR_MAX
+    INTR_DISABLE = 0,      ## !< Disable GPIO interrupt
+    INTR_POSEDGE = 1,      ## !< GPIO interrupt type : rising edge
+    INTR_NEGEDGE = 2,      ## !< GPIO interrupt type : falling edge
+    INTR_ANYEDGE = 3,      ## !< GPIO interrupt type : both rising and falling edge
+    INTR_LOW_LEVEL = 4,    ## !< GPIO interrupt type : input low level trigger
+    INTR_HIGH_LEVEL = 5,   ## !< GPIO interrupt type : input high level trigger
+    INTR_MAX
 
   gpio_mode_t* {.size: sizeof(cint).} = enum
-    GPIO_MODE_DISABLE = GPIO_MODE_DEF_DISABLE, ## !< GPIO mode : disable input and output
-    GPIO_MODE_INPUT = GPIO_MODE_DEF_INPUT, ## !< GPIO mode : input only
-    GPIO_MODE_OUTPUT = GPIO_MODE_DEF_OUTPUT, ## !< GPIO mode : output only mode
-    GPIO_MODE_INPUT_OUTPUT = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT)) ## !< GPIO mode : output and input mode
-    GPIO_MODE_OUTPUT_OD = ((GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)), ## !< GPIO mode : output only with open-drain mode
-    GPIO_MODE_INPUT_OUTPUT_OD = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)),  ## !< GPIO mode : output and input with open-drain mode
+    MODE_DISABLE = GPIO_MODE_DEF_DISABLE, ## !< GPIO mode : disable input and output
+    MODE_INPUT = GPIO_MODE_DEF_INPUT, ## !< GPIO mode : input only
+    MODE_OUTPUT = GPIO_MODE_DEF_OUTPUT, ## !< GPIO mode : output only mode
+    MODE_INPUT_OUTPUT = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT)) ## !< GPIO mode : output and input mode
+    MODE_OUTPUT_OD = ((GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)), ## !< GPIO mode : output only with open-drain mode
+    MODE_INPUT_OUTPUT_OD = ((GPIO_MODE_DEF_INPUT) or (GPIO_MODE_DEF_OUTPUT) or (GPIO_MODE_DEF_OD)),  ## !< GPIO mode : output and input with open-drain mode
 
   gpio_pullup_t* {.size: sizeof(cint).} = enum
-    GPIO_PULLUP_DISABLE = 0x00000000, ## !< Disable GPIO pull-up resistor
-    GPIO_PULLUP_ENABLE = 0x00000001 ## !< Enable GPIO pull-up resistor
+    PULLUP_DISABLE = 0x00000000, ## !< Disable GPIO pull-up resistor
+    PULLUP_ENABLE = 0x00000001 ## !< Enable GPIO pull-up resistor
 
   gpio_pulldown_t* {.size: sizeof(cint).} = enum
-    GPIO_PULLDOWN_DISABLE = 0x00000000, ## !< Disable GPIO pull-down resistor
-    GPIO_PULLDOWN_ENABLE = 0x00000001 ## !< Enable GPIO pull-down resistor
+    PULLDOWN_DISABLE = 0x00000000, ## !< Disable GPIO pull-down resistor
+    PULLDOWN_ENABLE = 0x00000001 ## !< Enable GPIO pull-down resistor
 
 
+const
+  GPIO_INTR_DISABLE* = INTR_DISABLE
+  GPIO_INTR_POSEDGE* = INTR_POSEDGE
+  GPIO_INTR_NEGEDGE* = INTR_NEGEDGE
+  GPIO_INTR_ANYEDGE* = INTR_ANYEDGE
+  GPIO_INTR_LOW_LEVEL* = INTR_LOW_LEVEL
+  GPIO_INTR_HIGH_LEVEL* = INTR_HIGH_LEVEL
+  GPIO_INTR_MAX* = INTR_MAX
+
+  GPIO_MODE_DISABLE* = MODE_DISABLE
+  GPIO_MODE_INPUT* = MODE_INPUT
+  GPIO_MODE_OUTPUT* = MODE_OUTPUT
+  GPIO_MODE_INPUT_OUTPUT* = MODE_INPUT_OUTPUT
+  GPIO_MODE_OUTPUT_OD* = MODE_OUTPUT_OD
+  GPIO_MODE_INPUT_OUTPUT_OD* = MODE_INPUT_OUTPUT_OD
+
+  GPIO_PULLUP_DISABLE* = PULLUP_DISABLE
+  GPIO_PULLUP_ENABLE* = PULLUP_ENABLE
+
+  GPIO_PULLDOWN_DISABLE* = PULLDOWN_DISABLE
+  GPIO_PULLDOWN_ENABLE* = PULLDOWN_ENABLE
 
 
 

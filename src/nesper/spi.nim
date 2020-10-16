@@ -1,10 +1,9 @@
 
 import endians
+import sequtils
 
 import consts, general
-import nesper
 import esp/driver/spi
-import sequtils
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
@@ -150,19 +149,19 @@ proc newSpiDevice*(
 # TODO: setup spi device rx memory
 # TODO: setup cmd/addr
 # TODO: setup cmd/addr custom sizes
+var spi_id: uint32 = 0'u32
 
 proc newSpiTrans*(dev: SpiDev;
                      data: openArray[uint8],
                      rxlen: bits = bits(0),
                      len: bits = bits(-1),
-                     ): SpiTrans =
-  result.dev = dev
-  if len.int < 0:
-    result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
-  else:
-    # Manually set bit length for non-byte length sizes
-    result.trn.length = len.uint
+                     flags: set[SpiBusFlag] = {},
+                  ): SpiTrans =
+  spi_id.inc()
 
+  result.dev = dev
+  result.trn.length = if len.int < 0: 8*data.len().csize_t() else: len.uint
+  result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
   result.trn.rxlength = rxlen.uint
 
   # For data less than 4 bytes, use data directly 
@@ -173,28 +172,9 @@ proc newSpiTrans*(dev: SpiDev;
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = data.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
-
-proc newSpiTrans*(dev: SpiDev;
-                  data: seq[uint8],
-                  rxlen: bits = bits(0),
-                  len: bits = bits(-1),
-                  ): SpiTrans =
-  result.dev = dev
-  if len.int < 0:
-    result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
-  else:
-    # Manually set bit length for non-byte length sizes
-    result.trn.length = len.uint
-
-  result.trn.rxlength = rxlen.uint
-
-  if data.len() <= 3:
-    for i in 0..high(data):
-      result.trn.tx.data[i] = data[i]
-  else:
-    # This order is important, copy the seq then take the unsafe addr
-    result.tx_data = data
-    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+  
+  # if rxlen <= 32:
+    
 
 proc newSpiTxTrans*(dev: SpiDev;
                   data: seq[uint8],

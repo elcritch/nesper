@@ -78,16 +78,74 @@ proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", head
 type 
 
   SpiBusFlag* {.size: sizeof(uint32).} = enum
-    BUSFLAG_SLAVE = (0),
-    BUSFLAG_MASTER = (1 shl 0), ## /< Initialize I/O in master mode
-    BUSFLAG_IOMUX_PINS = (1 shl 1), ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
-    BUSFLAG_SCLK = (1 shl 2), ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
-    BUSFLAG_MISO = (1 shl 3), ## /< Check existing of MISO pin. Or indicates MISO line initialized.
-    BUSFLAG_MOSI = (1 shl 4), ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
-    BUSFLAG_DUAL = (1 shl 5), ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
-    BUSFLAG_WPHD = (1 shl 6), ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
-    BUSFLAG_QUAD = (BUSFLAG_DUAL.uint32 or BUSFLAG_WPHD.uint32) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
-    # SPICOMMON_BUSFLAG_NATIVE_PINS = SPICOMMON_BUSFLAG_IOMUX_PINS
+    SLAVE = (0),
+    MASTER = (1 shl 0), ## /< Initialize I/O in master mode
+    IOMUX_PINS = (1 shl 1), ## /< Check using iomux pins. Or indicates the pins are configured through the IO mux rather than GPIO matrix.
+    SCLK = (1 shl 2), ## /< Check existing of SCLK pin. Or indicates CLK line initialized.
+    MISO = (1 shl 3), ## /< Check existing of MISO pin. Or indicates MISO line initialized.
+    MOSI = (1 shl 4), ## /< Check existing of MOSI pin. Or indicates CLK line initialized.
+    DUAL = (1 shl 5), ## /< Check MOSI and MISO pins can output. Or indicates bus able to work under DIO mode.
+    WPHD = (1 shl 6), ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
+    QUAD = (DUAL.uint32 or WPHD.uint32) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
+
+  SpiTransFlag* {.size: sizeof(uint32).} = enum
+    MODE_DIO = (1 shl 0), ## /< Transmit/receive data in 2-bit mode
+    MODE_QIO = (1 shl 1), ## /< Transmit/receive data in 4-bit mode
+    USE_RXDATA = (1 shl 2), ## /< Receive into rx_data member of spi_transaction_t instead into memory at rx_buffer.
+    USE_TXDATA = (1 shl 3), ## /< Transmit tx_data member of spi_transaction_t instead of data at tx_buffer. Do not set tx_buffer when using this.
+    MODE_DIOQIO_ADDR = (1 shl 4), ## /< Also transmit address in mode selected by SPI_MODE_DIO/SPI_MODE_QIO
+    VARIABLE_CMD = (1 shl 5), ## /< Use the ``command_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
+    VARIABLE_ADDR = (1 shl 6), ## /< Use the ``address_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
+    VARIABLE_DUMMY = (1 shl 7), ## /< Use the ``dummy_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
+    # SPI_TRANS_SET_CD = (1 shl 7)   ## /< Set the CD pin
+
+  SpiDeviceFlag* {.size: sizeof(uint32).} = enum
+    TXBIT_LSBFIRST =         (1 shl 0),  #///< Transmit command/address/data LSB first instead of the default MSB first
+    RXBIT_LSBFIRST =         (1 shl 1),  #///< Receive data LSB first instead of the default MSB first
+    BIT_LSBFIRST =           (TXBIT_LSBFIRST.uint32() or RXBIT_LSBFIRST.uint32()), #///< Transmit and receive LSB first
+    X3WIRE =                 (1 shl 2),  #///< Use MOSI (=spid) for both sending and receiving data
+    POSITIVE_CS =            (1 shl 3),  #///< Make CS positive during a transaction instead of negative
+    HALFDUPLEX =             (1 shl 4),  #///< Transmit data before receiving it, instead of simultaneously
+    CLK_AS_CS =              (1 shl 5),  #///< Output clock on CS line if CS is active
+    NO_DUMMY =               (1 shl 6),
+
+
+#define SPICOMMON_BUSFLAG_NATIVE_PINS   SPICOMMON_BUSFLAG_IOMUX_PINS
+const 
+  SPICOMMON_BUSFLAG_SLAVE* = SLAVE
+  SPICOMMON_BUSFLAG_MASTER* = MASTER
+  SPICOMMON_BUSFLAG_IOMUX_PINS* = IOMUX_PINS
+  SPICOMMON_BUSFLAG_SCLK* = SCLK
+  SPICOMMON_BUSFLAG_MISO* = MISO
+  SPICOMMON_BUSFLAG_MOSI* = MOSI
+  SPICOMMON_BUSFLAG_DUAL* = DUAL
+  SPICOMMON_BUSFLAG_WPHD* = WPHD
+  SPICOMMON_BUSFLAG_QUAD* = QUAD
+  SPICOMMON_BUSFLAG_NATIVE_PINS* = IOMUX_PINS
+
+  SPI_TRANS_MODE_DIO* = MODE_DIO
+  SPI_TRANS_MODE_QIO* = MODE_QIO
+  SPI_TRANS_USE_RXDATA* = USE_RXDATA
+  SPI_TRANS_USE_TXDATA* = USE_TXDATA
+  SPI_TRANS_MODE_DIOQIO_ADDR* = MODE_DIOQIO_ADDR
+  SPI_TRANS_VARIABLE_CMD* = VARIABLE_CMD
+  SPI_TRANS_VARIABLE_ADDR* = VARIABLE_ADDR
+  SPI_TRANS_VARIABLE_DUMMY* = VARIABLE_DUMMY
+  SPI_TRANS_SET_CD* = SPI_TRANS_VARIABLE_DUMMY
+
+  SPI_DEVICE_TXBIT_LSBFIRST* = TXBIT_LSBFIRST         # (1<<0)  #///< Transmit command/address/data LSB first instead of the default MSB first
+  SPI_DEVICE_RXBIT_LSBFIRST* = RXBIT_LSBFIRST         # (1<<1)  #///< Receive data LSB first instead of the default MSB first
+  SPI_DEVICE_BIT_LSBFIRST* = BIT_LSBFIRST           # (SPI_DEVICE_TXBIT_LSBFIRST|SPI_DEVICE_RXBIT_LSBFIRST) #///< Transmit and receive LSB first
+  SPI_DEVICE_3WIRE* = X3WIRE                  # (1<<2)  #///< Use MOSI (=spid) for both sending and receiving data
+  SPI_DEVICE_POSITIVE_CS* = POSITIVE_CS            # (1<<3)  #///< Make CS positive during a transaction instead of negative
+  SPI_DEVICE_HALFDUPLEX* = HALFDUPLEX             # (1<<4)  #///< Transmit data before receiving it, instead of simultaneously
+  SPI_DEVICE_CLK_AS_CS* = CLK_AS_CS              # (1<<5)  #///< Output clock on CS line if CS is active
+  SPI_DEVICE_NO_DUMMY* = NO_DUMMY               # (1<<6)
+
+  #** There are timing issue when reading at high frequency (the frequency is related to whether iomux pins are used, valid time after slave sees the clock).
+  # *     - In half-duplex mode, the driver automatically inserts dummy bits before reading phase to fix the timing issue. Set this flag to disable this feature.
+  # *     - In full-duplex mode, however, the hardware cannot use dummy bits, so there is no way to prevent data being read from getting corrupted.
+  # *       Set this flag to confirm that you're going to work with output only, or read without dummy bits at your own risk.
 
 ## *
 ##  @brief This is a configuration structure for a SPI bus.
@@ -290,17 +348,6 @@ type
                                                   ##   initialized with ESP_INTR_FLAG_IRAM.
                                                   ##
 
-
-const
-  SPI_TRANS_MODE_DIO* = (1 shl 0) ## /< Transmit/receive data in 2-bit mode
-  SPI_TRANS_MODE_QIO* = (1 shl 1) ## /< Transmit/receive data in 4-bit mode
-  SPI_TRANS_USE_RXDATA* = (1 shl 2) ## /< Receive into rx_data member of spi_transaction_t instead into memory at rx_buffer.
-  SPI_TRANS_USE_TXDATA* = (1 shl 3) ## /< Transmit tx_data member of spi_transaction_t instead of data at tx_buffer. Do not set tx_buffer when using this.
-  SPI_TRANS_MODE_DIOQIO_ADDR* = (1 shl 4) ## /< Also transmit address in mode selected by SPI_MODE_DIO/SPI_MODE_QIO
-  SPI_TRANS_VARIABLE_CMD* = (1 shl 5) ## /< Use the ``command_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
-  SPI_TRANS_VARIABLE_ADDR* = (1 shl 6) ## /< Use the ``address_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
-  SPI_TRANS_VARIABLE_DUMMY* = (1 shl 7) ## /< Use the ``dummy_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
-  SPI_TRANS_SET_CD* = (1 shl 7)   ## /< Set the CD pin
 
 ## *
 ##  This structure describes one SPI transaction. The descriptor should not be modified until the transaction finishes.
