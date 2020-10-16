@@ -24,7 +24,7 @@ let trn1 = dev.fullTrans(tdata1)
 
 # read non-byte number of bits
 var tdata2 = [byte 1, 2, 3]
-let trn2 = dev.fullTrans(tdata2, rxbits=bits(20))
+let trn2 = dev.fullTrans(tdata2, rxlength=bits(20))
 
 let trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
 

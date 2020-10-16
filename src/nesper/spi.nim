@@ -224,7 +224,7 @@ proc fullTrans*(dev: SpiDev;
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
     result.trn.rx.buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
-  if rxlength result.trn.rxlength in 1U..4U:
+  if result.trn.rxlength in 1U..4U:
     tflags.incl({USE_RXDATA})
   else:
     result.trn.rx.buffer = nil
