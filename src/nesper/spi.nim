@@ -167,7 +167,7 @@ proc addDevice*(
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
 
-proc rawTtrans*(dev: SpiDev;
+proc rwTrans*(dev: SpiDev;
                      cmd: uint16 = 0,
                      cmdaddr: uint64 = 0,
                      txdata: openArray[uint8],
@@ -235,7 +235,7 @@ proc txTrans*(dev: SpiDev;
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_RXDATA in flags)
-  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = blen, rxbits = bits(0), flags = flags)
+  rwTrans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = blen, rxbits = bits(0), flags = flags)
 
 proc rxTtrans*(dev: SpiDev;
                   cmd: uint16 = 0,
@@ -244,17 +244,8 @@ proc rxTtrans*(dev: SpiDev;
                   blen: bits = bits(-1),
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
-  assert not (USE_RXDATA in flags)
-  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
-
-proc rwTtrans*(dev: SpiDev;
-                  cmd: uint16 = 0,
-                  cmdaddr: uint64 = 0,
-                  data: seq[uint8],
-                  blen: bits = bits(-1),
-                  flags: set[SpiTransFlag] = {},
-                ): SpiTrans =
-  rawTtrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
+  assert not (USE_TXDATA in flags)
+  rwTrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
 
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
