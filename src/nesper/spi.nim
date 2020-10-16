@@ -172,7 +172,7 @@ var spi_id: uint32 = 0'u32
 proc fullTrans*(dev: SpiDev;
                      txdata: openArray[uint8],
                      txlength: bits = bits(-1),
-                     rxlength: bits = bits(-1),
+                     rxlength: bits = bits(0),
                      cmd: uint16 = 0,
                      cmdaddr: uint64 = 0,
                      flags: set[SpiTransFlag] = {},
@@ -209,10 +209,12 @@ proc fullTrans*(dev: SpiDev;
   else:
     result.trn.rx.buffer = nil
 
-  
   # Set RX Details
-  # result.trn.rxlength =
-    # if rxlength.uint() < 0:
+  result.trn.rxlength =
+    if rxlength.int() <= 0:
+      result.trn.length
+    else:
+      rxlength.uint()
       
   if result.trn.rxlength <= 3:
     result.trn.rx.buffer = nil
@@ -222,7 +224,7 @@ proc fullTrans*(dev: SpiDev;
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
     result.trn.rx.buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
-  if result.trn.rxlength in 1U..4U:
+  if rxlength result.trn.rxlength in 1U..4U:
     tflags.incl({USE_RXDATA})
   else:
     result.trn.rx.buffer = nil
