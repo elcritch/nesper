@@ -24,23 +24,24 @@ let trn1 = dev.fullTrans(tdata1)
 
 # read non-byte number of bits
 var tdata2 = [byte 1, 2, 3]
-let trn2 = dev.fullTrans(tdata2, rxlength=bits(20))
+var trn2 = dev.fullTrans(tdata2, rxlength=bits(20))
 
-let trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
+var trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
 
-let tdata4 = @[1'u8, 2, 3]
-let trn4 = dev.fullTrans(tdata4)
+var tdata4 = @[1'u8, 2, 3]
+var trn4 = dev.fullTrans(tdata4)
 
-let trn5 = dev.readTrans(bits(24))
+var trn5 = dev.readTrans(bits(24))
 # this is an error: let trn5 = dev.readTrans(@[1'u8, 2, 3, 4, 5])
 
-let trn6 = dev.writeTrans(@[1'u8, 2, 3, 4, 5])
+var trn6 = dev.writeTrans(@[1'u8, 2, 3, 4, 5])
 
 echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
 echo "trn3: " & repr(trn3)
 echo "trn4: " & repr(trn4)
 echo "trn5: " & repr(trn5)
+echo "trn5: " & repr(trn6)
 
 # Example: spi poll fullTransmission
 trn1.poll()
