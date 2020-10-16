@@ -81,7 +81,7 @@ proc initSpiBus*(
 # TODO: setup spi device (create spi_device_interface_config_t )
 #   - Note: SPI_DEVICE_* is bitwise flags in  spi_device_interface_config_t
 
-proc newSpiDevice*(
+proc addDevice*(
       bus: SpiBus,
       commandlen: bits, ## \
         ## Default amount of bits in command phase (0-16), used when ``SPI_TRANS_VARIABLE_CMD`` is not used, otherwise ignored.
@@ -93,6 +93,10 @@ proc newSpiDevice*(
         ## CS GPIO pin for this device, or -1 if not used
       clock_speed_hz: cint, ## \
         ## Clock speed, divisors of 80MHz, in Hz. See ``SPI_MASTER_FREQ_*``.
+      queue_size: int, ## \
+        ## Transaction queue size. This sets how many transactions can be 'in the air' \
+        ## (queued using spi_device_queue_trans but not yet finished using \
+        ## spi_device_get_trans_result) at the same time
       dummy_bits: uint8 = 0, ## \
         ## Amount of dummy bits to insert between address and data phase
       duty_cycle_pos: uint16 = 0, ## \
@@ -108,10 +112,6 @@ proc newSpiDevice*(
       ## performance at high frequency (over 8MHz), it's suggest to have the right value.
       flags: set[SpiDeviceFlag], ## \
         ## Flags from SpiDevices. Produces bitwise OR of SPI_DEVICE_* flags
-      queue_size: int = 1, ## \
-        ## Transaction queue size. This sets how many transactions can be 'in the air' \
-        ## (queued using spi_device_queue_trans but not yet finished using \
-        ## spi_device_get_trans_result) at the same time
       pre_cb: transaction_cb_t = nil, ## \
       ## Callback to be called before a transmission is started. \
       ## This callback is called within interrupt \

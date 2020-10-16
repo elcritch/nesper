@@ -13,10 +13,11 @@ let
 
 var
   dev: SpiDev =
-    bus.newSpiDevice(commandlen = bits(3),
+    bus.addDevice(commandlen = bits(3),
                      addresslen = bits(4),
                      mode=1, cs_io=23,
                      clock_speed_hz = 1_000_000, 
+                     queue_size = 10,
                      flags={})
 
 
