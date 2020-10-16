@@ -35,7 +35,7 @@ proc wifiStop()
 proc wifiStart()
 
 
-proc nim_app_main*() {.exportc.} =
+app_main():
   ## Main app entry - callback from `general.nim` that sets up Nim runtime.
   
   # Standard wifi setup
