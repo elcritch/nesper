@@ -88,6 +88,16 @@ type
     WPHD = (1 shl 6), ## /< Check existing of WP and HD pins. Or indicates WP & HD pins initialized.
     QUAD = (DUAL.uint32 or WPHD.uint32) ## /< Check existing of MOSI/MISO/WP/HD pins as output. Or indicates bus able to work under QIO mode.
 
+  SpiDeviceFlag* {.size: sizeof(uint32).} = enum
+    TXBIT_LSBFIRST =         (1 shl 0),  #///< Transmit command/address/data LSB first instead of the default MSB first
+    RXBIT_LSBFIRST =         (1 shl 1),  #///< Receive data LSB first instead of the default MSB first
+    BIT_LSBFIRST =           (TXBIT_LSBFIRST.uint32() or RXBIT_LSBFIRST.uint32()), #///< Transmit and receive LSB first
+    X3WIRE =                 (1 shl 2),  #///< Use MOSI (=spid) for both sending and receiving data
+    POSITIVE_CS =            (1 shl 3),  #///< Make CS positive during a transaction instead of negative
+    HALFDUPLEX =             (1 shl 4),  #///< Transmit data before receiving it, instead of simultaneously
+    CLK_AS_CS =              (1 shl 5),  #///< Output clock on CS line if CS is active
+    NO_DUMMY =               (1 shl 6),
+
   SpiTransFlag* {.size: sizeof(uint32).} = enum
     MODE_DIO = (1 shl 0), ## /< Transmit/receive data in 2-bit mode
     MODE_QIO = (1 shl 1), ## /< Transmit/receive data in 4-bit mode
@@ -98,16 +108,6 @@ type
     VARIABLE_ADDR = (1 shl 6), ## /< Use the ``address_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
     VARIABLE_DUMMY = (1 shl 7), ## /< Use the ``dummy_bits`` in ``spi_transaction_ext_t`` rather than default value in ``spi_device_interface_config_t``.
     # SPI_TRANS_SET_CD = (1 shl 7)   ## /< Set the CD pin
-
-  SpiDeviceFlag* {.size: sizeof(uint32).} = enum
-    TXBIT_LSBFIRST =         (1 shl 0),  #///< Transmit command/address/data LSB first instead of the default MSB first
-    RXBIT_LSBFIRST =         (1 shl 1),  #///< Receive data LSB first instead of the default MSB first
-    BIT_LSBFIRST =           (TXBIT_LSBFIRST.uint32() or RXBIT_LSBFIRST.uint32()), #///< Transmit and receive LSB first
-    X3WIRE =                 (1 shl 2),  #///< Use MOSI (=spid) for both sending and receiving data
-    POSITIVE_CS =            (1 shl 3),  #///< Make CS positive during a transaction instead of negative
-    HALFDUPLEX =             (1 shl 4),  #///< Transmit data before receiving it, instead of simultaneously
-    CLK_AS_CS =              (1 shl 5),  #///< Output clock on CS line if CS is active
-    NO_DUMMY =               (1 shl 6),
 
 
 #define SPICOMMON_BUSFLAG_NATIVE_PINS   SPICOMMON_BUSFLAG_IOMUX_PINS
@@ -255,51 +255,19 @@ proc spi_bus_free*(host_id: spi_host_device_t): esp_err_t {.importc: "spi_bus_fr
 ##  8MHz
 ##
 
-when APB_CLK_FREQ == 80 * 1000 * 1000:
-  const
-    SPI_MASTER_FREQ_8M* = (APB_CLK_FREQ div 10)
-    SPI_MASTER_FREQ_9M* = (APB_CLK_FREQ div 9) ## /< 8.89MHz
-    SPI_MASTER_FREQ_10M* = (APB_CLK_FREQ div 8) ## /< 10MHz
-    SPI_MASTER_FREQ_11M* = (APB_CLK_FREQ div 7) ## /< 11.43MHz
-    SPI_MASTER_FREQ_13M* = (APB_CLK_FREQ div 6) ## /< 13.33MHz
-    SPI_MASTER_FREQ_16M* = (APB_CLK_FREQ div 5) ## /< 16MHz
-    SPI_MASTER_FREQ_20M* = (APB_CLK_FREQ div 4) ## /< 20MHz
-    SPI_MASTER_FREQ_26M* = (APB_CLK_FREQ div 3) ## /< 26.67MHz
-    SPI_MASTER_FREQ_40M* = (APB_CLK_FREQ div 2) ## /< 40MHz
-    SPI_MASTER_FREQ_80M* = (APB_CLK_FREQ div 1) ## /< 80MHz
-elif APB_CLK_FREQ == 40 * 1000 * 1000:
-  const
-    SPI_MASTER_FREQ_7M* = (APB_CLK_FREQ div 6) ## /< 13.33MHz
-    SPI_MASTER_FREQ_8M* = (APB_CLK_FREQ div 5) ## /< 16MHz
-    SPI_MASTER_FREQ_10M* = (APB_CLK_FREQ div 4) ## /< 20MHz
-    SPI_MASTER_FREQ_13M* = (APB_CLK_FREQ div 3) ## /< 26.67MHz
-    SPI_MASTER_FREQ_20M* = (APB_CLK_FREQ div 2) ## /< 40MHz
-    SPI_MASTER_FREQ_40M* = (APB_CLK_FREQ div 1) ## /< 80MHz
+var
+  SPI_MASTER_FREQ_7M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
+  SPI_MASTER_FREQ_8M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 10)
+  SPI_MASTER_FREQ_9M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 9) ## /< 8.89MHz
+  SPI_MASTER_FREQ_10M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 8) ## /< 10MHz
+  SPI_MASTER_FREQ_11M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 7) ## /< 11.43MHz
+  SPI_MASTER_FREQ_13M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
+  SPI_MASTER_FREQ_16M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 5) ## /< 16MHz
+  SPI_MASTER_FREQ_20M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 4) ## /< 20MHz
+  SPI_MASTER_FREQ_26M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 3) ## /< 26.67MHz
+  SPI_MASTER_FREQ_40M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 2) ## /< 40MHz
+  SPI_MASTER_FREQ_80M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 1) ## /< 80MHz
 
-type
-
-  SpiDevice* {.size: sizeof(uint32).} = enum
-    TXBIT_LSBFIRST = (1 shl 0), ## \
-      ## Transmit command/address/data LSB first instead of the default MSB first
-    RXBIT_LSBFIRST = (1 shl 1), ## \
-      ## Receive data LSB first instead of the default MSB first
-    BIT_LSBFIRST = (TXBIT_LSBFIRST.uint32 or RXBIT_LSBFIRST.uint32), ## \
-      ## Transmit and receive LSB first
-    MOSI_3WIRE = (1 shl 2),   ## \
-      ## Use MOSI (=spid) for both sending and receiving data
-    POSITIVE_CS = (1 shl 3), ## \
-      ## Make CS positive during a transaction instead of negative
-    HALFDUPLEX = (1 shl 4), ## \
-      ## Transmit data before receiving it, instead of simultaneously
-    CLK_AS_CS = (1 shl 5), ## \
-      ## Output clock on CS line if CS is active \
-      ## * There are timing issue when reading at high frequency (the frequency is related to whether iomux pins are used, valid time after slave sees the clock). \
-      ##      - In half-duplex mode, the driver automatically inserts dummy bits before reading phase to fix the timing issue. Set this flag to disable this feature. \
-      ##      - In full-duplex mode, however, the hardware cannot use dummy bits, so there is no way to prevent data being read from getting corrupted. \
-      ##        Set this flag to confirm that you're going to work with output only, or read without dummy bits at your own risk. \
-      ##
-    NO_DUMMY = (1 shl 6),
-    DDRCLK = (1 shl 7)
 
 type
   transaction_cb_t* = proc (trans: ptr spi_transaction_t) {.cdecl.}

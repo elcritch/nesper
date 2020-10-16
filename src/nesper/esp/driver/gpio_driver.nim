@@ -94,6 +94,7 @@ const
   GPIO_SEL_37* = ((uint64)((cast[uint64](1)) shl 37)) ## !< Pin 37 selected
   GPIO_SEL_38* = ((uint64)((cast[uint64](1)) shl 38)) ## !< Pin 38 selected
   GPIO_SEL_39* = ((uint64)((cast[uint64](1)) shl 39)) ## !< Pin 39 selected
+
 var
   GPIO_PIN_REG_0* = IO_MUX_GPIO0_REG
   GPIO_PIN_REG_1* = IO_MUX_GPIO1_REG
@@ -178,6 +179,18 @@ type
     PULLDOWN_DISABLE = 0x00000000, ## !< Disable GPIO pull-down resistor
     PULLDOWN_ENABLE = 0x00000001 ## !< Enable GPIO pull-down resistor
 
+  gpio_pull_mode_t* {.size: sizeof(cint).} = enum
+    PULLUP_ONLY,         ## !< Pad pull up
+    PULLDOWN_ONLY,       ## !< Pad pull down
+    PULLUP_PULLDOWN,     ## !< Pad pull up + pull down
+    FLOATING             ## !< Pad floating
+
+  gpio_drive_cap_t* {.size: sizeof(cint).} = enum
+    DRIVE_CAP_0 = 0,       ## !< Pad drive capability: weak
+    DRIVE_CAP_1 = 1,       ## !< Pad drive capability: stronger
+    DRIVE_CAP_2 = 2,       ## !< Pad drive capability: default value
+    DRIVE_CAP_3 = 3,       ## !< Pad drive capability: strongest
+    DRIVE_CAP_MAX
 
 const
   GPIO_INTR_DISABLE* = INTR_DISABLE
@@ -201,7 +214,15 @@ const
   GPIO_PULLDOWN_DISABLE* = PULLDOWN_DISABLE
   GPIO_PULLDOWN_ENABLE* = PULLDOWN_ENABLE
 
-
+  GPIO_PULLUP_ONLY* = PULLUP_ONLY
+  GPIO_PULLDOWN_ONLY* = PULLDOWN_ONLY
+  GPIO_PULLUP_PULLDOWN* = PULLUP_PULLDOWN
+  GPIO_FLOATING* = FLOATING
+  GPIO_DRIVE_CAP_0* = DRIVE_CAP_0
+  GPIO_DRIVE_CAP_1* = DRIVE_CAP_1
+  GPIO_DRIVE_CAP_2* = DRIVE_CAP_2
+  GPIO_DRIVE_CAP_3* = DRIVE_CAP_3
+  GPIO_DRIVE_CAP_MAX* = DRIVE_CAP_MAX
 
 
 ## *
@@ -216,23 +237,12 @@ type
     pull_down_en* {.importc: "pull_down_en".}: gpio_pulldown_t ## !< GPIO pull-down
     intr_type* {.importc: "intr_type".}: gpio_int_type_t ## !< GPIO interrupt type
 
-  gpio_pull_mode_t* {.size: sizeof(cint).} = enum
-    GPIO_PULLUP_ONLY,         ## !< Pad pull up
-    GPIO_PULLDOWN_ONLY,       ## !< Pad pull down
-    GPIO_PULLUP_PULLDOWN,     ## !< Pad pull up + pull down
-    GPIO_FLOATING             ## !< Pad floating
-  gpio_drive_cap_t* {.size: sizeof(cint).} = enum
-    GPIO_DRIVE_CAP_0 = 0,       ## !< Pad drive capability: weak
-    GPIO_DRIVE_CAP_1 = 1,       ## !< Pad drive capability: stronger
-    GPIO_DRIVE_CAP_2 = 2,       ## !< Pad drive capability: default value
-    GPIO_DRIVE_CAP_3 = 3,       ## !< Pad drive capability: strongest
-    GPIO_DRIVE_CAP_MAX
   gpio_isr_t* = proc (a1: pointer) {.cdecl.}
   gpio_isr_handle_t* = intr_handle_t
 
 
-var
-  GPIO_DRIVE_CAP_DEFAULT = GPIO_DRIVE_CAP_2
+const
+  GPIO_DRIVE_CAP_DEFAULT* = GPIO_DRIVE_CAP_2
 
 ## *
 ##  @brief GPIO common configuration

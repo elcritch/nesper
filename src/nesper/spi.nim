@@ -106,7 +106,7 @@ proc newSpiDevice*(
       ## valid, including the possible clock delay from slave to master. The driver uses this value to give an extra \
       ## delay before the MISO is ready on the line. Leave at 0 unless you know you need a delay. For better timing \
       ## performance at high frequency (over 8MHz), it's suggest to have the right value.
-      flags: set[SpiDevice], ## \
+      flags: set[SpiDeviceFlag], ## \
         ## Flags from SpiDevices. Produces bitwise OR of SPI_DEVICE_* flags
       queue_size: int = 1, ## \
         ## Transaction queue size. This sets how many transactions can be 'in the air' \
@@ -155,7 +155,7 @@ proc newSpiTrans*(dev: SpiDev;
                      data: openArray[uint8],
                      rxlen: bits = bits(0),
                      len: bits = bits(-1),
-                     flags: set[SpiBusFlag] = {},
+                     flags: set[SpiTransFlag] = {},
                   ): SpiTrans =
   spi_id.inc()
 
