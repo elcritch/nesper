@@ -169,17 +169,18 @@ proc addDevice*(
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
 
-proc trans*(dev: SpiDev;
+proc fullTrans*(dev: SpiDev;
                      txdata: openArray[uint8],
-                     txbits: bits = bits(-1),
-                     rxbits: bits = bits(0),
+                     txlength: bits = bits(-1),
+                     rxlength: bits = bits(-1),
                      cmd: uint16 = 0,
                      cmdaddr: uint64 = 0,
                      flags: set[SpiTransFlag] = {},
                   ): SpiTrans =
   spi_id.inc()
   var tflags = flags
-  assert txbits.int() <= 8*len(txdata)
+  assert txlength.int() <= 8*len(txdata)
+  assert rxlength.int() >= 0
 
   result = new(SpiTrans)
   result.dev = dev
@@ -189,10 +190,10 @@ proc trans*(dev: SpiDev;
 
   # Set TX Details
   result.trn.length =
-    if txbits.int < 0:
+    if txlength.int < 0:
       8*txdata.len().csize_t()
     else:
-      txbits.uint32()
+      txlength.uint32()
 
   if result.trn.length <= 3:
     result.trn.rx.buffer = nil
@@ -210,7 +211,9 @@ proc trans*(dev: SpiDev;
 
   
   # Set RX Details
-  result.trn.rxlength = rxbits.uint()
+  # result.trn.rxlength =
+    # if rxlength.uint() < 0:
+      
   if result.trn.rxlength <= 3:
     result.trn.rx.buffer = nil
   else:
@@ -232,23 +235,22 @@ proc trans*(dev: SpiDev;
 
 proc writeTrans*(dev: SpiDev;
                   data: seq[uint8],
-                  txbits: bits = bits(-1),
+                  txlength: bits = bits(-1),
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_RXDATA in flags)
-  trans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = txbits, rxbits = bits(0), flags = flags)
+  fullTrans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txlength = txlength, rxlength = bits(0), flags = flags)
 
-proc readTtrans*(dev: SpiDev;
-                  data: seq[uint8],
-                  rxbits: bits = bits(-1),
+proc readTrans*(dev: SpiDev;
+                  rxlength: bits = bits(-1),
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_TXDATA in flags)
-  trans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = rxbits, txbits = bits(0), txdata = [], flags = flags)
+  fullTrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxlength = rxlength, txlength = bits(0), txdata = [], flags = flags)
 
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 

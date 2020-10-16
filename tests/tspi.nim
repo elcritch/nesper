@@ -20,17 +20,21 @@ var
 
 
 let tdata1 = [byte 1, 2]
-let trn1 = dev.trans(tdata1)
+let trn1 = dev.fullTrans(tdata1)
 
+# read non-byte number of bits
 var tdata2 = [byte 1, 2, 3]
-let trn2 = dev.trans(tdata2)
+let trn2 = dev.fullTrans(tdata2, rxbits=bits(20))
 
-let trn3 = dev.trans([byte 1, 2, 3, 4, 5])
+let trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
 
 let tdata4 = @[1'u8, 2, 3]
-let trn4 = dev.trans(tdata4)
+let trn4 = dev.fullTrans(tdata4)
 
-let trn5 = dev.trans(@[1'u8, 2, 3, 4, 5])
+let trn5 = dev.readTrans(bits(24))
+# this is an error: let trn5 = dev.readTrans(@[1'u8, 2, 3, 4, 5])
+
+let trn6 = dev.writeTrans(@[1'u8, 2, 3, 4, 5])
 
 echo "trn1: " & repr(trn1)
 echo "trn2: " & repr(trn2)
@@ -38,10 +42,10 @@ echo "trn3: " & repr(trn3)
 echo "trn4: " & repr(trn4)
 echo "trn5: " & repr(trn5)
 
-# Example: spi poll transmission
+# Example: spi poll fullTransmission
 trn1.poll()
 
-# Example spi queued transaction
+# Example spi queued fullTransaction
 trn2.queue()
 
 # Example aquire bus
