@@ -48,7 +48,7 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
   result.msg = msg
   result.code = error
 
-proc initSpiBus*(
+proc newSpiBus*(
         host: spi_host_device_t;
         miso, mosi, sclk: int;
         quadwp = -1, quadhd = -1;
@@ -86,7 +86,6 @@ proc initSpiBus*(
 #     spi_device_interface_config_t::command_bits
 #     spi_device_interface_config_t::address_bits
 #     spi_transaction_t::length
-# 
 # While the member spi_transaction_t::rxlength only determines the length of data received into the buffer.
 # 
 # In half-duplex transactions, the read and write phases are not simultaneous (one direction at a time). The lengths of the write and read phases are determined by length and rxlength members of the struct spi_transaction_t respectively.
@@ -96,6 +95,7 @@ proc initSpiBus*(
 # The read and write phases can also be optional, as not every transaction requires both writing and reading data. If rx_buffer is NULL and SPI_TRANS_USE_RXDATA is not set, the read phase is skipped. If tx_buffer is NULL and SPI_TRANS_USE_TXDATA is not set, the write phase is skipped.
 # 
 # The driver supports two types of transactions: the interrupt transactions and polling transactions. The programmer can choose to use a different transaction type per Device. If your Device requires both transaction types, see Notes on Sending Mixed Transactions to the Same Device.
+
 
 proc addDevice*(
       bus: SpiBus,
@@ -168,44 +168,58 @@ proc addDevice*(
 var spi_id: uint32 = 0'u32
 
 proc raw_trans*(dev: SpiDev;
+                     cmd: uint16,
+                     taddr: uint64,
                      txdata: openArray[uint8],
                      rxdata: openArray[uint8],
-                     rxlen: bits = bits(0),
-                     txlen: bits = bits(-1),
+                     txbits: bits = bits(-1),
+                     rxbits: bits = bits(0),
                      flags: set[SpiTransFlag] = {},
                   ): SpiTrans =
   spi_id.inc()
+  var tflags = flags
+  assert txbits.int() <= 8*len(txdata)
+  assert rxbits.int() <= 8*len(rxdata)
 
   result.dev = dev
-  result.trn.length = if len.int < 0: 8*data.len().csize_t() else: len.uint
   result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
-  result.trn.rxlength = rxlen.uint
 
   # For data less than 4 bytes, use data directly 
-  if data.len() <= 3:
-    for i in 0..high(data):
-      result.trn.tx.data[i] = data[i]
+  result.trn.length = if txbits.int < 0: 8*txdata.len().csize_t() else: txbits.uint32()
+  tflags.incl({USE_TXDATA})
+  if txdata.len() <= 3:
+    for i in 0..high(txdata):
+      result.trn.tx.data[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
-    result.tx_data = data.toSeq()
+    result.tx_data = txdata.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
   
   # if rxlen <= 32:
-    
+  result.trn.rxlength = if rxbits.int < 0: 8*rxdata.len().csize_t() else: rxbits.uint()
+  tflags.incl({USE_RXDATA})
+
+  result.trn.flags = 0
+  for flg in tflags:
+    result.trn.flags = flg.uint32 or result.trn.flags 
+
+
+
 proc tx_trans*(dev: SpiDev;
-                  data: seq[uint8],
+                  txdata: seq[uint8],
                   len: bits = bits(-1),
                 ): SpiTrans =
   raw_trans()
 
 proc rx_trans*(dev: SpiDev;
-                  data: seq[uint8],
+                  rxdata: seq[uint8],
                   len: bits = bits(-1),
                 ): SpiTrans =
   raw_trans()
 
 proc rw_trans*(dev: SpiDev;
-                  data: seq[uint8],
+                  txdata: seq[uint8],
+                  rxdata: seq[uint8],
                   len: bits = bits(-1),
                 ): SpiTrans =
   raw_trans()
