@@ -19,11 +19,11 @@ export gpio_driver
 ## * \defgroup gpio_apis, uart configuration and communication related apis
 
 ## TODO: the closes for these appear to be uint32, but may be wrong?!
-proc GPIO_REG_READ*(reg: uint32): uint32 {.importc: "$1", header: "gpio.h".}
-proc GPIO_REG_WRITE*(reg: uint32, val: uint32) {.importc: "$1", header: "gpio.h".}
+proc GPIO_REG_READ*(reg: uint32): uint32 {.importc: "$1", header: "esp32/rom/gpio.h".}
+proc GPIO_REG_WRITE*(reg: uint32, val: uint32) {.importc: "$1", header: "esp32/rom/gpio.h".}
 
 var
-  GPIO_ID_PIN0* {.importc: "$1", header: "gpio.h".} = 0
+  GPIO_ID_PIN0* {.importc: "$1", header: "esp32/rom/gpio.h".} = 0
 
 template GPIO_ID_PIN*(n: untyped): untyped =
   (GPIO_ID_PIN0 + (n))
@@ -78,7 +78,7 @@ type
 ##  @return None
 ##
 
-proc gpio_init*() {.importc: "gpio_init", header: "gpio.h".}
+proc gpio_init*() {.importc: "gpio_init", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Change GPIO(0-31) pin output by setting, clearing, or disabling pins, GPIO0<->BIT(0).
 ##          There is no particular ordering guaranteed; so if the order of writes is significant,
@@ -97,7 +97,7 @@ proc gpio_init*() {.importc: "gpio_init", header: "gpio.h".}
 
 proc gpio_output_set*(set_mask: uint32; clear_mask: uint32;
                      enable_mask: uint32; disable_mask: uint32) {.
-    importc: "gpio_output_set", header: "gpio.h".}
+    importc: "gpio_output_set", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Change GPIO(32-39) pin output by setting, clearing, or disabling pins, GPIO32<->BIT(0).
 ##          There is no particular ordering guaranteed; so if the order of writes is significant,
@@ -116,7 +116,7 @@ proc gpio_output_set*(set_mask: uint32; clear_mask: uint32;
 
 proc gpio_output_set_high*(set_mask: uint32; clear_mask: uint32;
                           enable_mask: uint32; disable_mask: uint32) {.
-    importc: "gpio_output_set_high", header: "gpio.h".}
+    importc: "gpio_output_set_high", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Sample the value of GPIO input pins(0-31) and returns a bitmask.
 ##
@@ -125,7 +125,7 @@ proc gpio_output_set_high*(set_mask: uint32; clear_mask: uint32;
 ##  @return uint32 : bitmask for GPIO input pins, BIT(0) for GPIO0.
 ##
 
-proc gpio_input_get*(): uint32 {.importc: "gpio_input_get", header: "gpio.h".}
+proc gpio_input_get*(): uint32 {.importc: "gpio_input_get", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Sample the value of GPIO input pins(32-39) and returns a bitmask.
 ##
@@ -135,7 +135,7 @@ proc gpio_input_get*(): uint32 {.importc: "gpio_input_get", header: "gpio.h".}
 ##
 
 proc gpio_input_get_high*(): uint32 {.importc: "gpio_input_get_high",
-                                     header: "gpio.h".}
+                                     header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Register an application-specific interrupt handler for GPIO pin interrupts.
 ##         Once the interrupt handler is called, it will not be called again until after a call to gpio_intr_ack.
@@ -149,7 +149,7 @@ proc gpio_input_get_high*(): uint32 {.importc: "gpio_input_get_high",
 ##
 
 proc gpio_intr_handler_register*(fn: gpio_intr_handler_fn_t; arg: pointer) {.
-    importc: "gpio_intr_handler_register", header: "gpio.h".}
+    importc: "gpio_intr_handler_register", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Get gpio interrupts which happens but not processed.
 ##         Please do not call this function in SDK.
@@ -159,7 +159,7 @@ proc gpio_intr_handler_register*(fn: gpio_intr_handler_fn_t; arg: pointer) {.
 ##  @return uint32 : bitmask for GPIO pending interrupts, BIT(0) for GPIO0.
 ##
 
-proc gpio_intr_pending*(): uint32 {.importc: "gpio_intr_pending", header: "gpio.h".}
+proc gpio_intr_pending*(): uint32 {.importc: "gpio_intr_pending", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Get gpio interrupts which happens but not processed.
 ##         Please do not call this function in SDK.
@@ -170,7 +170,7 @@ proc gpio_intr_pending*(): uint32 {.importc: "gpio_intr_pending", header: "gpio.
 ##
 
 proc gpio_intr_pending_high*(): uint32 {.importc: "gpio_intr_pending_high",
-                                        header: "gpio.h".}
+                                        header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Ack gpio interrupts to process pending interrupts.
 ##         Please do not call this function in SDK.
@@ -180,7 +180,7 @@ proc gpio_intr_pending_high*(): uint32 {.importc: "gpio_intr_pending_high",
 ##  @return None
 ##
 
-proc gpio_intr_ack*(ack_mask: uint32) {.importc: "gpio_intr_ack", header: "gpio.h".}
+proc gpio_intr_ack*(ack_mask: uint32) {.importc: "gpio_intr_ack", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Ack gpio interrupts to process pending interrupts.
 ##         Please do not call this function in SDK.
@@ -191,7 +191,7 @@ proc gpio_intr_ack*(ack_mask: uint32) {.importc: "gpio_intr_ack", header: "gpio.
 ##
 
 proc gpio_intr_ack_high*(ack_mask: uint32) {.importc: "gpio_intr_ack_high",
-    header: "gpio.h".}
+    header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Set GPIO to wakeup the ESP32.
 ##         Please do not call this function in SDK.
@@ -204,7 +204,7 @@ proc gpio_intr_ack_high*(ack_mask: uint32) {.importc: "gpio_intr_ack_high",
 ##
 
 proc gpio_pin_wakeup_enable*(i: uint32; intr_state: gpio_int_type_t) {.
-    importc: "gpio_pin_wakeup_enable", header: "gpio.h".}
+    importc: "gpio_pin_wakeup_enable", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief disable GPIOs to wakeup the ESP32.
 ##         Please do not call this function in SDK.
@@ -215,7 +215,7 @@ proc gpio_pin_wakeup_enable*(i: uint32; intr_state: gpio_int_type_t) {.
 ##
 
 proc gpio_pin_wakeup_disable*() {.importc: "gpio_pin_wakeup_disable",
-                                header: "gpio.h".}
+                                header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief set gpio input to a signal, one gpio can input to several signals.
 ##
@@ -232,7 +232,7 @@ proc gpio_pin_wakeup_disable*() {.importc: "gpio_pin_wakeup_disable",
 ##
 
 proc gpio_matrix_in*(gpio: uint32; signal_idx: uint32; inv: bool) {.
-    importc: "gpio_matrix_in", header: "gpio.h".}
+    importc: "gpio_matrix_in", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief set signal output to gpio, one signal can output to several gpios.
 ##
@@ -249,7 +249,7 @@ proc gpio_matrix_in*(gpio: uint32; signal_idx: uint32; inv: bool) {.
 ##
 
 proc gpio_matrix_out*(gpio: uint32; signal_idx: uint32; out_inv: bool;
-                     oen_inv: bool) {.importc: "gpio_matrix_out", header: "gpio.h".}
+                     oen_inv: bool) {.importc: "gpio_matrix_out", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Select pad as a gpio function from IOMUX.
 ##
@@ -259,7 +259,7 @@ proc gpio_matrix_out*(gpio: uint32; signal_idx: uint32; out_inv: bool;
 ##
 
 proc gpio_pad_select_gpio*(gpio_num: uint8) {.importc: "gpio_pad_select_gpio",
-    header: "gpio.h".}
+    header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Set pad driver capability.
 ##
@@ -271,7 +271,7 @@ proc gpio_pad_select_gpio*(gpio_num: uint8) {.importc: "gpio_pad_select_gpio",
 ##
 
 proc gpio_pad_set_drv*(gpio_num: uint8; drv: uint8) {.
-    importc: "gpio_pad_set_drv", header: "gpio.h".}
+    importc: "gpio_pad_set_drv", header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Pull up the pad from gpio number.
 ##
@@ -281,7 +281,7 @@ proc gpio_pad_set_drv*(gpio_num: uint8; drv: uint8) {.
 ##
 
 proc gpio_pad_pullup*(gpio_num: uint8) {.importc: "gpio_pad_pullup",
-                                        header: "gpio.h".}
+                                        header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Pull down the pad from gpio number.
 ##
@@ -291,7 +291,7 @@ proc gpio_pad_pullup*(gpio_num: uint8) {.importc: "gpio_pad_pullup",
 ##
 
 proc gpio_pad_pulldown*(gpio_num: uint8) {.importc: "gpio_pad_pulldown",
-    header: "gpio.h".}
+    header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Unhold the pad from gpio number.
 ##
@@ -301,7 +301,7 @@ proc gpio_pad_pulldown*(gpio_num: uint8) {.importc: "gpio_pad_pulldown",
 ##
 
 proc gpio_pad_unhold*(gpio_num: uint8) {.importc: "gpio_pad_unhold",
-                                        header: "gpio.h".}
+                                        header: "esp32/rom/gpio.h".}
 ## *
 ##  @brief Hold the pad from gpio number.
 ##
@@ -310,7 +310,7 @@ proc gpio_pad_unhold*(gpio_num: uint8) {.importc: "gpio_pad_unhold",
 ##  @return None
 ##
 
-proc gpio_pad_hold*(gpio_num: uint8) {.importc: "gpio_pad_hold", header: "gpio.h".}
+proc gpio_pad_hold*(gpio_num: uint8) {.importc: "gpio_pad_hold", header: "esp32/rom/gpio.h".}
 ## *
 ##  @}
 ##
