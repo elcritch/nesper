@@ -162,8 +162,6 @@ proc addDevice*(
   if (ret != ESP_OK):
     raise newSpiError("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
 
-# TODO: setup spi device rx memory
-# TODO: setup cmd/addr
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
 
@@ -288,12 +286,16 @@ proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.}
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
+  GC_ref(trn)
+
 proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): ptr spi_transaction_t {.inline.} = 
   let ret: esp_err_t =
     spi_device_get_trans_result(dev.handle, addr(result), ticks_to_wait)
 
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+
+  GC_ref(trn)
 
 proc transmit*(trn: SpiTrans) {.inline.} = 
   let ret: esp_err_t =
