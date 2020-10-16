@@ -168,8 +168,8 @@ proc addDevice*(
 var spi_id: uint32 = 0'u32
 
 proc raw_trans*(dev: SpiDev;
-                     cmd: uint16,
-                     taddr: uint64,
+                     cmd: uint16 = 0,
+                     cmdaddr: uint64 = 0,
                      txdata: openArray[uint8],
                      txbits: bits = bits(-1),
                      rxbits: bits = bits(-1),
@@ -183,53 +183,76 @@ proc raw_trans*(dev: SpiDev;
   result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
 
   # Set TX Details
-  result.trn.length = if txbits.int < 0: 8*txdata.len().csize_t() else: txbits.uint32()
-  if result.trn.length. in 1U..4U: tflags.incl({USE_TXDATA})
+  result.trn.length =
+    if txbits.int < 0:
+      8*txdata.len().csize_t()
+    else:
+      txbits.uint32()
+
   if result.trn.length <= 3:
-    for i in 0..<4:
-      result.trn.tx.data[i] = 0
+    result.trn.rx.buffer = nil
     for i in 0..high(txdata):
       result.trn.tx.data[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = txdata.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+
+  if result.trn.length. in 1U..4U:
+    tflags.incl({USE_TXDATA})
+  else:
+    result.trn.rx.buffer = nil
+
   
   # Set RX Details
   result.trn.rxlength = rxbits.uint()
-  if result.trn.rxlength in 1U..4U: tflags.incl({USE_RXDATA})
   if result.trn.rxlength <= 3:
-    for i in 0..high(txdata):
-      result.trn.rx.data[i] = 0
+    result.trn.rx.buffer = nil
   else:
     # This order is important, copy the seq then take the unsafe addr
     let rm = if result.trn.rxlength mod 8 > 0: 1 else: 0
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
     result.trn.rx.buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
+  if result.trn.rxlength in 1U..4U:
+    tflags.incl({USE_RXDATA})
+  else:
+    result.trn.rx.buffer = nil
+
+  ## Flags
   result.trn.flags = 0
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
 
 
 proc tx_trans*(dev: SpiDev;
-                  txdata: seq[uint8],
-                  len: bits = bits(-1),
+                  cmd: uint16 = 0,
+                  cmdaddr: uint64 = 0,
+                  data: seq[uint8],
+                  blen: bits = bits(-1),
+                  flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
-  raw_trans()
+  assert not (USE_RXDATA in flags)
+  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, txdata = data, txbits = blen, rxbits = bits(0), flags = flags)
 
 proc rx_trans*(dev: SpiDev;
-                  rxdata: seq[uint8],
-                  len: bits = bits(-1),
+                  cmd: uint16 = 0,
+                  cmdaddr: uint64 = 0,
+                  data: seq[uint8],
+                  blen: bits = bits(-1),
+                  flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
-  raw_trans()
+  assert not (USE_RXDATA in flags)
+  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
 
 proc rw_trans*(dev: SpiDev;
-                  txdata: seq[uint8],
-                  rxdata: seq[uint8],
-                  len: bits = bits(-1),
+                  cmd: uint16 = 0,
+                  cmdaddr: uint64 = 0,
+                  data: seq[uint8],
+                  blen: bits = bits(-1),
+                  flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
-  raw_trans()
+  raw_trans(dev, cmd = cmd, cmdaddr = cmdaddr, rxbits = blen, txbits = bits(0), txdata = [], flags = flags)
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
