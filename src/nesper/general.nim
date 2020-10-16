@@ -10,7 +10,7 @@ var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/Free
 
 proc NimMain() {.importc.}
 
-template app_main*(n: string, blk: untyped): untyped =
+template app_main*(blk: untyped): untyped =
 
   proc app_main*() {.exportc.} =
     NimMain() # initialize garbage collector memory, types and stack

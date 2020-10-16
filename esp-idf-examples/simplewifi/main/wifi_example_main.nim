@@ -104,7 +104,7 @@ proc exampleDisconnect*(): esp_err_t =
 
   return ESP_OK
 
-proc nim_app_main*() {.exportc.} =
+app_main():
   initNvs()
   tcpip_adapter_init()
 
