@@ -8,6 +8,8 @@ import esp/driver/spi
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
 
+const TAG = "spis"
+
 type
 
   bits* = distinct int
@@ -288,13 +290,15 @@ template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped) =
   blk
   dev.releaseBus()
 
-proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) = 
+proc queue*(trn: var SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) = 
   let ret: esp_err_t =
     spi_device_queue_trans(trn.dev.handle, addr(trn.trn), ticks_to_wait)
 
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
+  ## TODO: IMPORTANT test this...
+  logi(TAG, "queue: %s", repr(trn.addr()))
   GC_ref(trn)
 
 proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): SpiTrans = 
@@ -303,7 +307,9 @@ proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): SpiTrans
   let ret: esp_err_t =
     spi_device_get_trans_result(dev.handle, addr(trn), ticks_to_wait)
 
-  result = cast[ptr SpiTrans](trn.user)[]
+  let tptr = cast[ptr SpiTrans](trn.user)
+  logi(TAG, "retrieve: %s", repr(tptr))
+  result = tptr[]
   ## TODO: IMPORTANT test this...
   GC_unref( result )
 
