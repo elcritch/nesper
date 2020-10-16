@@ -95,3 +95,4 @@ proc generate_sensor_id*(): string =
     sensor_id.add(":")
 
   return sensor_id
+
