@@ -10,14 +10,11 @@ var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/Free
 
 proc NimMain() {.importc.}
 
-when defined(NimAppMain):
-
-  proc nim_app_main*() {.importc.}
+template app_main*(n: string, blk: untyped): untyped =
 
   proc app_main*() {.exportc.} =
-    ## Setup the standard main app
     NimMain() # initialize garbage collector memory, types and stack
-    nim_app_main()
+    blk
 
 type
   EspError* = object of OSError
