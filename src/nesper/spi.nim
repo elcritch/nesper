@@ -172,7 +172,7 @@ var spi_id: uint32 = 0'u32
 proc trans*(dev: SpiDev;
                      txdata: openArray[uint8],
                      txbits: bits = bits(-1),
-                     rxbits: bits = bits(-1),
+                     rxbits: bits = bits(0),
                      cmd: uint16 = 0,
                      cmdaddr: uint64 = 0,
                      flags: set[SpiTransFlag] = {},
