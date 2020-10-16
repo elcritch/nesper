@@ -74,7 +74,7 @@ proc joinBytes32*[T](bs: openArray[byte], count: range[1..4], top=false): T =
 proc joinBytes64*[T](bs: openArray[byte], count: range[1..8], top=false): T =
   var n = 0'u64
   let N = min(count, bs.len())
-  for i in 0 .. min(count, high(bs)):
+  for i in 0 ..< N:
     n = (n shl 8) or bs[i]
   if top:
     n = n shl (64-N*8)
