@@ -171,23 +171,23 @@ proc raw_trans*(dev: SpiDev;
                      cmd: uint16,
                      taddr: uint64,
                      txdata: openArray[uint8],
-                     rxdata: openArray[uint8],
                      txbits: bits = bits(-1),
-                     rxbits: bits = bits(0),
+                     rxbits: bits = bits(-1),
                      flags: set[SpiTransFlag] = {},
                   ): SpiTrans =
   spi_id.inc()
   var tflags = flags
   assert txbits.int() <= 8*len(txdata)
-  assert rxbits.int() <= 8*len(rxdata)
 
   result.dev = dev
   result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
 
-  # For data less than 4 bytes, use data directly 
+  # Set TX Details
   result.trn.length = if txbits.int < 0: 8*txdata.len().csize_t() else: txbits.uint32()
   tflags.incl({USE_TXDATA})
-  if txdata.len() <= 3:
+  if result.trn.length <= 3:
+    for i in 0..<4:
+      result.trn.tx.data[i] = 0
     for i in 0..high(txdata):
       result.trn.tx.data[i] = txdata[i]
   else:
@@ -195,9 +195,17 @@ proc raw_trans*(dev: SpiDev;
     result.tx_data = txdata.toSeq()
     result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
   
-  # if rxlen <= 32:
-  result.trn.rxlength = if rxbits.int < 0: 8*rxdata.len().csize_t() else: rxbits.uint()
+  # Set RX Details
+  result.trn.rxlength = rxbits.uint()
   tflags.incl({USE_RXDATA})
+  if result.trn.rxlength <= 3:
+    for i in 0..high(txdata):
+      result.trn.rx.data[i] = 0
+  else:
+    # This order is important, copy the seq then take the unsafe addr
+    let rm = if result.trn.rxlength mod 8 > 0: 1 else: 0
+    result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
+    result.trn.rx.buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
   result.trn.flags = 0
   for flg in tflags:
