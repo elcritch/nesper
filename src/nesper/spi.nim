@@ -181,6 +181,8 @@ proc rawTtrans*(dev: SpiDev;
 
   result.dev = dev
   result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
+  result.trn.cmd = cmd
+  result.trn.`addr` = cmdaddr
 
   # Set TX Details
   result.trn.length =
