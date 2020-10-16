@@ -80,6 +80,16 @@ proc initSpiBus*(
 
 # TODO: setup spi device (create spi_device_interface_config_t )
 #   - Note: SPI_DEVICE_* is bitwise flags in  spi_device_interface_config_t
+# The attributes of a transaction are determined by the bus configuration structure spi_bus_config_t, device configuration structure spi_device_interface_config_t, and transaction configuration structure spi_transaction_t.
+# An SPI Host can send full-duplex transactions, during which the read and write phases occur simultaneously. The total transaction length is determined by the sum of the following members:
+#     spi_device_interface_config_t::command_bits
+#     spi_device_interface_config_t::address_bits
+#     spi_transaction_t::length
+# While the member spi_transaction_t::rxlength only determines the length of data received into the buffer.
+# In half-duplex transactions, the read and write phases are not simultaneous (one direction at a time). The lengths of the write and read phases are determined by length and rxlength members of the struct spi_transaction_t respectively.
+# The command and address phases are optional, as not every SPI device requires a command and/or address. This is reflected in the Device’s configuration: if command_bits and/or address_bits are set to zero, no command or address phase will occur.
+# The read and write phases can also be optional, as not every transaction requires both writing and reading data. If rx_buffer is NULL and SPI_TRANS_USE_RXDATA is not set, the read phase is skipped. If tx_buffer is NULL and SPI_TRANS_USE_TXDATA is not set, the write phase is skipped.
+# The driver supports two types of transactions: the interrupt transactions and polling transactions. The programmer can choose to use a different transaction type per Device. If your Device requires both transaction types, see Notes on Sending Mixed Transactions to the Same Device.
 
 proc addDevice*(
       bus: SpiBus,
@@ -151,10 +161,11 @@ proc addDevice*(
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
 
-proc newSpiTrans*(dev: SpiDev;
-                     data: openArray[uint8],
+proc raw_trans*(dev: SpiDev;
+                     txdata: openArray[uint8],
+                     rxdata: openArray[uint8],
                      rxlen: bits = bits(0),
-                     len: bits = bits(-1),
+                     txlen: bits = bits(-1),
                      flags: set[SpiTransFlag] = {},
                   ): SpiTrans =
   spi_id.inc()
@@ -175,28 +186,23 @@ proc newSpiTrans*(dev: SpiDev;
   
   # if rxlen <= 32:
     
-
-proc newSpiTxTrans*(dev: SpiDev;
+proc tx_trans*(dev: SpiDev;
                   data: seq[uint8],
-                  rxlen: bits = bits(-1),
                   len: bits = bits(-1),
-                  ): SpiTrans =
-  result.dev = dev
-  if len.int < 0:
-    result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
-  else:
-    # Manually set bit length for non-byte length sizes
-    result.trn.length = len.uint
+                ): SpiTrans =
+  raw_trans()
 
-  result.trn.rxlength = rxlen.uint
+proc rx_trans*(dev: SpiDev;
+                  data: seq[uint8],
+                  len: bits = bits(-1),
+                ): SpiTrans =
+  raw_trans()
 
-  if data.len() <= 3:
-    for i in 0..high(data):
-      result.trn.tx.data[i] = data[i]
-  else:
-    # This order is important, copy the seq then take the unsafe addr
-    result.tx_data = data
-    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+proc rw_trans*(dev: SpiDev;
+                  data: seq[uint8],
+                  len: bits = bits(-1),
+                ): SpiTrans =
+  raw_trans()
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
