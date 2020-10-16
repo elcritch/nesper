@@ -153,7 +153,7 @@ proc newSpiDevice*(
 
 proc newSpiTrans*(dev: SpiDev;
                      data: openArray[uint8],
-                     rxlen: bits = bits(9),
+                     rxlen: bits = bits(0),
                      len: bits = bits(-1),
                      ): SpiTrans =
   result.dev = dev
@@ -177,6 +177,28 @@ proc newSpiTrans*(dev: SpiDev;
 proc newSpiTrans*(dev: SpiDev;
                   data: seq[uint8],
                   rxlen: bits = bits(0),
+                  len: bits = bits(-1),
+                  ): SpiTrans =
+  result.dev = dev
+  if len.int < 0:
+    result.trn.length = 8*data.len().csize_t() ## Command is 8 bits
+  else:
+    # Manually set bit length for non-byte length sizes
+    result.trn.length = len.uint
+
+  result.trn.rxlength = rxlen.uint
+
+  if data.len() <= 3:
+    for i in 0..high(data):
+      result.trn.tx.data[i] = data[i]
+  else:
+    # This order is important, copy the seq then take the unsafe addr
+    result.tx_data = data
+    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+
+proc newSpiTxTrans*(dev: SpiDev;
+                  data: seq[uint8],
+                  rxlen: bits = bits(-1),
                   len: bits = bits(-1),
                   ): SpiTrans =
   result.dev = dev

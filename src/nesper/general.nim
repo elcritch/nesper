@@ -60,7 +60,20 @@ proc setFromString*(val: var openArray[uint8], str: cstring) =
   copyMem(addr(val), str, lstr)
 
 proc ms_to_ticks*(ms: int): TickType_t =
-      TickType_t(uint32(ms) div portTICK_PERIOD_MS )
+  TickType_t(uint32(ms) div portTICK_PERIOD_MS )
 
 proc delayMillis*( milsecs: int ) =
   vTaskDelay(milsecs.ms_to_ticks())
+
+proc joinBytes32*[T](bs: openArray[byte], count: range[1..4]): T =
+  var n = 0'u32
+  for i in 0 ..< min(count, bs.len()):
+    n = (n shl 8) or bs[i]
+  return cast[T](n)
+
+proc joinBytes64*[T](bs: openArray[byte], count: range[1..8]): T =
+  var n = 0'u64
+  for i in 0 .. min(count, high(bs)):
+    n = (n shl 8) or bs[i]
+  return cast[T](n)
+

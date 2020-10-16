@@ -33,6 +33,10 @@ task test, "Runs the test suite":
     if dtest.startsWith("t") and dtest.endsWith(".nim"):
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
-  exec "nim c -r tests/trouter.nim"
+  for dtest in listFiles("tests/compile_tests/"):
+    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+      exec "nim c -r --cincludes:c_headers/mock/ $1" % [dtest]
+
+  # exec "nim c -r tests/trouter.nim"
 
 
