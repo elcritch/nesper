@@ -28,6 +28,10 @@ type
     tx_data*: seq[uint8]
     rx_data*: seq[uint8]
 
+  SpiHostDevice* = enum
+    HSPI = SPI2_HOST.int(),              ## /< SPI2
+    VSPI = SPI3_HOST.int()               ## /< SPI3
+
 
 proc swapDataTx*(data: uint32, len: uint32): uint32 =
   # bigEndian( data shl (32-len) )
@@ -49,7 +53,7 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
   result.code = error
 
 proc newSpiBus*(
-        host: spi_host_device_t;
+        host: SpiHostDevice;
         miso, mosi, sclk: int;
         quadwp = -1, quadhd = -1;
         dma_channel: range[0..2],
@@ -58,7 +62,7 @@ proc newSpiBus*(
         max_transfer_sz = 4094
       ): SpiBus = 
 
-  result.host = host
+  result.host = spi_host_device_t(host.int())
 
   result.buscfg.miso_io_num = miso.cint
   result.buscfg.mosi_io_num = mosi.cint
@@ -73,7 +77,7 @@ proc newSpiBus*(
     result.buscfg.flags = flg.uint32 or result.buscfg.flags 
 
     #//Initialize the SPI bus
-  let ret = spi_bus_initialize(host, addr(result.buscfg), dma_channel)
+  let ret = spi_bus_initialize(result.host, addr(result.buscfg), dma_channel)
   if (ret != ESP_OK):
     raise newSpiError("Error initializing spi (" & $esp_err_to_name(ret) & ")", ret)
 
@@ -177,8 +181,9 @@ proc rwTrans*(dev: SpiDev;
   var tflags = flags
   assert txbits.int() <= 8*len(txdata)
 
+  result = new(SpiTrans)
   result.dev = dev
-  result.trn.user = cast[pointer](spi_id) # use to keep track of spi trans id's
+  result.trn.user = cast[pointer]( addr(result) ) # use to keep track of spi trans id's
   result.trn.cmd = cmd
   result.trn.`addr` = cmdaddr
 
@@ -279,7 +284,7 @@ template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped) =
   blk
   dev.releaseBus()
 
-proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
+proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) = 
   let ret: esp_err_t =
     spi_device_queue_trans(trn.dev.handle, addr(trn.trn), ticks_to_wait)
 
@@ -288,14 +293,18 @@ proc queue*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.}
 
   GC_ref(trn)
 
-proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): ptr spi_transaction_t {.inline.} = 
+proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): SpiTrans = 
+  var trn: ptr spi_transaction_t
+
   let ret: esp_err_t =
-    spi_device_get_trans_result(dev.handle, addr(result), ticks_to_wait)
+    spi_device_get_trans_result(dev.handle, addr(trn), ticks_to_wait)
+
+  result = cast[ptr SpiTrans](trn.user)[]
+  ## TODO: IMPORTANT test this...
+  GC_unref( result )
 
   if (ret != ESP_OK):
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
-
-  GC_ref(trn)
 
 proc transmit*(trn: SpiTrans) {.inline.} = 
   let ret: esp_err_t =

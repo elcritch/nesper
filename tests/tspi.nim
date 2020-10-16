@@ -7,7 +7,7 @@ import nesper/spi
 #  define PIN_NUM_CS   34
 
 let
-  bus = SPI1_HOST.initSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={MASTER})
+  bus = SPI2_HOST.newSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={MASTER})
 
 var
   dev: SpiDev =
