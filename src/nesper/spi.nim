@@ -184,7 +184,7 @@ proc raw_trans*(dev: SpiDev;
 
   # Set TX Details
   result.trn.length = if txbits.int < 0: 8*txdata.len().csize_t() else: txbits.uint32()
-  tflags.incl({USE_TXDATA})
+  if result.trn.length. in 1U..4U: tflags.incl({USE_TXDATA})
   if result.trn.length <= 3:
     for i in 0..<4:
       result.trn.tx.data[i] = 0
@@ -197,7 +197,7 @@ proc raw_trans*(dev: SpiDev;
   
   # Set RX Details
   result.trn.rxlength = rxbits.uint()
-  tflags.incl({USE_RXDATA})
+  if result.trn.rxlength in 1U..4U: tflags.incl({USE_RXDATA})
   if result.trn.rxlength <= 3:
     for i in 0..high(txdata):
       result.trn.rx.data[i] = 0
@@ -210,7 +210,6 @@ proc raw_trans*(dev: SpiDev;
   result.trn.flags = 0
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
-
 
 
 proc tx_trans*(dev: SpiDev;
