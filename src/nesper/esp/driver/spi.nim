@@ -25,8 +25,8 @@ type
     SPI2_HOST = 1,              ## /< SPI2
     SPI3_HOST = 2               ## /< SPI3
 
-  spi_device_t* {.importc: "spi_device_t", header: "driver/spi_master.h", bycopy.} = object
-    id* {.importc: "id".}: cint
+  # spi_device_t* {.importc: "spi_device_t", header: "driver/spi_master.h", bycopy.} = object
+    # id* {.importc: "id".}: cint
     # trans_queue* {.importc: "trans_queue".}: QueueHandle_t
     # ret_queue* {.importc: "ret_queue".}: QueueHandle_t
     # cfg* {.importc: "cfg".}: spi_device_interface_config_t
@@ -337,7 +337,8 @@ type
     dummy_bits* {.importc: "dummy_bits".}: uint8 ## /< The dummy length in this transaction, in bits.
 
 
-  spi_device_handle_t* = ptr spi_device_t
+  # spi_device_handle_t* = ptr spi_device_t
+  spi_device_handle_t* = pointer
 
 ## /< Handle for a device on a SPI bus
 ## *
