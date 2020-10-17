@@ -25,7 +25,7 @@ type
     SPI2_HOST = 1,              ## /< SPI2
     SPI3_HOST = 2               ## /< SPI3
 
-  spi_device_t* {.importc: "spi_device_t", header: "spi_master.h", bycopy.} = object
+  spi_device_t* {.importc: "spi_device_t", header: "driver/spi_master.h", bycopy.} = object
     id* {.importc: "id".}: cint
     # trans_queue* {.importc: "trans_queue".}: QueueHandle_t
     # ret_queue* {.importc: "ret_queue".}: QueueHandle_t
@@ -173,15 +173,15 @@ type
                                             ##
 
 type
-  INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "spi_master.h", bycopy, union.} = object 
+  INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
     buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
     data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
 
-  INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "spi_master.h", bycopy, union.} = object 
+  INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
     buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
     data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
 
-  spi_transaction_t* {.importc: "spi_transaction_t", header: "spi_master.h", bycopy.} = object
+  spi_transaction_t* {.importc: "spi_transaction_t", header: "driver/spi_master.h", bycopy.} = object
     flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_TRANS_* flags
     cmd* {.importc: "cmd".}: uint16 ## *< Command data, of which the length is set in the ``command_bits`` of spi_device_interface_config_t.
                                   ##
@@ -256,17 +256,17 @@ proc spi_bus_free*(host_id: spi_host_device_t): esp_err_t {.importc: "spi_bus_fr
 ##
 
 var
-  SPI_MASTER_FREQ_7M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
-  SPI_MASTER_FREQ_8M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 10)
-  SPI_MASTER_FREQ_9M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 9) ## /< 8.89MHz
-  SPI_MASTER_FREQ_10M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 8) ## /< 10MHz
-  SPI_MASTER_FREQ_11M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 7) ## /< 11.43MHz
-  SPI_MASTER_FREQ_13M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
-  SPI_MASTER_FREQ_16M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 5) ## /< 16MHz
-  SPI_MASTER_FREQ_20M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 4) ## /< 20MHz
-  SPI_MASTER_FREQ_26M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 3) ## /< 26.67MHz
-  SPI_MASTER_FREQ_40M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 2) ## /< 40MHz
-  SPI_MASTER_FREQ_80M* {.importc: "$1", header: "spi_master.h".}: cint  # = (APB_CLK_FREQ div 1) ## /< 80MHz
+  SPI_MASTER_FREQ_7M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
+  SPI_MASTER_FREQ_8M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 10)
+  SPI_MASTER_FREQ_9M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 9) ## /< 8.89MHz
+  SPI_MASTER_FREQ_10M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 8) ## /< 10MHz
+  SPI_MASTER_FREQ_11M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 7) ## /< 11.43MHz
+  SPI_MASTER_FREQ_13M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 6) ## /< 13.33MHz
+  SPI_MASTER_FREQ_16M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 5) ## /< 16MHz
+  SPI_MASTER_FREQ_20M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 4) ## /< 20MHz
+  SPI_MASTER_FREQ_26M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 3) ## /< 26.67MHz
+  SPI_MASTER_FREQ_40M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 2) ## /< 40MHz
+  SPI_MASTER_FREQ_80M* {.importc: "$1", header: "driver/spi_master.h".}: cint  # = (APB_CLK_FREQ div 1) ## /< 80MHz
 
 
 type
@@ -278,7 +278,7 @@ type
 
 type
   spi_device_interface_config_t* {.importc: "spi_device_interface_config_t",
-                                  header: "spi_master.h", bycopy.} = object
+                                  header: "driver/spi_master.h", bycopy.} = object
     command_bits* {.importc: "command_bits".}: uint8 ## /< Default amount of bits in command phase (0-16), used when ``SPI_TRANS_VARIABLE_CMD`` is not used, otherwise ignored.
     address_bits* {.importc: "address_bits".}: uint8 ## /< Default amount of bits in address phase (0-64), used when ``SPI_TRANS_VARIABLE_ADDR`` is not used, otherwise ignored.
     dummy_bits* {.importc: "dummy_bits".}: uint8 ## /< Amount of dummy bits to insert between address and data phase
@@ -330,7 +330,7 @@ type
 
 type
   spi_transaction_ext_t* {.importc: "spi_transaction_ext_t",
-                          header: "spi_master.h", bycopy.} = object
+                          header: "driver/spi_master.h", bycopy.} = object
     base* {.importc: "base".}: spi_transaction_t ## /< Transaction data, so that pointer to spi_transaction_t can be converted into spi_transaction_ext_t
     command_bits* {.importc: "command_bits".}: uint8 ## /< The command length in this transaction, in bits.
     address_bits* {.importc: "address_bits".}: uint8 ## /< The address length in this transaction, in bits.
@@ -362,7 +362,7 @@ type
 proc spi_bus_add_device*(host_id: spi_host_device_t;
                         dev_config: ptr spi_device_interface_config_t;
                         handle: ptr spi_device_handle_t): esp_err_t {.
-    importc: "spi_bus_add_device", header: "spi_master.h".}
+    importc: "spi_bus_add_device", header: "driver/spi_master.h".}
 
 
 
@@ -377,7 +377,7 @@ proc spi_bus_add_device*(host_id: spi_host_device_t;
 ##
 
 proc spi_bus_remove_device*(handle: spi_device_handle_t): esp_err_t {.
-    importc: "spi_bus_remove_device", header: "spi_master.h".}
+    importc: "spi_bus_remove_device", header: "driver/spi_master.h".}
 
 
 
@@ -402,7 +402,7 @@ proc spi_bus_remove_device*(handle: spi_device_handle_t): esp_err_t {.
 proc spi_device_queue_trans*(handle: spi_device_handle_t;
                             trans_desc: ptr spi_transaction_t;
                             ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "spi_device_queue_trans", header: "spi_master.h".}
+    importc: "spi_device_queue_trans", header: "driver/spi_master.h".}
 
 
 
@@ -429,7 +429,7 @@ proc spi_device_queue_trans*(handle: spi_device_handle_t;
 proc spi_device_get_trans_result*(handle: spi_device_handle_t;
                                  trans_desc: ptr ptr spi_transaction_t;
                                  ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "spi_device_get_trans_result", header: "spi_master.h".}
+    importc: "spi_device_get_trans_result", header: "driver/spi_master.h".}
 
 
 
@@ -452,7 +452,7 @@ proc spi_device_get_trans_result*(handle: spi_device_handle_t;
 
 proc spi_device_transmit*(handle: spi_device_handle_t;
                          trans_desc: ptr spi_transaction_t): esp_err_t {.
-    importc: "spi_device_transmit", header: "spi_master.h".}
+    importc: "spi_device_transmit", header: "driver/spi_master.h".}
 
 
 
@@ -479,7 +479,7 @@ proc spi_device_transmit*(handle: spi_device_handle_t;
 proc spi_device_polling_start*(handle: spi_device_handle_t;
                               trans_desc: ptr spi_transaction_t;
                               ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "spi_device_polling_start", header: "spi_master.h".}
+    importc: "spi_device_polling_start", header: "driver/spi_master.h".}
 
 
 
@@ -500,7 +500,7 @@ proc spi_device_polling_start*(handle: spi_device_handle_t;
 ##
 
 proc spi_device_polling_end*(handle: spi_device_handle_t; ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "spi_device_polling_end", header: "spi_master.h".}
+    importc: "spi_device_polling_end", header: "driver/spi_master.h".}
 
 
 
@@ -523,7 +523,7 @@ proc spi_device_polling_end*(handle: spi_device_handle_t; ticks_to_wait: TickTyp
 
 proc spi_device_polling_transmit*(handle: spi_device_handle_t;
                                  trans_desc: ptr spi_transaction_t): esp_err_t {.
-    importc: "spi_device_polling_transmit", header: "spi_master.h".}
+    importc: "spi_device_polling_transmit", header: "driver/spi_master.h".}
 
 
 
@@ -543,7 +543,7 @@ proc spi_device_polling_transmit*(handle: spi_device_handle_t;
 ##
 
 proc spi_device_acquire_bus*(device: spi_device_handle_t; wait: TickType_t): esp_err_t {.
-    importc: "spi_device_acquire_bus", header: "spi_master.h".}
+    importc: "spi_device_acquire_bus", header: "driver/spi_master.h".}
 
 
 
@@ -554,7 +554,7 @@ proc spi_device_acquire_bus*(device: spi_device_handle_t; wait: TickType_t): esp
 ##
 
 proc spi_device_release_bus*(dev: spi_device_handle_t) {.
-    importc: "spi_device_release_bus", header: "spi_master.h".}
+    importc: "spi_device_release_bus", header: "driver/spi_master.h".}
 
 
 
@@ -569,7 +569,7 @@ proc spi_device_release_bus*(dev: spi_device_handle_t) {.
 ##
 
 proc spi_get_actual_clock*(fapb: cint; hz: cint; duty_cycle: cint): cint {.
-    importc: "spi_get_actual_clock", header: "spi_master.h".}
+    importc: "spi_get_actual_clock", header: "driver/spi_master.h".}
 
 
 
@@ -590,7 +590,7 @@ proc spi_get_actual_clock*(fapb: cint; hz: cint; duty_cycle: cint): cint {.
 
 proc spi_get_timing*(gpio_is_used: bool; input_delay_ns: cint; eff_clk: cint;
                     dummy_o: ptr cint; cycles_remain_o: ptr cint) {.
-    importc: "spi_get_timing", header: "spi_master.h".}
+    importc: "spi_get_timing", header: "driver/spi_master.h".}
 
 
 
@@ -605,4 +605,4 @@ proc spi_get_timing*(gpio_is_used: bool; input_delay_ns: cint; eff_clk: cint;
 ##
 
 proc spi_get_freq_limit*(gpio_is_used: bool; input_delay_ns: cint): cint {.
-    importc: "spi_get_freq_limit", header: "spi_master.h".}
+    importc: "spi_get_freq_limit", header: "driver/spi_master.h".}
