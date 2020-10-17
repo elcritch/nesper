@@ -97,7 +97,7 @@ proc startRpcQueueSocketServer*(port: Port; router: var RpcRouter) =
                   xCoreID=1)
 
   startSocketServer[RpcRouter](
-    Port(5555),
+    port,
     readHandler=rpcMsgPackQueueReadHandler,
     writeHandler=rpcMsgPackQueueWriteHandler,
     data=router)

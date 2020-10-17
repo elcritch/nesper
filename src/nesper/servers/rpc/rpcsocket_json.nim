@@ -43,7 +43,7 @@ proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
   logi(TAG, "starting json rpc server: buffer: %s", $router.buffer)
 
   startSocketServer[RpcRouter](
-    Port(5555),
+    port,
     readHandler=rpcMsgPackReadHandler,
     writeHandler=rpcMsgPackWriteHandler,
     data=router)
