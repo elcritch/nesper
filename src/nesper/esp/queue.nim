@@ -75,8 +75,10 @@ import ../consts
 ##  xQueueSend(), xQueueReceive(), etc.
 ##
 type
-  QueueHandle_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
-  StaticQueue_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
+  QueueHandle_t* = pointer
+  StaticQueue_t* = pointer
+#   QueueHandle_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
+#   StaticQueue_t* {.importc: "$1", header: "freertos/FreeRTOS.h".} = pointer
 
 ## *
 ##  Type by which queue sets are referenced.  For example, a call to
