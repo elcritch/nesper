@@ -45,6 +45,9 @@ proc setLevel*(pin: gpio_num_t, value: uint32) =
 proc setLevel*(pin: gpio_num_t, value: bool) =
   setLevel(pin, uint32(value))
 
+proc setLevel*(pin: gpio_num_t, value: range[0..1]) =
+  setLevel(pin, uint32(value))
+
 proc getLevel*(pin: gpio_num_t): bool =
   var ret: cint = gpio_getLevel(pin)
 
