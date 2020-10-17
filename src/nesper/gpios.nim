@@ -35,18 +35,18 @@ proc configure*(pins: set[gpio_num_t],
   if ret != ESP_OK:
     raise newEspError[GpioError]("gpio config:" & $esp_err_to_name(ret), ret )
 
-proc set_level*(pin: gpio_num_t, value: uint32) =
+proc setLevel*(pin: gpio_num_t, value: uint32) =
   var ret: esp_err_t
 
-  ret = gpio_set_level(pin, value.uint32())
+  ret = gpio_setLevel(pin, value.uint32())
   if ret != ESP_OK:
     raise newEspError[GpioError]("gpio set level:" & $esp_err_to_name(ret), ret )
 
-proc set_level*(pin: gpio_num_t, value: bool) =
-  set_level(pin, uint32(value))
+proc setLevel*(pin: gpio_num_t, value: bool) =
+  setLevel(pin, uint32(value))
 
-proc get_level*(pin: gpio_num_t): bool =
-  var ret: cint = gpio_get_level(pin)
+proc getLevel*(pin: gpio_num_t): bool =
+  var ret: cint = gpio_getLevel(pin)
 
   return
     if ret == 0:

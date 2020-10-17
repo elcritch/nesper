@@ -7,7 +7,7 @@ import nesper/gpios
 {GPIO_NUM_13}.configure(GPIO_MODE_OUTPUT_OD, pull_down=true)
 {GPIO_NUM_14}.configure(GPIO_MODE_INPUT_OUTPUT, interrupt = GPIO_INTR_ANYEDGE)
 
-GPIO_NUM_14.set_level(true)
+GPIO_NUM_14.setLevel(true)
 
-let state = GPIO_NUM_13.get_level()
+let state = GPIO_NUM_13.getLevel()
 echo("gpio 14: " & $state)
