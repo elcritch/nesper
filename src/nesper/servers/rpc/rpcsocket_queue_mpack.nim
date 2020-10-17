@@ -85,7 +85,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
 
 
 proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
-                                task_stack_depth = 8128'u32, task_priority = UBaseType_t(1), task_core=tskNO_AFFINITY) =
+                                task_stack_depth = 8128'u32, task_priority = UBaseType_t(1), task_core = BaseType_t(-1)) =
   logi(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
   var qh: RpcQueueHandle = new(RpcQueueHandle)
 
