@@ -80,7 +80,8 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
 
 
 
-proc startRpcQueueSocketServer*(port: Port; router: var RpcRouter) =
+proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
+                                task_stack_depth = 8128'u32, task_priority = UBaseType_t(1), task_core=tskNO_AFFINITY) =
   logi(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
   rpcRouter = router
   rpcInQueue = xQueueCreate(1, sizeof(JsonNode))
@@ -89,12 +90,12 @@ proc startRpcQueueSocketServer*(port: Port; router: var RpcRouter) =
   var rpcTask: TaskHandle_t
   discard xTaskCreatePinnedToCore(
                   execRpcSocketTask,
-                  pcName="rpc task",
-                  usStackDepth=8128,
+                  pcName="rpcqtask",
+                  usStackDepth=task_stack_depth,
                   pvParameters=addr(router),
-                  uxPriority=1,
+                  uxPriority=task_priority,
                   pvCreatedTask=addr(rpcTask),
-                  xCoreID=1)
+                  xCoreID=task_core)
 
   startSocketServer[RpcRouter](
     port,
