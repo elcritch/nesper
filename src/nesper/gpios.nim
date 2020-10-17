@@ -10,6 +10,8 @@ type
   GpioError* = object of OSError
     code*: esp_err_t
 
+  GPIO_PIN* = gpio_num_t
+
 proc configure*(pins: set[gpio_num_t],
     mode: gpio_mode_t, ## !< GPIO mode: set input/output mode
     pull_up: bool = false, ## !< GPIO pull-up
