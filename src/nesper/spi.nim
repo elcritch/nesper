@@ -238,7 +238,7 @@ proc fullTrans*(dev: SpiDev;
 
 
 proc writeTrans*(dev: SpiDev;
-                  data: seq[uint8],
+                  data: openArray[uint8],
                   txlength: bits = bits(-1),
                   cmd: uint16 = 0,
                   cmdaddr: uint64 = 0,
