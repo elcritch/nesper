@@ -70,6 +70,8 @@
 import ../consts
 import FreeRTOS
 
+import os
+const theader = currentSourcePath().splitPath.head & "/defs/ntask.h"
 
 type
   portMUX_TYPE* {.importc: "portMUX_TYPE", header: "projdefs.h", bycopy.} = object
@@ -109,29 +111,29 @@ const
 
 ##  Error definitions.
 
-var errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY* {.importc: "errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY", header: "freertos/task.h".}: cint
-var errQUEUE_BLOCKED* {.importc: "errQUEUE_BLOCKED", header: "freertos/task.h".}: cint
-var errQUEUE_YIELD* {.importc: "errQUEUE_YIELD", header: "freertos/task.h".}: cint
+var errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY* {.importc: "errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY", header: theader.}: cint
+var errQUEUE_BLOCKED* {.importc: "errQUEUE_BLOCKED", header: theader.}: cint
+var errQUEUE_YIELD* {.importc: "errQUEUE_YIELD", header: theader.}: cint
 
 ##  Macros used for basic data corruption checks.
 
-var configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES* {.importc: "configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES", header: "freertos/task.h".}: cint
-var pdINTEGRITY_CHECK_VALUE* {.importc: "pdINTEGRITY_CHECK_VALUE", header: "freertos/task.h".}: cint
+var configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES* {.importc: "configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES", header: theader.}: cint
+var pdINTEGRITY_CHECK_VALUE* {.importc: "pdINTEGRITY_CHECK_VALUE", header: theader.}: cint
 
 ## -----------------------------------------------------------
 ##  MACROS AND DEFINITIONS
 ## ----------------------------------------------------------
 
-var tskKERNEL_VERSION_NUMBER* {.importc: "tskKERNEL_VERSION_NUMBER", header: "freertos/task.h".}: cstring
-var tskKERNEL_VERSION_MAJOR* {.importc: "tskKERNEL_VERSION_MAJOR", header: "freertos/task.h".}: cint
-var tskKERNEL_VERSION_MINOR* {.importc: "tskKERNEL_VERSION_MINOR", header: "freertos/task.h".}: cint
-var tskKERNEL_VERSION_BUILD* {.importc: "tskKERNEL_VERSION_BUILD", header: "freertos/task.h".}: cint
+var tskKERNEL_VERSION_NUMBER* {.importc: "tskKERNEL_VERSION_NUMBER", header: theader.}: cstring
+var tskKERNEL_VERSION_MAJOR* {.importc: "tskKERNEL_VERSION_MAJOR", header: theader.}: cint
+var tskKERNEL_VERSION_MINOR* {.importc: "tskKERNEL_VERSION_MINOR", header: theader.}: cint
+var tskKERNEL_VERSION_BUILD* {.importc: "tskKERNEL_VERSION_BUILD", header: theader.}: cint
 
 ## *
 ##  @brief Argument of xTaskCreatePinnedToCore indicating that task has no affinity
 ##
 
-var tskNO_AFFINITY* {.importc: "tskNO_AFFINITY", header: "freertos/task.h".}: cint
+var tskNO_AFFINITY* {.importc: "tskNO_AFFINITY", header: theader.}: cint
 
 ## *
 ##  task. h
@@ -144,7 +146,7 @@ var tskNO_AFFINITY* {.importc: "tskNO_AFFINITY", header: "freertos/task.h".}: ci
 ##
 
 type
-  TaskHandle_t* {.importc: "TaskHandle_t", header: "freertos/task.h".} = pointer
+  TaskHandle_t* {.importc: "TaskHandle_t", header: "freertos/FreeRTOS.h".} = pointer
 
 ## *
 ##  Defines the prototype to which the application task hook function must
@@ -182,7 +184,7 @@ type
 ##
 
 type
-  TimeOut_t* {.importc: "TimeOut_t", header: "freertos/task.h", bycopy.} = object
+  TimeOut_t* {.importc: "TimeOut_t", header: theader, bycopy.} = object
     xOverflowCount* {.importc: "xOverflowCount".}: BaseType_t
     xTimeOnEntering* {.importc: "xTimeOnEntering".}: TickType_t
 
@@ -192,7 +194,7 @@ type
 ##
 
 type
-  MemoryRegion_t* {.importc: "MemoryRegion_t", header: "freertos/task.h", bycopy.} = object
+  MemoryRegion_t* {.importc: "MemoryRegion_t", header: theader, bycopy.} = object
     pvBaseAddress* {.importc: "pvBaseAddress".}: pointer
     ulLengthInBytes* {.importc: "ulLengthInBytes".}: uint32
     ulParameters* {.importc: "ulParameters".}: uint32
@@ -203,7 +205,7 @@ type
 ##
 
 type
-  TaskParameters_t* {.importc: "TaskParameters_t", header: "freertos/task.h", bycopy.} = object
+  TaskParameters_t* {.importc: "TaskParameters_t", header: theader, bycopy.} = object
     pvTaskCode* {.importc: "pvTaskCode".}: TaskFunction_t
     pcName* {.importc: "pcName".}: cstring ## lint !e971 Unqualified char types are allowed for strings and single characters only.
     usStackDepth* {.importc: "usStackDepth".}: uint32
@@ -219,7 +221,7 @@ type
 ##
 
 type
-  TaskStatus_t* {.importc: "TaskStatus_t", header: "freertos/task.h", bycopy.} = object
+  TaskStatus_t* {.importc: "TaskStatus_t", header: theader, bycopy.} = object
     xHandle* {.importc: "xHandle".}: TaskHandle_t ## !< The handle of the task to which the rest of the information in the structure relates.
     pcTaskName* {.importc: "pcTaskName".}: cstring ## !< A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated!
                                                ## lint !e971 Unqualified char types are allowed for strings and single characters only.
@@ -231,7 +233,7 @@ type
     pxStackBase* {.importc: "pxStackBase".}: ptr StackType_t ## !< Points to the lowest address of the task's stack area.
     usStackHighWaterMark* {.importc: "usStackHighWaterMark".}: uint32 ## !< The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack.
 
-var xCoreID* {.importc: "xCoreID", header: "freertos/task.h".}: BaseType_t
+var xCoreID* {.importc: "xCoreID", header: theader.}: BaseType_t
       ## !< Core this task is pinned to. This field is present if CONFIG_FREERTOS_VTASKLIST_INCLUDE_COREID is set.
 
 
@@ -241,7 +243,7 @@ var xCoreID* {.importc: "xCoreID", header: "freertos/task.h".}: BaseType_t
 ##
 
 type
-  TaskSnapshot_t* {.importc: "TaskSnapshot_t", header: "freertos/task.h", bycopy.} = object
+  TaskSnapshot_t* {.importc: "TaskSnapshot_t", header: theader, bycopy.} = object
     pxTCB* {.importc: "pxTCB".}: pointer ## !< Address of task control block.
     pxTopOfStack* {.importc: "pxTopOfStack".}: ptr StackType_t ## !< Points to the location of the last item placed on the tasks stack.
     pxEndOfStack* {.importc: "pxEndOfStack".}: ptr StackType_t ## !< Points to the end of the stack. pxTopOfStack < pxEndOfStack, stack grows hi2lo
@@ -276,7 +278,7 @@ const
 ##  \ingroup SchedulerControl
 ##
 
-proc taskYIELD*() {.importc: "taskYIELD", header: "freertos/task.h".}
+proc taskYIELD*() {.importc: "taskYIELD", header: theader.}
 
 ## *
 ##  task. h
@@ -290,7 +292,7 @@ proc taskYIELD*() {.importc: "taskYIELD", header: "freertos/task.h".}
 ##  \ingroup SchedulerControl
 ##
 
-proc taskENTER_CRITICAL*(mux: portMUX_TYPE) {.importc: "taskENTER_CRITICAL", header: "freertos/task.h".}
+proc taskENTER_CRITICAL*(mux: portMUX_TYPE) {.importc: "taskENTER_CRITICAL", header: theader.}
 
 ## *
 ##  task. h
@@ -304,7 +306,7 @@ proc taskENTER_CRITICAL*(mux: portMUX_TYPE) {.importc: "taskENTER_CRITICAL", hea
 ##  \ingroup SchedulerControl
 ##
 
-proc taskEXIT_CRITICAL*() {.importc: "taskEXIT_CRITICAL", header: "freertos/task.h".}
+proc taskEXIT_CRITICAL*() {.importc: "taskEXIT_CRITICAL", header: theader.}
 
 ## *
 ##  task. h
@@ -314,7 +316,7 @@ proc taskEXIT_CRITICAL*() {.importc: "taskEXIT_CRITICAL", header: "freertos/task
 ##  \ingroup SchedulerControl
 ##
 
-proc taskDISABLE_INTERRUPTS*() {.importc: "taskDISABLE_INTERRUPTS", header: "freertos/task.h".}
+proc taskDISABLE_INTERRUPTS*() {.importc: "taskDISABLE_INTERRUPTS", header: theader.}
 
 ## *
 ##  task. h
@@ -324,7 +326,7 @@ proc taskDISABLE_INTERRUPTS*() {.importc: "taskDISABLE_INTERRUPTS", header: "fre
 ##  \ingroup SchedulerControl
 ##
 
-proc taskENABLE_INTERRUPTS*() {.importc: "taskENABLE_INTERRUPTS", header: "freertos/task.h".}
+proc taskENABLE_INTERRUPTS*() {.importc: "taskENABLE_INTERRUPTS", header: theader.}
 
 ##  Definitions returned by xTaskGetSchedulerState().  taskSCHEDULER_SUSPENDED is
 ## 0 to generate more optimal code when configASSERT() is defined as the constant
@@ -386,7 +388,7 @@ proc xTaskCreatePinnedToCore*(pvTaskCode: TaskFunction_t;
                                 pvCreatedTask: ptr TaskHandle_t;
                                 xCoreID: BaseType_t
                             ): BaseType_t {.
-    importc: "xTaskCreatePinnedToCore", header: "freertos/task.h".}
+    importc: "xTaskCreatePinnedToCore", header: theader.}
 ## *
 ##  Create a new task and add it to the list of tasks that are ready to run.
 ##
@@ -526,7 +528,7 @@ proc xTaskCreateStaticPinnedToCore*(pvTaskCode: TaskFunction_t; pcName: cstring;
                                    pxStackBuffer: ptr StackType_t;
                                    pxTaskBuffer: ptr StaticTask_t;
                                    xCoreID: BaseType_t): TaskHandle_t {.
-    importc: "xTaskCreateStaticPinnedToCore", header: "freertos/task.h".}
+    importc: "xTaskCreateStaticPinnedToCore", header: theader.}
 ## *
 ##  Create a new task and add it to the list of tasks that are ready to run.
 ##
@@ -698,7 +700,7 @@ proc xTaskCreateStatic*(pvTaskCode: TaskFunction_t; pcName: cstring;
 
 proc xTaskCreateRestricted*(pxTaskDefinition: ptr TaskParameters_t;
                            pxCreatedTask: ptr TaskHandle_t): BaseType_t {.
-    importc: "xTaskCreateRestricted", header: "freertos/task.h".}
+    importc: "xTaskCreateRestricted", header: theader.}
 ## *
 ##  Memory regions are assigned to a restricted task when the task is created by
 ##  a call to xTaskCreateRestricted().  These regions can be redefined using
@@ -743,7 +745,7 @@ proc xTaskCreateRestricted*(pxTaskDefinition: ptr TaskParameters_t;
 ##
 
 proc vTaskAllocateMPURegions*(xTask: TaskHandle_t; pxRegions: ptr MemoryRegion_t) {.
-    importc: "vTaskAllocateMPURegions", header: "freertos/task.h".}
+    importc: "vTaskAllocateMPURegions", header: theader.}
 ## * @endcond
 ## *
 ##  Remove a task from the RTOS real time kernel's management.
@@ -784,7 +786,7 @@ proc vTaskAllocateMPURegions*(xTask: TaskHandle_t; pxRegions: ptr MemoryRegion_t
 ##
 
 proc vTaskDelete*(xTaskToDelete: TaskHandle_t) {.importc: "vTaskDelete",
-    header: "freertos/task.h".}
+    header: theader.}
 ## -----------------------------------------------------------
 ##  TASK CONTROL API
 ## ----------------------------------------------------------
@@ -831,7 +833,7 @@ proc vTaskDelete*(xTaskToDelete: TaskHandle_t) {.importc: "vTaskDelete",
 ##  \ingroup TaskCtrl
 ##
 
-proc vTaskDelay*(xTicksToDelay: TickType_t) {.importc: "vTaskDelay", header: "freertos/task.h".}
+proc vTaskDelay*(xTicksToDelay: TickType_t) {.importc: "vTaskDelay", header: theader.}
 ## *
 ##  Delay a task until a specified time.
 ##
@@ -888,7 +890,7 @@ proc vTaskDelay*(xTicksToDelay: TickType_t) {.importc: "vTaskDelay", header: "fr
 ##
 
 proc vTaskDelayUntil*(pxPreviousWakeTime: ptr TickType_t; xTimeIncrement: TickType_t) {.
-    importc: "vTaskDelayUntil", header: "freertos/task.h".}
+    importc: "vTaskDelayUntil", header: theader.}
 ## *
 ##  Obtain the priority of any task.
 ##
@@ -932,7 +934,7 @@ proc vTaskDelayUntil*(pxPreviousWakeTime: ptr TickType_t; xTimeIncrement: TickTy
 ##
 
 proc uxTaskPriorityGet*(xTask: TaskHandle_t): UBaseType_t {.
-    importc: "uxTaskPriorityGet", header: "freertos/task.h".}
+    importc: "uxTaskPriorityGet", header: theader.}
 ## *
 ##  A version of uxTaskPriorityGet() that can be used from an ISR.
 ##
@@ -944,7 +946,7 @@ proc uxTaskPriorityGet*(xTask: TaskHandle_t): UBaseType_t {.
 ##
 
 proc uxTaskPriorityGetFromISR*(xTask: TaskHandle_t): UBaseType_t {.
-    importc: "uxTaskPriorityGetFromISR", header: "freertos/task.h".}
+    importc: "uxTaskPriorityGetFromISR", header: theader.}
 ## *
 ##  Obtain the state of any task.
 ##
@@ -961,7 +963,7 @@ proc uxTaskPriorityGetFromISR*(xTask: TaskHandle_t): UBaseType_t {.
 ##
 
 proc eTaskGetState*(xTask: TaskHandle_t): eTaskState {.importc: "eTaskGetState",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Set the priority of any task.
 ##
@@ -1000,7 +1002,7 @@ proc eTaskGetState*(xTask: TaskHandle_t): eTaskState {.importc: "eTaskGetState",
 ##
 
 proc vTaskPrioritySet*(xTask: TaskHandle_t; uxNewPriority: UBaseType_t) {.
-    importc: "vTaskPrioritySet", header: "freertos/task.h".}
+    importc: "vTaskPrioritySet", header: theader.}
 ## *
 ##  Suspend a task.
 ##
@@ -1050,7 +1052,7 @@ proc vTaskPrioritySet*(xTask: TaskHandle_t; uxNewPriority: UBaseType_t) {.
 ##
 
 proc vTaskSuspend*(xTaskToSuspend: TaskHandle_t) {.importc: "vTaskSuspend",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Resumes a suspended task.
 ##
@@ -1096,7 +1098,7 @@ proc vTaskSuspend*(xTaskToSuspend: TaskHandle_t) {.importc: "vTaskSuspend",
 ##
 
 proc vTaskResume*(xTaskToResume: TaskHandle_t) {.importc: "vTaskResume",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  An implementation of vTaskResume() that can be called from within an ISR.
 ##
@@ -1122,7 +1124,7 @@ proc vTaskResume*(xTaskToResume: TaskHandle_t) {.importc: "vTaskResume",
 ##
 
 proc xTaskResumeFromISR*(xTaskToResume: TaskHandle_t): BaseType_t {.
-    importc: "xTaskResumeFromISR", header: "freertos/task.h".}
+    importc: "xTaskResumeFromISR", header: theader.}
 ## -----------------------------------------------------------
 ##  SCHEDULER CONTROL
 ## ----------------------------------------------------------
@@ -1152,7 +1154,7 @@ proc xTaskResumeFromISR*(xTaskToResume: TaskHandle_t): BaseType_t {.
 ##  \ingroup SchedulerControl
 ##
 
-proc vTaskStartScheduler*() {.importc: "vTaskStartScheduler", header: "freertos/task.h".}
+proc vTaskStartScheduler*() {.importc: "vTaskStartScheduler", header: theader.}
 ## *
 ##  Stops the real time kernel tick.
 ##
@@ -1205,7 +1207,7 @@ proc vTaskStartScheduler*() {.importc: "vTaskStartScheduler", header: "freertos/
 ##  \ingroup SchedulerControl
 ##
 
-proc vTaskEndScheduler*() {.importc: "vTaskEndScheduler", header: "freertos/task.h".}
+proc vTaskEndScheduler*() {.importc: "vTaskEndScheduler", header: theader.}
 ## * @endcond
 ## *
 ##  Suspends the scheduler without disabling interrupts.
@@ -1254,7 +1256,7 @@ proc vTaskEndScheduler*() {.importc: "vTaskEndScheduler", header: "freertos/task
 ##  \ingroup SchedulerControl
 ##
 
-proc vTaskSuspendAll*() {.importc: "vTaskSuspendAll", header: "freertos/task.h".}
+proc vTaskSuspendAll*() {.importc: "vTaskSuspendAll", header: theader.}
 ## *
 ##  Resumes scheduler activity after it was suspended by a call to
 ##  vTaskSuspendAll().
@@ -1304,7 +1306,7 @@ proc vTaskSuspendAll*() {.importc: "vTaskSuspendAll", header: "freertos/task.h".
 ##  \ingroup SchedulerControl
 ##
 
-proc xTaskResumeAll*(): BaseType_t {.importc: "xTaskResumeAll", header: "freertos/task.h".}
+proc xTaskResumeAll*(): BaseType_t {.importc: "xTaskResumeAll", header: theader.}
 ## -----------------------------------------------------------
 ##  TASK UTILITIES
 ## ----------------------------------------------------------
@@ -1317,7 +1319,7 @@ proc xTaskResumeAll*(): BaseType_t {.importc: "xTaskResumeAll", header: "freerto
 ##
 
 proc xTaskGetTickCount*(): TickType_t {.importc: "xTaskGetTickCount",
-                                     header: "freertos/task.h".}
+                                     header: theader.}
 ## *
 ##  Get tick count from ISR
 ##
@@ -1332,7 +1334,7 @@ proc xTaskGetTickCount*(): TickType_t {.importc: "xTaskGetTickCount",
 ##
 
 proc xTaskGetTickCountFromISR*(): TickType_t {.importc: "xTaskGetTickCountFromISR",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Get current number of tasks
 ##
@@ -1345,7 +1347,7 @@ proc xTaskGetTickCountFromISR*(): TickType_t {.importc: "xTaskGetTickCountFromIS
 ##
 
 proc uxTaskGetNumberOfTasks*(): UBaseType_t {.importc: "uxTaskGetNumberOfTasks",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Get task name
 ##
@@ -1358,7 +1360,7 @@ proc uxTaskGetNumberOfTasks*(): UBaseType_t {.importc: "uxTaskGetNumberOfTasks",
 ##
 
 proc pcTaskGetTaskName*(xTaskToQuery: TaskHandle_t): cstring {.
-    importc: "pcTaskGetTaskName", header: "freertos/task.h".}
+    importc: "pcTaskGetTaskName", header: theader.}
 ## lint !e971 Unqualified char types are allowed for strings and single characters only.
 ## *
 ##  Returns the high water mark of the stack associated with xTask.
@@ -1379,7 +1381,7 @@ proc pcTaskGetTaskName*(xTaskToQuery: TaskHandle_t): cstring {.
 ##
 
 proc uxTaskGetStackHighWaterMark*(xTask: TaskHandle_t): UBaseType_t {.
-    importc: "uxTaskGetStackHighWaterMark", header: "freertos/task.h".}
+    importc: "uxTaskGetStackHighWaterMark", header: theader.}
 ## *
 ##  Returns the start of the stack associated with xTask.
 ##
@@ -1397,7 +1399,7 @@ proc uxTaskGetStackHighWaterMark*(xTask: TaskHandle_t): UBaseType_t {.
 ##
 
 proc pxTaskGetStackStart*(xTask: TaskHandle_t): ptr uint8 {.
-    importc: "pxTaskGetStackStart", header: "freertos/task.h".}
+    importc: "pxTaskGetStackStart", header: theader.}
 ##  When using trace macros it is sometimes necessary to include task.h before
 ## FreeRTOS.h.  When this is done TaskHookFunction_t will not yet have been defined,
 ## so the following two prototypes will cause a compilation error.  This can be
@@ -1414,7 +1416,7 @@ proc pxTaskGetStackStart*(xTask: TaskHandle_t): ptr uint8 {.
 
 proc vTaskSetApplicationTaskTag*(xTask: TaskHandle_t;
                                 pxHookFunction: TaskHookFunction_t) {.
-    importc: "vTaskSetApplicationTaskTag", header: "freertos/task.h".}
+    importc: "vTaskSetApplicationTaskTag", header: theader.}
 ## *
 ##  Get the hook function assigned to given task.
 ##  @param xTask Handle of the task to get the hook function for
@@ -1424,7 +1426,7 @@ proc vTaskSetApplicationTaskTag*(xTask: TaskHandle_t;
 ##
 
 proc xTaskGetApplicationTaskTag*(xTask: TaskHandle_t): TaskHookFunction_t {.
-    importc: "xTaskGetApplicationTaskTag", header: "freertos/task.h".}
+    importc: "xTaskGetApplicationTaskTag", header: theader.}
 ## *
 ##  Set local storage pointer specific to the given task.
 ##
@@ -1441,7 +1443,7 @@ proc xTaskGetApplicationTaskTag*(xTask: TaskHandle_t): TaskHookFunction_t {.
 
 proc vTaskSetThreadLocalStoragePointer*(xTaskToSet: TaskHandle_t;
                                        xIndex: BaseType_t; pvValue: pointer) {.
-    importc: "vTaskSetThreadLocalStoragePointer", header: "freertos/task.h".}
+    importc: "vTaskSetThreadLocalStoragePointer", header: theader.}
 ## *
 ##  Get local storage pointer specific to the given task.
 ##
@@ -1458,7 +1460,7 @@ proc vTaskSetThreadLocalStoragePointer*(xTaskToSet: TaskHandle_t;
 
 proc pvTaskGetThreadLocalStoragePointer*(xTaskToQuery: TaskHandle_t;
                                         xIndex: BaseType_t): pointer {.
-    importc: "pvTaskGetThreadLocalStoragePointer", header: "freertos/task.h".}
+    importc: "pvTaskGetThreadLocalStoragePointer", header: theader.}
 ## *
 ##  Prototype of local storage pointer deletion callback.
 ##
@@ -1492,7 +1494,7 @@ type
 
 proc vTaskSetThreadLocalStoragePointerAndDelCallback*(xTaskToSet: TaskHandle_t;
     xIndex: BaseType_t; pvValue: pointer; pvDelCallback: TlsDeleteCallbackFunction_t) {.
-    importc: "vTaskSetThreadLocalStoragePointerAndDelCallback", header: "freertos/task.h".}
+    importc: "vTaskSetThreadLocalStoragePointerAndDelCallback", header: theader.}
 ## *
 ##  Calls the hook function associated with xTask. Passing xTask as NULL has
 ##  the effect of calling the Running tasks (the calling task) hook function.
@@ -1504,7 +1506,7 @@ proc vTaskSetThreadLocalStoragePointerAndDelCallback*(xTaskToSet: TaskHandle_t;
 ##
 
 proc xTaskCallApplicationTaskHook*(xTask: TaskHandle_t; pvParameter: pointer): BaseType_t {.
-    importc: "xTaskCallApplicationTaskHook", header: "freertos/task.h".}
+    importc: "xTaskCallApplicationTaskHook", header: theader.}
 ## *
 ##  Get the handle of idle task for the current CPU.
 ##
@@ -1516,7 +1518,7 @@ proc xTaskCallApplicationTaskHook*(xTask: TaskHandle_t; pvParameter: pointer): B
 ##
 
 proc xTaskGetIdleTaskHandle*(): TaskHandle_t {.importc: "xTaskGetIdleTaskHandle",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Get the handle of idle task for the given CPU.
 ##
@@ -1530,7 +1532,7 @@ proc xTaskGetIdleTaskHandle*(): TaskHandle_t {.importc: "xTaskGetIdleTaskHandle"
 ##
 
 proc xTaskGetIdleTaskHandleForCPU*(cpuid: UBaseType_t): TaskHandle_t {.
-    importc: "xTaskGetIdleTaskHandleForCPU", header: "freertos/task.h".}
+    importc: "xTaskGetIdleTaskHandleForCPU", header: theader.}
 ## *
 ##  Get the state of tasks in the system.
 ##
@@ -1633,7 +1635,7 @@ proc xTaskGetIdleTaskHandleForCPU*(cpuid: UBaseType_t): TaskHandle_t {.
 
 proc uxTaskGetSystemState*(pxTaskStatusArray: ptr TaskStatus_t;
                           uxArraySize: UBaseType_t; pulTotalRunTime: ptr uint32): UBaseType_t {.
-    importc: "uxTaskGetSystemState", header: "freertos/task.h".}
+    importc: "uxTaskGetSystemState", header: theader.}
 ## *
 ##  List all the current tasks.
 ##
@@ -1676,7 +1678,7 @@ proc uxTaskGetSystemState*(pxTaskStatusArray: ptr TaskStatus_t;
 ##  \ingroup TaskUtils
 ##
 
-proc vTaskList*(pcWriteBuffer: cstring) {.importc: "vTaskList", header: "freertos/task.h".}
+proc vTaskList*(pcWriteBuffer: cstring) {.importc: "vTaskList", header: theader.}
 ## lint !e971 Unqualified char types are allowed for strings and single characters only.
 ## *
 ##  Get the state of running tasks as a string
@@ -1728,7 +1730,7 @@ proc vTaskList*(pcWriteBuffer: cstring) {.importc: "vTaskList", header: "freerto
 ##
 
 proc vTaskGetRunTimeStats*(pcWriteBuffer: cstring) {.
-    importc: "vTaskGetRunTimeStats", header: "freertos/task.h".}
+    importc: "vTaskGetRunTimeStats", header: theader.}
 ## lint !e971 Unqualified char types are allowed for strings and single characters only.
 ## *
 ##  Send task notification.
@@ -1805,7 +1807,7 @@ proc vTaskGetRunTimeStats*(pcWriteBuffer: cstring) {.
 
 proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
                  eAction: eNotifyAction): BaseType_t {.importc: "xTaskNotify",
-    header: "freertos/task.h".}
+    header: theader.}
 ## *
 ##  Send task notification from an ISR.
 ##
@@ -1894,7 +1896,7 @@ proc xTaskNotify*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
 proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
                         eAction: eNotifyAction;
                         pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
-    importc: "xTaskNotifyFromISR", header: "freertos/task.h".}
+    importc: "xTaskNotifyFromISR", header: theader.}
 ## *
 ##  Wait for task notification
 ##
@@ -1970,7 +1972,7 @@ proc xTaskNotifyFromISR*(xTaskToNotify: TaskHandle_t; ulValue: uint32;
 proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32;
                      ulBitsToClearOnExit: uint32;
                      pulNotificationValue: ptr uint32; xTicksToWait: TickType_t): BaseType_t {.
-    importc: "xTaskNotifyWait", header: "freertos/task.h".}
+    importc: "xTaskNotifyWait", header: theader.}
 ## *
 ##  Simplified macro for sending task notification.
 ##
@@ -2015,7 +2017,7 @@ proc xTaskNotifyWait*(ulBitsToClearOnEntry: uint32;
 ##
 
 proc xTaskNotifyGive*(xTaskToNotify: TaskHandle_t): BaseType_t {.
-    importc: "xTaskNotifyGive", header: "freertos/task.h".}
+    importc: "xTaskNotifyGive", header: theader.}
 
 ## *
 ##  Simplified macro for sending task notification from ISR.
@@ -2071,7 +2073,7 @@ proc xTaskNotifyGive*(xTaskToNotify: TaskHandle_t): BaseType_t {.
 
 proc vTaskNotifyGiveFromISR*(xTaskToNotify: TaskHandle_t;
                             pxHigherPriorityTaskWoken: ptr BaseType_t) {.
-    importc: "vTaskNotifyGiveFromISR", header: "freertos/task.h".}
+    importc: "vTaskNotifyGiveFromISR", header: theader.}
 ## *
 ##  Simplified macro for receiving task notification.
 ##
@@ -2139,7 +2141,7 @@ proc vTaskNotifyGiveFromISR*(xTaskToNotify: TaskHandle_t;
 ##
 
 proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t): uint32 {.
-    importc: "ulTaskNotifyTake", header: "freertos/task.h".}
+    importc: "ulTaskNotifyTake", header: theader.}
 
 # ## -----------------------------------------------------------
 # ##  SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -2162,7 +2164,7 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 # ##
 
 # proc xTaskIncrementTick*(): BaseType_t {.importc: "xTaskIncrementTick",
-#                                       header: "freertos/task.h".}
+#                                       header: theader.}
 
 # ##
 # ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2197,11 +2199,11 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 # ##
 
 # proc vTaskPlaceOnEventList*(pxEventList: ptr List_t; xTicksToWait: TickType_t) {.
-#     importc: "vTaskPlaceOnEventList", header: "freertos/task.h".}
+#     importc: "vTaskPlaceOnEventList", header: theader.}
 # proc vTaskPlaceOnUnorderedEventList*(pxEventList: ptr List_t;
 #                                     xItemValue: TickType_t;
 #                                     xTicksToWait: TickType_t) {.
-#     importc: "vTaskPlaceOnUnorderedEventList", header: "freertos/task.h".}
+#     importc: "vTaskPlaceOnUnorderedEventList", header: theader.}
 
 # ##
 # ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2217,7 +2219,7 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 
 # proc vTaskPlaceOnEventListRestricted*(pxEventList: ptr List_t;
 #                                      xTicksToWait: TickType_t) {.
-#     importc: "vTaskPlaceOnEventListRestricted", header: "freertos/task.h".}
+#     importc: "vTaskPlaceOnEventListRestricted", header: theader.}
 
 # ##
 # ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2245,10 +2247,10 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 # ##
 
 # proc xTaskRemoveFromEventList*(pxEventList: ptr List_t): BaseType_t {.
-#     importc: "xTaskRemoveFromEventList", header: "freertos/task.h".}
+#     importc: "xTaskRemoveFromEventList", header: theader.}
 # proc xTaskRemoveFromUnorderedEventList*(pxEventListItem: ptr ListItem_t;
 #                                        xItemValue: TickType_t): BaseType_t {.
-#     importc: "xTaskRemoveFromUnorderedEventList", header: "freertos/task.h".}
+#     importc: "xTaskRemoveFromUnorderedEventList", header: theader.}
 
 # ##
 # ##  THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
@@ -2259,7 +2261,7 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 # ##  that is ready to run.
 # ##
 
-# proc vTaskSwitchContext*() {.importc: "vTaskSwitchContext", header: "freertos/task.h".}
+# proc vTaskSwitchContext*() {.importc: "vTaskSwitchContext", header: theader.}
 
 # ##
 # ##  THESE FUNCTIONS MUST NOT BE USED FROM APPLICATION CODE.  THEY ARE USED BY
@@ -2267,14 +2269,14 @@ proc ulTaskNotifyTake*(xClearCountOnExit: BaseType_t; xTicksToWait: TickType_t):
 # ##
 
 # proc uxTaskResetEventItemValue*(): TickType_t {.
-#     importc: "uxTaskResetEventItemValue", header: "freertos/task.h".}
+#     importc: "uxTaskResetEventItemValue", header: theader.}
 
 ##
 ##  Return the handle of the calling task.
 ##
 
 proc xTaskGetCurrentTaskHandle*(): TaskHandle_t {.
-    importc: "xTaskGetCurrentTaskHandle", header: "freertos/task.h".}
+    importc: "xTaskGetCurrentTaskHandle", header: theader.}
 ##
 ##  Return the handle of the task running on a certain CPU. Because of
 ##  the nature of SMP processing, there is no guarantee that this
@@ -2283,66 +2285,66 @@ proc xTaskGetCurrentTaskHandle*(): TaskHandle_t {.
 ##
 
 proc xTaskGetCurrentTaskHandleForCPU*(cpuid: BaseType_t): TaskHandle_t {.
-    importc: "xTaskGetCurrentTaskHandleForCPU", header: "freertos/task.h".}
+    importc: "xTaskGetCurrentTaskHandleForCPU", header: theader.}
 ##
 ##  Capture the current time status for future reference.
 ##
 
 proc vTaskSetTimeOutState*(pxTimeOut: ptr TimeOut_t) {.
-    importc: "vTaskSetTimeOutState", header: "freertos/task.h".}
+    importc: "vTaskSetTimeOutState", header: theader.}
 ##
 ##  Compare the time status now with that previously captured to see if the
 ##  timeout has expired.
 ##
 
 proc xTaskCheckForTimeOut*(pxTimeOut: ptr TimeOut_t; pxTicksToWait: ptr TickType_t): BaseType_t {.
-    importc: "xTaskCheckForTimeOut", header: "freertos/task.h".}
+    importc: "xTaskCheckForTimeOut", header: theader.}
 ##
 ##  Shortcut used by the queue implementation to prevent unnecessary call to
 ##  taskYIELD();
 ##
 
-proc vTaskMissedYield*() {.importc: "vTaskMissedYield", header: "freertos/task.h".}
+proc vTaskMissedYield*() {.importc: "vTaskMissedYield", header: theader.}
 ##
 ##  Returns the scheduler state as taskSCHEDULER_RUNNING,
 ##  taskSCHEDULER_NOT_STARTED or taskSCHEDULER_SUSPENDED.
 ##
 
 proc xTaskGetSchedulerState*(): BaseType_t {.importc: "xTaskGetSchedulerState",
-    header: "freertos/task.h".}
+    header: theader.}
 ##
 ##  Raises the priority of the mutex holder to that of the calling task should
 ##  the mutex holder have a priority less than the calling task.
 ##
 
 proc vTaskPriorityInherit*(pxMutexHolder: TaskHandle_t) {.
-    importc: "vTaskPriorityInherit", header: "freertos/task.h".}
+    importc: "vTaskPriorityInherit", header: theader.}
 ##
 ##  Set the priority of a task back to its proper priority in the case that it
 ##  inherited a higher priority while it was holding a semaphore.
 ##
 
 proc xTaskPriorityDisinherit*(pxMutexHolder: TaskHandle_t): BaseType_t {.
-    importc: "xTaskPriorityDisinherit", header: "freertos/task.h".}
+    importc: "xTaskPriorityDisinherit", header: theader.}
 ##
 ##  Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
 ##
 
 proc uxTaskGetTaskNumber*(xTask: TaskHandle_t): UBaseType_t {.
-    importc: "uxTaskGetTaskNumber", header: "freertos/task.h".}
+    importc: "uxTaskGetTaskNumber", header: theader.}
 ##
 ##  Get the current core affinity of a task
 ##
 
 proc xTaskGetAffinity*(xTask: TaskHandle_t): BaseType_t {.
-    importc: "xTaskGetAffinity", header: "freertos/task.h".}
+    importc: "xTaskGetAffinity", header: theader.}
 ##
 ##  Set the uxTaskNumber of the task referenced by the xTask parameter to
 ##  uxHandle.
 ##
 
 proc vTaskSetTaskNumber*(xTask: TaskHandle_t; uxHandle: UBaseType_t) {.
-    importc: "vTaskSetTaskNumber", header: "freertos/task.h".}
+    importc: "vTaskSetTaskNumber", header: theader.}
 ##
 ##  Only available when configUSE_TICKLESS_IDLE is set to 1.
 ##  If tickless mode is being used, or a low power mode is implemented, then
@@ -2353,7 +2355,7 @@ proc vTaskSetTaskNumber*(xTask: TaskHandle_t; uxHandle: UBaseType_t) {.
 ##
 
 proc vTaskStepTick*(xTicksToJump: TickType_t) {.importc: "vTaskStepTick",
-    header: "freertos/task.h".}
+    header: theader.}
 ##
 ##  Only avilable when configUSE_TICKLESS_IDLE is set to 1.
 ##  Provided for use within portSUPPRESS_TICKS_AND_SLEEP() to allow the port
@@ -2370,14 +2372,14 @@ proc vTaskStepTick*(xTicksToJump: TickType_t) {.importc: "vTaskStepTick",
 ##
 
 proc eTaskConfirmSleepModeStatus*(): eSleepModeStatus {.
-    importc: "eTaskConfirmSleepModeStatus", header: "freertos/task.h".}
+    importc: "eTaskConfirmSleepModeStatus", header: theader.}
 ##
 ##  For internal use only.  Increment the mutex held count when a mutex is
 ##  taken and return the handle of the task that has taken the mutex.
 ##
 
 proc pvTaskIncrementMutexHeldCount*(): pointer {.
-    importc: "pvTaskIncrementMutexHeldCount", header: "freertos/task.h".}
+    importc: "pvTaskIncrementMutexHeldCount", header: theader.}
 ##
 ##  This function fills array with TaskSnapshot_t structures for every task in the system.
 ##  Used by core dump facility to get snapshots of all tasks in the system.
@@ -2390,5 +2392,5 @@ proc pvTaskIncrementMutexHeldCount*(): pointer {.
 
 proc uxTaskGetSnapshotAll*(pxTaskSnapshotArray: ptr TaskSnapshot_t;
                           uxArraySize: UBaseType_t; pxTcbSz: ptr UBaseType_t): UBaseType_t {.
-    importc: "uxTaskGetSnapshotAll", header: "freertos/task.h".}
+    importc: "uxTaskGetSnapshotAll", header: theader.}
 ## * @endcond

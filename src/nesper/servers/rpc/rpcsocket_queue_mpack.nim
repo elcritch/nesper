@@ -1,5 +1,7 @@
 import nativesockets, net, selectors, tables, posix
 
+include nesper
+
 import ../../consts
 import ../../general
 import ../../queues
