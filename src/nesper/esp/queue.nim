@@ -75,8 +75,8 @@ import ../consts
 ##  xQueueSend(), xQueueReceive(), etc.
 ##
 type
-  QueueHandle_t* {.importc: "$1", header: "freertos/semphr.h".} = pointer
-  StaticQueue_t* {.importc: "$1", header: "freertos/semphr.h".} = pointer
+  QueueHandle_t* {.importc: "$1", header: "freertos/queue.h".} = pointer
+  StaticQueue_t* {.importc: "$1", header: "freertos/queue.h".} = pointer
 
 ## *
 ##  Type by which queue sets are referenced.  For example, a call to
@@ -84,7 +84,7 @@ type
 ##  parameter to xQueueSelectFromSet(), xQueueAddToSet(), etc.
 ##
 type
-  QueueSetHandle_t* {.importc: "$1", header: "freertos/semphr.h".} = pointer
+  QueueSetHandle_t* {.importc: "$1", header: "freertos/queue.h".} = pointer
 
 ## *
 ##  Queue sets can contain both queues and semaphores, so the
@@ -92,7 +92,7 @@ type
 ##  return value can be either an QueueHandle_t or an SemaphoreHandle_t.
 ##
 type
-  QueueSetMemberHandle_t* {.importc: "$1", header: "freertos/semphr.h".} = pointer
+  QueueSetMemberHandle_t* {.importc: "$1", header: "freertos/queue.h".} = pointer
 
 
 # ## * @cond
@@ -162,7 +162,7 @@ type
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueCreate*(uxQueueLength, uxItemSize: UBaseType_t): QueueHandle_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueCreate*(uxQueueLength, uxItemSize: UBaseType_t): QueueHandle_t {.importc: "$1", header: "freertos/queue.h".}
 
 ## *
 ##  Creates a new queue instance, and returns a handle by which the new queue
@@ -237,7 +237,7 @@ proc xQueueCreate*(uxQueueLength, uxItemSize: UBaseType_t): QueueHandle_t {.impo
 ##
 
 proc xQueueCreateStatic*(uxQueueLength: UBaseType_t, uxItemSize: UBaseType_t, pucQueueStorage: pointer,
-                            pxQueueBuffer: ptr StaticQueue_t): QueueHandle_t {.importc: "$1", header: "freertos/semphr.h".}
+                            pxQueueBuffer: ptr StaticQueue_t): QueueHandle_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -315,7 +315,7 @@ proc xQueueSendToFront*(
   xQueue: QueueHandle_t,
   pvItemToQueue: pointer,
   xTicksToWait: TickType_t):
-    BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+    BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -389,7 +389,7 @@ proc xQueueSendToFront*(
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -465,7 +465,7 @@ proc xQueueSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWa
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSend*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueSend*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -541,7 +541,7 @@ proc xQueueSend*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: Ti
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -621,7 +621,7 @@ proc xQueueOverwrite*(xQueue: QueueHandle_t, pvItemToQueue: pointer): BaseType_t
 
 proc xQueueGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                        xTicksToWait: TickType_t; xCopyPosition: BaseType_t): BaseType_t {.
-    importc: "xQueueGenericSend", header: "freertos/semphr.h".}
+    importc: "xQueueGenericSend", header: "freertos/queue.h".}
 
 
 
@@ -711,7 +711,7 @@ proc xQueueGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
 ##  \ingroup QueueManagement
 ##
 
-proc xQueuePeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueuePeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 ## *
@@ -738,7 +738,7 @@ proc xQueuePeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickTyp
 ##  \ingroup QueueManagement
 ##
 
-proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -833,7 +833,7 @@ proc xQueuePeekFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer): BaseType_t {.
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -926,7 +926,7 @@ proc xQueueReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: Tick
 
 proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           xTicksToWait: TickType_t; xJustPeek: BaseType_t): BaseType_t {.
-    importc: "xQueueGenericReceive", header: "freertos/semphr.h".}
+    importc: "xQueueGenericReceive", header: "freertos/queue.h".}
 
 
 ## *
@@ -939,7 +939,7 @@ proc xQueueGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
 ##  \ingroup QueueManagement
 ##
 
-proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQueueMessagesWaiting", header: "freertos/semphr.h".}
+proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQueueMessagesWaiting", header: "freertos/queue.h".}
 
 
 ## *
@@ -954,7 +954,7 @@ proc uxQueueMessagesWaiting*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQ
 ##  \ingroup QueueManagement
 ##
 
-proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQueueSpacesAvailable", header: "freertos/semphr.h".}
+proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQueueSpacesAvailable", header: "freertos/queue.h".}
 
 
 
@@ -967,7 +967,7 @@ proc uxQueueSpacesAvailable*(xQueue: QueueHandle_t): UBaseType_t {.importc: "uxQ
 ##  \ingroup QueueManagement
 ##
 
-proc vQueueDelete*(xQueue: QueueHandle_t) {.importc: "vQueueDelete", header: "freertos/semphr.h".}
+proc vQueueDelete*(xQueue: QueueHandle_t) {.importc: "vQueueDelete", header: "freertos/queue.h".}
 
 
 
@@ -1029,7 +1029,7 @@ proc vQueueDelete*(xQueue: QueueHandle_t) {.importc: "vQueueDelete", header: "fr
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSendToFrontFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueSendToFrontFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -1091,7 +1091,7 @@ proc xQueueSendToFrontFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, px
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -1170,7 +1170,7 @@ proc xQueueSendToBackFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxH
 ##  \ingroup QueueManagement
 ##
 
-proc xQueueOverwriteFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueOverwriteFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -1238,7 +1238,7 @@ proc xQueueOverwriteFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHi
 ##
 
 
-proc xQueueSendFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueSendFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 
 
@@ -1312,11 +1312,11 @@ proc xQueueSendFromISR*(xQueue: QueueHandle_t, pvItemToQueue: pointer, pxHigherP
 proc xQueueGenericSendFromISR*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                               pxHigherPriorityTaskWoken: ptr BaseType_t;
                               xCopyPosition: BaseType_t): BaseType_t {.
-    importc: "xQueueGenericSendFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueGenericSendFromISR", header: "freertos/queue.h".}
 
 
 proc xQueueGiveFromISR*(xQueue: QueueHandle_t; pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
-    importc: "xQueueGiveFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueGiveFromISR", header: "freertos/queue.h".}
 
 
 ##  Receive an item from a queue.  It is safe to use this function from within an
@@ -1397,7 +1397,7 @@ proc xQueueGiveFromISR*(xQueue: QueueHandle_t; pxHigherPriorityTaskWoken: ptr Ba
 
 proc xQueueReceiveFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer;
                           pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
-    importc: "xQueueReceiveFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueReceiveFromISR", header: "freertos/queue.h".}
 
 
 ##  Utilities to query queues that are safe to use from an ISR.  These utilities
@@ -1405,15 +1405,15 @@ proc xQueueReceiveFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer;
 ##
 
 proc xQueueIsQueueEmptyFromISR*(xQueue: QueueHandle_t): BaseType_t {.
-    importc: "xQueueIsQueueEmptyFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueIsQueueEmptyFromISR", header: "freertos/queue.h".}
 
 
 proc xQueueIsQueueFullFromISR*(xQueue: QueueHandle_t): BaseType_t {.
-    importc: "xQueueIsQueueFullFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueIsQueueFullFromISR", header: "freertos/queue.h".}
 
 
 proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.
-    importc: "uxQueueMessagesWaitingFromISR", header: "freertos/semphr.h".}
+    importc: "uxQueueMessagesWaitingFromISR", header: "freertos/queue.h".}
 
 ## *
 ##  xQueueAltGenericSend() is an alternative version of xQueueGenericSend().
@@ -1432,20 +1432,20 @@ proc uxQueueMessagesWaitingFromISR*(xQueue: QueueHandle_t): UBaseType_t {.
 
 proc xQueueAltGenericSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                           xTicksToWait: TickType_t; xCopyPosition: BaseType_t): BaseType_t {.
-    importc: "$1", header: "freertos/semphr.h".}
+    importc: "$1", header: "freertos/queue.h".}
 
 proc xQueueAltGenericReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                              xTicksToWait: TickType_t; xJustPeeking: BaseType_t): BaseType_t {.
-    importc: "xQueueAltGenericReceive", header: "freertos/semphr.h".}
+    importc: "xQueueAltGenericReceive", header: "freertos/queue.h".}
 
 
-proc xQueueAltSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueAltSendToFront*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
-proc xQueueAltSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueAltSendToBack*(xQueue: QueueHandle_t, pvItemToQueue: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
-proc xQueueAltReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueAltReceive*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
-proc xQueueAltPeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueAltPeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: TickType_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 ##
 ##  The functions defined above are for passing data to and from tasks.  The
@@ -1459,19 +1459,19 @@ proc xQueueAltPeek*(xQueue: QueueHandle_t, pvBuffer: pointer, xTicksToWait: Tick
 
 proc xQueueCRSendFromISR*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                          xCoRoutinePreviouslyWoken: BaseType_t): BaseType_t {.
-    importc: "xQueueCRSendFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueCRSendFromISR", header: "freertos/queue.h".}
 
 proc xQueueCRReceiveFromISR*(xQueue: QueueHandle_t; pvBuffer: pointer;
                             pxTaskWoken: ptr BaseType_t): BaseType_t {.
-    importc: "xQueueCRReceiveFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueCRReceiveFromISR", header: "freertos/queue.h".}
 
 proc xQueueCRSend*(xQueue: QueueHandle_t; pvItemToQueue: pointer;
                   xTicksToWait: TickType_t): BaseType_t {.
-    importc: "xQueueCRSend", header: "freertos/semphr.h".}
+    importc: "xQueueCRSend", header: "freertos/queue.h".}
 
 proc xQueueCRReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
                      xTicksToWait: TickType_t): BaseType_t {.
-    importc: "xQueueCRReceive", header: "freertos/semphr.h".}
+    importc: "xQueueCRReceive", header: "freertos/queue.h".}
 
 
 
@@ -1484,7 +1484,7 @@ proc xQueueCRReceive*(xQueue: QueueHandle_t; pvBuffer: pointer;
 ##  @return always returns pdPASS
 ##
 
-proc xQueueReset*(xQueue: QueueHandle_t): BaseType_t {.importc: "$1", header: "freertos/semphr.h".}
+proc xQueueReset*(xQueue: QueueHandle_t): BaseType_t {.importc: "$1", header: "freertos/queue.h".}
 
 ## *
 ##  The registry is provided as a means for kernel aware debuggers to
@@ -1510,7 +1510,7 @@ proc xQueueReset*(xQueue: QueueHandle_t): BaseType_t {.importc: "$1", header: "f
 ##
 
 proc vQueueAddToRegistry*(xQueue: QueueHandle_t; pcName: cstring) {.
-    importc: "vQueueAddToRegistry", header: "freertos/semphr.h".}
+    importc: "vQueueAddToRegistry", header: "freertos/queue.h".}
 
 
 ## *
@@ -1525,7 +1525,7 @@ proc vQueueAddToRegistry*(xQueue: QueueHandle_t; pcName: cstring) {.
 ##
 
 proc vQueueUnregisterQueue*(xQueue: QueueHandle_t) {.
-    importc: "vQueueUnregisterQueue", header: "freertos/semphr.h".}
+    importc: "vQueueUnregisterQueue", header: "freertos/queue.h".}
 
 
 ## *
@@ -1543,7 +1543,7 @@ proc vQueueUnregisterQueue*(xQueue: QueueHandle_t) {.
 ##
 
 proc pcQueueGetName*(xQueue: QueueHandle_t): cstring {.
-    importc: "pcQueueGetName", header: "freertos/semphr.h".}
+    importc: "pcQueueGetName", header: "freertos/queue.h".}
 
 
 ## *
@@ -1554,7 +1554,7 @@ proc pcQueueGetName*(xQueue: QueueHandle_t): cstring {.
 
 proc xQueueGenericCreate*(uxQueueLength: UBaseType_t; uxItemSize: UBaseType_t;
                           ucQueueType: uint8): QueueHandle_t {.
-    importc: "xQueueGenericCreate", header: "freertos/semphr.h".}
+    importc: "xQueueGenericCreate", header: "freertos/queue.h".}
 
 
 
@@ -1568,7 +1568,7 @@ proc xQueueGenericCreateStatic*(uxQueueLength: UBaseType_t;
                                 pucQueueStorage: ptr uint8;
                                 pxStaticQueue: ptr StaticQueue_t;
                                 ucQueueType: uint8): QueueHandle_t {.
-    importc: "xQueueGenericCreateStatic", header: "freertos/semphr.h".}
+    importc: "xQueueGenericCreateStatic", header: "freertos/queue.h".}
 
 
 
@@ -1622,7 +1622,7 @@ proc xQueueGenericCreateStatic*(uxQueueLength: UBaseType_t;
 ##
 
 proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.
-    importc: "xQueueCreateSet", header: "freertos/semphr.h".}
+    importc: "xQueueCreateSet", header: "freertos/queue.h".}
 
 
 
@@ -1651,7 +1651,7 @@ proc xQueueCreateSet*(uxEventQueueLength: UBaseType_t): QueueSetHandle_t {.
 
 proc xQueueAddToSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
                     xQueueSet: QueueSetHandle_t): BaseType_t {.
-    importc: "xQueueAddToSet", header: "freertos/semphr.h".}
+    importc: "xQueueAddToSet", header: "freertos/queue.h".}
 
 
 
@@ -1676,7 +1676,7 @@ proc xQueueAddToSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
 
 proc xQueueRemoveFromSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
                          xQueueSet: QueueSetHandle_t): BaseType_t {.
-    importc: "xQueueRemoveFromSet", header: "freertos/semphr.h".}
+    importc: "xQueueRemoveFromSet", header: "freertos/queue.h".}
 
 
 
@@ -1717,7 +1717,7 @@ proc xQueueRemoveFromSet*(xQueueOrSemaphore: QueueSetMemberHandle_t;
 ##
 
 proc xQueueSelectFromSet*(xQueueSet: QueueSetHandle_t; xTicksToWait: TickType_t): QueueSetMemberHandle_t {.
-    importc: "xQueueSelectFromSet", header: "freertos/semphr.h".}
+    importc: "xQueueSelectFromSet", header: "freertos/queue.h".}
 
 
 
@@ -1726,25 +1726,25 @@ proc xQueueSelectFromSet*(xQueueSet: QueueSetHandle_t; xTicksToWait: TickType_t)
 ##
 
 proc xQueueSelectFromSetFromISR*(xQueueSet: QueueSetHandle_t): QueueSetMemberHandle_t {.
-    importc: "xQueueSelectFromSetFromISR", header: "freertos/semphr.h".}
+    importc: "xQueueSelectFromSetFromISR", header: "freertos/queue.h".}
 
 
 # ##  Not public API functions.
 
 # proc vQueueWaitForMessageRestricted*(xQueue: QueueHandle_t;
 #                                     xTicksToWait: TickType_t) {.
-#     importcpp: "vQueueWaitForMessageRestricted(@)", header: "freertos/semphr.h".}
+#     importcpp: "vQueueWaitForMessageRestricted(@)", header: "freertos/queue.h".}
 #   ##  PRIVILEGED_FUNCTION
 # proc xQueueGenericReset*(xQueue: QueueHandle_t; xNewQueue: BaseType_t): BaseType_t {.
-#     cdecl, importcpp: "xQueueGenericReset(@)", header: "freertos/semphr.h".}
+#     cdecl, importcpp: "xQueueGenericReset(@)", header: "freertos/queue.h".}
 #   ##  PRIVILEGED_FUNCTION
 # proc vQueueSetQueueNumber*(xQueue: QueueHandle_t; uxQueueNumber: UBaseType_t) {.
-#     cdecl, importcpp: "vQueueSetQueueNumber(@)", header: "freertos/semphr.h".}
+#     cdecl, importcpp: "vQueueSetQueueNumber(@)", header: "freertos/queue.h".}
 #   ##  PRIVILEGED_FUNCTION
 # proc uxQueueGetQueueNumber*(xQueue: QueueHandle_t): UBaseType_t {.
-#     importcpp: "uxQueueGetQueueNumber(@)", header: "freertos/semphr.h".}
+#     importcpp: "uxQueueGetQueueNumber(@)", header: "freertos/queue.h".}
 #   ##  PRIVILEGED_FUNCTION
 # proc ucQueueGetQueueType*(xQueue: QueueHandle_t): uint8 {.
-#     importcpp: "ucQueueGetQueueType(@)", header: "freertos/semphr.h".}
+#     importcpp: "ucQueueGetQueueType(@)", header: "freertos/queue.h".}
 #   ##  PRIVILEGED_FUNCTION
 # ## * @endcond
