@@ -13,14 +13,14 @@ type
   GPIO_PIN* = gpio_num_t
 
 proc configure*(pins: set[gpio_num_t],
-    mode: gpio_mode_t, ## !< GPIO mode: set input/output mode
-    pull_up: bool = false, ## !< GPIO pull-up
-    pull_down: bool = false, ## !< GPIO pull-down
-    interrupt: gpio_int_type_t = GPIO_INTR_DISABLE, ## !< GPIO interrupt type
-) =
-  var pin_mask: uint64 
+        mode: gpio_mode_t, ## !< GPIO mode: set input/output mode
+        pull_up: bool = false, ## !< GPIO pull-up
+        pull_down: bool = false, ## !< GPIO pull-down
+        interrupt: gpio_int_type_t = GPIO_INTR_DISABLE, ## !< GPIO interrupt type
+      ) =
+  var pin_mask: uint64 = 0U
   for pin in pins:
-    pin_mask = pin_mask or BIT(pin.int())
+    pin_mask = pin_mask or BIT64(pin.int())
 
   var io_conf: gpio_config_t
   io_conf.mode = mode

@@ -67,6 +67,9 @@ type
 template BIT*(x: untyped): untyped =
   (1U shl x)
 
+template BIT64*(x: untyped): untyped =
+  (1'u64 shl x)
+
 # Not sure why the ESP-IDF folks define both BIT(N) and N BIT<N> macros that do the same thing...
 template NBIT*(x: untyped): untyped =
   (1U shl (x))

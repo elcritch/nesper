@@ -10,9 +10,9 @@ export consts
 export general
 export esp_log
 
-{.emit: """/*TYPESECTION*/
-#include <freertos/FreeRTOS.h>
-""".}
+#{.emit: """/*TYPESECTION*/
+##include <freertos/FreeRTOS.h>
+#""".}
 
 # type
 #   Submodule* = object
