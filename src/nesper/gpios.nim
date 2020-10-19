@@ -25,7 +25,7 @@ proc configure*(pins: set[gpio_num_t],
   var io_conf: gpio_config_t
   io_conf.mode = mode
   io_conf.pin_bit_mask = pin_mask
-  io_conf.pull_up_en = if pull_down: GPIO_PULLUP_ENABLE else: GPIO_PULLUP_DISABLE
+  io_conf.pull_up_en = if pull_up: GPIO_PULLUP_ENABLE else: GPIO_PULLUP_DISABLE
   io_conf.pull_down_en  = if pull_down: GPIO_PULLDOWN_ENABLE else: GPIO_PULLDOWN_DISABLE
   io_conf.intr_type = interrupt
   
