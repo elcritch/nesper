@@ -3,10 +3,12 @@ import endians
 import sequtils
 
 import consts, general
+import gpios
 import esp/driver/spi
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
+export gpios.gpio_num_t
 
 const TAG = "spis"
 
@@ -56,8 +58,8 @@ proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
 
 proc newSpiBus*(
         host: SpiHostDevice;
-        miso, mosi, sclk: int;
-        quadwp = -1, quadhd = -1;
+        miso, mosi, sclk: gpio_num_t;
+        quadwp = gpio_num_t(-1), quadhd = gpio_num_t(-1);
         dma_channel: range[0..2],
         flags: set[SpiBusFlag] = {},
         intr_flags: int = 0,
@@ -111,7 +113,7 @@ proc addDevice*(
         ## Default amount of bits in address phase (0-64), used when ``SPI_TRANS_VARIABLE_ADDR`` is not used, otherwise ignored.
       mode: range[0..3], ## \
         ## SPI mode (0-3)
-      cs_io: int, ## \
+      cs_io: gpio_num_t, ## \
         ## CS GPIO pin for this device, or -1 if not used
       clock_speed_hz: cint, ## \
         ## Clock speed, divisors of 80MHz, in Hz. See ``SPI_MASTER_FREQ_*``.

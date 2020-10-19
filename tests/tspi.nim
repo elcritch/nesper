@@ -7,13 +7,13 @@ import nesper/spi
 #  define PIN_NUM_CS   34
 
 let
-  bus = HSPI.newSpiBus(miso=9, mosi=10, sclk=12, dma_channel=2, flags={MASTER})
+  bus = HSPI.newSpiBus(miso=gpio_num_t(9), mosi=gpio_num_t(10), sclk=gpio_num_t(12), dma_channel=2, flags={MASTER})
 
 var
   dev: SpiDev =
     bus.addDevice(commandlen = bits(3),
                      addresslen = bits(4),
-                     mode=1, cs_io=23,
+                     mode=1, cs_io=gpio_num_t(23),
                      clock_speed_hz = 1_000_000, 
                      queue_size = 10,
                      flags={HALFDUPLEX})
