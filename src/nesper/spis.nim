@@ -200,18 +200,18 @@ proc fullTrans*(dev: SpiDev;
       txlength.uint32()
 
   if result.trn.length <= 3:
-    result.trn.rx.buffer = nil
+    result.trn.rx_buffer = nil
     for i in 0..high(txdata):
-      result.trn.tx.data[i] = txdata[i]
+      result.trn.tx_data[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = txdata.toSeq()
-    result.trn.tx.buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
+    result.trn.tx_buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
   if result.trn.length. in 1U..4U:
     tflags.incl({USE_TXDATA})
   else:
-    result.trn.rx.buffer = nil
+    result.trn.rx_buffer = nil
 
   # Set RX Details
   result.trn.rxlength =
@@ -221,17 +221,17 @@ proc fullTrans*(dev: SpiDev;
       rxlength.uint()
       
   if result.trn.rxlength <= 3:
-    result.trn.rx.buffer = nil
+    result.trn.rx_buffer = nil
   else:
     # This order is important, copy the seq then take the unsafe addr
     let rm = if result.trn.rxlength mod 8 > 0: 1 else: 0
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
-    result.trn.rx.buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
+    result.trn.rx_buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
   if result.trn.rxlength in 1U..4U:
     tflags.incl({USE_RXDATA})
   else:
-    result.trn.rx.buffer = nil
+    result.trn.rx_buffer = nil
 
   ## Flags
   result.trn.flags = 0

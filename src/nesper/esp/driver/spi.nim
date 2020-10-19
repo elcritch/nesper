@@ -173,13 +173,13 @@ type
                                             ##
 
 type
-  INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
-    buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
-    data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+  # INNER_C_UNION_spi_master_tx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
+  #   buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
+  #   data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
 
-  INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
-    buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
-    data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
+  # INNER_C_UNION_spi_master_rx* {.importc: "no_name", header: "driver/spi_master.h", bycopy, union.} = object 
+  #   buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to receive buffer, or NULL for no MISO phase. Written by 4 bytes-unit if DMA is used.
+  #   data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_RXDATA is set, data is received directly to this variable
 
   spi_transaction_t* {.importc: "spi_transaction_t", header: "driver/spi_master.h", bycopy.} = object
     flags* {.importc: "flags".}: uint32 ## /< Bitwise OR of SPI_TRANS_* flags
@@ -198,8 +198,16 @@ type
     length* {.importc: "length".}: csize_t ## /< Total data length, in bits
     rxlength* {.importc: "rxlength".}: csize_t ## /< Total data length received, should be not greater than ``length`` in full-duplex mode (0 defaults this to the value of ``length``).
     user* {.importc: "user".}: pointer ## /< User-defined variable. Can be used to store eg transaction ID.
-    tx*: INNER_C_UNION_spi_master_tx
-    rx*: INNER_C_UNION_spi_master_rx
+
+    # Note: Nim's union assumes there's a filed name, but in this case it's an inline C enum, so this works better
+    tx_buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
+    tx_data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+
+    rx_buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
+    rx_data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+
+    # tx* {.im: INNER_C_UNION_spi_master_tx
+    # rx*: INNER_C_UNION_spi_master_rx
 
 
 ## *
