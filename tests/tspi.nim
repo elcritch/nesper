@@ -1,5 +1,5 @@
 
-import nesper/spi
+import nesper/spis
 
 #  define PIN_NUM_MISO 37
 #  define PIN_NUM_MOSI 35

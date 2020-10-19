@@ -35,7 +35,7 @@ type
     # semphr_polling* {.importc: "semphr_polling".}: SemaphoreHandle_t ## semaphore to notify the device it claimed the bus
     # waiting* {.importc: "waiting".}: bool ## the device is waiting for the exclusive control of the bus
 
-# proc __builtin_bswap32*(data: uint32): uin32 {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
+# proc __builtin_bswap32*(data: uint32): uin32 {.importc: "SPI_SWAP_DATA_TX", header: "driver/spi_master.h".}
 
 ## *
 ##  Transform unsigned integer of length <= 32 bits to the format which can be
@@ -52,7 +52,7 @@ type
 ##       the MSB, this helps to shift the data to the MSB.
 ##
 
-proc SPI_SWAP_DATA_TX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_TX", header: "spi_common.h".}
+proc SPI_SWAP_DATA_TX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_TX", header: "driver/spi_master.h".}
 
 # proc swap_data_tx*(data: untyped, len: uint32): uint32 =
   # bigEndian( data shl (32-len) )
@@ -70,7 +70,7 @@ proc SPI_SWAP_DATA_TX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_TX", head
 ##       the MSB, this helps to shift the data to the LSB.
 ##
 
-proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", header: "spi_common.h".}
+proc SPI_SWAP_DATA_RX*(data: uint32): uint32 {.importc: "SPI_SWAP_DATA_RX", header: "driver/spi_master.h".}
 
 # proc swap_data_rx*(data: untyped, len: uint32): uint32 =
   # bigEndian(data) shr (32-len)
@@ -158,7 +158,7 @@ const
 ##
 
 type
-  spi_bus_config_t* {.importc: "spi_bus_config_t", header: "spi_common.h", bycopy.} = object
+  spi_bus_config_t* {.importc: "spi_bus_config_t", header: "driver/spi_master.h", bycopy.} = object
     mosi_io_num* {.importc: "mosi_io_num".}: cint ## /< GPIO pin for Master Out Slave In (=spi_d) signal, or -1 if not used.
     miso_io_num* {.importc: "miso_io_num".}: cint ## /< GPIO pin for Master In Slave Out (=spi_q) signal, or -1 if not used.
     sclk_io_num* {.importc: "sclk_io_num".}: cint ## /< GPIO pin for Spi CLocK signal, or -1 if not used.
@@ -231,7 +231,7 @@ type
 
 proc spi_bus_initialize*(host_id: spi_host_device_t;
                         bus_config: ptr spi_bus_config_t; dma_chan: cint): esp_err_t {.
-    importc: "spi_bus_initialize", header: "spi_common.h".}
+    importc: "spi_bus_initialize", header: "driver/spi_master.h".}
 
 
 
@@ -248,7 +248,7 @@ proc spi_bus_initialize*(host_id: spi_host_device_t;
 ##
 
 proc spi_bus_free*(host_id: spi_host_device_t): esp_err_t {.importc: "spi_bus_free",
-    header: "spi_common.h".}
+    header: "driver/spi_master.h".}
 
 
 ## * SPI master clock is divided by 80MHz apb clock. Below defines are example frequencies, and are accurate. Be free to specify a random frequency, it will be rounded to closest frequency (to macros below if above 8MHz).
