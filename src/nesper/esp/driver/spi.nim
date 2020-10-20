@@ -203,8 +203,8 @@ type
     tx_buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
     tx_data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
 
-    rx_buffer* {.importc: "tx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
-    rx_data* {.importc: "tx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
+    rx_buffer* {.importc: "rx_buffer".}: pointer ## /< Pointer to transmit buffer, or NULL for no MOSI phase
+    rx_data* {.importc: "rx_data".}: array[4, uint8] ## /< If SPI_TRANS_USE_TXDATA is set, data set here is sent directly from this variable.
 
     # tx* {.im: INNER_C_UNION_spi_master_tx
     # rx*: INNER_C_UNION_spi_master_rx

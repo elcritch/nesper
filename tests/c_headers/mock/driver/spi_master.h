@@ -14,10 +14,11 @@
 
 #pragma once
 
-#include "esp_err.h"
-#include "freertos/FreeRTOS.h"
+// #include "esp_err.h"
+// #include "freertos/FreeRTOS.h"
 //for spi_bus_initialization funcions. to be back-compatible
-#include "driver/spi_common.h"
+#include "spi_common.h"
+
 
 /** SPI master clock is divided by 80MHz apb clock. Below defines are example frequencies, and are accurate. Be free to specify a random frequency, it will be rounded to closest frequency (to macros below if above 8MHz).
   * 8MHz
@@ -32,11 +33,6 @@
 #define SPI_MASTER_FREQ_26M     (APB_CLK_FREQ/3)    ///< 26.67MHz
 #define SPI_MASTER_FREQ_40M     (APB_CLK_FREQ/2)    ///< 40MHz
 #define SPI_MASTER_FREQ_80M     (APB_CLK_FREQ/1)    ///< 80MHz
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 #define SPI_DEVICE_TXBIT_LSBFIRST          (1<<0)  ///< Transmit command/address/data LSB first instead of the default MSB first
 #define SPI_DEVICE_RXBIT_LSBFIRST          (1<<1)  ///< Receive data LSB first instead of the default MSB first
@@ -381,7 +377,4 @@ void spi_get_timing(bool gpio_is_used, int input_delay_ns, int eff_clk, int* dum
   */
 int spi_get_freq_limit(bool gpio_is_used, int input_delay_ns);
 
-#ifdef __cplusplus
-}
-#endif
 

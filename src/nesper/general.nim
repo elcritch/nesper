@@ -10,6 +10,10 @@ var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/Free
 
 proc NimMain() {.importc.}
 
+converter toBits*(x: bytes): bits =
+  bits(8*x.int())
+
+
 template app_main*(blk: untyped): untyped =
 
   proc app_main*() {.exportc.} =

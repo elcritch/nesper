@@ -1,4 +1,3 @@
-
 import nesper/spis
 
 #  define PIN_NUM_MISO 37
@@ -31,7 +30,7 @@ var trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
 var tdata4 = @[1'u8, 2, 3]
 var trn4 = dev.fullTrans(tdata4)
 
-var trn5 = dev.readTrans(bits(24))
+var trn5 = dev.readTrans(bytes(3))
 # this is an error: let trn5 = dev.readTrans(@[1'u8, 2, 3, 4, 5])
 
 var trn6 = dev.writeTrans(@[1'u8, 2, 3, 4, 5])

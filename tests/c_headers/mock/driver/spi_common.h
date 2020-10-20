@@ -16,16 +16,14 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "esp_err.h"
-#include "esp32/rom/lldesc.h"
-#include "soc/spi_periph.h"
-#include "hal/spi_types.h"
-#include "sdkconfig.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "driver_mocks.h"
+
+// #include "esp_err.h"
+// #include "esp32/rom/lldesc.h"
+// #include "soc/spi_periph.h"
+// #include "hal/spi_types.h"
+// #include "sdkconfig.h"
 
 //Maximum amount of bytes that can be put in one DMA descriptor
 #define SPI_MAX_DMA_LEN (4096-4)
@@ -44,7 +42,7 @@ extern "C"
  * @param LEN Length of data to be sent, since the SPI peripheral sends from
  *      the MSB, this helps to shift the data to the MSB.
  */
-#define SPI_SWAP_DATA_TX(DATA, LEN) __builtin_bswap32((uint32_t)(DATA)<<(32-(LEN)))
+#define SPI_SWAP_DATA_TX(DATA, LEN) (DATA)
 
 /**
  * Transform received data of length <= 32 bits to the format of an unsigned integer.
@@ -57,7 +55,7 @@ extern "C"
  * @param LEN Length of data received, since the SPI peripheral writes from
  *      the MSB, this helps to shift the data to the LSB.
  */
-#define SPI_SWAP_DATA_RX(DATA, LEN) (__builtin_bswap32(DATA)>>(32-(LEN)))
+#define SPI_SWAP_DATA_RX(DATA, LEN) (DATA)
 
 #define SPICOMMON_BUSFLAG_SLAVE         0          ///< Initialize I/O in slave mode
 #define SPICOMMON_BUSFLAG_MASTER        (1<<0)     ///< Initialize I/O in master mode
@@ -139,6 +137,3 @@ esp_err_t spi_bus_initialize(spi_host_device_t host, const spi_bus_config_t *bus
 esp_err_t spi_bus_free(spi_host_device_t host);
 
 
-#ifdef __cplusplus
-}
-#endif
