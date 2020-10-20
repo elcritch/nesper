@@ -55,5 +55,5 @@ withSpiBus(dev):
   trn4.poll()
 
 # Regular spi transmit
-trn5.transmit()
+var res = trn5.transmit()
 
