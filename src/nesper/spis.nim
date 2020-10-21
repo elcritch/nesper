@@ -14,6 +14,8 @@ export gpios.gpio_num_t
 
 const TAG = "spis"
 
+{.experimental: "notnil".}
+
 type
 
   SpiError* = object of OSError
@@ -65,9 +67,9 @@ proc newSpiBus*(
         flags: set[SpiBusFlag] = {},
         intr_flags: int = 0,
         max_transfer_sz = 4094
-      ): SpiBus = 
+      ): SpiBus not nil = 
 
-  result = new(SpiBus)
+  result = SpiBus()
   result.host = spi_host_device_t(host.int())
 
   result.buscfg.miso_io_num = miso.cint
