@@ -1,6 +1,5 @@
 import strutils 
 
-import consts
 import general
 import esp/esp_system
 
