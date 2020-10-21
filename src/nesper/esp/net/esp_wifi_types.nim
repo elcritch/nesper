@@ -96,8 +96,7 @@ type
 ## * @brief Aggregate of active & passive scan time per channel
 
 type
-  wifi_scan_time_t* {.importc: "wifi_scan_time_t", header: "esp_wifi_types.h", bycopy.} = object {.
-      union.}
+  wifi_scan_time_t* {.importc: "wifi_scan_time_t", header: "esp_wifi_types.h", bycopy, union.} = object
     active* {.importc: "active".}: wifi_active_scan_time_t ## *< active scan time per channel, units: millisecond.
     passive* {.importc: "passive".}: uint32 ## *< passive scan time per channel, units: millisecond, values above 1500ms may
                                           ##                                           cause station to disconnect from AP and are not recommended.
@@ -242,8 +241,7 @@ type
 ##
 
 type
-  wifi_config_t* {.importc: "wifi_config_t", header: "esp_wifi_types.h", bycopy.} = object {.
-      union.}
+  wifi_config_t* {.importc: "wifi_config_t", header: "esp_wifi_types.h", bycopy, union.} = object
     ap* {.importc: "ap".}: wifi_ap_config_t ## *< configuration of AP
     sta* {.importc: "sta".}: wifi_sta_config_t ## *< configuration of STA
 

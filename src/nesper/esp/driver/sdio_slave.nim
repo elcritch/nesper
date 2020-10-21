@@ -12,7 +12,6 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 
 const
   SDIO_SLAVE_RECV_MAX_BUFFER* = (4096 - 4)

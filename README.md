@@ -4,6 +4,15 @@ Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP A
 
 ## Updates 
 
+
+**Version 0.2.0**
+- Cleaned up the SPI api, implemented a GPIO api's.
+- Tested GPIO on board, working; tested SPI init, still testing other SPI features
+- Fixed compile issues in ethernet libraries
+- Fixed c imports for task and queues requiring FreeRTOS.h to be included first
+        Note: This might require future follow ups as it essentially compiles to a absolute path
+- Fixed issues with using second with xTaskCreatePinned and rpc queue mpack passing arguments
+
 **Version 0.2.0**
 - Wrote compilation tests for several important modules 
 - My internal esp32 project has been switched over to using Nesper

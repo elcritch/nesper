@@ -13,7 +13,6 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 import esp_eth_com
 import esp_eth_mac
 import esp_eth_phy

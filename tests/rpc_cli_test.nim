@@ -4,10 +4,8 @@ import times
 import stats
 import sequtils
 
-import nesper/servers/rpc/router
 
 when not defined(TcpJsonRpcServer):
-  import msgpack4nim
   import msgpack4nim/msgpack2json
 
 import parseopt

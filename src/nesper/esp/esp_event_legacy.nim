@@ -118,7 +118,7 @@ type
 
 type
   system_event_info_t* {.importc: "system_event_info_t",
-                        header: "esp_event_legacy.h", bycopy.} = object {.union.}
+                        header: "esp_event_legacy.h", bycopy, union.} = object
     connected* {.importc: "connected".}: system_event_sta_connected_t ## !< ESP32 station connected to AP
     disconnected* {.importc: "disconnected".}: system_event_sta_disconnected_t ## !< ESP32 station disconnected to AP
     scan_done* {.importc: "scan_done".}: system_event_sta_scan_done_t ## !< ESP32 station scan (APs) done

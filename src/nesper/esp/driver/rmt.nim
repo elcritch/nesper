@@ -12,7 +12,6 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 import gpio_driver
 import rmt_struct
 
@@ -109,8 +108,7 @@ type
 ##
 
 type
-  INNER_C_UNION_rmt_126* {.importc: "no_name", header: "rmt.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_126* {.importc: "no_name", header: "rmt.h", bycopy, union.} = object
     tx_config* {.importc: "tx_config".}: rmt_tx_config_t ## !< RMT TX parameter
     rx_config* {.importc: "rx_config".}: rmt_rx_config_t ## !< RMT RX parameter
 

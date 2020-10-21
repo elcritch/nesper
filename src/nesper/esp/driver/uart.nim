@@ -153,7 +153,7 @@ type
 type
   uart_event_t* {.importc: "uart_event_t", header: "<driver/uart.h>", bycopy.} = object
     `type`* {.importc: "type".}: uart_event_type_t ## !< UART event type
-    size* {.importc: "size".}: csize ## !< UART data size for UART_DATA event
+    size* {.importc: "size".}: csize_t ## !< UART data size for UART_DATA event
 
   uart_isr_handle_t* = intr_handle_t
 
@@ -642,7 +642,7 @@ proc uart_tx_chars*(uart_num: uart_port_t; buffer: cstring; len: uint32): cint {
 ##      - OTHERS (>=0) The number of bytes pushed to the TX FIFO
 ##
 
-proc uart_write_bytes*(uart_num: uart_port_t; src: cstring; size: csize): cint {.cdecl,
+proc uart_write_bytes*(uart_num: uart_port_t; src: cstring; size: csize_t): cint {.cdecl,
     importc: "uart_write_bytes", header: "<driver/uart.h>".}
 ## *
 ##  @brief Send data to the UART port from a given buffer and length,
@@ -665,7 +665,7 @@ proc uart_write_bytes*(uart_num: uart_port_t; src: cstring; size: csize): cint {
 ##      - OTHERS (>=0) The number of bytes pushed to the TX FIFO
 ##
 
-proc uart_write_bytes_with_break*(uart_num: uart_port_t; src: cstring; size: csize;
+proc uart_write_bytes_with_break*(uart_num: uart_port_t; src: cstring; size: csize_t;
                                  brk_len: cint): cint {.cdecl,
     importc: "uart_write_bytes_with_break", header: "<driver/uart.h>".}
 ## *
@@ -721,7 +721,7 @@ proc uart_flush_input*(uart_num: uart_port_t): esp_err_t {.cdecl,
 ##      - ESP_FAIL Parameter error
 ##
 
-proc uart_get_buffered_data_len*(uart_num: uart_port_t; size: ptr csize): esp_err_t {.
+proc uart_get_buffered_data_len*(uart_num: uart_port_t; size: ptr csize_t): esp_err_t {.
     cdecl, importc: "uart_get_buffered_data_len", header: "<driver/uart.h>".}
 ## *
 ##  @brief   UART disable pattern detect function.

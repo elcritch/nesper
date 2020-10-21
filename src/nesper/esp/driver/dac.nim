@@ -12,7 +12,6 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 import gpio_driver
 
 type

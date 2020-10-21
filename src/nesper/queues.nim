@@ -49,7 +49,7 @@ type
 template xQueueCreate*(uxQueueLength, uxItemSize: int): untyped =
   xQueueCreate(UBaseType_t(uxQueueLength), UBaseType_t(uxItemSize))
 
-template createXQueue[N](depth: int, itemSize: N): QueueHandle_t =
+template createXQueue*[N](depth: int, itemSize: N): QueueHandle_t =
   let q: QueueHandle_t = xQueueCreate(20,sizeof(uint32))
   cast[XQueue[N]](q)
 

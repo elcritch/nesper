@@ -1,1 +1,2 @@
-import nesper/esp/driver/rmt
+import nesper/esp/driver/rmt 
+export rmt

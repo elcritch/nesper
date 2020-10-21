@@ -13,7 +13,6 @@
 ##  limitations under the License.
 
 import ../../consts
-import ../../general
 import ../driver/spi
 import esp_eth_com
 

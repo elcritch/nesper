@@ -1,1 +1,2 @@
-import nesper/esp/driver/dac
+import nesper/esp/driver/dac 
+export dac

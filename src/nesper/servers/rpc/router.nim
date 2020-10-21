@@ -20,12 +20,12 @@ type
   # Procedure signature accepted as an RPC call by server
   RpcProc* = proc(input: JsonNode): JsonNode {.gcsafe.}
 
-  RpcProcError* = object of Exception
+  RpcProcError* = object of ValueError
     code*: int
     data*: JsonNode
 
-  RpcBindError* = object of Exception
-  RpcAddressUnresolvableError* = object of Exception
+  RpcBindError* = object of ValueError
+  RpcAddressUnresolvableError* = object of ValueError
 
   RpcRouter* = ref object
     procs*: Table[string, RpcProc]
@@ -95,7 +95,7 @@ proc createRpcRouter*(max_buffer: int): RpcRouter =
   echo "createRpcRouter: " & $(result.buffer)
 
 proc register*(router: var RpcRouter, path: string, call: RpcProc) =
-  router.procs.add(path, call)
+  router.procs[path] = call
 
 proc clear*(router: var RpcRouter) = router.procs.clear
 
