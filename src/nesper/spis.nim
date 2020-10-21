@@ -287,6 +287,11 @@ proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} =
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
 
+template withSpiBus*(dev: SpiDev, blk: untyped): untyped =
+  dev.acquireBus()
+  blk
+  dev.releaseBus()
+
 template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
   dev.acquireBus(wait)
   blk
