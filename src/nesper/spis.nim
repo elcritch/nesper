@@ -263,6 +263,12 @@ proc readTrans*(dev: SpiDev;
   assert not (USE_TXDATA in flags)
   fullTrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxlength = rxlength, txlength = bits(0), txdata = [], flags = flags)
 
+proc getData*(trn: SpiTrans): seq[byte] = 
+  if trn.trn.rxlength < 32:
+    return trn.trn.rx_data.toSeq()
+  else:
+    return trn.rx_data.toSeq()
+
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
@@ -279,10 +285,12 @@ proc poll*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} 
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} = 
+proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY): seq[byte] {.inline.} = 
   let ret: esp_err_t = spi_device_acquire_bus(trn.handle, wait)
   if (ret != ESP_OK):
     raise newSpiError("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
+
+  return 
 
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
