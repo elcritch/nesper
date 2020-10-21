@@ -16,12 +16,7 @@
 
 #pragma once
 
-#include "driver/spi_common.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "spi_common.h"
 
 
 /**
@@ -262,6 +257,3 @@ void spicommon_dmaworkaround_idle(int dmachan);
  */
 void spicommon_dmaworkaround_transfer_active(int dmachan);
 
-#ifdef __cplusplus
-}
-#endif

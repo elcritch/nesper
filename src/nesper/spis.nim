@@ -1,29 +1,30 @@
-
 import endians
 import sequtils
 
-import consts, general
+import consts
+import general
 import gpios
 import esp/driver/spi
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
+export consts.bits, consts.bytes, consts.TickType_t
+export general.toBits
 export gpios.gpio_num_t
 
 const TAG = "spis"
 
 type
 
-  bits* = distinct int
-
   SpiError* = object of OSError
     code*: esp_err_t
 
-  SpiBus* = object
+  SpiBus* = ref object
     host*: spi_host_device_t
     buscfg*: spi_bus_config_t
 
-  SpiDev* = object
+  SpiDev* = ref object
+    devcfg*: spi_device_interface_config_t 
     handle*: spi_device_handle_t
 
   SpiTrans* = ref object
@@ -66,6 +67,7 @@ proc newSpiBus*(
         max_transfer_sz = 4094
       ): SpiBus = 
 
+  result = new(SpiBus)
   result.host = spi_host_device_t(host.int())
 
   result.buscfg.miso_io_num = miso.cint
@@ -146,26 +148,28 @@ proc addDevice*(
       ## context should be in IRAM for best performance, see "Transferring Speed" 
     ): SpiDev =
 
-  var devcfg: spi_device_interface_config_t 
-  devcfg.command_bits = commandlen.uint8 
-  devcfg.address_bits = addresslen.uint8
-  devcfg.dummy_bits = dummy_bits 
-  devcfg.mode = mode.uint8
-  devcfg.duty_cycle_pos = duty_cycle_pos
-  devcfg.cs_ena_pretrans = cs_cycles_pretrans
-  devcfg.cs_ena_posttrans = cs_cycles_posttrans
-  devcfg.clock_speed_hz = clock_speed_hz
-  devcfg.input_delay_ns = input_delay_ns
-  devcfg.spics_io_num = cs_io.cint
-  devcfg.queue_size = queue_size.cint
-  devcfg.pre_cb = pre_cb
-  devcfg.post_cb = post_cb
+  # var devcfg: spi_device_interface_config_t 
+  result = new(SpiDev)
 
-  devcfg.flags = 0
+  result.devcfg.command_bits = commandlen.uint8 
+  result.devcfg.address_bits = addresslen.uint8
+  result.devcfg.dummy_bits = dummy_bits 
+  result.devcfg.mode = mode.uint8
+  result.devcfg.duty_cycle_pos = duty_cycle_pos
+  result.devcfg.cs_ena_pretrans = cs_cycles_pretrans
+  result.devcfg.cs_ena_posttrans = cs_cycles_posttrans
+  result.devcfg.clock_speed_hz = clock_speed_hz
+  result.devcfg.input_delay_ns = input_delay_ns
+  result.devcfg.spics_io_num = cs_io.cint
+  result.devcfg.queue_size = queue_size.cint
+  result.devcfg.pre_cb = pre_cb
+  result.devcfg.post_cb = post_cb
+
+  result.devcfg.flags = 0
   for flg in flags:
-    devcfg.flags = flg.uint32 or devcfg.flags 
+    result.devcfg.flags = flg.uint32 or result.devcfg.flags 
 
-  let ret = spi_bus_add_device(bus.host, unsafeAddr(devcfg), addr(result.handle))
+  let ret = spi_bus_add_device(bus.host, unsafeAddr(result.devcfg), addr(result.handle))
 
   if (ret != ESP_OK):
     raise newSpiError("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
@@ -199,19 +203,19 @@ proc fullTrans*(dev: SpiDev;
     else:
       txlength.uint32()
 
-  if result.trn.length <= 3:
+  if result.trn.length <= 32:
     result.trn.rx_buffer = nil
     for i in 0..high(txdata):
-      result.trn.tx_data[i] = txdata[i]
+      result.trn.txdata[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = txdata.toSeq()
     result.trn.tx_buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-  if result.trn.length. in 1U..4U:
+  if result.trn.length. in 1U..32U:
     tflags.incl({USE_TXDATA})
   else:
-    result.trn.rx_buffer = nil
+    result.trn.tx_buffer = nil
 
   # Set RX Details
   result.trn.rxlength =
@@ -220,15 +224,15 @@ proc fullTrans*(dev: SpiDev;
     else:
       rxlength.uint()
       
-  if result.trn.rxlength <= 3:
+  if result.trn.rxlength <= 32:
     result.trn.rx_buffer = nil
   else:
     # This order is important, copy the seq then take the unsafe addr
-    let rm = if result.trn.rxlength mod 8 > 0: 1 else: 0
+    let rm = if (result.trn.rxlength mod 8) > 0: 1 else: 0
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
     result.trn.rx_buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
-  if result.trn.rxlength in 1U..4U:
+  if result.trn.rxlength in 1U..32U:
     tflags.incl({USE_RXDATA})
   else:
     result.trn.rx_buffer = nil
@@ -238,6 +242,7 @@ proc fullTrans*(dev: SpiDev;
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
 
+  return result
 
 proc writeTrans*(dev: SpiDev;
                   data: openArray[uint8],
@@ -257,6 +262,12 @@ proc readTrans*(dev: SpiDev;
                 ): SpiTrans =
   assert not (USE_TXDATA in flags)
   fullTrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxlength = rxlength, txlength = bits(0), txdata = [], flags = flags)
+
+proc getData*(trn: SpiTrans): seq[byte] = 
+  if trn.trn.rxlength < 32:
+    return trn.trn.rx_data.toSeq()
+  else:
+    return trn.rx_data.toSeq()
 
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
@@ -282,12 +293,12 @@ proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} =
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
 
-template withSpiBus*(dev: SpiDev, blk: untyped) =
+template withSpiBus*(dev: SpiDev, blk: untyped): untyped =
   dev.acquireBus()
   blk
   dev.releaseBus()
 
-template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped) =
+template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
   dev.acquireBus(wait)
   blk
   dev.releaseBus()
@@ -319,6 +330,7 @@ proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): SpiTrans
     raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc transmit*(trn: SpiTrans) {.inline.} = 
+  # result = new(SpiTrans)
   let ret: esp_err_t =
     spi_device_transmit(trn.dev.handle, addr(trn.trn))
 
