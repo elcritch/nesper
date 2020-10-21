@@ -1,4 +1,3 @@
-
 import nesper/spis
 
 #  define PIN_NUM_MISO 37
