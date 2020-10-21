@@ -8,7 +8,7 @@ import esp/driver/spi
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
-export consts.bits, consts.bytes
+export consts.bits, consts.bytes, consts.TickType_t
 export general.toBits
 export gpios.gpio_num_t
 

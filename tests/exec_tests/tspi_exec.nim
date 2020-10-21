@@ -104,7 +104,7 @@ trn1.poll()
 trn2.queue()
 
 # Example aquire bus
-withSpiBus(dev):
+withSpiBus(dev, TickType_t(0)):
   trn3.poll()
   trn4.poll()
 
