@@ -285,12 +285,10 @@ proc poll*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} 
   if (ret != ESP_OK):
     raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
-proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY): seq[byte] {.inline.} = 
+proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_acquire_bus(trn.handle, wait)
   if (ret != ESP_OK):
     raise newSpiError("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
-
-  return 
 
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
