@@ -111,11 +111,9 @@ type
                             event_base: esp_event_base_t; event_id: int32;
                             event_data: pointer) {.cdecl.}
 
+type
   bits* = distinct int
   bytes* = distinct int
-
-converter toBits*(x: bytes): bits =
-  bits(8*x.int())
 
 ## *< function called when an event is posted to the queue
 ##  Defines for registering/unregistering event handlers
@@ -123,3 +121,7 @@ converter toBits*(x: bytes): bits =
 const
   ESP_EVENT_ANY_BASE* = nil
   ESP_EVENT_ANY_ID* = -1
+
+## toBits
+# converter toBits(x: bytes): bits =
+  # bits(8*x.int())

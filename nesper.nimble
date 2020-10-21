@@ -15,27 +15,36 @@ requires "nim >= 1.2.0"
 # Tasks
 import os, strutils
 
-task test, "Runs the test suite":
-
+proc general_tests() =
+  # Regular tests
   for dtest in listFiles("tests/"):
     if dtest.startsWith("t") and dtest.endsWith(".nim"):
       echo("Testing: " & $dtest)
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
-  # exec "nim c --os:freertos tests/tconsts.nim"
-  # exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tgeneral.nim"
-  # exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tnvs.nim"
-  # exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tspi.nim"
-  # exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos tests/tgpios.nim"
-
-
+proc driver_tests() =
+  # Driver tests
   for dtest in listFiles("tests/driver/"):
     if dtest.startsWith("t") and dtest.endsWith(".nim"):
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
+proc exec_tests() =
+  # Exec tests
   for dtest in listFiles("tests/exec_tests/"):
     if dtest.startsWith("t") and dtest.endsWith(".nim"):
-      exec "nim c -r --cincludes:c_headers/mock/ $1" % [dtest]
+      exec "nim c -r --cincludes:$2/tests/c_headers/mock/ $1" % [dtest, getCurrentDir()]
+
+task test, "Runs the test suite":
+  general_tests()
+  driver_tests()
+  exec_tests()
+
+task test_general, "Runs the test suite":
+  general_tests()
+task test_drivers, "Runs the test suite":
+  driver_tests()
+task test_execs, "Runs the test suite":
+  exec_tests()
 
   # exec "nim c -r tests/trouter.nim"
 

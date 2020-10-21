@@ -1,14 +1,14 @@
-
 import endians
 import sequtils
 
-import consts, general
+import consts
+import general
 import gpios
 import esp/driver/spi
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
-export consts.bits, consts.bytes
+export general
 export gpios.gpio_num_t
 
 const TAG = "spis"
@@ -201,8 +201,7 @@ proc fullTrans*(dev: SpiDev;
   if result.trn.length <= 32:
     result.trn.rx_buffer = nil
     for i in 0..high(txdata):
-      echo "i: " & $i & " tx: " & $txdata[i]
-      result.trn.tx_data[i] = txdata[i]
+      result.trn.txdata[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
     result.tx_data = txdata.toSeq()
@@ -211,7 +210,7 @@ proc fullTrans*(dev: SpiDev;
   if result.trn.length. in 1U..32U:
     tflags.incl({USE_TXDATA})
   else:
-    result.trn.rx_buffer = nil
+    result.trn.tx_buffer = nil
 
   # Set RX Details
   result.trn.rxlength =
@@ -238,9 +237,7 @@ proc fullTrans*(dev: SpiDev;
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
 
-  echo ""
-  echo "spi txdata: " & repr(txdata)
-  echo "spi transaction: " & repr(result)
+  return result
 
 proc writeTrans*(dev: SpiDev;
                   data: openArray[uint8],

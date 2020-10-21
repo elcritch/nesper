@@ -1,4 +1,5 @@
 
+import nesper/consts
 import nesper/spis
 
 {.emit: """
@@ -72,19 +73,19 @@ var
                      flags={HALFDUPLEX})
 
 
-let tdata1 = [byte 1, 2]
+let tdata1 = [byte 11, 22]
 let trn1 = dev.fullTrans(tdata1)
 
 # read non-byte number of bits
-var tdata2 = [byte 1, 2, 3]
+var tdata2 = [byte 11, 22, 33]
 var trn2 = dev.fullTrans(tdata2, rxlength=bits(20))
 
-var trn3 = dev.fullTrans([byte 1, 2, 3, 4, 5])
+var trn3 = dev.fullTrans([byte 11, 22, 33, 44, 55])
 
-var tdata4 = @[1'u8, 2, 3]
+var tdata4 = @[11'u8, 22, 33]
 var trn4 = dev.fullTrans(tdata4)
 
-var trn5 = dev.readTrans(bits(24))
+var trn5 = dev.readTrans(bytes(3))
 # this is an error: let trn5 = dev.readTrans(@[1'u8, 2, 3, 4, 5])
 
 var trn6 = dev.writeTrans(@[1'u8, 2, 3, 4, 5])
