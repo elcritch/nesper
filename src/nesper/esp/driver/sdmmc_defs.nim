@@ -598,13 +598,13 @@ const
 ##  @return 32-bit word where requested bits start from LSB
 ##
 
-proc MMC_RSP_BITS*(src: ptr uint32; start: cint; len: cint): uint32 {.inline.} =
-  var mask: uint32
-  var word: csize_t
-  var shift: csize_t
-  var right: uint32
-  var left: uint32
-  return (left or right) and mask
+# proc MMC_RSP_BITS*(src: ptr uint32; start: cint; len: cint): uint32 {.inline.} =
+#   var mask: uint32
+#   # var word: csize_t
+#   # var shift: csize_t
+#   var right: uint32
+#   var left: uint32
+#   return (left or right) and mask
 
 ##  SD R4 response (IO OCR)
 

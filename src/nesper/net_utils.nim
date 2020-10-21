@@ -67,9 +67,6 @@ proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   # for i in 0..15:
     # result.address_v6[i] = uint8(address shr (i*8))
 
-proc c_sprintf(buf, frmt: cstring): cint {.
-  importc: "sprintf", header: "<stdio.h>", varargs, noSideEffect.}
-
 ## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
 proc generate_hostname*(hostname: string): string =
   var mac: array[6, uint8]
