@@ -198,9 +198,10 @@ proc fullTrans*(dev: SpiDev;
     else:
       txlength.uint32()
 
-  if result.trn.length <= 3:
+  if result.trn.length <= 32:
     result.trn.rx_buffer = nil
     for i in 0..high(txdata):
+      echo "i: " & $i & " tx: " & $txdata[i]
       result.trn.tx_data[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
@@ -237,6 +238,8 @@ proc fullTrans*(dev: SpiDev;
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
 
+  echo ""
+  echo "spi txdata: " & repr(txdata)
   echo "spi transaction: " & repr(result)
 
 proc writeTrans*(dev: SpiDev;
