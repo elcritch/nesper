@@ -1,2 +1,3 @@
-import nesper/esp/driver/adc
+import nesper/esp/driver/adc 
+export adc
 

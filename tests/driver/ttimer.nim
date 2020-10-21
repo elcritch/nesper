@@ -1,1 +1,2 @@
-import nesper/esp/driver/timer
+import nesper/esp/driver/timer 
+export timer

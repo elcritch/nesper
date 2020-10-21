@@ -32,8 +32,7 @@ type
 ##
 
 type
-  INNER_C_UNION_ip_addr_71* {.importc: "no_name", header: "lwip/ip_addr.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_ip_addr_71* {.importc: "no_name", header: "lwip/ip_addr.h", bycopy, union.} = object
     ip6* {.importc: "ip6".}: ip6_addr_t
     ip4* {.importc: "ip4".}: ip4_addr_t
 

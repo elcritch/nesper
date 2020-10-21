@@ -1,1 +1,2 @@
-import nesper/esp/driver/sdio_slave
+import nesper/esp/driver/sdio_slave 
+export sdio_slave

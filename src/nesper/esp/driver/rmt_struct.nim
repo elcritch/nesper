@@ -21,8 +21,7 @@ type
     mem_pd* {.importc: "mem_pd", bitsize: 1.}: uint32 ## This bit is used to reduce power consumed by memory. 1:memory is in low power state.
     clk_en* {.importc: "clk_en", bitsize: 1.}: uint32 ## This bit  is used  to control clock.when software configure RMT internal registers  it controls the register clock.
 
-  INNER_C_UNION_rmt_struct_29* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_29* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_37* {.importc: "ano_rmt_struct_37".}: INNER_C_STRUCT_rmt_struct_30
     val* {.importc: "val".}: uint32
 
@@ -42,8 +41,7 @@ type
     idle_out_en* {.importc: "idle_out_en", bitsize: 1.}: uint32 ## This is the output enable control bit for channel0-7 in IDLE state.
     reserved20* {.importc: "reserved20", bitsize: 12.}: uint32
 
-  INNER_C_UNION_rmt_struct_41* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_41* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_56* {.importc: "ano_rmt_struct_56".}: INNER_C_STRUCT_rmt_struct_42
     val* {.importc: "val".}: uint32
 
@@ -85,8 +83,7 @@ type
     ch6_tx_thr_event* {.importc: "ch6_tx_thr_event", bitsize: 1.}: uint32 ## The interrupt raw bit for channel 6 turns to high level when transmitter in channel6  have send data more than  reg_rmt_tx_lim_ch6  after detecting this interrupt  software can updata the old data with new data.
     ch7_tx_thr_event* {.importc: "ch7_tx_thr_event", bitsize: 1.}: uint32 ## The interrupt raw bit for channel 7 turns to high level when transmitter in channel7  have send data more than  reg_rmt_tx_lim_ch7  after detecting this interrupt  software can updata the old data with new data.
 
-  INNER_C_UNION_rmt_struct_63* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_63* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_96* {.importc: "ano_rmt_struct_96".}: INNER_C_STRUCT_rmt_struct_64
     val* {.importc: "val".}: uint32
 
@@ -124,8 +121,7 @@ type
     ch6_tx_thr_event* {.importc: "ch6_tx_thr_event", bitsize: 1.}: uint32 ## The interrupt state bit  for channel 6's rmt_ch6_tx_thr_event_int_raw when mt_ch6_tx_thr_event_int_ena is set to 1.
     ch7_tx_thr_event* {.importc: "ch7_tx_thr_event", bitsize: 1.}: uint32 ## The interrupt state bit  for channel 7's rmt_ch7_tx_thr_event_int_raw when mt_ch7_tx_thr_event_int_ena is set to 1.
 
-  INNER_C_UNION_rmt_struct_100* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_100* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_133* {.importc: "ano_rmt_struct_133".}: INNER_C_STRUCT_rmt_struct_101
     val* {.importc: "val".}: uint32
 
@@ -163,8 +159,7 @@ type
     ch6_tx_thr_event* {.importc: "ch6_tx_thr_event", bitsize: 1.}: uint32 ## Set this bit to enable rmt_ch6_tx_thr_event_int_st.
     ch7_tx_thr_event* {.importc: "ch7_tx_thr_event", bitsize: 1.}: uint32 ## Set this bit to enable rmt_ch7_tx_thr_event_int_st.
 
-  INNER_C_UNION_rmt_struct_137* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_137* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_170* {.importc: "ano_rmt_struct_170".}: INNER_C_STRUCT_rmt_struct_138
     val* {.importc: "val".}: uint32
 
@@ -202,8 +197,7 @@ type
     ch6_tx_thr_event* {.importc: "ch6_tx_thr_event", bitsize: 1.}: uint32 ## Set this bit to clear the  rmt_ch6_tx_thr_event_int_raw interrupt.
     ch7_tx_thr_event* {.importc: "ch7_tx_thr_event", bitsize: 1.}: uint32 ## Set this bit to clear the  rmt_ch7_tx_thr_event_int_raw interrupt.
 
-  INNER_C_UNION_rmt_struct_174* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_174* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_207* {.importc: "ano_rmt_struct_207".}: INNER_C_STRUCT_rmt_struct_175
     val* {.importc: "val".}: uint32
 
@@ -211,8 +205,7 @@ type
     low* {.importc: "low", bitsize: 16.}: uint32 ## This register is used to configure carrier wave's low level value for channel0-7.
     high* {.importc: "high", bitsize: 16.}: uint32 ## This register is used to configure carrier wave's high level value for channel0-7.
 
-  INNER_C_UNION_rmt_struct_211* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_211* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_214* {.importc: "ano_rmt_struct_214".}: INNER_C_STRUCT_rmt_struct_212
     val* {.importc: "val".}: uint32
 
@@ -220,8 +213,7 @@ type
     limit* {.importc: "limit", bitsize: 9.}: uint32 ## When channel0-7 sends more than reg_rmt_tx_lim_ch0 data then channel0-7 produce the relative interrupt.
     reserved9* {.importc: "reserved9", bitsize: 23.}: uint32
 
-  INNER_C_UNION_rmt_struct_218* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_218* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_221* {.importc: "ano_rmt_struct_221".}: INNER_C_STRUCT_rmt_struct_219
     val* {.importc: "val".}: uint32
 
@@ -230,8 +222,7 @@ type
     mem_tx_wrap_en* {.importc: "mem_tx_wrap_en", bitsize: 1.}: uint32 ## when data need to be send is more than channel's mem can store  then set this bit to enable reuse of mem this bit is used together with reg_rmt_tx_lim_chn.
     reserved2* {.importc: "reserved2", bitsize: 30.}: uint32
 
-  INNER_C_UNION_rmt_struct_225* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_225* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_229* {.importc: "ano_rmt_struct_229".}: INNER_C_STRUCT_rmt_struct_226
     val* {.importc: "val".}: uint32
 
@@ -264,8 +255,7 @@ type
     duration1* {.importc: "duration1", bitsize: 15.}: uint32
     level1* {.importc: "level1", bitsize: 1.}: uint32
 
-  INNER_C_UNION_rmt_struct_240* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_rmt_struct_240* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_245* {.importc: "ano_rmt_struct_245".}: INNER_C_STRUCT_rmt_struct_241
     val* {.importc: "val".}: uint32
 
@@ -276,11 +266,11 @@ type
 ## Allow access to RMT memory using RMTMEM.chan[0].data32[8]
 
 type
-  INNER_C_UNION_rmt_struct_254* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object {.
-      union.}
+  # TODO: This doesn't look right
+  INNER_C_UNION_rmt_struct_254* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     data32* {.importc: "data32".}: array[64, rmt_item32_t]
 
-  INNER_C_STRUCT_rmt_struct_253* {.importc: "no_name", header: "rmt_struct.h", bycopy.} = object
+  INNER_C_STRUCT_rmt_struct_253* {.importc: "no_name", header: "rmt_struct.h", bycopy, union.} = object
     ano_rmt_struct_255* {.importc: "ano_rmt_struct_255".}: INNER_C_UNION_rmt_struct_254
 
   rmt_mem_t* {.importc: "rmt_mem_t", header: "rmt_struct.h", bycopy.} = object

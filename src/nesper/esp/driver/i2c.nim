@@ -71,8 +71,7 @@ type
     addr_10bit_en* {.importc: "addr_10bit_en".}: uint8 ## !< I2C 10bit address mode enable for slave mode
     slave_addr* {.importc: "slave_addr".}: uint16 ## !< I2C address for slave mode
 
-  INNER_C_UNION_i2c_types_84* {.importc: "no_name", header: "i2c_types.h", bycopy.} = object {.
-      union.}
+  INNER_C_UNION_i2c_types_84* {.importc: "no_name", header: "i2c_types.h", bycopy, union.} = object
     master* {.importc: "master".}: INNER_C_STRUCT_i2c_types_85 ## !< I2C master config
     slave* {.importc: "slave".}: INNER_C_STRUCT_i2c_types_88 ## !< I2C slave config
 
