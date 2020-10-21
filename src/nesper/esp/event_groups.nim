@@ -2,6 +2,7 @@ import ../consts
 import FreeRTOS
 
 # {.compile: "nqueue.c".}
+import os
 const evt_header = currentSourcePath().splitPath.head & "/esp/defs/nevents.h"
 
 ## *
