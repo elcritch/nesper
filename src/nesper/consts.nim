@@ -111,6 +111,12 @@ type
                             event_base: esp_event_base_t; event_id: int32;
                             event_data: pointer) {.cdecl.}
 
+  bits* = distinct int
+  bytes* = distinct int
+
+converter toBits*(x: bytes): bits =
+  bits(8*x.int())
+
 ## *< function called when an event is posted to the queue
 ##  Defines for registering/unregistering event handlers
 

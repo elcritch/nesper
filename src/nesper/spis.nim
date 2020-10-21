@@ -8,13 +8,12 @@ import esp/driver/spi
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export spi
+export consts.bits, consts.bytes
 export gpios.gpio_num_t
 
 const TAG = "spis"
 
 type
-
-  bits* = distinct int
 
   SpiError* = object of OSError
     code*: esp_err_t
@@ -208,7 +207,7 @@ proc fullTrans*(dev: SpiDev;
     result.tx_data = txdata.toSeq()
     result.trn.tx_buffer = unsafeAddr(result.tx_data[0]) ## The data is the cmd itself
 
-  if result.trn.length. in 1U..4U:
+  if result.trn.length. in 1U..32U:
     tflags.incl({USE_TXDATA})
   else:
     result.trn.rx_buffer = nil
@@ -220,15 +219,15 @@ proc fullTrans*(dev: SpiDev;
     else:
       rxlength.uint()
       
-  if result.trn.rxlength <= 3:
+  if result.trn.rxlength <= 32:
     result.trn.rx_buffer = nil
   else:
     # This order is important, copy the seq then take the unsafe addr
-    let rm = if result.trn.rxlength mod 8 > 0: 1 else: 0
+    let rm = if (result.trn.rxlength mod 8) > 0: 1 else: 0
     result.rx_data = newSeq[byte](int(result.trn.rxlength div 8) + rm)
     result.trn.rx_buffer = unsafeAddr(result.rx_data[0]) ## The data is the cmd itself
 
-  if result.trn.rxlength in 1U..4U:
+  if result.trn.rxlength in 1U..32U:
     tflags.incl({USE_RXDATA})
   else:
     result.trn.rx_buffer = nil
@@ -238,6 +237,7 @@ proc fullTrans*(dev: SpiDev;
   for flg in tflags:
     result.trn.flags = flg.uint32 or result.trn.flags 
 
+  echo "spi transaction: " & repr(result)
 
 proc writeTrans*(dev: SpiDev;
                   data: openArray[uint8],
