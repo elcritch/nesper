@@ -37,21 +37,24 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
-      timeBlockDebug("rpcSocketDecode"):
-        var rcall = msgpack2json.toJsonNode(msg)
+      var rcall = msgpack2json.toJsonNode(msg)
+      var prcall: ptr JsonNode = addr(rcall)
       
       logd(TAG, "rpc socket sent result: %s", repr(rcall))
       GC_ref(rcall)
-      discard xQueueSend(qh.inQueue, addr rcall, TickType_t(1000)) 
+      discard xQueueSend(qh.inQueue, addr(prcall), TickType_t(1000)) 
+      logi(TAG,"exec rpc task send:ptr: %s", repr(rcall.addr().pointer()))
 
-      var res: JsonNode
+      var res: ptr JsonNode
       while xQueueReceive(qh.outQueue, addr(res), 0) == 0: 
         # logd(TAG, "rpc socket waiting for result")
         continue
 
-      timeBlockDebug("rpcSocketEncode"):
-        var rmsg: string = msgpack2json.fromJsonNode(res)
-      logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
+      logi(TAG,"exec rpc task send:ptr: %s", repr(res.addr().pointer()))
+      logi(TAG,"exec rpc task send:ref: %s", repr(res[].addr().pointer()))
+      logi(TAG,"exec rpc task send: %s", repr(res))
+      var rmsg: string = msgpack2json.fromJsonNode(res[])
+      logi(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr(rmsg[0]), rmsg.len)
 
   except TimeoutError:
@@ -68,15 +71,22 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
     try:
       timeBlockDebug("rpcTask"):
         logd(TAG,"exec rpc task wait: ")
-        var rcall: JsonNode
-        if xQueueReceive(qh.inQueue, addr(rcall), portMAX_DELAY) != 0: 
-          logd(TAG,"exec rpc task got: %s", repr(addr(rcall).pointer))
+        var prcall: ptr JsonNode
+        if xQueueReceive(qh.inQueue, addr(prcall), portMAX_DELAY) != 0: 
+          logi(TAG,"exec rpc task got: %s", repr(prcall.pointer))
+          if prcall == nil:
+            raise newException(ValueError, "bad data ptr in rpc queue!")
+
+          var rcall: JsonNode = prcall[]
     
           var res: JsonNode = qh.router.route( rcall )
+          var pres: ptr JsonNode = addr(res)
     
-          logd(TAG,"exec rpc task send: %s", $(res))
+          logi(TAG,"exec rpc task send:ref: %s", repr(res.addr().pointer()))
+          logi(TAG,"exec rpc task send:ptr: %s", repr(pres.addr().pointer()))
+          logi(TAG,"exec rpc task send: %s", $(res))
           GC_ref(res)
-          discard xQueueSend(qh.outQueue, addr(res), TickType_t(1_000)) 
+          discard xQueueSend(qh.outQueue, addr(pres), TickType_t(1_000)) 
 
     except:
       let
@@ -92,8 +102,8 @@ proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
   var qh: RpcQueueHandle = new(RpcQueueHandle)
 
   qh.router = router
-  qh.inQueue = xQueueCreate(1, sizeof(JsonNode))
-  qh.outQueue = xQueueCreate(1, sizeof(JsonNode))
+  qh.inQueue = xQueueCreate(1, sizeof(pointer))
+  qh.outQueue = xQueueCreate(1, sizeof(pointer))
 
   var rpcTask: TaskHandle_t
   discard xTaskCreatePinnedToCore(
