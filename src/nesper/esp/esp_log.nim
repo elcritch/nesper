@@ -26,7 +26,7 @@ proc logv*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, hea
 proc log_timestamp*(): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
 
 type 
-  MallocCapacity = enum
+  MallocCapacity* = enum
     MALLOC_CAP_EXEC     = BIT(0)  # ///< Memory must be able to run executable code
     MALLOC_CAP_32BIT    = BIT(1)  # ///< Memory must allow for aligned 32-bit data accesses
     MALLOC_CAP_8BIT     = BIT(2)  # ///< Memory must allow for 8/16/...-bit data accesses
