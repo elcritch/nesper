@@ -35,7 +35,8 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
-      var rcall = msgpack2json.toJsonNode(msg)
+      timeBlockDebug("rpcTask:encode:"):
+        var rcall = msgpack2json.toJsonNode(msg)
       var prcall: ptr JsonNode = addr(rcall)
       
       discard xQueueSend(qh.inQueue, addr(prcall), TickType_t(1000)) 
@@ -44,7 +45,8 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
       while xQueueReceive(qh.outQueue, addr(res), 0) == 0: 
         continue
 
-      var rmsg: string = msgpack2json.fromJsonNode(res[])
+      timeBlockDebug("rpcTask:encode:"):
+        var rmsg: string = msgpack2json.fromJsonNode(res[])
       sourceClient.send(rmsg)
 
   except TimeoutError:
