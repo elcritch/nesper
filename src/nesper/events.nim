@@ -3,14 +3,15 @@ import general
 
 when defined(ESP_IDF_V4_0):
     import esp/net/tcpip_adapter
+    export tcpip_adapter
 else:
     import esp/net/esp_netif
+    export esp_netif
 
 import esp/net/esp_wifi_types
 import esp/esp_event
 import esp/event_groups
 
-export tcpip_adapter
 export esp_wifi_types
 export esp_event
 export event_groups
