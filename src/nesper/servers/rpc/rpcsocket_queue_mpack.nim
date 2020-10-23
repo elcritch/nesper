@@ -45,7 +45,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
         continue
 
       var rmsg: string = msgpack2json.fromJsonNode(res[])
-      sourceClient.send(move rmsg)
+      sourceClient.send(rmsg)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
