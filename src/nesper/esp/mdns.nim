@@ -13,8 +13,12 @@
 
 import ../consts
 import ../net_utils
-import ../esp/net/tcpip_adapter
 import ../esp/esp_event_legacy
+
+when defined(ESP_IDF_V4_0):
+  import ../esp/net/tcpip_adapter
+else:
+  import ../esp/net/esp_netif_types
 
 type
   mdns_type* = enum
@@ -53,8 +57,17 @@ type
 
 type
   mdns_ip_addr_t* {.importc: "mdns_ip_addr_t", header: "mdns.h", bycopy.} = object
-    `addr`* {.importc: "addr".}: ip_addr_t ## !< IP address
+    when defined(ESP_IDF_V4_0):
+      `addr`* {.importc: "addr".}: ip_addr_t ## !< IP address
+    else:
+      `addr`* {.importc: "addr".}: esp_ip_addr_t ## !< IP address
     next* {.importc: "next".}: ptr mdns_ip_addr_t ## !< next IP, or NULL for the last IP in the list
+
+  mdns_if_t* = enum
+    MDNS_IF_STA = 0,
+    MDNS_IF_AP = 1,
+    MDNS_IF_ETH = 2,
+    MDNS_IF_MAX
 
 
 ## *
@@ -64,7 +77,10 @@ type
 type
   mdns_result_t* {.importc: "mdns_result_t", header: "mdns.h", bycopy.} = object
     next* {.importc: "next".}: ptr mdns_result_t ## !< next result, or NULL for the last result in the list
-    tcpip_if* {.importc: "tcpip_if".}: tcpip_adapter_if_t ## !< interface on which the result came (AP/STA/ETH)
+    when defined(ESP_IDF_V4_0):
+        tcpip_if* {.importc: "tcpip_if".}: tcpip_adapter_if_t ## !< interface on which the result came (AP/STA/ETH)
+    else:
+        tcpip_if* {.importc: "tcpip_if".}: mdns_if_t ## !< interface on which the result came (AP/STA/ETH)
     ip_protocol* {.importc: "ip_protocol".}: mdns_ip_protocol_t ## !< ip_protocol type of the interface (v4/v6)
                                                             ##  PTR
     instance_name* {.importc: "instance_name".}: cstring ## !< instance name
