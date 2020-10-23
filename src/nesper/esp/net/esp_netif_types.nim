@@ -195,7 +195,7 @@ type
   esp_netif_driver_ifconfig_t* = esp_netif_driver_ifconfig
 
   ##  @brief  Generic esp_netif configuration
-  esp_netif_config* {.importc: "esp_netif_config", header: "esp_netif_types.h",
+  esp_netif_config* {.importc: "esp_netif_config_t", header: "esp_netif_types.h",
                      bycopy.} = object
     base* {.importc: "base".}: ptr esp_netif_inherent_config_t
     driver* {.importc: "driver".}: ptr esp_netif_driver_ifconfig_t
@@ -205,7 +205,7 @@ type
 
 
   ##  @brief  Specific L3 network stack configuration
-  esp_netif_config_t* = esp_netif_config
+  # esp_netif_config_t* = esp_netif_config
 
 
 type
