@@ -1,7 +1,11 @@
 import consts
 import general
 
-import esp/net/tcpip_adapter
+when defined(ESP_IDF_V4_0):
+    import esp/net/tcpip_adapter
+else:
+    import esp/net/esp_netif
+
 import esp/net/esp_wifi_types
 import esp/esp_event
 import esp/event_groups
