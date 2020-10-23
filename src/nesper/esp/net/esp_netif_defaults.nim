@@ -11,7 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import esp_netif
+# import esp_netif
 
 ##
 ##  Macros to assemble master configs with partial configs from netif, stack and driver
