@@ -170,7 +170,7 @@ proc esp_netif_receive*(esp_netif: ptr esp_netif_t; buffer: pointer; len: csize_
 ##
 
 proc esp_netif_action_start*(esp_netif: pointer; base: esp_event_base_t;
-                            event_id: int32_t; data: pointer) {.
+                            event_id: int32; data: pointer) {.
     importc: "esp_netif_action_start", header: "esp_netif.h".}
 ## *
 ##  @brief Default building block for network interface action upon IO driver stop event
@@ -184,7 +184,7 @@ proc esp_netif_action_start*(esp_netif: pointer; base: esp_event_base_t;
 ##
 
 proc esp_netif_action_stop*(esp_netif: pointer; base: esp_event_base_t;
-                           event_id: int32_t; data: pointer) {.
+                           event_id: int32; data: pointer) {.
     importc: "esp_netif_action_stop", header: "esp_netif.h".}
 ## *
 ##  @brief Default building block for network interface action upon IO driver connected event
@@ -198,7 +198,7 @@ proc esp_netif_action_stop*(esp_netif: pointer; base: esp_event_base_t;
 ##
 
 proc esp_netif_action_connected*(esp_netif: pointer; base: esp_event_base_t;
-                                event_id: int32_t; data: pointer) {.
+                                event_id: int32; data: pointer) {.
     importc: "esp_netif_action_connected", header: "esp_netif.h".}
 ## *
 ##  @brief Default building block for network interface action upon IO driver disconnected event
@@ -212,7 +212,7 @@ proc esp_netif_action_connected*(esp_netif: pointer; base: esp_event_base_t;
 ##
 
 proc esp_netif_action_disconnected*(esp_netif: pointer; base: esp_event_base_t;
-                                   event_id: int32_t; data: pointer) {.
+                                   event_id: int32; data: pointer) {.
     importc: "esp_netif_action_disconnected", header: "esp_netif.h".}
 ## *
 ##  @brief Default building block for network interface action upon network got IP event
@@ -226,7 +226,7 @@ proc esp_netif_action_disconnected*(esp_netif: pointer; base: esp_event_base_t;
 ##
 
 proc esp_netif_action_got_ip*(esp_netif: pointer; base: esp_event_base_t;
-                             event_id: int32_t; data: pointer) {.
+                             event_id: int32; data: pointer) {.
     importc: "esp_netif_action_got_ip", header: "esp_netif.h".}
 ## *
 ##  @}
@@ -246,7 +246,7 @@ proc esp_netif_action_got_ip*(esp_netif: pointer; base: esp_event_base_t;
 ##  @return     ESP_OK
 ##
 
-proc esp_netif_set_mac*(esp_netif: ptr esp_netif_t; mac: ptr uint8_t): esp_err_t {.
+proc esp_netif_set_mac*(esp_netif: ptr esp_netif_t; mac: ptr uint8): esp_err_t {.
     importc: "esp_netif_set_mac", header: "esp_netif.h".}
 ## *
 ##  @brief  Set the hostname of an interface
@@ -413,7 +413,7 @@ proc esp_netif_get_netif_impl_index*(esp_netif: ptr esp_netif_t): cint {.
 proc esp_netif_dhcps_option*(esp_netif: ptr esp_netif_t;
                             opt_op: esp_netif_dhcp_option_mode_t;
                             opt_id: esp_netif_dhcp_option_id_t; opt_val: pointer;
-                            opt_len: uint32_t): esp_err_t {.
+                            opt_len: uint32): esp_err_t {.
     importc: "esp_netif_dhcps_option", header: "esp_netif.h".}
 ## *
 ##  @brief  Set or Get DHCP client option
@@ -434,7 +434,7 @@ proc esp_netif_dhcps_option*(esp_netif: ptr esp_netif_t;
 proc esp_netif_dhcpc_option*(esp_netif: ptr esp_netif_t;
                             opt_op: esp_netif_dhcp_option_mode_t;
                             opt_id: esp_netif_dhcp_option_id_t; opt_val: pointer;
-                            opt_len: uint32_t): esp_err_t {.
+                            opt_len: uint32): esp_err_t {.
     importc: "esp_netif_dhcpc_option", header: "esp_netif.h".}
 ## *
 ##  @brief Start DHCP client (only if enabled in interface object)
@@ -654,8 +654,8 @@ proc esp_netif_get_ip6_global*(esp_netif: ptr esp_netif_t;
 ##  @param d
 ##
 
-proc esp_netif_set_ip4_addr*(`addr`: ptr esp_ip4_addr_t; a: uint8_t; b: uint8_t;
-                            c: uint8_t; d: uint8_t) {.
+proc esp_netif_set_ip4_addr*(`addr`: ptr esp_ip4_addr_t; a: uint8; b: uint8;
+                            c: uint8; d: uint8) {.
     importc: "esp_netif_set_ip4_addr", header: "esp_netif.h".}
 ## *
 ##  @brief Converts numeric IP address into decimal dotted ASCII representation.
@@ -677,7 +677,7 @@ proc esp_ip4addr_ntoa*(`addr`: ptr esp_ip4_addr_t; buf: cstring; buflen: cint): 
 ##  @return ip address in network order
 ##
 
-proc esp_ip4addr_aton*(`addr`: cstring): uint32_t {.importc: "esp_ip4addr_aton",
+proc esp_ip4addr_aton*(`addr`: cstring): uint32 {.importc: "esp_ip4addr_aton",
     header: "esp_netif.h".}
 ## *
 ##  @}
@@ -751,7 +751,7 @@ proc esp_netif_get_desc*(esp_netif: ptr esp_netif_t): cstring {.
 ##
 
 proc esp_netif_get_event_id*(esp_netif: ptr esp_netif_t;
-                            event_type: esp_netif_ip_event_type_t): int32_t {.
+                            event_type: esp_netif_ip_event_type_t): int32 {.
     importc: "esp_netif_get_event_id", header: "esp_netif.h".}
 ## *
 ##  @}

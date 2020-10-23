@@ -13,8 +13,6 @@
 
 
 import ../../consts
-import esp_netif_ip_addr
-import esp_netif_types
 
 ##
 ##  Note: tcpip_adapter legacy API has to be included by default to provide full compatibility
@@ -24,4 +22,9 @@ import esp_netif_types
 when defined(ESP_IDF_V4_0):
   include tcpip_adapter
 else:
+  import esp_netif_ip_addr
+  import esp_netif_types
+  export esp_netif_ip_addr
+  export esp_netif_types
+
   include esp_netif_impl

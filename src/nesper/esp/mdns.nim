@@ -15,10 +15,7 @@ import ../consts
 import ../net_utils
 import ../esp/esp_event_legacy
 
-when defined(ESP_IDF_V4_0):
-  import ../esp/net/tcpip_adapter
-else:
-  import ../esp/net/esp_netif_types
+import ../esp/net/esp_netif
 
 type
   mdns_type* = enum
