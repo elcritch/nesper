@@ -23,19 +23,17 @@ const
   ESP_IPADDR_TYPE_ANY* = 46
 
 type
-  esp_ip6_addr* {.importc: "esp_ip6_addr", header: "esp_netif_ip_addr.h", bycopy.} = object
+  esp_ip6_addr_t* {.importc: "esp_ip6_addr_t", header: "esp_netif_ip_addr.h", bycopy.} = object
     address* {.importc: "addr".}: array[4, uint32]
     zone* {.importc: "zone".}: uint8
 
-  esp_ip4_addr* {.importc: "esp_ip4_addr", header: "esp_netif_ip_addr.h", bycopy.} = object
+  esp_ip4_addr_t* {.importc: "esp_ip4_addr_t", header: "esp_netif_ip_addr.h", bycopy.} = object
     address* {.importc: "addr".}: uint32
 
   INNER_C_UNION_esp_netif_ip_addr_97* {.header: "esp_netif_ip_addr.h", bycopy, union.} = object
     ip6* {.importc: "ip6".}: esp_ip6_addr_t
     ip4* {.importc: "ip4".}: esp_ip4_addr_t
 
-  esp_ip4_addr_t* = esp_ip4_addr
-  esp_ip6_addr_t* = esp_ip6_addr
   esp_ip_addr_t* {.importc: "esp_ip_addr_t", header: "esp_netif_ip_addr.h", bycopy.} = object
     u_addr* {.importc: "u_addr".}: INNER_C_UNION_esp_netif_ip_addr_97
     `type`* {.importc: "type".}: uint8

@@ -178,6 +178,7 @@ type
 
   ##  @brief  IO driver handle type
   esp_netif_iodriver_handle* = pointer
+
   esp_netif_driver_base_t* {.importc: "esp_netif_driver_base_t",
                             header: "esp_netif_types.h", bycopy.} = object
     post_attach* {.importc: "post_attach".}: proc (netif: ptr esp_netif_t;
@@ -185,14 +186,12 @@ type
     netif* {.importc: "netif".}: ptr esp_netif_t
 
   ##  @brief  Specific IO driver configuration
-  esp_netif_driver_ifconfig* {.importc: "esp_netif_driver_ifconfig",
+  esp_netif_driver_ifconfig_t* {.importc: "esp_netif_driver_ifconfig_t",
                               header: "esp_netif_types.h", bycopy.} = object
     handle* {.importc: "handle".}: esp_netif_iodriver_handle
     transmit* {.importc: "transmit".}: proc (h: pointer; buffer: pointer; len: csize_t): esp_err_t
     driver_free_rx_buffer* {.importc: "driver_free_rx_buffer".}: proc (h: pointer;
         buffer: pointer)
-
-  esp_netif_driver_ifconfig_t* = esp_netif_driver_ifconfig
 
   ##  @brief  Generic esp_netif configuration
   esp_netif_config_t* {.importc: "esp_netif_config_t", header: "esp_netif_types.h",
