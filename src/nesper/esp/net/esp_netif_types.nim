@@ -34,9 +34,7 @@ const
 ## * @brief Type of esp_netif_object server
 
 type
-  esp_netif_obj* {.importc: "esp_netif_obj", header: "esp_netif_types.h", bycopy.} = object
-
-  esp_netif_t* = esp_netif_obj
+  esp_netif_t* {.importc: "esp_netif_t", header: "esp_netif_types.h", bycopy.} = object
 
 ## * @brief Type of DNS server
 

@@ -31,11 +31,9 @@ const netif_def_headers = """#include "esp_netif.h"
 
 proc ESP_NETIF_DEFAULT_ETH*(cfg: var esp_netif_config_t) =
   {.emit: """
-  cfg = {                                           
-    .base = ESP_NETIF_BASE_DEFAULT_ETH, 
-    .driver = NULL, 
-    .stack = ESP_NETIF_NETSTACK_DEFAULT_ETH, 
-  }
+  cfg->base = ESP_NETIF_BASE_DEFAULT_ETH;
+  cfg->driver = NULL; 
+  cfg->stack = ESP_NETIF_NETSTACK_DEFAULT_ETH; 
   """.}
   discard "ok"
 
