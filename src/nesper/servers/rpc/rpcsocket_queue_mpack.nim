@@ -30,8 +30,6 @@ proc rpcMsgPackQueueWriteHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Re
 proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: ReadyKey, sourceClient: Socket, qh: RpcQueueHandle) =
 
   try:
-    logd(TAG, "rpc server handler: router: %x", qh.router.buffer)
-
     let msg = sourceClient.recv(qh.router.buffer, -1)
 
     if msg.len() == 0:
@@ -40,32 +38,23 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
       var rcall = msgpack2json.toJsonNode(msg)
       var prcall: ptr JsonNode = addr(rcall)
       
-      logd(TAG, "rpc socket sent result: %s", repr(rcall))
-      GC_ref(rcall)
       discard xQueueSend(qh.inQueue, addr(prcall), TickType_t(1000)) 
-      logd(TAG,"exec rpc task send:ptr: %s", repr(rcall.addr().pointer()))
 
       var res: ptr JsonNode
       while xQueueReceive(qh.outQueue, addr(res), 0) == 0: 
-        logd(TAG, "rpc socket waiting for result")
         continue
 
-      logd(TAG,"exec rpc task send:ptr: %s", repr(res.addr().pointer()))
-      logd(TAG,"exec rpc task send:ref: %s", repr(res[].addr().pointer()))
-      logd(TAG,"exec rpc task send: %s", repr(res))
       var rmsg: string = msgpack2json.fromJsonNode(res[])
-      logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
-      discard sourceClient.send(addr(rmsg[0]), rmsg.len)
+      sourceClient.send(move rmsg)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
+var rpcSocketId = 1
+
 # Execute RPC Server #
 proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
   var qh: ptr RpcQueueHandle = cast[ptr RpcQueueHandle](arg)
-  logd(TAG,"exec rpc task qh: %s", repr(qh.pointer()))
-  logd(TAG,"exec rpc task rpcInQueue: %s", repr(addr(qh.inQueue).pointer))
-  logd(TAG,"exec rpc task rpcOutQueue: %s", repr(addr(qh.outQueue).pointer))
 
   while true:
     try:
@@ -83,9 +72,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
           var pres: ptr JsonNode = addr(res)
           GC_ref(res)
     
-          logd(TAG,"exec rpc task send:ref: %s", repr(res.addr().pointer()))
-          logd(TAG,"exec rpc task send:ptr: %s", repr(pres.addr().pointer()))
-          logd(TAG,"exec rpc task send: %s", $(res))
+          inc(rpcSocketId)
           discard xQueueSend(qh.outQueue, addr(pres), TickType_t(1_000)) 
 
     except:
@@ -121,7 +108,3 @@ proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
     writeHandler=rpcMsgPackQueueWriteHandler,
     data=qh)
 
-
-
-when isMainModule:
-    runTcpServer()
