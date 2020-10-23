@@ -12,8 +12,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_eth
+import ../../consts
+import esp_eth
 
 ## *
 ##  @brief Create a netif glue for Ethernet driver
