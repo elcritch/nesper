@@ -11,7 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-# import esp_netif
+import esp_netif
 
 ##
 ##  Macros to assemble master configs with partial configs from netif, stack and driver
@@ -25,6 +25,9 @@
 ##          .driver = NULL,                          \
 ##          .stack = ESP_NETIF_NETSTACK_DEFAULT_ETH, \
 ##      }
+
+const netif_def_headers = """#include "esp_netif_types.h" 
+                             #include "esp_netif_defaults.h" """
 
 proc ESP_NETIF_DEFAULT_ETH*(cfg: var esp_netif_config_t) =
   {.emit: """
@@ -73,18 +76,18 @@ proc ESP_NETIF_DEFAULT_ETH*(cfg: var esp_netif_config_t) =
 ##
 
 var gg_esp_netif_netstack_default_eth* {.importc: "_g_esp_netif_netstack_default_eth",
-  header: "esp_netif_defaults.h".}: ptr esp_netif_netstack_config_t
+  header: netif_def_headers.}: ptr esp_netif_netstack_config_t
 
 var gg_esp_netif_netstack_default_wifi_sta* {.
   importc: "_g_esp_netif_netstack_default_wifi_sta",
-  header: "esp_netif_defaults.h".}: ptr esp_netif_netstack_config_t
+  header: netif_def_headers.}: ptr esp_netif_netstack_config_t
 
 var gg_esp_netif_netstack_default_wifi_ap* {.
     importc: "_g_esp_netif_netstack_default_wifi_ap",
-    header: "esp_netif_defaults.h".}: ptr esp_netif_netstack_config_t
+    header: netif_def_headers.}: ptr esp_netif_netstack_config_t
 
 var gg_esp_netif_netstack_default_ppp* {.importc: "_g_esp_netif_netstack_default_ppp",
-                                       header: "esp_netif_defaults.h".}: ptr esp_netif_netstack_config_t
+                                       header: netif_def_headers.}: ptr esp_netif_netstack_config_t
 
 ##
 ##  Include default common configs inherent to esp-netif
@@ -93,16 +96,16 @@ var gg_esp_netif_netstack_default_ppp* {.importc: "_g_esp_netif_netstack_default
 ##
 
 var gg_esp_netif_inherent_sta_config* {.importc: "_g_esp_netif_inherent_sta_config",
-                                      header: "esp_netif_defaults.h".}: esp_netif_inherent_config_t
+                                      header: netif_def_headers.}: esp_netif_inherent_config_t
 
 var gg_esp_netif_inherent_ap_config* {.importc: "_g_esp_netif_inherent_ap_config",
-                                     header: "esp_netif_defaults.h".}: esp_netif_inherent_config_t
+                                     header: netif_def_headers.}: esp_netif_inherent_config_t
 
 var gg_esp_netif_inherent_eth_config* {.importc: "_g_esp_netif_inherent_eth_config",
-                                      header: "esp_netif_defaults.h".}: esp_netif_inherent_config_t
+                                      header: netif_def_headers.}: esp_netif_inherent_config_t
 
 var gg_esp_netif_inherent_ppp_config* {.importc: "_g_esp_netif_inherent_ppp_config",
-                                      header: "esp_netif_defaults.h".}: esp_netif_inherent_config_t
+                                      header: netif_def_headers.}: esp_netif_inherent_config_t
 
 ##  @brief  Default base config (esp-netif inherent) of WIFI STA
 ##
