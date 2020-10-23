@@ -26,7 +26,7 @@ import esp_netif
 ##          .stack = ESP_NETIF_NETSTACK_DEFAULT_ETH, \
 ##      }
 
-const netif_def_headers = """#include "esp_netif_types.h" 
+const netif_def_headers = """#include "esp_netif.h" 
                              #include "esp_netif_defaults.h" """
 
 proc ESP_NETIF_DEFAULT_ETH*(cfg: var esp_netif_config_t) =
