@@ -24,7 +24,10 @@ when defined(ESP_IDF_V4_0):
 else:
   import esp_netif_ip_addr
   import esp_netif_types
+  import esp_eth_netif_glue
   export esp_netif_ip_addr
   export esp_netif_types
+  export esp_eth_netif_glue
 
   include esp_netif_impl
+  include esp_netif_defaults
