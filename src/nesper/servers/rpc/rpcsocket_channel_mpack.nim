@@ -108,12 +108,7 @@ proc handleTask*(qh: ptr RpcQueueHandle) =
   logi(TAG,"exec rpc task send:cdata: %s ", repr(rmsg.cstring.pointer))
   logi(TAG,"exec rpc task send:sz: %s ", $(rmsg.len()))
 
-  # var pbuff: ptr DataBuffer = addr(buff)
-  # logi(TAG,"exec rpc task sent:ptr %s", repr(pbuff.pointer))
-
   chanOut.send(rmsg)
-
-  discard xQueueSend(qh.outQueue, addr(buff), TickType_t(100_000)) 
   for i in 0..<3:
     logi(TAG,"exec rpc task sent ............... ")
     delayMillis(1_000)
@@ -140,8 +135,8 @@ proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
   var qh: RpcQueueHandle = new(RpcQueueHandle)
 
   qh.router = router
-  qh.inQueue = xQueueCreate(1, sizeof(DataBuffer))
-  qh.outQueue = xQueueCreate(1, sizeof(DataBuffer))
+  # qh.inQueue = xQueueCreate(1, sizeof(pointer))
+  # qh.outQueue = xQueueCreate(1, sizeof(pointer))
   chanIn.open()
   chanOut.open()
 
