@@ -47,8 +47,6 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
 
-var rpcSocketId = 1
-
 # Execute RPC Server #
 proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
   var qh: ptr RpcQueueHandle = cast[ptr RpcQueueHandle](arg)
@@ -59,19 +57,11 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
         logd(TAG,"exec rpc task wait: ")
         var rcall: JsonNode
         if xQueueReceive(qh.inQueue, addr(rcall), portMAX_DELAY) != 0: 
-          # logd(TAG,"exec rpc task got: %s", repr(prcall.pointer))
-          # if prcall == nil:
-            # raise newException(ValueError, "bad data ptr in rpc queue!")
-
-          # var rcall: JsonNode = rcall
-    
           var res: JsonNode = qh.router.route( rcall )
     
           inc(rpcSocketId)
           discard xQueueSend(qh.outQueue, addr(res), TickType_t(1_000)) 
-          # GC_ref(res)
           wasMoved(res)
-
     except:
       let
         e = getCurrentException()
