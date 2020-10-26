@@ -268,10 +268,11 @@ proc getData*(trn: SpiTrans): seq[byte] =
     return trn.rx_data.toSeq()
 
 proc getSmallData*(trn: SpiTrans): array[4, uint8] =
-  if trn.trn.rxlength < 32:
-    return trn.trn.rx_data
-  else:
-    return [0, 0, 0, 0]
+  if not (trn.trn.rxlength < 32):
+    raise newException(SpiError, "transaction data too large")
+
+  return trn.trn.rx_data
+
 
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
