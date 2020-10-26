@@ -267,6 +267,12 @@ proc getData*(trn: SpiTrans): seq[byte] =
   else:
     return trn.rx_data.toSeq()
 
+proc getSmallData*(trn: SpiTrans): array[4, uint8] =
+  if trn.trn.rxlength < 32:
+    return trn.trn.rx_data
+  else:
+    return [0, 0, 0, 0]
+
 
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
