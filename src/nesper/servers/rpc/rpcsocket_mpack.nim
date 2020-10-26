@@ -1,12 +1,10 @@
 import nativesockets, net, selectors, tables, posix
 
-import ../../consts
 import ../../general
 import ../tcpsocket
 
 import router
 import json
-import msgpack4nim
 import msgpack4nim/msgpack2json
 
 export tcpsocket, router
@@ -21,18 +19,18 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
   try:
     logd(TAG, "rpc server handler: router: %x", rt.buffer)
 
-    let msg = sourceClient.recv(rt.buffer, -1)
+    var msg = sourceClient.recv(rt.buffer, -1)
 
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
-      var rcall = msgpack2json.toJsonNode(msg)
+      var rcall = msgpack2json.toJsonNode(move msg)
 
-      var res: JsonNode = rt.route( rcall )
-      var rmsg: string = msgpack2json.fromJsonNode(res)
+      var res: JsonNode = rt.route(rcall)
+      var rmsg: string = msgpack2json.fromJsonNode(move res)
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
-      discard sourceClient.send(addr rmsg[0], rmsg.len)
+      sourceClient.send(move rmsg)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
@@ -47,7 +45,3 @@ proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
     writeHandler=rpcMsgPackWriteHandler,
     data=router)
 
-
-
-when isMainModule:
-    runTcpServer()
