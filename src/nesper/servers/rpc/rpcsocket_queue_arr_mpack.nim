@@ -48,9 +48,6 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
         continue
 
       var res: JsonNode = queue_data[1]
-      # logi(TAG,"exec rpc handler got:pidx: %s", repr(pidx))
-      # logi(TAG,"exec rpc handler got:res: %s", $(res))
-
       var rmsg: string = msgpack2json.fromJsonNode(res)
       sourceClient.send(move rmsg)
 
@@ -62,23 +59,16 @@ proc handleTaskRpc*(qh: ptr RpcQueueHandle) =
   logd(TAG,"exec rpc task wait: ")
   var ridx: int
   if xQueueReceive(qh.inQueue, addr(ridx), portMAX_DELAY) != 0: 
-    logi(TAG,"exec rpc task got: %s", repr(ridx))
-
     var rcall = move queue_data[0]
     queue_data[0] = JsonNode()
-    # logi(TAG,"exec rpc task got: %s", repr(rcall))
 
     var res: JsonNode = qh.router.route(rcall)
 
-    # logi(TAG,"exec rpc task send: %s", repr(addr(res).pointer))
     queue_data[1] = move res
     res = JsonNode()
     
     var pidx = 1
     discard xQueueSend(qh.outQueue, addr(pidx), TickType_t(1_000)) 
-
-    logi(TAG,"exec rpc task sent: ")
-    # wasMoved(res)
 
 # Execute RPC Server #
 proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
