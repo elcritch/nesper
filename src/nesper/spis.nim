@@ -216,8 +216,6 @@ proc fullTrans*(dev: SpiDev;
 
   if result.trn.length. in 1U..32U:
     tflags.incl({USE_TXDATA})
-  else:
-    result.trn.tx_buffer = nil
 
   # Set RX Details
   result.trn.rxlength =
@@ -236,8 +234,6 @@ proc fullTrans*(dev: SpiDev;
 
   if result.trn.rxlength in 1U..32U:
     tflags.incl({USE_RXDATA})
-  else:
-    result.trn.rx_buffer = nil
 
   ## Flags
   result.trn.flags = 0
