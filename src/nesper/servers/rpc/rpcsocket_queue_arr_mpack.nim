@@ -11,7 +11,6 @@ import ../tcpsocket
 
 import router
 import json
-import msgpack4nim
 import msgpack4nim/msgpack2json
 
 export tcpsocket, router
@@ -37,8 +36,6 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
     else:
-      heap_caps_print_heap_info(MALLOC_CAP_8BIT)
-
       var ridx = 0
       var rcall = msgpack2json.toJsonNode(msg)
       queue_data[ridx] = move(rcall)
@@ -51,8 +48,8 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
         continue
 
       var res: JsonNode = queue_data[1]
-      logi(TAG,"exec rpc handler got:pidx: %s", repr(pidx))
-      logi(TAG,"exec rpc handler got:res: %s", $(res))
+      # logi(TAG,"exec rpc handler got:pidx: %s", repr(pidx))
+      # logi(TAG,"exec rpc handler got:res: %s", $(res))
 
       var rmsg: string = msgpack2json.fromJsonNode(res)
       sourceClient.send(move rmsg)
@@ -69,13 +66,11 @@ proc handleTaskRpc*(qh: ptr RpcQueueHandle) =
 
     var rcall = move queue_data[0]
     queue_data[0] = JsonNode()
-    logi(TAG,"exec rpc task got: %s", repr(rcall))
+    # logi(TAG,"exec rpc task got: %s", repr(rcall))
 
-    # var res: JsonNode = qh.router.route( rcall )
-    var res: JsonNode = %* {"jsonrpc":"2.0","id":1,"result":55}
-    # GC_unref(res)
+    var res: JsonNode = qh.router.route(rcall)
 
-    logi(TAG,"exec rpc task send: %s", repr(addr(res).pointer))
+    # logi(TAG,"exec rpc task send: %s", repr(addr(res).pointer))
     queue_data[1] = move res
     res = JsonNode()
     
