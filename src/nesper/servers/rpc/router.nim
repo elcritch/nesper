@@ -184,8 +184,8 @@ macro rpc*(server: RpcRouter, path: string, body: untyped): untyped =
     # when parameters present: proc that contains our rpc body
     doMain = newIdentNode(procNameStr & "DoMain")
     # async result
-    res = newIdentNode("result")
-    errJson = newIdentNode("errJson")
+    # res = newIdentNode("result")
+    # errJson = newIdentNode("errJson")
   var
     setup = jsonToNim(parameters, paramsIdent)
     procBody = if body.kind == nnkStmtList: body else: body.body
