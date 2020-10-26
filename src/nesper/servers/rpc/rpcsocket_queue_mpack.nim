@@ -28,6 +28,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
 
   try:
     let msg = sourceClient.recv(qh.router.buffer, -1)
+    taskYIELD()
 
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
@@ -36,13 +37,15 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
       
       discard xQueueSend(qh.inQueue, addr(rcall), TickType_t(1000)) 
       wasMoved(rcall)
+      taskYIELD()
 
       var res: JsonNode
       while xQueueReceive(qh.outQueue, addr(res), 0) == 0: 
         continue
 
       var rmsg: string = msgpack2json.fromJsonNode(res)
-      sourceClient.send(rmsg)
+      sourceClient.send(move rmsg)
+      taskYIELD()
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
@@ -59,7 +62,6 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
         if xQueueReceive(qh.inQueue, addr(rcall), portMAX_DELAY) != 0: 
           var res: JsonNode = qh.router.route( rcall )
     
-          inc(rpcSocketId)
           discard xQueueSend(qh.outQueue, addr(res), TickType_t(1_000)) 
           wasMoved(res)
     except:

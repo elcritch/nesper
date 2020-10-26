@@ -40,6 +40,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle],
 
   try:
     var msg = sourceClient.recv(qh.router.buffer, -1)
+    taskYIELD()
 
     if msg.len() == 0:
       raise newException(TcpClientDisconnected, "")
@@ -50,6 +51,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle],
       logi(TAG,"exec rpc handler tosend:sz: %s ", $(ibuff.size))
       logi(TAG,"exec rpc handler tosend:cdata: %s ", repr(ibuff.data.pointer))
       discard xQueueSend(qh.inQueue, addr(ibuff), TickType_t(1000)) 
+      taskYIELD()
 
       logi(TAG,"exec rpc handler waiting... ")
       delayMillis(10_000)
@@ -70,6 +72,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle],
 
       # var buff: DataBuffer = pbuff[]
       discard sourceClient.send(pbuff.data, pbuff.size)
+      taskYIELD()
 
       logd(TAG,"exec rpc handler sending ")
       # c_free(res)
