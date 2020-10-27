@@ -66,7 +66,7 @@ proc ms_to_ticks*(ms: int): TickType_t =
 proc delayMillis*( milsecs: int ) =
   vTaskDelay(milsecs.ms_to_ticks())
 
-proc joinBytes32*[T](bs: openArray[byte], count: range[1..4], top=false): T =
+proc joinBytes32*[T](bs: openArray[byte], count: range[0..4], top=false): T =
   var n = 0'u32
   let N = min(count, bs.len())
   for i in 0 ..< N:
@@ -75,7 +75,7 @@ proc joinBytes32*[T](bs: openArray[byte], count: range[1..4], top=false): T =
     n = n shl (32-N*8)
   return cast[T](n)
 
-proc joinBytes64*[T](bs: openArray[byte], count: range[1..8], top=false): T =
+proc joinBytes64*[T](bs: openArray[byte], count: range[0..8], top=false): T =
   var n = 0'u64
   let N = min(count, bs.len())
   for i in 0 ..< N:
