@@ -9,17 +9,31 @@ import ../tcpsocket
 
 import router
 import json
+import streams
 import msgpack4nim/msgpack2json
 
 export tcpsocket, router
 
 const TAG = "socketrpc"
+const MsgChunk {.intdefine.} = 1400
 
 type 
   RpcQueueHandle = ref object
     router: RpcRouter
     inQueue: QueueHandle_t
     outQueue: QueueHandle_t
+
+
+proc sendChunks*(sourceClient: Socket, rmsg: string) =
+  let rN = rmsg.len()
+  logd(TAG,"rpc handler send client: %d bytes", rN)
+  var i = 0
+  while i < rN:
+    var j = min(i + MsgChunk, rN) 
+    logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
+    var sl = rmsg[i..<j]
+    sourceClient.send(move sl)
+    i = j
 
 proc rpcMsgPackQueueWriteHandler*(srv: TcpServerInfo[RpcQueueHandle], result: ReadyKey, sourceClient: Socket, qh: RpcQueueHandle) =
   raise newException(OSError, "the request to the OS failed")
@@ -42,7 +56,13 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
         continue
 
       var rmsg: string = msgpack2json.fromJsonNode(res)
-      sourceClient.send(move rmsg)
+      var rmsgN: int = rmsg.len()
+      var rmsgSz = newString(4)
+      for i in 0..3:
+        rmsgSz[i] = char(rmsgN and 0xFF)
+        rmsgN = rmsgN shr 8
+
+      sourceClient.sendChunks(rmsg)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)
