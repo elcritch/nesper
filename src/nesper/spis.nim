@@ -268,7 +268,7 @@ proc getData*(trn: SpiTrans): seq[byte] =
     return trn.rx_data.toSeq()
 
 proc getSmallData*(trn: SpiTrans): array[4, uint8] =
-  if not (trn.trn.rxlength < 32):
+  if trn.trn.rxlength > 32:
     raise newException(SpiError, "transaction data too large")
 
   return trn.trn.rx_data
