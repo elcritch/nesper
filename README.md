@@ -2,9 +2,41 @@
 
 Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP API support in Nim. 
 
-## Updates 
+See [Releases](https://github.com/elcritch/nesper/releases) for updates. 
+ 
+## Example Code 
 
-See [Releases](https://github.com/elcritch/nesper/releases). 
+```nim
+import asynchttpserver, asyncdispatch, net
+import nesper, nesper/consts, nesper/general, nesper/gpios
+
+const
+  MY_PIN_A* = gpio_num_t(4)
+  MY_PIN_B* = gpio_num_t(5)
+
+var 
+  level = false
+  
+proc config_pins() =
+    MOTOR1_PIN.setLevel(true)
+
+proc http_cb*(req: Request) {.async.} =
+    level = not level 
+    echo "toggle my pin to: #", $level
+    MY_PIN_A.setLevel(level)
+    await req.respond(Http200, "Toggle MY_PIN_A: " & $level)
+
+proc run_http_server*() {.exportc.} =
+    echo "configure pins"
+    {MY_PIN_A, MY_PIN_B}.configure(MODE_OUTPUT) 
+    MY_PIN_A.setLevel(lastLevel)
+    
+    echo "starting http server on port 8181"
+    var server = newAsyncHttpServer()
+    waitFor server.serve(Port(8181), http_cb)
+
+```
+
 
 
 ## Status
