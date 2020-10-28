@@ -40,8 +40,11 @@ proc millis*(): Millis =
 converter toTicks*(ms: Millis): TickType_t =
   TickType_t(uint32(ms) div portTICK_PERIOD_MS)
 
-proc delayMillis*(ms: uint64) =
+proc delayMillis*(ms: uint64): uint64 =
+  var start = millis()
   vTaskDelay(Millis(ms).toTicks())
+  var stop = millis()
+  return stop-start
 
 # void IRAM_ATTR delayMicroseconds(uint32_t us)
 proc delayMicros*(us: uint64): uint64 =
@@ -59,7 +62,7 @@ proc delayMicros*(us: uint64): uint64 =
 
   return curr
 
-proc delay*(ts: Millis) = delayMillis(ts.uint64)
+proc delay*(ts: Millis) = discard delayMillis(ts.uint64)
 proc delay*(ts: Micros) = discard delayMicros(ts.uint64)
 
 template timeBlock*(n: string, blk: untyped): untyped =
