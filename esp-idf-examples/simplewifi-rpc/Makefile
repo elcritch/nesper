@@ -1,6 +1,4 @@
-
-build: 
-	idf.py build
+default: mpack_rpc_queue_server
 
 json_rpc_server:
 	nim prepare main/wifi_example_main.nim -d:TcpMpackRpcServer -d:release && idf.py reconfigure 
@@ -14,6 +12,13 @@ mpack_rpc_queue_server:
 tcp_echo_server:
 	nim prepare main/wifi_example_main.nim -d:TcpEchoServer -d:release && idf.py reconfigure 
 
+build: 
+	idf.py build
+
 clean:
 	rm -Rf main/nimcache/
+
+fullclean: clean
+	idf.py fullclean
+
 
