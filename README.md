@@ -88,6 +88,8 @@ when isMainModule:
 ### GPIOs 
 
 ```nim
+import nesper, nesper/consts, nesper/general, nesper/gpios
+
 const
   MOTOR1_PIN* = gpio_num_t(4)
   MOTOR2_PIN* = gpio_num_t(5)
@@ -101,6 +103,61 @@ proc config_pins() =
   MOTOR1_PIN.setLevel(true)
   MOTOR2_PIN.setLevel(false) 
 ```
+
+### SPIs
+
+```
+import nesper, nesper/consts, nesper/general, nesper/spis
+
+proc cs_adc_pre(trans: ptr spi_transaction_t) {.cdecl.} = ... 
+proc cs_unselect(trans: ptr spi_transaction_t) {.cdecl.} = ...
+
+proc config_spis() = 
+  # Setup SPI example using custom Chip select pins using pre/post callbacks 
+  let
+    std_hz = 1_000_000.cint()
+    fast_hz = 8_000_000.cint()
+    
+  var BUS1 = HSPI.newSpiBus(
+        mosi = gpio_num_t(32),
+        sclk = gpio_num_t(33),
+        miso = gpio_num_t(34),
+        dma_channel=0,
+        flags={MASTER})
+
+  logi(TAG, "cfg_spi: bus1: %s", repr(BUS1))
+
+  var ADC_SPI = BUS1.addDevice(commandlen = bits(8),
+                               addresslen = bits(0),
+                               mode = 0,
+                               cs_io = gpio_num_t(-1),
+                               clock_speed_hz = fast_hz, 
+                               queue_size = 1,
+                               pre_cb=cs_adc_pre,
+                               post_cb=cs_unselect,
+                               flags={HALFDUPLEX})
+```
+
+Later these can be used like: 
+
+```nim
+
+const 
+  ADC_READ_MULTI_CMD =  0x80
+  ADC_REG_CONFIG0 = 0x03
+
+proc read_regs*(reg: byte, n: range[1..16]): SpiTrans =
+  let read_cmd = reg or ADC_READ_MULTI_CMD # does bitwise or
+  return ADC_SPI.readTrans(cmd=read_cmd, rxlength=bytes(n), )
+
+proc adc_read_config*(): seq[byte] =
+  var trn = read_regs(ADC_REG_CONFIG0, 2)
+  trn.transmit() # preforms SPI transaction using transaction queue
+  result = trn.getData()
+
+```
+
+See more in the test [SPI Test](https://github.com/elcritch/nesper/blob/master/tests/tspi.nim) or the read the wrapper (probably best docs for now): [spis.nim](https://github.com/elcritch/nesper/blob/master/src/nesper/spis.nim). 
 
 
 ## Why Nim for Embedded?
