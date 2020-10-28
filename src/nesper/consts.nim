@@ -33,14 +33,13 @@ template ESP_INTR_ENABLE*(inum: untyped): untyped =
 template ESP_INTR_DISABLE*(inum: untyped): untyped =
   xt_ints_off((1 shl inum))
 
+type 
+  Millis* = distinct uint64
+  Micros* = distinct uint64
+
 type
   TickType_t* = uint32
-#   INNER_C_UNION_consts_39* {.importcpp: "no_name", header: "freertos/FreeRTOS.h", bycopy.} = object {.
-#       union.}
-#     pvDummy2* {.importc: "pvDummy2".}: pointer
-#     uxDummy2* {.importc: "uxDummy2".}: UBaseType_t
-
-#   StaticSemaphore_t* = StaticQueue_t
+  #StaticSemaphore_t* = StaticQueue_t
   portCHAR* = int8
   portFLOAT* = cfloat
   portDOUBLE* = cdouble

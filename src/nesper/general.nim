@@ -3,7 +3,7 @@ import macros
 import esp/esp_log
 import tasks
 
-export esp_log
+export esp_log, timers, tasks
 
 var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: uint32
@@ -60,12 +60,6 @@ proc setFromString*(val: var openArray[uint8], str: cstring) =
 
   copyMem(addr(val), str, lstr)
 
-proc ms_to_ticks*(ms: int): TickType_t =
-  TickType_t(uint32(ms) div portTICK_PERIOD_MS )
-
-proc delayMillis*( milsecs: int ) =
-  vTaskDelay(milsecs.ms_to_ticks())
-
 proc joinBytes32*[T](bs: openArray[byte], count: range[0..4], top=false): T =
   var n = 0'u32
   let N = min(count, bs.len())
@@ -83,4 +77,3 @@ proc joinBytes64*[T](bs: openArray[byte], count: range[0..8], top=false): T =
   if top:
     n = n shl (64-N*8)
   return cast[T](n)
-

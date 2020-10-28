@@ -27,8 +27,40 @@ proc createTimer*(
 
   return out_handle
 
-proc micros*(): int64 =
-  return esp_timer_get_time()
+
+proc microsRaw*(): uint64 {.inline.} =
+  return cast[uint64](esp_timer_get_time())
+
+proc micros*(): Micros =
+  return Micros(microsRaw())
+
+proc millis*(): Millis =
+  return Millis(micros().uint64 div 1000U)
+
+converter toTicks*(ms: Millis): TickType_t =
+  TickType_t(uint32(ms) div portTICK_PERIOD_MS)
+
+proc delayMillis*(ms: int) =
+  vTaskDelay(Millis(ms).toTicks())
+
+# void IRAM_ATTR delayMicroseconds(uint32_t us)
+proc delayMicros*(us: Micros): Micros =
+  if us.uint64 == 0:
+    return
+
+  var curr: uint64 = microsRaw()
+  var target = curr + us.uint64
+  if target < curr: # overflow?
+    while curr > target:
+      curr = microsRaw()
+
+  while(curr < target):
+    curr = microsRaw()
+
+  return curr.Micros()
+
+proc delay*(ts: Millis) = delayMillis(ts)
+proc delay*(ts: Micros) = discard delayMicros(ts)
 
 template timeBlock*(n: string, blk: untyped): untyped =
   let t0 = micros()
