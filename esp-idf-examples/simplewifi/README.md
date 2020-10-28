@@ -26,6 +26,7 @@ This compiles the Nim code and updates the ESP-IDF project files. You can then c
 ```sh
 idf.py build
 ```
+
 ```sh
 make build
 ```

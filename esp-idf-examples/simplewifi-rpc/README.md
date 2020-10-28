@@ -18,14 +18,22 @@ Build Nim project:
 ```sh
 export WIFI_SSID="[SSID]"
 export WIFI_PASSWORD="[PASSWORD]"
-make 
+make default
 ```
 
-This compiles the Nim code and updates the ESP-IDF project files. You can then compile the ESP-IDF build by one of: 
+This compiles the Nim code and updates the ESP-IDF project files. This example contains several variants which can be built by changing the make target like: `make tcp_echo_server` then following the rest of the steps. The current options are: 
+
+- json_rpc_server
+- mpack_rpc_server
+- mpack_rpc_queue_server
+- tcp_echo_server
+
+You can then compile the ESP-IDF build by one of: 
 
 ```sh
 idf.py build
 ```
+
 ```sh
 make build
 ```
