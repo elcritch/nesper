@@ -106,7 +106,7 @@ proc config_pins() =
 
 ### SPIs
 
-```
+```nim
 import nesper, nesper/consts, nesper/general, nesper/spis
 
 proc cs_adc_pre(trans: ptr spi_transaction_t) {.cdecl.} = ... 
