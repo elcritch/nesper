@@ -83,6 +83,25 @@ when isMainModule:
     run_http_server()
 ```
 
+## Nim-ified ESP32 APIs
+
+### GPIOs 
+
+```nim
+const
+  MOTOR1_PIN* = gpio_num_t(4)
+  MOTOR2_PIN* = gpio_num_t(5)
+
+proc config_pins() =
+  # Inputs pins use Nim's set `{}` notation
+  configure({MOTOR1_PIN, MOTOR2_PIN}, GPIO_MODE_INPUT)
+  # or method call style:
+  {MOTOR1_PIN, MOTOR2_PIN}.configure(MODE_INPUT)
+  
+  MOTOR1_PIN.setLevel(true)
+  MOTOR2_PIN.setLevel(false) 
+```
+
 
 ## Why Nim for Embedded?
 
