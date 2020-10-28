@@ -1,28 +1,11 @@
-# nesper
+# Nesper
 
 Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP API support in Nim. 
 
 ## Updates 
 
+See [Releases](https://github.com/elcritch/nesper/releases). 
 
-**Version 0.2.0**
-- Cleaned up the SPI api, implemented a GPIO api's.
-- Tested GPIO on board, working; tested SPI init, still testing other SPI features
-- Fixed compile issues in ethernet libraries
-- Fixed c imports for task and queues requiring FreeRTOS.h to be included first
-        Note: This might require future follow ups as it essentially compiles to a absolute path
-- Fixed issues with using second with xTaskCreatePinned and rpc queue mpack passing arguments
-
-**Version 0.2.0**
-- Wrote compilation tests for several important modules 
-- My internal esp32 project has been switched over to using Nesper
-- It's possible to write a full Nim only esp32 app
-- There are now Nim wrappers for esp_wifi, tcpip_adapter, event_groups, tasks, and more esp-idf modules
-- More Nim friendly API's have been added for NVS, SPI (untested), I2C (untested), wifi, & events
-
-
-**Version 0.1.0**
-- Initial framework layout
 
 ## Status
 
@@ -40,16 +23,19 @@ Supported ESP-IDF libraries:
 
 - [x] Nim stdandard library support for most basic POSIX network api's!
 - [x] Most of the basic `FreeRTOS.h` header 
-- [x] NVS Flash
+- [x] NVS Flash 
 - [x] UART 
 - [x] SPI
-- [x] I2C 
+- [?] I2C (untested on hardware)
 
 Things I'd like to get to:
 
-- [ ] Nim standard library wrapping of FreeRTOS semaphore's, mutexes, etc
-- [ ] Nim support for `xqueue` and other "thread safe" data structures
-- [ ] Nim standard library support for FreeRTOS tasks using thread api's
+- [x] Nim standard library wrapping of FreeRTOS semaphore's, mutexes, etc
+   - include `pthread` in your CMakeLists.txt file and use Nim's POSIX lock API's
+- [x] Nim support for `xqueue` and other "thread safe" data structures
+   - Raw C Wrappers exist, see `[rpcsocket_queue_mpack.nim](https://github.com/elcritch/nesper/blob/master/src/nesper/servers/rpc/rpcsocket_queue_mpack.nim) for proper usage. Nim Channel's appear to work as well. 
+- [x] Nim standard library support for FreeRTOS tasks using thread api's
+   - include `pthread` in your CMakeLists.txt file and use Nim's POSIX Pthread API's
 
 Things I'm not planning on (PR's welcome!)
 
@@ -60,35 +46,43 @@ Things I'm not planning on (PR's welcome!)
 
 ## General Usage
 
-1. Install Nim 1.4+ (currently only the `devel` branch works) with `asdf` or `choosenim`
+1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. nimble install https://github.com/elcritch/nesper
-3. Nesper wrapper API names generally match the C names directly, usually in snake case
+3. It's recommend to copy `simplewifi` project example initially, to see the proper build steps. 
+4. Nesper wrapper API names generally match the C names directly, usually in snake case
   + FreeRTOS functions usually are camel case and start with an `x`, e.g. `xTaskDelay`
   + These api's are found under `nesper/esp/*` or `nesper/esp/net/*`, e.g. `nesper/esp/nvs`
-4. Nesper Nim friendly api, usually in camel case
+5. Nesper Nim friendly api, usually in camel case
   + These api's are found under `nesper/*`, e.g. `nesper/nvs`
-
 
 ## Example Async server on a ESP32-CAM (or other Esp32 Wifi board)
 
-Copy one the example wifi:
+See [SimpleWifi Example](https://github.com/elcritch/nesper/blob/master/esp-idf-examples/simplewifi/README.md)
 
-```shell
-git clone https://github.com/elcritch/nesper
-cd nesper/esp-idf-examples/simplewifi/ 
-export WIFI_SSID=[ssid]
-export WIFI_PASSWORD=[password]
-nim prepare ./main/wifi_example_main.nim 
-idf.py reconfigure # sometimes required if new Nim C files are generated
+The async code really is simple Nim code:
+
+```nim
+import asynchttpserver, asyncdispatch, net
+
+var count = 0
+
+proc cb*(req: Request) {.async.} =
+    inc count
+    echo "req #", count
+    await req.respond(Http200, "Hello World from nim on ESP32\n")
+    # GC_fullCollect()
+
+proc run_http_server*() {.exportc.} =
+    echo "starting http server on port 8181"
+    var server = newAsyncHttpServer()
+
+    waitFor server.serve(Port(8181), cb)
+
+when isMainModule:
+    echo "running server"
+    run_http_server()
 ```
 
-Then do the standard idf build and flash steps:
-
-```shell
-idf.py build
-idf.py -p [port] flash
-idf.py -p [port] monitor
-```
 
 ## Why Nim for Embedded?
 
