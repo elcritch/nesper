@@ -80,7 +80,7 @@ Things I'm not planning on (PR's welcome!)
 
 1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. nimble install https://github.com/elcritch/nesper
-3. It's recommend to copy `simplewifi` project example initially, to see the proper build steps. 
+3. It's recommend to copy `nesper/esp-idf-examples/simplewifi` example project initially, to get the proper build steps. 
 4. Nesper wrapper API names generally match the C names directly, usually in snake case
   + FreeRTOS functions usually are camel case and start with an `x`, e.g. `xTaskDelay`
   + These api's are found under `nesper/esp/*` or `nesper/esp/net/*`, e.g. `nesper/esp/nvs`
