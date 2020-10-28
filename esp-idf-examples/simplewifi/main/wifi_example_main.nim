@@ -25,11 +25,9 @@ var sConnectEventGroup*: EventGroupHandle_t
 var sIpAddr*: IpAddress
 var sConnectionName*: cstring
 
-
 proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
-               event_data: pointer) {.cdecl.} =
+              event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
-
   logi TAG, "event.ip_info.ip: %s", $(event.ip_info.ip)
 
   sIpAddr = toIpAddress(event.ip_info.ip)
@@ -106,8 +104,14 @@ proc exampleDisconnect*(): esp_err_t =
 
 app_main():
   initNvs()
-  tcpip_adapter_init()
+  when defined(ESP_IDF_V4_0):
+    tcpip_adapter_init()
+  else:
+    # Initialize TCP/IP network interface (should be called only once in application)
+    check: esp_netif_init()
 
+
+  # Create default event loop that running in background
   check: esp_event_loop_create_default()
 
   logi(TAG, "wifi setup!\n")
