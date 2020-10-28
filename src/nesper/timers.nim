@@ -60,7 +60,7 @@ proc delayMicros*(us: uint64): uint64 =
   while(curr < target):
     curr = microsRaw()
 
-  return curr
+  return target-curr
 
 proc delay*(ts: Millis) = discard delayMillis(ts.uint64)
 proc delay*(ts: Micros) = discard delayMicros(ts.uint64)
