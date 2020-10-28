@@ -3,7 +3,7 @@ import consts
 import general
 
 import esp/esp_timer
-export esp_timer
+export esp_timer, consts
 
 type
   TimerError* = object of OSError
