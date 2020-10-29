@@ -63,6 +63,9 @@ when isMainModule:
   rpc(rt, "add") do(a: int, b: int) -> int:
     result = a + b
 
+  rpc(rt, "quit") do() -> int:
+    quit(1)
+
   rpc(rt, "sum") do(args: seq[int]) -> int:
     result = 0
     for v in args:
