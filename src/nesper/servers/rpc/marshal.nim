@@ -213,7 +213,7 @@ proc jsonToNim*(params, jsonIdent: NimNode): NimNode =
       let
         paramName = $paramIdent
         jsonElement = quote do:
-          `jsonIdent`[`pos`]
+          `jsonIdent`.elems[`pos`]
 
       inc pos
       # declare variable before assignment

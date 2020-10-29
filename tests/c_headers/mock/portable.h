@@ -205,34 +205,17 @@ BaseType_t xPortInterruptedFromISRContext();
 #endif
 
 /* Multi-core: get current core ID */
-static inline uint32_t IRAM_ATTR xPortGetCoreID() {
-    uint32_t id;
-    __asm__ __volatile__ (
-        "rsr.prid %0\n"
-        " extui %0,%0,13,1"
-        :"=r"(id));
-    return id;
+static inline uint32_t xPortGetCoreID() {
+    return 0;
 }
 
 /* Get tick rate per second */
 uint32_t xPortGetTickRateHz(void);
 
 
-static inline bool IRAM_ATTR xPortCanYield(void)
+static inline bool xPortCanYield(void)
 {
-    uint32_t ps_reg = 0;
-
-    //Get the current value of PS (processor status) register
-    RSR(PS, ps_reg);
-
-    /*
-     * intlevel = (ps_reg & 0xf);
-     * excm  = (ps_reg >> 4) & 0x1;
-     * CINTLEVEL is max(excm * EXCMLEVEL, INTLEVEL), where EXCMLEVEL is 3.
-     * However, just return true, only intlevel is zero.
-     */
-
-    return ((ps_reg & PS_INTLEVEL_MASK) == 0);
+    return true;
 }
 
 #ifdef __cplusplus

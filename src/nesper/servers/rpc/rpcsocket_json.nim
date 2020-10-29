@@ -12,6 +12,7 @@ import json
 
 export tcpsocket, router
 
+
 const TAG = "socketrpc"
 
 proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
@@ -51,4 +52,16 @@ proc startRpcSocketServer*(port: Port; router: var RpcRouter) =
 
 
 when isMainModule:
-    runTcpServer()
+
+  const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
+
+  var rt = createRpcRouter(MaxRpcReceiveBuffer)
+
+  rpc(rt, "hello") do(input: string) -> string:
+    result = "Hello " & input
+
+  rpc(rt, "add") do(a: int, b: int) -> int:
+    result = a + b
+
+  startRpcSocketServer(Port(5555), rt)
+
