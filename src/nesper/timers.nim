@@ -77,6 +77,9 @@ proc delay*(ts: Micros) = discard delayMicros(ts.uint64)
 proc newBasicTimer*(): BasicTimer =
   return BasicTimer(ts: micros())
 
+proc elapsed*(timer: BasicTimer): Micros =
+  return micros() - timer.ts
+
 proc waitFor*(timer: BasicTimer, duration: Millis): Millis =
   var curr: Millis = millis()
   let ts: Millis = timer.ts.toMillis()
