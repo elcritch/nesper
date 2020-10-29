@@ -77,3 +77,18 @@ proc joinBytes64*[T](bs: openArray[byte], count: range[0..8], top=false): T =
   if top:
     n = n shl (64-N*8)
   return cast[T](n)
+
+proc splitBytes*[T](val: T, count: range[0..8], top=false): seq[byte] =
+  let szT = sizeof(T)
+  let N = min(count, szT)
+
+  var x = val
+  result = newSeqOfCap[byte](N)
+  for i in 0 ..< N:
+    if top == false:
+      result.add(byte(x))
+      x = x shr 8
+    else:
+      result.add( byte(x shr (8*szT-8) ))
+      x = x shl 8
+

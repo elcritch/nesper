@@ -1,5 +1,6 @@
 import strutils
 import nesper
+import algorithm
 
 let n1 = joinBytes32[uint32]([0x01'u8, 0x02, 0x03], 3)
 let n2 = joinBytes32[uint32]([0x01'u8, 0x02, 0x03], 2)
@@ -33,5 +34,20 @@ assert (ashr(n9 , 8)) == -2'i64, "got: " & $n9.toHex() & " int: " & $n9
 
 echo " n10 == -5411 got: " & $(n10)
 assert n10 == -5411, "got: " & $(n10)
+
+let o1 = splitBytes(0x12345678'u32, 3)
+let o2 = splitBytes(0x12345678'u32, 3, top=true)
+
+let o3 = splitBytes(0x12345678_9ABCDEFF'u64, 8)
+
+assert o1 == @[0x78'u8, 0x56'u8, 0x34'u8], "got: " & $(o1)
+assert o2 == @[byte 0x12, 0x34, 0x56], "got: " & $(o2)
+
+var
+  o3t = @[byte 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xFF]
+  o3r: seq[byte] = o3t.reversed()
+
+assert o3 == o3r, "got: " & $(o3)
+# let o3 = splitBytes(0x12345678_9ABCDEF'u64, 3)
 
 echo "GENERAL"
