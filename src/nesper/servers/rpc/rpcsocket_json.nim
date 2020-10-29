@@ -63,5 +63,10 @@ when isMainModule:
   rpc(rt, "add") do(a: int, b: int) -> int:
     result = a + b
 
+  rpc(rt, "sum") do(args: seq[int]) -> int:
+    result = 0
+    for v in args:
+      result += v
+
   startRpcSocketServer(Port(5555), rt)
 
