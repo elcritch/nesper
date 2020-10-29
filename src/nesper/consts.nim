@@ -37,6 +37,22 @@ type
   Millis* = distinct uint64
   Micros* = distinct uint64
 
+
+proc `+` *(a, b: Millis): Millis {.borrow.}
+proc `-` *(a, b: Millis): Millis {.borrow.}
+
+proc `<` *(a, b: Millis): bool {.borrow.}
+proc `<=` *(a, b: Millis): bool {.borrow.}
+proc `==` *(a, b: Millis): bool {.borrow.}
+
+proc `+` *(a, b: Micros): Micros {.borrow.}
+proc `-` *(a, b: Micros): Micros {.borrow.}
+
+proc `<` *(a, b: Micros): bool {.borrow.}
+proc `<=` *(a, b: Micros): bool {.borrow.}
+proc `==` *(a, b: Micros): bool {.borrow.}
+
+
 type
   TickType_t* = uint32
   #StaticSemaphore_t* = StaticQueue_t

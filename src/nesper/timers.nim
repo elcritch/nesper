@@ -8,6 +8,9 @@ export esp_timer, consts
 type
   TimerError* = object of OSError
     code*: esp_err_t
+  
+  BasicTimer* = object 
+    ts: Micros
 
 proc createTimer*(
         callback: esp_timer_cb_t, ## !< Function to call when timer expires
@@ -37,19 +40,25 @@ proc micros*(): Micros =
 proc millis*(): Millis =
   return Millis(micros().uint64 div 1000U)
 
-converter toTicks*(ms: Millis): TickType_t =
-  TickType_t(uint32(ms) div portTICK_PERIOD_MS)
+converter toTicks*(ts: Millis): TickType_t =
+  return TickType_t(uint32(ts) div portTICK_PERIOD_MS)
+
+converter toMillis*(ts: Micros): Millis =
+  return Millis(ts.uint64 div 1_000U)
+
+proc toMicros*(ts: Millis): Micros =
+  return Micros(ts.uint64 * 1_000U)
 
 proc delayMillis*(ms: uint64): uint64 =
   var start = millis()
   vTaskDelay(Millis(ms).toTicks())
   var stop = millis()
-  return stop-start
+  return (stop-start).uint64
 
 # void IRAM_ATTR delayMicroseconds(uint32_t us)
 proc delayMicros*(us: uint64): uint64 =
   if us.uint64 == 0:
-    return
+    return 0
 
   var curr: uint64 = microsRaw()
   var target = curr + us.uint64
@@ -64,6 +73,31 @@ proc delayMicros*(us: uint64): uint64 =
 
 proc delay*(ts: Millis) = discard delayMillis(ts.uint64)
 proc delay*(ts: Micros) = discard delayMicros(ts.uint64)
+
+proc newBasicTimer*(): BasicTimer =
+  return BasicTimer(ts: micros())
+
+proc waitFor*(timer: BasicTimer, duration: Millis): Millis =
+  var curr: Millis = millis()
+  let ts: Millis = timer.ts.toMillis()
+  let te = ts + duration
+
+  if te <= curr:
+    return curr - ts
+  else:
+    delay(te - curr)
+    return micros() - ts
+
+proc waitFor*(timer: BasicTimer, duration: Micros): Micros =
+  var curr: Micros = micros()
+  let ts: Micros = timer.ts
+  let te = ts + duration
+
+  if te <= curr:
+    return curr - ts
+  else:
+    delay(te - curr)
+    return micros() - ts
 
 template timeBlock*(n: string, blk: untyped): untyped =
   let t0 = micros()
