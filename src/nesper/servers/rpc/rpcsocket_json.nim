@@ -33,6 +33,9 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       var res: JsonNode = rt.route( rcall )
       var rmsg: string = $res
 
+      if res["result"].getStr() == "quit":
+        raise newException(OSError, "quit")
+
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
       discard sourceClient.send(addr rmsg[0], rmsg.len)
 
@@ -63,13 +66,16 @@ when isMainModule:
   rpc(rt, "add") do(a: int, b: int) -> int:
     result = a + b
 
-  rpc(rt, "quit") do() -> int:
-    quit(1)
+  rpc(rt, "quit") do() -> string:
+    return "quit"
 
   rpc(rt, "sum") do(args: seq[int]) -> int:
     result = 0
     for v in args:
       result += v
 
-  startRpcSocketServer(Port(5555), rt)
+  try:
+    startRpcSocketServer(Port(5555), rt)
+  except:
+    logi(TAG, "exiting")
 
