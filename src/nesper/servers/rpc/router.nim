@@ -196,8 +196,9 @@ macro rpc*(server: RpcRouter, path: string, body: untyped): untyped =
   # delegate async proc allows return and setting of result as native type
   result.add quote do:
     proc `doMain`(`paramsIdent`: JsonNode): `ReturnType` =
-      `setup`
-      `procBody`
+      {.cast(gcsafe).}:
+        `setup`
+        `procBody`
 
   if ReturnType == ident"JsonNode":
     # `JsonNode` results don't need conversion
