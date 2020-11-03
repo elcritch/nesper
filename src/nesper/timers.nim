@@ -10,7 +10,7 @@ type
     code*: esp_err_t
   
   BasicTimer* = object 
-    ts: Micros
+    ts*: Micros
 
 proc createTimer*(
         callback: esp_timer_cb_t, ## !< Function to call when timer expires
