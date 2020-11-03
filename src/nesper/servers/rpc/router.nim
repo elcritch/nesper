@@ -127,7 +127,7 @@ template wrapException(body: untyped) =
     return resp
 
 
-proc route*(router: RpcRouter, node: JsonNode): JsonNode =
+proc route*(router: RpcRouter, node: JsonNode): JsonNode {.gcsafe.} =
   ## Assumes correct setup of node
   let
     methodName = node[methodField].str
@@ -202,11 +202,11 @@ macro rpc*(server: RpcRouter, path: string, body: untyped): untyped =
   if ReturnType == ident"JsonNode":
     # `JsonNode` results don't need conversion
     result.add quote do:
-      proc `procName`(`paramsIdent`: JsonNode): JsonNode =
+      proc `procName`(`paramsIdent`: JsonNode): JsonNode {.gcsafe.} =
         return `doMain`(`paramsIdent`)
   else:
     result.add quote do:
-      proc `procName`(`paramsIdent`: JsonNode): JsonNode =
+      proc `procName`(`paramsIdent`: JsonNode): JsonNode {.gcsafe.} =
         return %* `doMain`(`paramsIdent`)
 
 
