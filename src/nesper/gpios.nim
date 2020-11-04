@@ -56,11 +56,13 @@ proc getLevel*(pin: gpio_num_t): bool =
     else:
       true
 
-
-proc setLevelMultiLow*(pins: set[gpio_num_t], value: bool) =
+proc setLevelMulti*(pins: set[gpio_num_t], value: bool) =
+  # Sets the given gpio pin 0-31 either high or low 
 
   var pin_mask: uint32 = 0'u32
   for pin in pins:
+    if pin > 31:
+      raise newException(ValueError, "GPIO Pin's must be 0-31")
     pin_mask = pin_mask or BIT(pin.int()).uint32
 
   if value:
@@ -70,6 +72,18 @@ proc setLevelMultiLow*(pins: set[gpio_num_t], value: bool) =
     # Clear
     GPIO_REG_WRITE(GPIO_OUT_W1TC_REG.uint32, pin_mask) # 
 
-  # TODO: High bits? Ignoring for now...
-  # GPIO_OUT_W1TS_REG GPIO_OUT_W1TC_REG
-  # GPIO_OUT1_W1TS_REG GPIO_OUT2_W1TC_REG
+proc setLevelMultiHi*(pins: set[gpio_num_t], value: bool) =
+  # Sets the given gpio pin 32-63 either high or low 
+
+  var pin_mask: uint32 = 0'u32
+  for pin in pins:
+    if pin <= 31:
+      raise newException(ValueError, "GPIO Pin's must be 32-63")
+    pin_mask = pin_mask or BIT(pin.int() - 32).uint32
+
+  if value:
+    # Set
+    GPIO_REG_WRITE(GPIO_OUT1_W1TS_REG.uint32, pin_mask) # 
+  else:
+    # Clear
+    GPIO_REG_WRITE(GPIO_OUT2_W1TC_REG.uint32, pin_mask) # 
