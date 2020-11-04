@@ -190,7 +190,7 @@ proc fullTrans*(dev: SpiDev;
   spi_id.inc()
   var tflags = flags
   assert txlength.int() <= 8*len(txdata)
-  assert rxlength.int() >= 0
+  # assert rxlength.int() >= 0
 
   result = new(SpiTrans)
   result.dev = dev
