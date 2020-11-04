@@ -1,5 +1,5 @@
-import nesper/consts
-import nesper/general
+import consts
+import general
 
 # import esp/driver/gpio
 import esp/gpio
@@ -56,3 +56,20 @@ proc getLevel*(pin: gpio_num_t): bool =
     else:
       true
 
+
+proc setLevelMultiLow*(pins: set[gpio_num_t], value: bool) =
+
+  var pin_mask: uint32 = 0'u32
+  for pin in pins:
+    pin_mask = pin_mask or BIT(pin.int()).uint33
+
+  if value:
+    # Set
+    GPIO_REG_WRITE(GPIO_OUT_W1TS_REG.uint32, pin_mask) # 
+  else:
+    # Clear
+    GPIO_REG_WRITE(GPIO_OUT_W1TC_REG.uint32, pin_mask) # 
+
+  # TODO: High bits? Ignoring for now...
+  # GPIO_OUT_W1TS_REG GPIO_OUT_W1TC_REG
+  # GPIO_OUT1_W1TS_REG GPIO_OUT2_W1TC_REG

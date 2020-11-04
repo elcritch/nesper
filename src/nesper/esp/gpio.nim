@@ -24,6 +24,12 @@ proc GPIO_REG_WRITE*(reg: uint32, val: uint32) {.importc: "$1", header: "esp32/r
 var
   GPIO_ID_PIN0* {.importc: "$1", header: "esp32/rom/gpio.h".} = 0
 
+var
+  GPIO_OUT_W1TS_REG* {.importc: "$1", header: "soc/gpio_reg.h".} = 0
+  GPIO_OUT_W1TC_REG* {.importc: "$1", header: "soc/gpio_reg.h".} = 0
+  GPIO_OUT1_W1TS_REG* {.importc: "$1", header: "soc/gpio_reg.h".} = 0
+  GPIO_OUT2_W1TC_REG* {.importc: "$1", header: "soc/gpio_reg.h".} = 0
+
 template GPIO_ID_PIN*(n: untyped): untyped =
   (GPIO_ID_PIN0 + (n))
 
