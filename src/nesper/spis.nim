@@ -260,6 +260,7 @@ proc readTrans*(dev: SpiDev;
                 ): SpiTrans =
   assert not (USE_TXDATA in flags)
   if (dev.devcfg.flags.uint32 and HALFDUPLEX.uint32) > 0:
+    logi(TAG, "HALFDUPLEX", )
     fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=bits(0), txdata=[], flags=flags)
   else:
     var n = rxlength.int div 8
