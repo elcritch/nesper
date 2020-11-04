@@ -61,7 +61,7 @@ proc setLevelMulti*(pins: set[gpio_num_t], value: bool) =
 
   var pin_mask: uint32 = 0'u32
   for pin in pins:
-    if pin > 31:
+    if pin.int > 31:
       raise newException(ValueError, "GPIO Pin's must be 0-31")
     pin_mask = pin_mask or BIT(pin.int()).uint32
 
@@ -77,7 +77,7 @@ proc setLevelMultiHi*(pins: set[gpio_num_t], value: bool) =
 
   var pin_mask: uint32 = 0'u32
   for pin in pins:
-    if pin <= 31:
+    if pin.int <= 31:
       raise newException(ValueError, "GPIO Pin's must be 32-63")
     pin_mask = pin_mask or BIT(pin.int() - 32).uint32
 
