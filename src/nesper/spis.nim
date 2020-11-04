@@ -207,7 +207,7 @@ proc fullTrans*(dev: SpiDev;
 
   if result.trn.length <= 32:
     result.trn.rx_buffer = nil
-    for i in 0..<high(txdata):
+    for i in 0..high(txdata):
       result.trn.txdata[i] = txdata[i]
   else:
     # This order is important, copy the seq then take the unsafe addr
