@@ -265,7 +265,7 @@ proc readTrans*(dev: SpiDev;
     var n = rxlength.int div 8
     if n*8 <= rxlength.int: n += 1
     var data = newSeq[byte](n)
-    fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=data, txdata=[], flags=flags)
+    fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=rxlength, txdata=data, flags=flags)
 
 proc getData*(trn: SpiTrans): seq[byte] = 
   if trn.trn.rxlength < 32:
