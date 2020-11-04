@@ -61,7 +61,7 @@ proc setLevelMultiLow*(pins: set[gpio_num_t], value: bool) =
 
   var pin_mask: uint32 = 0'u32
   for pin in pins:
-    pin_mask = pin_mask or BIT(pin.int()).uint33
+    pin_mask = pin_mask or BIT(pin.int()).uint32
 
   if value:
     # Set
