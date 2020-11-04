@@ -262,7 +262,7 @@ proc readTrans*(dev: SpiDev;
   if (dev.devcfg.flags.uint32 and HALFDUPLEX.uint32) > 0:
     fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=bits(0), txdata=[], flags=flags)
   else:
-    var n = rxlength div 8
+    var n = rxlength.int div 8
     if n*8 <= rxlength: n += 1
     var data = newSeq[byte](n)
     fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=data, txdata=[], flags=flags)
