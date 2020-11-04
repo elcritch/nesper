@@ -259,7 +259,10 @@ proc readTrans*(dev: SpiDev;
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_TXDATA in flags)
-  fullTrans(dev, cmd = cmd, cmdaddr = cmdaddr, rxlength = rxlength, txlength = bits(0), txdata = [], flags = flags)
+  if (dev.devcfg.flags and HALFDUPLEX) > 0:
+    fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=bits(0), txdata=[], flags=flags)
+  else:
+    fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=rxlength, txdata=[], flags=flags)
 
 proc getData*(trn: SpiTrans): seq[byte] = 
   if trn.trn.rxlength < 32:
