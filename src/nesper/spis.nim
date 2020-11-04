@@ -259,7 +259,7 @@ proc readTrans*(dev: SpiDev;
                   flags: set[SpiTransFlag] = {},
                 ): SpiTrans =
   assert not (USE_TXDATA in flags)
-  if (dev.devcfg.flags and HALFDUPLEX) > 0:
+  if (dev.devcfg.flags.uint32 and HALFDUPLEX) > 0:
     fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=bits(0), txdata=[], flags=flags)
   else:
     fullTrans(dev, cmd=cmd, cmdaddr=cmdaddr, rxlength=rxlength, txlength=rxlength, txdata=[], flags=flags)
