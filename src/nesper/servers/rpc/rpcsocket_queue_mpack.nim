@@ -26,11 +26,11 @@ type
 
 proc sendChunks*(sourceClient: Socket, rmsg: string) =
   let rN = rmsg.len()
-  logd(TAG,"rpc handler send client: %d bytes", rN)
+  # logd(TAG,"rpc handler send client: %d bytes", rN)
   var i = 0
   while i < rN:
     var j = min(i + MsgChunk, rN) 
-    logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
+    # logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
     var sl = rmsg[i..<j]
     sourceClient.send(move sl)
     i = j
@@ -79,7 +79,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
   while true:
     try:
       timeBlockDebug("rpcTask"):
-        logd(TAG,"exec rpc task wait: ")
+        # logd(TAG,"exec rpc task wait: ")
         var rcall: JsonNode
         if xQueueReceive(qh.inQueue, addr(rcall), portMAX_DELAY) != 0: 
           var res: JsonNode = qh.router.route( rcall )
@@ -93,10 +93,9 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
       echo "Got exception ", repr(e), " with message ", msg
 
 
-
 proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
                                 task_stack_depth = 8128'u32, task_priority = UBaseType_t(1), task_core = BaseType_t(-1)) =
-  logd(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
+  logi(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
   var qh: RpcQueueHandle = new(RpcQueueHandle)
 
   qh.router = router
