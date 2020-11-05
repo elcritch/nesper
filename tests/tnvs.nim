@@ -1,5 +1,5 @@
 
-import nesper/nvs
+import nesper/nvs_utils
 
 
 let nvs_handle = newNvs("storage", NVS_READWRITE)

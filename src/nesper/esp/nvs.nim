@@ -136,6 +136,8 @@ type
 proc nvs_open*(name: cstring; open_mode: nvs_open_mode_t;
               out_handle: ptr nvs_handle_t): esp_err_t {.cdecl, importc: "nvs_open",
     header: "nvs.h".}
+
+
 ## *
 ##  @brief      Open non-volatile storage with a given namespace from specified partition
 ##
@@ -162,11 +164,12 @@ proc nvs_open*(name: cstring; open_mode: nvs_open_mode_t;
 ##              - ESP_ERR_NVS_INVALID_NAME if namespace name doesn't satisfy constraints
 ##              - other error codes from the underlying storage driver
 ##
-
 proc nvs_open_from_partition*(part_name: cstring; name: cstring;
                              open_mode: nvs_open_mode_t;
                              out_handle: ptr nvs_handle_t): esp_err_t {.cdecl,
     importc: "nvs_open_from_partition", header: "nvs.h".}
+
+
 ## *@{
 ## *
 ##  @brief      set value for given key
@@ -215,6 +218,8 @@ proc nvs_set_u64*(handle: nvs_handle_t; key: cstring; value: uint64): esp_err_t 
     cdecl, importc: "nvs_set_u64", header: "nvs.h".}
 proc nvs_set_str*(handle: nvs_handle_t; key: cstring; value: cstring): esp_err_t {.
     cdecl, importc: "nvs_set_str", header: "nvs.h".}
+
+
 ## *@}
 ## *
 ##  @brief       set variable length binary value for given key
@@ -246,6 +251,8 @@ proc nvs_set_str*(handle: nvs_handle_t; key: cstring; value: cstring): esp_err_t
 
 proc nvs_set_blob*(handle: nvs_handle_t; key: cstring; value: pointer; length: csize_t): esp_err_t {.
     cdecl, importc: "nvs_set_blob", header: "nvs.h".}
+
+
 ## *@{
 ## *
 ##  @brief      get value for given key
@@ -301,6 +308,9 @@ proc nvs_get_i64*(handle: nvs_handle_t; key: cstring; out_value: ptr int64): esp
     cdecl, importc: "nvs_get_i64", header: "nvs.h".}
 proc nvs_get_u64*(handle: nvs_handle_t; key: cstring; out_value: ptr uint64): esp_err_t {.
     cdecl, importc: "nvs_get_u64", header: "nvs.h".}
+
+
+
 ## *@}
 ## *
 ##  @brief      get value for given key
@@ -366,6 +376,9 @@ proc nvs_get_str*(handle: nvs_handle_t; key: cstring; out_value: cstring;
 proc nvs_get_blob*(handle: nvs_handle_t; key: cstring; out_value: pointer;
                   length: ptr csize_t): esp_err_t {.cdecl, importc: "nvs_get_blob",
     header: "nvs.h".}
+
+
+
 ## *@}
 ## *
 ##  @brief      Erase key-value pair with given key name.
@@ -389,6 +402,8 @@ proc nvs_get_blob*(handle: nvs_handle_t; key: cstring; out_value: pointer;
 
 proc nvs_erase_key*(handle: nvs_handle_t; key: cstring): esp_err_t {.cdecl,
     importc: "nvs_erase_key", header: "nvs.h".}
+
+
 ## *
 ##  @brief      Erase all key-value pairs in a namespace
 ##
@@ -406,6 +421,8 @@ proc nvs_erase_key*(handle: nvs_handle_t; key: cstring): esp_err_t {.cdecl,
 
 proc nvs_erase_all*(handle: nvs_handle_t): esp_err_t {.cdecl,
     importc: "nvs_erase_all", header: "nvs.h".}
+
+
 ## *
 ##  @brief      Write any pending changes to non-volatile storage
 ##
@@ -424,6 +441,8 @@ proc nvs_erase_all*(handle: nvs_handle_t): esp_err_t {.cdecl,
 
 proc nvs_commit*(handle: nvs_handle_t): esp_err_t {.cdecl, importc: "nvs_commit",
     header: "nvs.h".}
+
+
 ## *
 ##  @brief      Close the storage handle and free any allocated resources
 ##
@@ -437,6 +456,8 @@ proc nvs_commit*(handle: nvs_handle_t): esp_err_t {.cdecl, importc: "nvs_commit"
 ##
 
 proc nvs_close*(handle: nvs_handle_t) {.cdecl, importc: "nvs_close", header: "nvs.h".}
+
+
 ## *
 ##  @note Info about storage space NVS.
 ##
@@ -485,6 +506,8 @@ type
 
 proc nvs_get_stats*(part_name: cstring; nvs_stats: ptr nvs_stats_t): esp_err_t {.cdecl,
     importc: "nvs_get_stats", header: "nvs.h".}
+
+
 ## *
 ##  @brief      Calculate all entries in a namespace.
 ##
@@ -524,6 +547,8 @@ proc nvs_get_stats*(part_name: cstring; nvs_stats: ptr nvs_stats_t): esp_err_t {
 
 proc nvs_get_used_entry_count*(handle: nvs_handle_t; used_entries: ptr csize_t): esp_err_t {.
     cdecl, importc: "nvs_get_used_entry_count", header: "nvs.h".}
+
+
 ## *
 ##  @brief       Create an iterator to enumerate NVS entries based on one or more parameters
 ##
@@ -558,6 +583,8 @@ proc nvs_get_used_entry_count*(handle: nvs_handle_t; used_entries: ptr csize_t):
 
 proc nvs_entry_find*(part_name: cstring; namespace_name: cstring; `type`: nvs_type_t): nvs_iterator_t {.
     cdecl, importc: "nvs_entry_find", header: "nvs.h".}
+
+
 ## *
 ##  @brief       Returns next item matching the iterator criteria, NULL if no such item exists.
 ##
@@ -571,6 +598,8 @@ proc nvs_entry_find*(part_name: cstring; namespace_name: cstring; `type`: nvs_ty
 
 proc nvs_entry_next*(`iterator`: nvs_iterator_t): nvs_iterator_t {.cdecl,
     importc: "nvs_entry_next", header: "nvs.h".}
+
+
 ## *
 ##  @brief       Fills nvs_entry_info_t structure with information about entry pointed to by the iterator.
 ##
@@ -581,6 +610,8 @@ proc nvs_entry_next*(`iterator`: nvs_iterator_t): nvs_iterator_t {.cdecl,
 
 proc nvs_entry_info*(`iterator`: nvs_iterator_t; out_info: ptr nvs_entry_info_t) {.
     cdecl, importc: "nvs_entry_info", header: "nvs.h".}
+
+
 ## *
 ##  @brief       Release iterator
 ##

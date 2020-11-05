@@ -18,10 +18,10 @@ type
     mode*: nvs_open_mode_t 
     handle*: nvs_handle_t 
 
+
 proc initNvs*() =
   # // Initialize NVS
   var nvs_error = nvs_flash_init()
-
 
   if nvs_error == ESP_ERR_NVS_NO_FREE_PAGES or nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND:
     echo("NVS partition was truncated and needs to be erased")
@@ -32,6 +32,10 @@ proc initNvs*() =
     nvs_error = nvs_flash_init()
     if ESP_OK != nvs_error:
       raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS", nvs_error)
+
+  if ESP_OK != nvs_error:
+    raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
+
 
 proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
   # // Initialize NVS
@@ -47,7 +51,6 @@ proc newNvs*(name: string, mode: nvs_open_mode_t): NvsObject =
     echo("Error (%s) opening NVS handle!", esp_err_to_name(nvs_error))
     raise newEspError[NvsError]("Error opening nvs (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
-  result.mode = mode
   result.mode = mode
 
 proc getInt*(nvs: NvsObject, key: string): Option[int32] =
