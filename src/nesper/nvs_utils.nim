@@ -26,9 +26,7 @@ proc deInitNvs*(part_name = "nvs"): esp_err_t =
 
 proc initNvs*(part_name = "nvs") =
   # // Initialize NVS
-  echo("NVS partition init")
   var nvs_error = nvs_flash_init_partition(part_name)
-  echo("NVS partition init res: ", esp_err_to_name(nvs_error))
 
   if nvs_error == ESP_ERR_NVS_NO_FREE_PAGES or nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND:
     echo("NVS partition was truncated and needs to be erased")
@@ -45,6 +43,7 @@ proc initNvs*(part_name = "nvs") =
 
 
 proc newNvs*(name: string, mode: nvs_open_mode_t; part_name = "nvs"): NvsObject =
+  result = NvsObject()
   # // Initialize NVS
   initNvs(part_name)
 
