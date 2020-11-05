@@ -42,7 +42,7 @@ proc initNvs*(part_name = "nvs") =
     raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
 
 
-proc newNvs*(name: string, mode: nvs_open_mode_t, part_name = "nvs"): NvsObject =
+proc newNvs*(name: string, mode: nvs_open_mode_t; part_name = "nvs"): NvsObject =
   # // Initialize NVS
   initNvs(part_name)
 
