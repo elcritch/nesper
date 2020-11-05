@@ -14,7 +14,7 @@ type
   NvsError* = object of OSError
     code*: esp_err_t
 
-  NvsObject* = ref object
+  NvsObject* = object
     mode*: nvs_open_mode_t 
     handle*: nvs_handle_t 
 
