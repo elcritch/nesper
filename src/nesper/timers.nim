@@ -49,14 +49,14 @@ converter toMillis*(ts: Micros): Millis =
 proc toMicros*(ts: Millis): Micros =
   return Micros(ts.uint64 * 1_000U)
 
-proc delayMillis*(ms: uint64): uint64 =
+proc delayMillis*(ms: uint64): uint64 {.discardable.} =
   var start = millis()
   vTaskDelay(Millis(ms).toTicks())
   var stop = millis()
   return (stop-start).uint64
 
 # void IRAM_ATTR delayMicroseconds(uint32_t us)
-proc delayMicros*(us: uint64): uint64 =
+proc delayMicros*(us: uint64): uint64 {.discardable.} =
   if us.uint64 == 0:
     return 0
 
