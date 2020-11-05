@@ -71,8 +71,8 @@ proc delayMicros*(us: uint64): uint64 =
 
   return target-curr
 
-proc delay*(ts: Millis) = discard delayMillis(ts.uint64)
-proc delay*(ts: Micros) = discard delayMicros(ts.uint64)
+proc delay*(ts: Millis) {.discardable.} = discard delayMillis(ts.uint64)
+proc delay*(ts: Micros) {.discardable.} = discard delayMicros(ts.uint64)
 
 proc newBasicTimer*(): BasicTimer =
   return BasicTimer(ts: micros())
@@ -80,7 +80,7 @@ proc newBasicTimer*(): BasicTimer =
 proc elapsed*(timer: BasicTimer): Micros =
   return micros() - timer.ts
 
-proc waitFor*(timer: BasicTimer, duration: Millis): Millis =
+proc waitFor*(timer: BasicTimer, duration: Millis): Millis {.discardable.} =
   var curr: Millis = millis()
   let ts: Millis = timer.ts.toMillis()
   let te = ts + duration
@@ -91,7 +91,7 @@ proc waitFor*(timer: BasicTimer, duration: Millis): Millis =
     delay(te - curr)
     return micros() - ts
 
-proc waitFor*(timer: BasicTimer, duration: Micros): Micros =
+proc waitFor*(timer: BasicTimer, duration: Micros): Micros {.discardable.} =
   var curr: Micros = micros()
   let ts: Micros = timer.ts
   let te = ts + duration
