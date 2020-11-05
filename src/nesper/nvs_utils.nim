@@ -35,11 +35,11 @@ proc initNvs*(part_name = "nvs") =
 
     nvs_error = nvs_flash_erase_partition(part_name)
     if ESP_OK != nvs_error:
-      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS ", & name nvs_error)
+      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS " & part_name, nvs_error)
     logi(TAG, "NVS partition: %s was erased. Initializing it", part_name)
     nvs_error = nvs_flash_init_partition(part_name)
     if ESP_OK != nvs_error:
-      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS ", & name nvs_error)
+      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS " & part_name, nvs_error)
 
   if ESP_OK != nvs_error:
     raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
