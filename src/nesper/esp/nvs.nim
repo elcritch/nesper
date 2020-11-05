@@ -104,7 +104,7 @@ type
 type
 #   nvs_opaque_iterator_t {.header: "<nvs.h>", importc: "nvs_opaque_iterator_t".} = object
 #   nvs_iterator_t* = ptr nvs_opaque_iterator_t
-  nvs_iterator_t {.header: "<nvs.h>", importc: "nvs_iterator_t".} = ptr
+  nvs_iterator_t* {.header: "<nvs.h>", importc: "nvs_iterator_t".} = ptr
 
 ## *
 ##  @brief      Open non-volatile storage with a given namespace from the default NVS partition
