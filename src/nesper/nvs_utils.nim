@@ -10,6 +10,8 @@ import esp/nvs_flash
 
 export nvs_open_mode_t
 
+const TAG = "NVS"
+
 type
   NvsError* = object of OSError
     code*: esp_err_t
@@ -29,14 +31,15 @@ proc initNvs*(part_name = "nvs") =
   var nvs_error = nvs_flash_init_partition(part_name)
 
   if nvs_error == ESP_ERR_NVS_NO_FREE_PAGES or nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND:
-    echo("NVS partition was truncated and needs to be erased")
+    logi(TAG, "NVS partition: %s was truncated and needs to be erased", part_name)
+
     nvs_error = nvs_flash_erase_partition(part_name)
     if ESP_OK != nvs_error:
-      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS", nvs_error)
-    echo("NVS partition was erased, now initializing it")
+      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") erahsing NVS ", & name nvs_error)
+    logi(TAG, "NVS partition: %s was erased. Initializing it", part_name)
     nvs_error = nvs_flash_init_partition(part_name)
     if ESP_OK != nvs_error:
-      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS", nvs_error)
+      raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ") initializing NVS ", & name nvs_error)
 
   if ESP_OK != nvs_error:
     raise newEspError[NvsError]("Error (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
@@ -48,14 +51,14 @@ proc newNvs*(name: string, mode: nvs_open_mode_t; part_name = "nvs"): NvsObject 
   initNvs(part_name)
 
   #// Open
-  echo("Opening Non-Volatile Storage (NVS) handle... ")
+  logi(TAG, "Opening Non-Volatile Storage (NVS) handle: part: %s section: %s", part_name, name)
 
   # Set NVS handle
   var nvs_error = nvs_open_from_partition(part_name, name, mode, addr(result.handle))
 
   if nvs_error != ESP_OK:
-    echo("Error (%s) opening NVS handle!", esp_err_to_name(nvs_error))
-    raise newEspError[NvsError]("Error opening nvs (" & $esp_err_to_name(nvs_error) & ")", nvs_error)
+    logi(TAG, "Error (%s) opening NVS handle for part/section: %s/%s!", esp_err_to_name(nvs_error), part_name, name)
+    raise newEspError[NvsError]("Error opening nvs (" & $esp_err_to_name(nvs_error) & ") " & part_name & "/" & name, nvs_error)
 
   result.mode = mode
 
