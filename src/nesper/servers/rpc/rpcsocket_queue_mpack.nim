@@ -14,8 +14,10 @@ import msgpack4nim/msgpack2json
 
 export tcpsocket, router
 
-const TAG = "socketrpc"
-const MsgChunk {.intdefine.} = 1400
+const
+  TAG = "socketrpc"
+  MsgChunk {.intdefine.} = 1400
+  RpcOutQueueWaitTicks {.intdefine.} = 1_000 # can be adjusted for responsiveness
 
 type 
   RpcQueueHandle = ref object
@@ -61,7 +63,7 @@ proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: Rea
       wasMoved(rcall)
 
       var res: JsonNode
-      while xQueueReceive(qh.outQueue, addr(res), 0) == 0: 
+      while xQueueReceive(qh.outQueue, addr(res), RpcOutQueueWaitTicks.TickType_t) == 0: 
         continue
 
       var rmsg: string = msgpack2json.fromJsonNode(res)
