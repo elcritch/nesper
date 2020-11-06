@@ -43,5 +43,5 @@ type
     MALLOC_CAP_INVALID  = BIT(31) # ///< Memory can't be used / list end marker
 
 proc heap_caps_print_heap_info*(cap: MallocCapacity) {.importc: "$1", header: "esp_heap_caps.h".}
-proc heap_caps_get_free_size*(cap: MallocCapacity) {.importc: "$1", header: "esp_heap_caps.h".}
-proc multi_heap_free_size*(cap: MallocCapacity) {.importc: "$1", header: "esp_heap_caps.h".}
+proc heap_caps_get_free_size*(cap: MallocCapacity): csize_t {.importc: "$1", header: "esp_heap_caps.h".}
+proc multi_heap_free_size*(cap: MallocCapacity): csize_t {.importc: "$1", header: "esp_heap_caps.h".}
