@@ -3,8 +3,10 @@ import FreeRTOS
 
 # {.compile: "nqueue.c".}
 # "freertos/event_groups.h"
-import os
-const evt_header = currentSourcePath().splitPath.head & "/defs/nevents.h"
+# import os
+# const evt_header = currentSourcePath().splitPath.head & "/defs/nevents.h"
+const evt_header = """#include <freertos/FreeRTOS.h>
+                      #include "freertos/event_groups.h" """
 
 ## *
 ##  An event group is a collection of bits to which an application can assign a

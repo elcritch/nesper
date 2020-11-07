@@ -68,10 +68,11 @@
 ##
 
 import ../consts
-import os
-
+# import os
 # {.compile: "nqueue.c".}
-const qheader = currentSourcePath().splitPath.head & "/defs/nqueue.h"
+# const qheader = currentSourcePath().splitPath.head & "/defs/nqueue.h"
+const qheader = """#include <freertos/FreeRTOS.h>
+                   #include "freertos/queue.h" """
 
 ## *
 ##  Type by which queues are referenced.  For example, a call to xQueueCreate()

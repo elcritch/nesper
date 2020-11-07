@@ -3,7 +3,9 @@ import consts
 import general
 
 import esp/esp_timer
-export esp_timer, consts
+import esp/driver/timer
+
+export consts, esp_timer
 
 type
   TimerError* = object of OSError
@@ -114,3 +116,11 @@ template timeBlockDebug*(n: string, blk: untyped): untyped =
     echo n & " took: ", $(micros() - t0), " micros "
   else:
     blk
+
+
+proc disableWdtForTask*() =
+  # Method to disable checking WDT on long running task:
+  # https://github.com/espressif/esp-idf/issues/1646#issuecomment-413829778
+  TIMERG0.wdt_wprotect = TIMG_WDT_WKEY_VALUE
+  TIMERG0.wdt_feed = 1
+  TIMERG0.wdt_wprotect = 0

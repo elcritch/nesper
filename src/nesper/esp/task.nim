@@ -70,8 +70,10 @@
 import ../consts
 import FreeRTOS
 
-import os
-const theader = currentSourcePath().splitPath.head & "/defs/ntask.h"
+# import os
+# const theader = currentSourcePath().splitPath.head & "/defs/ntask.h"
+const theader = """#include <freertos/FreeRTOS.h>
+                   #include "freertos/task.h" """
 
 type
   portMUX_TYPE* {.importc: "portMUX_TYPE", header: "projdefs.h", bycopy.} = object

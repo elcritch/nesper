@@ -12,6 +12,10 @@
 ##  limitations under the License.
 
 import ../../consts
+import timer_group_struct
+
+export timer_group_struct
+
 
 const
   TIMER_BASE_CLK* = (APB_CLK_FREQ) ## !< Frequency of the clock on the input of the timer groups
