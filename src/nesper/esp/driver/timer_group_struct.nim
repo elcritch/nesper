@@ -184,4 +184,4 @@ type
 var TIMERG0* {.importc: "TIMERG0", header: tgs_header.}: timg_dev_t
 var TIMERG1* {.importc: "TIMERG1", header: tgs_header.}: timg_dev_t
 
-var TIMG_WDT_WKEY_VALUE* {.importc: "$!", header: tgs_header.}: uint32
+var TIMG_WDT_WKEY_VALUE* {.importc: "$1", header: tgs_header.}: uint32
