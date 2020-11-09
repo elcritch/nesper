@@ -7,6 +7,7 @@ import posix
 import ../consts
 import ../general
 import ../tasks
+import ../timers
 
 export net, selectors, tables, posix
 
@@ -116,7 +117,8 @@ proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHa
           result.processReads(srv, data)
       if Event.Write in result.events:
           result.processWrites(srv, data)
-      taskYIELD()
+      # taskYIELD()
+    delayMillis(10)
   
   select.close()
   server.close()
