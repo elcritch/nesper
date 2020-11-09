@@ -7,6 +7,8 @@ export esp_log, tasks
 
 var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
 var portTICK_PERIOD_MS* {.importc: "portTICK_PERIOD_MS", header: "<freertos/FreeRTOS.h>".}: uint32
+var portNOP* {.importc: "portNOP", header: "<freertos/FreeRTOS.h>".}: uint32
+var configTICK_RATE_HZ* {.importc: "configTICK_RATE_HZ", header: "<freertos/FreeRTOSConfig.h>".}: uint32
 
 proc NimMain() {.importc.}
 
