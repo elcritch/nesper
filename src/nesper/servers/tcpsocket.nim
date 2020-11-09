@@ -118,7 +118,9 @@ proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHa
       if Event.Write in result.events:
           result.processWrites(srv, data)
       # taskYIELD()
-    delayMillis(1)
+    # delayMillis(1)
+    vTaskDelay(1.TickType_t)
+
   
   select.close()
   server.close()
