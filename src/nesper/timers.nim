@@ -90,17 +90,6 @@ proc elapsed*(timer: BasicTimer): Micros =
 proc reset*(timer: var BasicTimer) =
   timer.ts = micros()
 
-proc waitFor*(timer: BasicTimer, duration: Millis): Millis {.discardable.} =
-  var curr: Millis = millis()
-  let ts: Millis = timer.ts.toMillis()
-  let te = ts + duration
-
-  if te <= curr:
-    return curr - ts
-  else:
-    delay(te - curr)
-    return micros() - ts
-
 proc waitFor*(timer: BasicTimer, duration: Micros): Micros {.discardable.} =
   var curr: Micros = micros()
   let ts: Micros = timer.ts
@@ -109,7 +98,18 @@ proc waitFor*(timer: BasicTimer, duration: Micros): Micros {.discardable.} =
   if te <= curr:
     return curr - ts
   else:
-    delay(te - curr)
+    delayMicros((te - curr).uint64)
+    return micros() - ts
+
+proc waitFor*(timer: BasicTimer, duration: Millis): Millis {.discardable.} =
+  var curr: Millis = millis()
+  let ts: Millis = timer.ts.toMillis()
+  let te = ts + duration
+
+  if te <= curr:
+    return curr - ts
+  else:
+    delayMillis((te - curr).uint64)
     return micros() - ts
 
 template timeBlock*(n: string, blk: untyped): untyped =
