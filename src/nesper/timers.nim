@@ -45,7 +45,7 @@ proc millis*(): Millis =
 converter toTicks*(ts: Millis): TickType_t =
   return TickType_t(uint32(ts) div portTICK_PERIOD_MS)
 
-converter toMillis*(ts: Micros): Millis =
+proc toMillis*(ts: Micros): Millis =
   return Millis(ts.uint64 div 1_000U)
 
 proc toMicros*(ts: Millis): Micros =
@@ -110,7 +110,7 @@ proc waitFor*(timer: BasicTimer, duration: Millis): Millis {.discardable.} =
     return curr - ts
   else:
     delayMillis((te - curr).uint64)
-    return micros() - ts
+    return millis() - ts
 
 template timeBlock*(n: string, blk: untyped): untyped =
   let t0 = micros()
