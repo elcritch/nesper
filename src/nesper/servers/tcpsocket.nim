@@ -11,6 +11,8 @@ import ../timers
 
 export net, selectors, tables, posix
 
+export consts, general, timers
+
 const TAG = "socketrpc"
 
 type 

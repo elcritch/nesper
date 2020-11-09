@@ -1,6 +1,7 @@
 import nativesockets, net, selectors, tables, posix
 
 import ../../general
+import ../../timers
 import ../tcpsocket
 
 import router
