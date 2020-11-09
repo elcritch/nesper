@@ -52,6 +52,8 @@ proc `<` *(a, b: Micros): bool {.borrow.}
 proc `<=` *(a, b: Micros): bool {.borrow.}
 proc `==` *(a, b: Micros): bool {.borrow.}
 
+proc `$` *(v: Millis): string {.borrow.}
+proc `$` *(v: Micros): string {.borrow.}
 
 type
   TickType_t* = uint32
