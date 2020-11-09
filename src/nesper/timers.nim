@@ -87,6 +87,9 @@ proc newBasicTimer*(): BasicTimer =
 proc elapsed*(timer: BasicTimer): Micros =
   return micros() - timer.ts
 
+proc reset*(timer: var BasicTimer) =
+  timer.ts = micros()
+
 proc waitFor*(timer: BasicTimer, duration: Millis): Millis {.discardable.} =
   var curr: Millis = millis()
   let ts: Millis = timer.ts.toMillis()
