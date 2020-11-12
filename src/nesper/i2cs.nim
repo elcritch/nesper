@@ -159,6 +159,15 @@ proc writeBytes*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
+proc begin*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
+  let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+template doI2cCommand*(port: I2CMasterPort, blk: untyped) =
+  var cmd = newI2CCmd(port)
+  blk
+  cmd.begin()
 
 ## 
 ## I2C Slave ##
