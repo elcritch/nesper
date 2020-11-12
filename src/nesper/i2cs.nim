@@ -150,7 +150,7 @@ proc writeByte*(cmd: I2CCmd; data: uint8; ack_en: bool = false) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc write*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) = 
+proc writeBytes*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) = 
   let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack_en)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
@@ -160,6 +160,17 @@ proc writeBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickTy
   if ret == ESP_FAIL:
     raise newEspError[I2CError]("slave write error (" & $esp_err_to_name(ret) & ")", ret)
   return ret
+
+proc readBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickType_t): cint =
+  let ret = i2c_slave_read_buffer(port.port, addr(data[0]), data.len().csize_t, ticks_to_wait)
+  if ret == ESP_FAIL:
+    raise newEspError[I2CError]("slave write error (" & $esp_err_to_name(ret) & ")", ret)
+  return ret
+
+proc readBuffer*(port: I2CSlavePort; max_size: int; ticks_to_wait: TickType_t): seq[byte] =
+  result = newSeq[byte](max_size)
+  let ret = readBuffer(port, result, ticks_to_wait)
+  result.setLen(ret)
 
 
 proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csize_t;
