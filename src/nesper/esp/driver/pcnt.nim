@@ -258,7 +258,7 @@ proc pcnt_get_event_value*(unit: pcnt_unit_t; evt_type: pcnt_evt_type_t;
 ##      - ESP_ERR_INVALID_ARG Function pointer error.
 ##
 
-proc pcnt_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
+proc pcnt_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: esp_intr_flags;
                        handle: ptr pcnt_isr_handle_t): esp_err_t {.
     importc: "pcnt_isr_register", header: "pcnt.h".}
 ## *
@@ -393,7 +393,7 @@ proc pcnt_isr_handler_add*(unit: pcnt_unit_t; isr_handler: proc (a1: pointer) {.
 ##      - ESP_ERR_INVALID_STATE ISR service already installed
 ##
 
-proc pcnt_isr_service_install*(intr_alloc_flags: cint): esp_err_t {.
+proc pcnt_isr_service_install*(intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "pcnt_isr_service_install", header: "pcnt.h".}
 ## *
 ##  @brief Uninstall PCNT ISR service, freeing related resources.

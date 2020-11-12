@@ -642,7 +642,7 @@ proc rmt_config*(rmt_param: ptr rmt_config_t): esp_err_t {.importc: "rmt_config"
 ##      - ESP_FAIL System driver installed, can not register ISR handler for RMT
 ##
 
-proc rmt_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
+proc rmt_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: esp_intr_flags;
                       handle: ptr rmt_isr_handle_t): esp_err_t {.
     importc: "rmt_isr_register", header: "rmt.h".}
 ## *
@@ -689,7 +689,7 @@ proc rmt_fill_tx_items*(channel: rmt_channel_t; item: ptr rmt_item32_t;
 ##
 
 proc rmt_driver_install*(channel: rmt_channel_t; rx_buf_size: csize_t;
-                        intr_alloc_flags: cint): esp_err_t {.
+                        intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "rmt_driver_install", header: "rmt.h".}
 ## *
 ##  @brief Uninstall RMT driver.

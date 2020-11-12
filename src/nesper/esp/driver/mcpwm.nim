@@ -789,5 +789,5 @@ proc mcpwm_sync_disable*(mcpwm_num: mcpwm_unit_t; timer_num: mcpwm_timer_t): esp
 ##
 
 proc mcpwm_isr_register*(mcpwm_num: mcpwm_unit_t; fn: proc (a1: pointer) {.cdecl.}; arg: pointer;
-                        intr_alloc_flags: cint; handle: ptr intr_handle_t): esp_err_t {.
+                        intr_alloc_flags: esp_intr_flags; handle: ptr intr_handle_t): esp_err_t {.
     importc: "mcpwm_isr_register", header: "mcpwm.h".}

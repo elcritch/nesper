@@ -429,7 +429,7 @@ proc gpio_wakeup_disable*(gpio_num: gpio_num_t): esp_err_t {.
 ##      - ESP_ERR_NOT_FOUND No free interrupt found with the specified flags
 ##
 
-proc gpio_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: cint;
+proc gpio_isr_register*(fn: proc (a1: pointer) {.cdecl.}; arg: pointer; intr_alloc_flags: esp_intr_flags;
                        handle: ptr gpio_isr_handle_t): esp_err_t {.
     importc: "gpio_isr_register", header: "driver/gpio.h".}
 ## *
@@ -496,7 +496,7 @@ proc gpio_pulldown_dis*(gpio_num: gpio_num_t): esp_err_t {.
 ##      - ESP_ERR_INVALID_ARG GPIO error
 ##
 
-proc gpio_install_isr_service*(intr_alloc_flags: cint): esp_err_t {.
+proc gpio_install_isr_service*(intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "gpio_install_isr_service", header: "driver/gpio.h".}
 ## *
 ##  @brief Uninstall the driver's GPIO ISR service, freeing related resources.

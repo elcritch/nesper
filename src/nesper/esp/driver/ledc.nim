@@ -338,7 +338,7 @@ proc ledc_set_fade*(speed_mode: ledc_mode_t; channel: ledc_channel_t; duty: uint
 ##      - ESP_ERR_INVALID_ARG Function pointer error.
 ##
 
-proc ledc_isr_register*(fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: cint;
+proc ledc_isr_register*(fn: proc (a1: pointer); arg: pointer; intr_alloc_flags: esp_intr_flags;
                        handle: ptr ledc_isr_handle_t): esp_err_t {.
     importc: "ledc_isr_register", header: "ledc.h".}
 ## *
@@ -474,7 +474,7 @@ proc ledc_set_fade_with_time*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
 ##      - ESP_ERR_INVALID_STATE Fade function already installed.
 ##
 
-proc ledc_fade_func_install*(intr_alloc_flags: cint): esp_err_t {.
+proc ledc_fade_func_install*(intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "ledc_fade_func_install", header: "ledc.h".}
 ## *
 ##  @brief Uninstall LEDC fade function.

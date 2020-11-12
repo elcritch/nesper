@@ -448,7 +448,7 @@ proc uart_enable_tx_intr*(uart_num: uart_port_t; enable: cint; thresh: cint): es
 ##
 
 proc uart_isr_register*(uart_num: uart_port_t; fn: proc (a1: pointer) {.cdecl.};
-                       arg: pointer; intr_alloc_flags: cint;
+                       arg: pointer; intr_alloc_flags: esp_intr_flags;
                        handle: ptr uart_isr_handle_t): esp_err_t {.cdecl,
     importc: "uart_isr_register", header: "<driver/uart.h>".}
 ## *
@@ -579,7 +579,7 @@ proc uart_intr_config*(uart_num: uart_port_t; intr_conf: ptr uart_intr_config_t)
 
 proc uart_driver_install*(uart_num: uart_port_t; rx_buffer_size: cint;
                          tx_buffer_size: cint; queue_size: cint;
-                         uart_queue: ptr QueueHandle_t; intr_alloc_flags: cint): esp_err_t {.
+                         uart_queue: ptr QueueHandle_t; intr_alloc_flags: esp_intr_flags): esp_err_t {.
     cdecl, importc: "uart_driver_install", header: "<driver/uart.h>".}
 ## *
 ##  @brief Uninstall UART driver.
