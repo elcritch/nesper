@@ -91,7 +91,6 @@ proc initI2CDriver(
 
 proc newI2CMaster*(
     port: i2c_port_t,
-    mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
     scl_io_num: gpio_num_t, ## !< GPIO number for I2C scl signal
     clk_speed: Hertz;
@@ -108,7 +107,6 @@ proc newI2CMaster*(
 
 proc newI2CSlave*(
     port: i2c_port_t,
-    mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
     scl_io_num: gpio_num_t, ## !< GPIO number for I2C scl signal
     clk_speed: Hertz;
@@ -134,30 +132,48 @@ proc newI2CCmd*(port: I2CPort): I2CCmd =
   # i2c_master_write_byte(cmd, (address shl 1) or WRITE_BIT, ACK_CHECK_EN)
   # i2c_master_stop(cmd)
 
+proc newCmd*(port: I2CPort): I2CCmd = newI2CCmd(port)
 
 ## 
 ## I2C Master ##
 ## 
 
-proc i2cStart*(cmd: I2CCmd) =
+proc start*(cmd: I2CCmd) =
   let ret = i2c_master_start(cmd.handle)
   if ret != ESP_OK:
     raise newEspError[I2CError]("start cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc i2cStop*(cmd: I2CCmd) =
+proc stop*(cmd: I2CCmd) =
   let ret = i2c_master_start(cmd.handle)
   if ret != ESP_OK:
     raise newEspError[I2CError]("stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc writeByte*(cmd: I2CCmd; data: uint8; ack_en: bool = false) = 
-  let ret = i2c_master_write_byte(cmd.handle, data, ack_en)
+proc write*(cmd: I2CCmd; data: byte; ack: bool = true) = 
+  let ret = i2c_master_write_byte(cmd.handle, data, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc writeBytes*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) = 
-  let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack_en)
+proc write*(cmd: I2CCmd; data: var seq[byte]; ack: bool = true) = 
+  let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc write*(cmd: I2CCmd; data: varargs[byte]; ack: bool = true) = 
+  write(cmd, data, ack) 
+
+proc read*(cmd: I2CCmd; ack: i2c_ack_type_t): byte = 
+  let ret = i2c_master_read_byte(cmd.handle, addr(result), ack)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc read*(cmd: I2CCmd; data: var seq[byte], ack: i2c_ack_type_t) = 
+  let ret = i2c_master_read(cmd.handle, addr(data[0]), data.len().csize_t, ack)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc read*(cmd: I2CCmd; count: int, ack: i2c_ack_type_t): seq[byte] = 
+  result = newSeq[byte](count)
+  read(cmd, result, ack)
 
 proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
