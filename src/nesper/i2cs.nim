@@ -2,6 +2,7 @@
 import consts
 import general
 import esp/gpio
+import esp/esp_intr_alloc
 import esp/driver/i2c
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
@@ -30,28 +31,23 @@ type
   # i2c_obj_t = distinct pointer
 
 # var p_i2c_obj {.importc: "p_i2c_obj".}: UncheckedArray[i2c_obj_t]
-proc newI2CMaster*(
+proc newI2CDriver(
     port: i2c_port_t,
     mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
     scl_io_num: gpio_num_t, ## !< GPIO number for I2C scl signal
     clk_speed: Hertz,
+    slv_rx_buf_len: csize_t,
+    slv_tx_buf_len: csize_t;
     sda_pullup_en: bool, ## !< Internal GPIO pull mode for I2C sda signal
     scl_pullup_en: bool, ## !< Internal GPIO pull mode for I2C scl signal
-): I2CPort =
+    intr_alloc_flags: set[InterruptFlags]): I2CPort =
 
-  proc i2c_driver_install*(i2c_num: i2c_port_t;
-                            mode: i2c_mode_t;
-                            slv_rx_buf_len: csize_t;
-                            slv_tx_buf_len: csize_t;
-                            intr_alloc_flags: esp_intr_flags
-                            ): esp_err_t {. .}
+  var iflags = esp_intr_flags(0)
+  for fl in intr_alloc_flags:
+    iflags = iflags or fl.esp_intr_flags
 
-  let iret = i2c_driver_install(port,
-                                I2C_MODE_MASTER,
-                                I2C_MASTER_RX_BUF_DISABLE,
-                                I2C_MASTER_TX_BUF_DISABLE,
-                                0)
+  let iret = i2c_driver_install(port, I2C_MODE_MASTER, slv_rx_buf_len, slv_tx_buf_len, iflags)
   if iret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
 
@@ -65,6 +61,33 @@ proc newI2CMaster*(
   let ret = i2c_param_config(port, addr(conf))
   if ret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
+
+
+proc newI2CMaster*(
+    port: i2c_port_t,
+    mode: i2c_mode_t, ## !< I2C mode
+    sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
+    scl_io_num: gpio_num_t, ## !< GPIO number for I2C scl signal
+    clk_speed: Hertz;
+    sda_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C sda signal
+    scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
+    intr_alloc_flags: set[InterruptFlags]): I2CPort =
+
+  return newI2CDriver( port, mode, sda_io_num, scl_io_num, clk_speed, slv_rx_buf_len = 0, slv_tx_buf_len = 0, sda_pullup_en, scl_pullup_en, intr_alloc_flags)
+
+proc newI2CSlave*(
+    port: i2c_port_t,
+    mode: i2c_mode_t, ## !< I2C mode
+    sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
+    scl_io_num: gpio_num_t, ## !< GPIO number for I2C scl signal
+    clk_speed: Hertz;
+    slv_rx_buf_len: csize_t,
+    slv_tx_buf_len: csize_t,
+    sda_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C sda signal
+    scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
+    intr_alloc_flags: set[InterruptFlags]): I2CPort =
+
+  return newI2CDriver(port, mode, sda_io_num, scl_io_num, clk_speed, slv_rx_buf_len = slv_rx_buf_len , slv_tx_buf_len = slv_tx_buf_len, sda_pullup_en, scl_pullup_en, intr_alloc_flags)
 
 
 proc newI2CCmd*(): I2CCmd =
