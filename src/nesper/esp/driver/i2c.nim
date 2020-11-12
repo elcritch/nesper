@@ -91,8 +91,8 @@ var I2C_APB_CLK_FREQ* {.importc: "APB_CLK_FREQ", header: "<driver/i2c.h>".}: cin
 var I2C_NUM_MAX* {.importc: "SOC_I2C_NUM", header: "<driver/i2c.h>".}: cint
 
 const
-  I2C_NUM_0* = 0              ## !< I2C port 0
-  I2C_NUM_1* = 1              ## !< I2C port 1
+  I2C_NUM_0* = i2c_port_t(0)              ## !< I2C port 0
+  I2C_NUM_1* = i2c_port_t(1)              ## !< I2C port 1
 
 type
   i2c_cmd_handle_t* = distinct pointer
