@@ -54,11 +54,6 @@ proc swapDataRx*(data: uint32, len: uint32): uint32 =
 
   return outp shr (32-len)
 
-proc newSpiError*(msg: string, error: esp_err_t): ref SpiError =
-  new(result)
-  result.msg = msg
-  result.code = error
-
 proc newSpiBus*(
         host: SpiHostDevice;
         miso, mosi, sclk: gpio_num_t;
@@ -87,7 +82,7 @@ proc newSpiBus*(
     #//Initialize the SPI bus
   let ret = spi_bus_initialize(result.host, addr(result.buscfg), dma_channel)
   if (ret != ESP_OK):
-    raise newSpiError("Error initializing spi (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("Error initializing spi (" & $esp_err_to_name(ret) & ")", ret)
 
 
 # TODO: setup spi device (create spi_device_interface_config_t )
@@ -174,7 +169,7 @@ proc addDevice*(
   let ret = spi_bus_add_device(bus.host, unsafeAddr(result.devcfg), addr(result.handle))
 
   if (ret != ESP_OK):
-    raise newSpiError("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("Error adding spi device (" & $esp_err_to_name(ret) & ")", ret)
 
 # TODO: setup cmd/addr custom sizes
 var spi_id: uint32 = 0'u32
@@ -284,22 +279,22 @@ proc getSmallData*(trn: SpiTrans): array[4, uint8] =
 proc pollingStart*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_start(trn.dev.handle, addr(trn.trn), ticks_to_wait)
   if (ret != ESP_OK):
-    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc pollingEnd*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret = spi_device_polling_end(dev.handle, ticks_to_wait)
   if (ret != ESP_OK):
-    raise newSpiError("end polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("end polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc poll*(trn: SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_polling_transmit(trn.dev.handle, addr(trn.trn))
   if (ret != ESP_OK):
-    raise newSpiError("spi polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("spi polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc acquireBus*(trn: SpiDev, wait: TickType_t = portMAX_DELAY) {.inline.} = 
   let ret: esp_err_t = spi_device_acquire_bus(trn.handle, wait)
   if (ret != ESP_OK):
-    raise newSpiError("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("spi aquire bus (" & $esp_err_to_name(ret) & ")", ret)
 
 proc releaseBus*(dev: SpiDev) {.inline.} = 
   spi_device_release_bus(dev.handle)
@@ -319,7 +314,7 @@ proc queue*(trn: var SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) =
     spi_device_queue_trans(trn.dev.handle, addr(trn.trn), ticks_to_wait)
 
   if (ret != ESP_OK):
-    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
   ## TODO: IMPORTANT test this...
   logi(TAG, "queue: %s", repr(trn.addr()))
@@ -338,7 +333,7 @@ proc retrieve*(dev: SpiDev, ticks_to_wait: TickType_t = portMAX_DELAY): SpiTrans
   GC_unref( result )
 
   if (ret != ESP_OK):
-    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
 proc transmit*(trn: SpiTrans) {.inline.} = 
   # result = new(SpiTrans)
@@ -346,6 +341,6 @@ proc transmit*(trn: SpiTrans) {.inline.} =
     spi_device_transmit(trn.dev.handle, addr(trn.trn))
 
   if (ret != ESP_OK):
-    raise newSpiError("start polling (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[SpiError]("start polling (" & $esp_err_to_name(ret) & ")", ret)
 
 
