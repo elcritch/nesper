@@ -124,7 +124,7 @@ type
 
 proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
                         slv_rx_buf_len: csize_t; slv_tx_buf_len: csize_t;
-                        intr_alloc_flags: ESP_INTR_FLAGS): esp_err_t {.
+                        intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "i2c_driver_install", header: "driver/i2c.h".}
 ## *
 ##  @brief I2C driver delete
