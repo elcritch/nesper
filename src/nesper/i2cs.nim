@@ -1,4 +1,3 @@
-import sequtils
 
 import consts
 import general
@@ -39,18 +38,19 @@ type
 
   # i2c_obj_t = distinct pointer
 
+var i2c_err: esp_err_t # may be racey? We'll ignore it for now... 
 
 proc master_port_finalizer(cmd: I2CMasterPort) =
-  TAG.logi("i2c port finalize")
-  let ret = i2c_driver_delete(cmd.port)
-  if ret != ESP_OK:
-    raise newEspError[I2CError]("Error destroying i2c port (" & $esp_err_to_name(ret) & ")", ret)
+  # TAG.logi("i2c port finalize")
+  i2c_err = i2c_driver_delete(cmd.port)
+  if i2c_err != ESP_OK:
+    raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
 
 proc slave_port_finalizer(cmd: I2CSlavePort) =
-  TAG.logi("i2c port finalize")
-  let ret = i2c_driver_delete(cmd.port)
-  if ret != ESP_OK:
-    raise newEspError[I2CError]("Error destroying i2c port (" & $esp_err_to_name(ret) & ")", ret)
+  # TAG.logi("i2c port finalize")
+  i2c_err = i2c_driver_delete(cmd.port)
+  if i2c_err != ESP_OK:
+    raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
 
 proc cmd_finalizer(cmd: I2CCmd) =
   # I2C_CHECK(i2c_num < I2C_NUM_MAX, I2C_NUM_ERROR_STR, ESP_ERR_INVALID_ARG);
