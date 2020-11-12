@@ -22,16 +22,40 @@ type
   I2CError* = object of OSError
     code*: esp_err_t
 
-  I2CPort* = object
+  I2CMasterPort* = ref object
+    port*: i2c_port_t
+  I2CSlavePort* = ref object
     port*: i2c_port_t
 
-  I2CCmd* = object
+  I2CPort* = I2CMasterPort | I2CSlavePort
+
+  I2CCmd* = ref object
     handle*: i2c_cmd_handle_t
 
   # i2c_obj_t = distinct pointer
 
+proc master_port_finalizer(cmd: I2CMasterPort) =
+  TAG.logi("i2c port finalize")
+  let ret = i2c_driver_delete(cmd.port)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("Error destroying i2c port (" & $esp_err_to_name(ret) & ")", ret)
+
+proc slave_port_finalizer(cmd: I2CSlavePort) =
+  TAG.logi("i2c port finalize")
+  let ret = i2c_driver_delete(cmd.port)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("Error destroying i2c port (" & $esp_err_to_name(ret) & ")", ret)
+
+proc cmd_finalizer(cmd: I2CCmd) =
+  # I2C_CHECK(i2c_num < I2C_NUM_MAX, I2C_NUM_ERROR_STR, ESP_ERR_INVALID_ARG);
+  # I2C_CHECK(p_i2c_obj[i2c_num] != NULL, I2C_DRIVER_ERR_STR, ESP_FAIL);
+  TAG.logi("i2c cmd finalize")
+  if cmd.handle.pointer != nil:
+    i2c_cmd_link_delete(cmd.handle)
+
 # var p_i2c_obj {.importc: "p_i2c_obj".}: UncheckedArray[i2c_obj_t]
-proc newI2CDriver(
+proc initI2CDriver[T](
+    res: var T,
     port: i2c_port_t,
     mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
@@ -41,15 +65,15 @@ proc newI2CDriver(
     slv_tx_buf_len: csize_t;
     sda_pullup_en: bool, ## !< Internal GPIO pull mode for I2C sda signal
     scl_pullup_en: bool, ## !< Internal GPIO pull mode for I2C scl signal
-    intr_alloc_flags: set[InterruptFlags]): I2CPort =
+    intr_alloc_flags: set[InterruptFlags]) =
 
   var iflags = esp_intr_flags(0)
   for fl in intr_alloc_flags:
     iflags = iflags or fl.esp_intr_flags
 
-  let iret = i2c_driver_install(port, I2C_MODE_MASTER, slv_rx_buf_len, slv_tx_buf_len, iflags)
+  let iret = i2c_driver_install(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags)
   if iret != ESP_OK:
-    raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(iret) & ")", iret)
 
   var conf: i2c_config_t
   conf.mode = I2C_MODE_MASTER
@@ -58,6 +82,7 @@ proc newI2CDriver(
   conf.scl_io_num = scl_io_num
   conf.scl_pullup_en = scl_pullup_en
   conf.master.clk_speed = clk_speed.uint32
+
   let ret = i2c_param_config(port, addr(conf))
   if ret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
@@ -71,9 +96,14 @@ proc newI2CMaster*(
     clk_speed: Hertz;
     sda_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C sda signal
     scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
-    intr_alloc_flags: set[InterruptFlags]): I2CPort =
+    intr_alloc_flags: set[InterruptFlags]): I2CMasterPort =
 
-  return newI2CDriver( port, mode, sda_io_num, scl_io_num, clk_speed, slv_rx_buf_len = 0, slv_tx_buf_len = 0, sda_pullup_en, scl_pullup_en, intr_alloc_flags)
+  new(result, master_port_finalizer)
+  initI2CDriver(result, port, I2C_MODE_MASTER,
+                sda_io_num, scl_io_num, clk_speed,
+                slv_rx_buf_len = 0, slv_tx_buf_len = 0,
+                sda_pullup_en, scl_pullup_en,
+                intr_alloc_flags)
 
 proc newI2CSlave*(
     port: i2c_port_t,
@@ -85,49 +115,22 @@ proc newI2CSlave*(
     slv_tx_buf_len: csize_t,
     sda_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C sda signal
     scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
-    intr_alloc_flags: set[InterruptFlags]): I2CPort =
+    intr_alloc_flags: set[InterruptFlags]): I2CSlavePort =
 
-  return newI2CDriver(port, mode, sda_io_num, scl_io_num, clk_speed, slv_rx_buf_len = slv_rx_buf_len , slv_tx_buf_len = slv_tx_buf_len, sda_pullup_en, scl_pullup_en, intr_alloc_flags)
+  new(result, slave_port_finalizer)
+  initI2CDriver(result, port, I2C_MODE_SLAVE,
+                sda_io_num, scl_io_num, clk_speed,
+                slv_rx_buf_len = slv_rx_buf_len , slv_tx_buf_len = slv_tx_buf_len,
+                sda_pullup_en, scl_pullup_en,
+                intr_alloc_flags)
 
-
-proc newI2CCmd*(): I2CCmd =
+proc newI2CCmd*(port: I2CPort): I2CCmd =
   # Creates a new I2C Command object
+  new(result, cmd_finalizer)
   result.handle = i2c_cmd_link_create()
 
-proc `=destroy`(cmd: var I2CCmd) =
-  # I2C_CHECK(i2c_num < I2C_NUM_MAX, I2C_NUM_ERROR_STR, ESP_ERR_INVALID_ARG);
-  # I2C_CHECK(p_i2c_obj[i2c_num] != NULL, I2C_DRIVER_ERR_STR, ESP_FAIL);
-  if cmd.handle.pointer != nil:
-    i2c_cmd_link_delete(cmd.handle)
+  # i2c_master_start(cmd)
+  # i2c_master_write_byte(cmd, (address shl 1) or WRITE_BIT, ACK_CHECK_EN)
+  # i2c_master_stop(cmd)
 
-proc initialize() =
-  i2c_driver_install(i2c_port, I2C_MODE_MASTER, I2C_MASTER_RX_BUF_DISABLE,
-                     I2C_MASTER_TX_BUF_DISABLE, 0)
-  i2c_master_driver_initialize()
 
-  """
-    static i2c_port_t i2c_port = I2C_NUM_0;
-    i2c_driver_install(i2c_port, I2C_MODE_MASTER, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
-    i2c_master_driver_initialize();
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, chip_addr << 1 | WRITE_BIT, ACK_CHECK_EN);
-    if (i2cset_args.register_address->count) {
-        i2c_master_write_byte(cmd, data_addr, ACK_CHECK_EN);
-    }
-    for (int i = 0; i < len; i++) {
-        i2c_master_write_byte(cmd, i2cset_args.data->ival[i], ACK_CHECK_EN);
-    }
-    i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(i2c_port, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-    if (ret == ESP_OK) {
-        ESP_LOGI(TAG, "Write OK");
-    } else if (ret == ESP_ERR_TIMEOUT) {
-        ESP_LOGW(TAG, "Bus is busy");
-    } else {
-        ESP_LOGW(TAG, "Write Failed");
-    }
-    i2c_driver_delete(i2c_port);
-    return 0;
-  """
