@@ -34,6 +34,7 @@ type
 
   # i2c_obj_t = distinct pointer
 
+
 proc master_port_finalizer(cmd: I2CMasterPort) =
   TAG.logi("i2c port finalize")
   let ret = i2c_driver_delete(cmd.port)
@@ -54,8 +55,8 @@ proc cmd_finalizer(cmd: I2CCmd) =
     i2c_cmd_link_delete(cmd.handle)
 
 # var p_i2c_obj {.importc: "p_i2c_obj".}: UncheckedArray[i2c_obj_t]
-proc initI2CDriver[T](
-    res: var T,
+proc initI2CDriver(
+    res: var I2CPort,
     port: i2c_port_t,
     mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
@@ -133,4 +134,28 @@ proc newI2CCmd*(port: I2CPort): I2CCmd =
   # i2c_master_write_byte(cmd, (address shl 1) or WRITE_BIT, ACK_CHECK_EN)
   # i2c_master_stop(cmd)
 
+
+proc i2cStart*(cmd: I2CCmd) =
+  let ret = i2c_master_start(cmd.handle)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("start cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc i2cStop*(cmd: I2CCmd) =
+  let ret = i2c_master_start(cmd.handle)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc writeByte*(cmd: I2CCmd; data: uint8; ack_en: bool = false) = 
+  let ret = i2c_master_write_byte(cmd.handle, data, ack_en)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc write*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) = 
+  let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack_en)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+
+converter toCmdHandle*(cmd: I2CCmd): i2c_cmd_handle_t = cmd.handle
+converter toPort*(port: I2CPort): i2c_port_t = port.port
 
