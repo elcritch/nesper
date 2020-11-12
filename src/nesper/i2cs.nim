@@ -155,6 +155,16 @@ proc write*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
+proc writeBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickType_t): cint =
+  let ret = i2c_slave_write_buffer(port.port, addr(data[0]), data.len().cint, ticks_to_wait)
+  if ret == ESP_FAIL:
+    raise newEspError[I2CError]("slave write error (" & $esp_err_to_name(ret) & ")", ret)
+  return ret
+
+
+proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csize_t;
+                           ticks_to_wait: TickType_t): cint {.
+    importc: "i2c_slave_read_buffer", header: "i2c.h".}
 
 converter toCmdHandle*(cmd: I2CCmd): i2c_cmd_handle_t = cmd.handle
 converter toPort*(port: I2CPort): i2c_port_t = port.port
