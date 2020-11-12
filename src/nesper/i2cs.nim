@@ -44,7 +44,7 @@ proc newI2CMaster*(
                             mode: i2c_mode_t;
                             slv_rx_buf_len: csize_t;
                             slv_tx_buf_len: csize_t;
-                            intr_alloc_flags: cint
+                            intr_alloc_flags: esp_intr_flags
                             ): esp_err_t {. .}
 
   let iret = i2c_driver_install(port,
