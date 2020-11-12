@@ -51,7 +51,7 @@ The library is currently a collection of random ESP-IDF libraries that I import 
 
 Caveat: these features are tested as they're used for my use case. However, both Nim and the esp-idf seem designed well enough that they mostly "just work". PR's are welcome! 
 
-Supported ESP-IDF libraries: 
+Supported ESP-IDF drivers with Nim'ified interfaces: 
 
 - [x] Nim stdandard library support for most basic POSIX network api's!
 - [x] Most of the basic `FreeRTOS.h` header 
