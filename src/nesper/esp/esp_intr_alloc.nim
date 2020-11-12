@@ -41,6 +41,23 @@ const
   ESP_INTR_FLAG_LEVELMASK* = (ESP_INTR_FLAG_LEVEL1 or ESP_INTR_FLAG_LEVEL2 or ESP_INTR_FLAG_LEVEL3 or ESP_INTR_FLAG_LEVEL4 or ESP_INTR_FLAG_LEVEL5 or ESP_INTR_FLAG_LEVEL6 or ESP_INTR_FLAG_NMI) ## /< Mask for all level flags
                                               ## *@}
 
+type
+  InterruptFlags* = enum
+    intr_flag_level1 = ESP_INTR_FLAG_LEVEL1,
+    intr_flag_level2 = ESP_INTR_FLAG_LEVEL2,
+    intr_flag_level3 = ESP_INTR_FLAG_LEVEL3,
+    intr_flag_lowmed = ESP_INTR_FLAG_LOWMED,
+    intr_flag_level4 = ESP_INTR_FLAG_LEVEL4,
+    intr_flag_level5 = ESP_INTR_FLAG_LEVEL5,
+    intr_flag_level6 = ESP_INTR_FLAG_LEVEL6,
+    intr_flag_nmi = ESP_INTR_FLAG_NMI,
+    intr_flag_high = ESP_INTR_FLAG_HIGH,
+    intr_flag_levelmask = ESP_INTR_FLAG_LEVELMASK
+    intr_flag_shared = ESP_INTR_FLAG_SHARED,
+    intr_flag_edge = ESP_INTR_FLAG_EDGE,
+    intr_flag_iram = ESP_INTR_FLAG_IRAM,
+    intr_flag_intrdisabled = ESP_INTR_FLAG_INTRDISABLED,
+
 ## * @addtogroup Intr_Alloc_Pseudo_Src
 ##  @{
 ##
@@ -93,6 +110,8 @@ type
 
 proc esp_intr_mark_shared*(intno: cint; cpu: cint; is_in_iram: bool): esp_err_t {.
     importc: "esp_intr_mark_shared", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Reserve an interrupt to be used outside of this framework
 ##
@@ -108,6 +127,8 @@ proc esp_intr_mark_shared*(intno: cint; cpu: cint; is_in_iram: bool): esp_err_t 
 
 proc esp_intr_reserve*(intno: cint; cpu: cint): esp_err_t {.
     importc: "esp_intr_reserve", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Allocate an interrupt with the given parameters.
 ##
@@ -145,6 +166,8 @@ proc esp_intr_reserve*(intno: cint; cpu: cint): esp_err_t {.
 proc esp_intr_alloc*(source: cint; flags: cint; handler: intr_handler_t; arg: pointer;
                     ret_handle: ptr intr_handle_t): esp_err_t {.
     importc: "esp_intr_alloc", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Allocate an interrupt with the given parameters.
 ##
@@ -181,10 +204,11 @@ proc esp_intr_alloc*(source: cint; flags: cint; handler: intr_handler_t; arg: po
 ##          ESP_OK otherwise
 ##
 
-proc esp_intr_alloc_intrstatus*(source: cint; flags: cint; intrstatusreg: uint32_t;
-                               intrstatusmask: uint32_t; handler: intr_handler_t;
+proc esp_intr_alloc_intrstatus*(source: cint; flags: cint; intrstatusreg: uint32;
+                               intrstatusmask: uint32; handler: intr_handler_t;
                                arg: pointer; ret_handle: ptr intr_handle_t): esp_err_t {.
     importc: "esp_intr_alloc_intrstatus", header: "esp_intr_alloc.h".}
+
 ## *
 ##  @brief Disable and free an interrupt.
 ##
@@ -206,6 +230,8 @@ proc esp_intr_alloc_intrstatus*(source: cint; flags: cint; intrstatusreg: uint32
 
 proc esp_intr_free*(handle: intr_handle_t): esp_err_t {.importc: "esp_intr_free",
     header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Get CPU number an interrupt is tied to
 ##
@@ -216,6 +242,8 @@ proc esp_intr_free*(handle: intr_handle_t): esp_err_t {.importc: "esp_intr_free"
 
 proc esp_intr_get_cpu*(handle: intr_handle_t): cint {.importc: "esp_intr_get_cpu",
     header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Get the allocated interrupt for a certain handle
 ##
@@ -226,6 +254,8 @@ proc esp_intr_get_cpu*(handle: intr_handle_t): cint {.importc: "esp_intr_get_cpu
 
 proc esp_intr_get_intno*(handle: intr_handle_t): cint {.
     importc: "esp_intr_get_intno", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Disable the interrupt associated with the handle
 ##
@@ -245,6 +275,8 @@ proc esp_intr_get_intno*(handle: intr_handle_t): cint {.
 
 proc esp_intr_disable*(handle: intr_handle_t): esp_err_t {.
     importc: "esp_intr_disable", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Enable the interrupt associated with the handle
 ##
@@ -259,6 +291,8 @@ proc esp_intr_disable*(handle: intr_handle_t): esp_err_t {.
 
 proc esp_intr_enable*(handle: intr_handle_t): esp_err_t {.
     importc: "esp_intr_enable", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Set the "in IRAM" status of the handler.
 ##
@@ -274,16 +308,22 @@ proc esp_intr_enable*(handle: intr_handle_t): esp_err_t {.
 
 proc esp_intr_set_in_iram*(handle: intr_handle_t; is_in_iram: bool): esp_err_t {.
     importc: "esp_intr_set_in_iram", header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Disable interrupts that aren't specifically marked as running from IRAM
 ##
 
 proc esp_intr_noniram_disable*() {.importc: "esp_intr_noniram_disable",
                                  header: "esp_intr_alloc.h".}
+
+
 ## *
 ##  @brief Re-enable interrupts disabled by esp_intr_noniram_disable
 ##
 
 proc esp_intr_noniram_enable*() {.importc: "esp_intr_noniram_enable",
                                 header: "esp_intr_alloc.h".}
+
+
 ## *@}
