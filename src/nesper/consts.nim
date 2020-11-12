@@ -3,6 +3,8 @@ include soc
 type
   esp_err_t* = int32
   # maybe try distinct type later
+  esp_intr_flags* = distinct uint32
+
 
 ##  Definitions for error constants.
 
@@ -36,6 +38,7 @@ template ESP_INTR_DISABLE*(inum: untyped): untyped =
 type 
   Millis* = distinct uint64
   Micros* = distinct uint64
+  Hertz* = distinct uint32
 
 
 proc `+` *(a, b: Millis): Millis {.borrow.}
@@ -54,6 +57,8 @@ proc `==` *(a, b: Micros): bool {.borrow.}
 
 proc `$` *(v: Millis): string {.borrow.}
 proc `$` *(v: Micros): string {.borrow.}
+
+proc `or`* (x, y: esp_intr_flags): esp_intr_flags {.borrow.}
 
 type
   TickType_t* = uint32
