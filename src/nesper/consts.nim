@@ -62,6 +62,8 @@ proc `or`* (x, y: esp_intr_flags): esp_intr_flags {.borrow.}
 
 type
   TickType_t* = uint32
+  Ticks* = TickType_t
+
   #StaticSemaphore_t* = StaticQueue_t
   portCHAR* = int8
   portFLOAT* = cfloat

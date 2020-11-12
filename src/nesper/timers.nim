@@ -42,8 +42,8 @@ proc micros*(): Micros =
 proc millis*(): Millis =
   return Millis(micros().uint64 div 1000U)
 
-converter toTicks*(ts: Millis): TickType_t =
-  return TickType_t(uint32(ts) div portTICK_PERIOD_MS)
+# converter toTicks*(ts: Millis): TickType_t =
+  # return TickType_t(uint32(ts) div portTICK_PERIOD_MS)
 
 proc toMillis*(ts: Micros): Millis =
   return Millis(ts.uint64 div 1_000U)

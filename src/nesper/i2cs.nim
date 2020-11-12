@@ -1,3 +1,4 @@
+import sequtils
 
 import consts
 import general
@@ -11,7 +12,11 @@ export consts.bits, consts.bytes, consts.TickType_t
 export general.toBits
 export gpio.gpio_num_t
 
-const TAG = "i2cs"
+const
+  TAG = "i2cs"
+  ACK* = I2C_MASTER_ACK  ## !< I2C ack for each byte read
+  NACK* = I2C_MASTER_NACK ## !< I2C nack for each byte read
+  LAST_NACK* = I2C_MASTER_LAST_NACK ## !< I2C nack for the last byte
 
 type
 
@@ -148,7 +153,7 @@ proc stop*(cmd: I2CCmd) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc write*(cmd: I2CCmd; data: byte; ack: bool = true) = 
+proc writeByte*(cmd: I2CCmd; data: byte; ack: bool = true) = 
   let ret = i2c_master_write_byte(cmd.handle, data, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
@@ -158,10 +163,12 @@ proc write*(cmd: I2CCmd; data: var seq[byte]; ack: bool = true) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc write*(cmd: I2CCmd; data: varargs[byte]; ack: bool = true) = 
-  write(cmd, data, ack) 
+proc write*(cmd: I2CCmd; data: openArray[byte]; ack: bool = true) = 
+  let ret = i2c_master_write(cmd.handle, unsafeAddr(data[0]), data.len().csize_t, ack)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc read*(cmd: I2CCmd; ack: i2c_ack_type_t): byte = 
+proc readByte*(cmd: I2CCmd; ack: i2c_ack_type_t): byte = 
   let ret = i2c_master_read_byte(cmd.handle, addr(result), ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
@@ -179,6 +186,9 @@ proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
   if ret != ESP_OK:
     raise newEspError[I2CError]("cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc cmdBegin*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
+  submit(port, cmd, ticks_to_wait)
 
 template doI2cCommand*(port: I2CMasterPort, blk: untyped) =
   block:

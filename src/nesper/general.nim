@@ -15,6 +15,8 @@ proc NimMain() {.importc.}
 converter toBits*(x: bytes): bits =
   bits(8*x.int())
 
+converter toTicks*(ts: Millis): TickType_t =
+  return TickType_t(uint32(ts) div portTICK_PERIOD_MS)
 
 template app_main*(blk: untyped): untyped =
 

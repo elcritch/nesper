@@ -18,22 +18,19 @@ var
   cmd1 = port1.newCmd()
 
 cmd1.start()
-cmd1.write(0x22)
-cmd1.write(@[0x12'u8, 0x13, 0x14])
+cmd1.writeByte(0x22)
+cmd1.write([0x12'u8, 0x13, 0x14])
 cmd1.start()
-cmd1.write(0x23)
-cmd1.read()
+cmd1.writeByte(0x23)
 
+var
+  b1 = cmd1.readByte(ACK)
+  b2 = cmd1.readByte(NACK)
+  b3 = cmd1.readByte(LAST_NACK)
+  b4 = cmd1.read(3, LAST_NACK)
 
-    i2c_master_start(cmd)
-    i2c_master_write_byte(cmd, chip_addr shl 1 or WRITE_BIT, ACK_CHECK_EN)
-    i2c_master_write_byte(cmd, data_addr, ACK_CHECK_EN)
-    i2c_master_start(cmd)
-    i2c_master_write_byte(cmd, chip_addr shl 1 or READ_BIT, ACK_CHECK_EN)
-    if size > 1:
-      i2c_master_read(cmd, data, size - 1, ACK_VAL)
-    i2c_master_read_byte(cmd, data + size - 1, NACK_VAL)
-    i2c_master_stop(cmd)
-    var ret: esp_err_t = i2c_master_cmd_begin(i2c_port, cmd, 50 div
-        portTICK_RATE_MS)
-    i2c_cmd_link_delete(cmd)
+cmd1.stop()
+port1.submit(cmd1, 10.Millis)
+
+echo("bytes: ", b1, b2, b3, b4)
+
