@@ -135,6 +135,10 @@ proc newI2CCmd*(port: I2CPort): I2CCmd =
   # i2c_master_stop(cmd)
 
 
+## 
+## I2C Master ##
+## 
+
 proc i2cStart*(cmd: I2CCmd) =
   let ret = i2c_master_start(cmd.handle)
   if ret != ESP_OK:
@@ -154,6 +158,11 @@ proc writeBytes*(cmd: I2CCmd; data: var seq[byte]; ack_en: bool = false) =
   let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack_en)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+
+## 
+## I2C Slave ##
+## 
 
 proc writeBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickType_t): cint =
   let ret = i2c_slave_write_buffer(port.port, addr(data[0]), data.len().cint, ticks_to_wait)
