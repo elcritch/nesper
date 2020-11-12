@@ -126,6 +126,8 @@ proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
                         slv_rx_buf_len: csize_t; slv_tx_buf_len: csize_t;
                         intr_alloc_flags: esp_intr_flags): esp_err_t {.
     importc: "i2c_driver_install", header: "driver/i2c.h".}
+
+
 ## *
 ##  @brief I2C driver delete
 ##
@@ -138,6 +140,8 @@ proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
 
 proc i2c_driver_delete*(i2c_num: i2c_port_t): esp_err_t {.
     importc: "i2c_driver_delete", header: "driver/i2c.h".}
+
+
 ## *
 ##  @brief I2C parameter initialization
 ##
@@ -151,6 +155,8 @@ proc i2c_driver_delete*(i2c_num: i2c_port_t): esp_err_t {.
 
 proc i2c_param_config*(i2c_num: i2c_port_t; i2c_conf: ptr i2c_config_t): esp_err_t {.
     importc: "i2c_param_config", header: "i2c.h".}
+
+
 ## *
 ##  @brief reset I2C tx hardware fifo
 ##
@@ -163,6 +169,8 @@ proc i2c_param_config*(i2c_num: i2c_port_t; i2c_conf: ptr i2c_config_t): esp_err
 
 proc i2c_reset_tx_fifo*(i2c_num: i2c_port_t): esp_err_t {.
     importc: "i2c_reset_tx_fifo", header: "i2c.h".}
+
+
 ## *
 ##  @brief reset I2C rx fifo
 ##
@@ -175,6 +183,8 @@ proc i2c_reset_tx_fifo*(i2c_num: i2c_port_t): esp_err_t {.
 
 proc i2c_reset_rx_fifo*(i2c_num: i2c_port_t): esp_err_t {.
     importc: "i2c_reset_rx_fifo", header: "i2c.h".}
+
+
 ## *
 ##  @brief I2C isr handler register
 ##
@@ -193,6 +203,8 @@ proc i2c_reset_rx_fifo*(i2c_num: i2c_port_t): esp_err_t {.
 proc i2c_isr_register*(i2c_num: i2c_port_t; fn: proc (a1: pointer) {.cdecl.}; arg: pointer;
                       intr_alloc_flags: esp_intr_flags; handle: ptr intr_handle_t): esp_err_t {.
     importc: "i2c_isr_register", header: "i2c.h".}
+
+
 ## *
 ##  @brief to delete and free I2C isr.
 ##
@@ -205,6 +217,8 @@ proc i2c_isr_register*(i2c_num: i2c_port_t; fn: proc (a1: pointer) {.cdecl.}; ar
 
 proc i2c_isr_free*(handle: intr_handle_t): esp_err_t {.importc: "i2c_isr_free",
     header: "i2c.h".}
+
+
 ## *
 ##  @brief Configure GPIO signal for I2C sck and sda
 ##
@@ -223,6 +237,8 @@ proc i2c_isr_free*(handle: intr_handle_t): esp_err_t {.importc: "i2c_isr_free",
 proc i2c_set_pin*(i2c_num: i2c_port_t; sda_io_num: cint; scl_io_num: cint;
                  sda_pullup_en: bool; scl_pullup_en: bool; mode: i2c_mode_t): esp_err_t {.
     importc: "i2c_set_pin", header: "i2c.h".}
+
+
 ## *
 ##  @brief Create and init I2C command link
 ##         @note
@@ -236,6 +252,8 @@ proc i2c_set_pin*(i2c_num: i2c_port_t; sda_io_num: cint; scl_io_num: cint;
 
 proc i2c_cmd_link_create*(): i2c_cmd_handle_t {.importc: "i2c_cmd_link_create",
     header: "i2c.h".}
+
+
 ## *
 ##  @brief Free I2C command link
 ##         @note
@@ -249,6 +267,8 @@ proc i2c_cmd_link_create*(): i2c_cmd_handle_t {.importc: "i2c_cmd_link_create",
 
 proc i2c_cmd_link_delete*(cmd_handle: i2c_cmd_handle_t) {.
     importc: "i2c_cmd_link_delete", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to generate a start signal
 ##         @note
@@ -264,6 +284,8 @@ proc i2c_cmd_link_delete*(cmd_handle: i2c_cmd_handle_t) {.
 
 proc i2c_master_start*(cmd_handle: i2c_cmd_handle_t): esp_err_t {.
     importc: "i2c_master_start", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to write one byte to I2C bus
 ##         @note
@@ -281,6 +303,8 @@ proc i2c_master_start*(cmd_handle: i2c_cmd_handle_t): esp_err_t {.
 
 proc i2c_master_write_byte*(cmd_handle: i2c_cmd_handle_t; data: uint8; ack_en: bool): esp_err_t {.
     importc: "i2c_master_write_byte", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to write buffer to I2C bus
 ##         @note
@@ -302,6 +326,8 @@ proc i2c_master_write_byte*(cmd_handle: i2c_cmd_handle_t; data: uint8; ack_en: b
 proc i2c_master_write*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
                       data_len: csize_t; ack_en: bool): esp_err_t {.
     importc: "i2c_master_write", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to read one byte from I2C bus
 ##         @note
@@ -322,6 +348,8 @@ proc i2c_master_write*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
 proc i2c_master_read_byte*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
                           ack: i2c_ack_type_t): esp_err_t {.
     importc: "i2c_master_read_byte", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to read data from I2C bus
 ##         @note
@@ -343,6 +371,8 @@ proc i2c_master_read_byte*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
 proc i2c_master_read*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
                      data_len: csize_t; ack: i2c_ack_type_t): esp_err_t {.
     importc: "i2c_master_read", header: "i2c.h".}
+
+
 ## *
 ##  @brief Queue command for I2C master to generate a stop signal
 ##         @note
@@ -358,6 +388,8 @@ proc i2c_master_read*(cmd_handle: i2c_cmd_handle_t; data: ptr uint8;
 
 proc i2c_master_stop*(cmd_handle: i2c_cmd_handle_t): esp_err_t {.
     importc: "i2c_master_stop", header: "i2c.h".}
+
+
 ## *
 ##  @brief I2C master send queued commands.
 ##         This function will trigger sending all queued commands.
@@ -382,6 +414,8 @@ proc i2c_master_stop*(cmd_handle: i2c_cmd_handle_t): esp_err_t {.
 proc i2c_master_cmd_begin*(i2c_num: i2c_port_t; cmd_handle: i2c_cmd_handle_t;
                           ticks_to_wait: TickType_t): esp_err_t {.
     importc: "i2c_master_cmd_begin", header: "i2c.h".}
+
+
 ## *
 ##  @brief I2C slave write data to internal ringbuffer, when tx fifo empty, isr will fill the hardware
 ##         fifo from the internal ringbuffer
@@ -401,6 +435,8 @@ proc i2c_master_cmd_begin*(i2c_num: i2c_port_t; cmd_handle: i2c_cmd_handle_t;
 proc i2c_slave_write_buffer*(i2c_num: i2c_port_t; data: ptr uint8; size: cint;
                             ticks_to_wait: TickType_t): cint {.
     importc: "i2c_slave_write_buffer", header: "i2c.h".}
+
+
 ## *
 ##  @brief I2C slave read data from internal buffer. When I2C slave receive data, isr will copy received data
 ##         from hardware rx fifo to internal ringbuffer. Then users can read from internal ringbuffer.
@@ -420,6 +456,8 @@ proc i2c_slave_write_buffer*(i2c_num: i2c_port_t; data: ptr uint8; size: cint;
 proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csize_t;
                            ticks_to_wait: TickType_t): cint {.
     importc: "i2c_slave_read_buffer", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C master clock period
 ##
@@ -434,6 +472,8 @@ proc i2c_slave_read_buffer*(i2c_num: i2c_port_t; data: ptr uint8; max_size: csiz
 
 proc i2c_set_period*(i2c_num: i2c_port_t; high_period: cint; low_period: cint): esp_err_t {.
     importc: "i2c_set_period", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C master clock period
 ##
@@ -448,6 +488,8 @@ proc i2c_set_period*(i2c_num: i2c_port_t; high_period: cint; low_period: cint): 
 
 proc i2c_get_period*(i2c_num: i2c_port_t; high_period: ptr cint; low_period: ptr cint): esp_err_t {.
     importc: "i2c_get_period", header: "i2c.h".}
+
+
 ## *
 ##  @brief enable hardware filter on I2C bus
 ##         Sometimes the I2C bus is disturbed by high frequency noise(about 20ns), or the rising edge of
@@ -467,6 +509,8 @@ proc i2c_get_period*(i2c_num: i2c_port_t; high_period: ptr cint; low_period: ptr
 
 proc i2c_filter_enable*(i2c_num: i2c_port_t; cyc_num: uint8): esp_err_t {.
     importc: "i2c_filter_enable", header: "i2c.h".}
+
+
 ## *
 ##  @brief disable filter on I2C bus
 ##
@@ -479,6 +523,8 @@ proc i2c_filter_enable*(i2c_num: i2c_port_t; cyc_num: uint8): esp_err_t {.
 
 proc i2c_filter_disable*(i2c_num: i2c_port_t): esp_err_t {.
     importc: "i2c_filter_disable", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C master start signal timing
 ##
@@ -493,6 +539,8 @@ proc i2c_filter_disable*(i2c_num: i2c_port_t): esp_err_t {.
 
 proc i2c_set_start_timing*(i2c_num: i2c_port_t; setup_time: cint; hold_time: cint): esp_err_t {.
     importc: "i2c_set_start_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C master start signal timing
 ##
@@ -508,6 +556,8 @@ proc i2c_set_start_timing*(i2c_num: i2c_port_t; setup_time: cint; hold_time: cin
 proc i2c_get_start_timing*(i2c_num: i2c_port_t; setup_time: ptr cint;
                           hold_time: ptr cint): esp_err_t {.
     importc: "i2c_get_start_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C master stop signal timing
 ##
@@ -522,6 +572,8 @@ proc i2c_get_start_timing*(i2c_num: i2c_port_t; setup_time: ptr cint;
 
 proc i2c_set_stop_timing*(i2c_num: i2c_port_t; setup_time: cint; hold_time: cint): esp_err_t {.
     importc: "i2c_set_stop_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C master stop signal timing
 ##
@@ -537,6 +589,8 @@ proc i2c_set_stop_timing*(i2c_num: i2c_port_t; setup_time: cint; hold_time: cint
 proc i2c_get_stop_timing*(i2c_num: i2c_port_t; setup_time: ptr cint;
                          hold_time: ptr cint): esp_err_t {.
     importc: "i2c_get_stop_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C data signal timing
 ##
@@ -551,6 +605,8 @@ proc i2c_get_stop_timing*(i2c_num: i2c_port_t; setup_time: ptr cint;
 
 proc i2c_set_data_timing*(i2c_num: i2c_port_t; sample_time: cint; hold_time: cint): esp_err_t {.
     importc: "i2c_set_data_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C data signal timing
 ##
@@ -566,6 +622,8 @@ proc i2c_set_data_timing*(i2c_num: i2c_port_t; sample_time: cint; hold_time: cin
 proc i2c_get_data_timing*(i2c_num: i2c_port_t; sample_time: ptr cint;
                          hold_time: ptr cint): esp_err_t {.
     importc: "i2c_get_data_timing", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C timeout value
 ##  @param i2c_num I2C port number
@@ -577,6 +635,8 @@ proc i2c_get_data_timing*(i2c_num: i2c_port_t; sample_time: ptr cint;
 
 proc i2c_set_timeout*(i2c_num: i2c_port_t; timeout: cint): esp_err_t {.
     importc: "i2c_set_timeout", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C timeout value
 ##  @param i2c_num I2C port number
@@ -588,6 +648,8 @@ proc i2c_set_timeout*(i2c_num: i2c_port_t; timeout: cint): esp_err_t {.
 
 proc i2c_get_timeout*(i2c_num: i2c_port_t; timeout: ptr cint): esp_err_t {.
     importc: "i2c_get_timeout", header: "i2c.h".}
+
+
 ## *
 ##  @brief set I2C data transfer mode
 ##
@@ -603,6 +665,8 @@ proc i2c_get_timeout*(i2c_num: i2c_port_t; timeout: ptr cint): esp_err_t {.
 proc i2c_set_data_mode*(i2c_num: i2c_port_t; tx_trans_mode: i2c_trans_mode_t;
                        rx_trans_mode: i2c_trans_mode_t): esp_err_t {.
     importc: "i2c_set_data_mode", header: "i2c.h".}
+
+
 ## *
 ##  @brief get I2C data transfer mode
 ##
