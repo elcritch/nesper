@@ -171,11 +171,13 @@ proc write*(cmd: I2CCmd; data: openArray[byte]; ack: bool = true) =
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc readByte*(cmd: I2CCmd; data: var byte, ack: i2c_ack_type_t) = 
+  ## Read byte into given byte address after the port.submit(cmd) is given (e.g. cmd_begin)
   let ret = i2c_master_read_byte(cmd.handle, addr(data), ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc read*(cmd: I2CCmd; data: var seq[byte], ack: i2c_ack_type_t) = 
+  ## Read data into given seq address after the port.submit(cmd) is given (e.g. cmd_begin)
   let ret = i2c_master_read(cmd.handle, addr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
