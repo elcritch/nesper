@@ -63,7 +63,7 @@ proc cmd_finalizer(cmd: I2CCmd) =
 
 # var p_i2c_obj {.importc: "p_i2c_obj".}: UncheckedArray[i2c_obj_t]
 proc initI2CDriver(
-    res: var I2CPort,
+    i2cport: var I2CPort,
     port: i2c_port_t,
     mode: i2c_mode_t, ## !< I2C mode
     sda_io_num: gpio_num_t, ## !< GPIO number for I2C sda signal
@@ -95,6 +95,8 @@ proc initI2CDriver(
   let iret = i2c_driver_install(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags)
   if iret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(iret) & ")", iret)
+
+  i2cport.port = port
 
 
 proc newI2CMaster*(
