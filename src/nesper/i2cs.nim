@@ -158,10 +158,20 @@ proc stop*(cmd: I2CCmd) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc writeByte*(cmd: I2CCmd; data: byte; ack: bool = true) = 
-  let ret = i2c_master_write_byte(cmd.handle, data, ack)
+proc writeTo*(cmd: I2CCmd; data: byte; ack: bool = true) = 
+  let ret = i2c_master_write_byte(cmd.handle, (data shl 1) or 0x01'u8, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc readFrom*(cmd: I2CCmd; data: byte; ack: bool = true) = 
+  let ret = i2c_master_write_byte(cmd.handle, (data shl 1) or 0x00'u8, ack)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
+
+proc write*(cmd: I2CCmd; data: byte; ack: bool = true) = 
+  let ret = i2c_master_write_byte(cmd.handle, data, ack)
+  if ret != ESP_OK:
+    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc write*(cmd: I2CCmd; data: var seq[byte]; ack: bool = true) = 
   let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack)
