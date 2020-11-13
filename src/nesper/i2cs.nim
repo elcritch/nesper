@@ -170,8 +170,8 @@ proc write*(cmd: I2CCmd; data: openArray[byte]; ack: bool = true) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc readByte*(cmd: I2CCmd; ack: i2c_ack_type_t): byte = 
-  let ret = i2c_master_read_byte(cmd.handle, addr(result), ack)
+proc readByte*(cmd: I2CCmd; data: var byte, ack: i2c_ack_type_t) = 
+  let ret = i2c_master_read_byte(cmd.handle, addr(data), ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
@@ -179,10 +179,6 @@ proc read*(cmd: I2CCmd; data: var seq[byte], ack: i2c_ack_type_t) =
   let ret = i2c_master_read(cmd.handle, addr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
-
-proc read*(cmd: I2CCmd; count: int, ack: i2c_ack_type_t): seq[byte] = 
-  result = newSeq[byte](count)
-  read(cmd, result, ack)
 
 proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
