@@ -14,6 +14,11 @@
 import ../../consts
 import ../../esp/gpio
 
+const
+  hdr_i2c_types = "driver/i2c.h"
+  hdr_i2c = "driver/i2c.h"
+
+
 ## *
 ##  @brief I2C port number, can be I2C_NUM_0 ~ (I2C_NUM_MAX-1).
 ##
@@ -65,18 +70,18 @@ type
 ##
 
 type
-  i2c_config_master_t* {.importc: "no_name", header: "i2c_types.h", bycopy.} = object
+  i2c_config_master_t* {.importc: "no_name", header: hdr_i2c_types, bycopy.} = object
     clk_speed* {.importc: "clk_speed".}: uint32 ## !< I2C clock frequency for master mode, (no higher than 1MHz for now)
 
-  i2c_config_slave_t* {.importc: "no_name", header: "i2c_types.h", bycopy.} = object
+  i2c_config_slave_t* {.importc: "no_name", header: hdr_i2c_types, bycopy.} = object
     addr_10bit_en* {.importc: "addr_10bit_en".}: uint8 ## !< I2C 10bit address mode enable for slave mode
     slave_addr* {.importc: "slave_addr".}: uint16 ## !< I2C address for slave mode
 
-#   INNER_C_UNION_i2c_types_84* {.importc: "no_name", header: "i2c_types.h", bycopy, union.} = object
+#   INNER_C_UNION_i2c_types_84* {.importc: "no_name", header: hdr_i2c_types, bycopy, union.} = object
     # master* {.importc: "master".}: INNER_C_STRUCT_i2c_types_85 ## !< I2C master config
     # slave* {.importc: "slave".}: INNER_C_STRUCT_i2c_types_88 ## !< I2C slave config
 
-  i2c_config_t* {.importc: "i2c_config_t", header: "i2c_types.h", bycopy.} = object
+  i2c_config_t* {.importc: "i2c_config_t", header: hdr_i2c_types, bycopy.} = object
     mode* {.importc: "mode".}: i2c_mode_t ## !< I2C mode
     sda_io_num* {.importc: "sda_io_num".}: gpio_num_t ## !< GPIO number for I2C sda signal
     scl_io_num* {.importc: "scl_io_num".}: gpio_num_t ## !< GPIO number for I2C scl signal
@@ -125,7 +130,7 @@ type
 proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
                         slv_rx_buf_len: csize_t; slv_tx_buf_len: csize_t;
                         intr_alloc_flags: esp_intr_flags): esp_err_t {.
-    importc: "i2c_driver_install", header: "driver/i2c.h".}
+    importc: "i2c_driver_install", header: hdr_i2c.}
 
 
 ## *
@@ -139,7 +144,7 @@ proc i2c_driver_install*(i2c_num: i2c_port_t; mode: i2c_mode_t;
 ##
 
 proc i2c_driver_delete*(i2c_num: i2c_port_t): esp_err_t {.
-    importc: "i2c_driver_delete", header: "driver/i2c.h".}
+    importc: "i2c_driver_delete", header: hdr_i2c.}
 
 
 ## *
