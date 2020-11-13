@@ -79,12 +79,8 @@ proc initI2CDriver(
   for fl in intr_alloc_flags:
     iflags = iflags or fl.esp_intr_flags
 
-  let iret = i2c_driver_install(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags)
-  if iret != ESP_OK:
-    raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(iret) & ")", iret)
-
   var conf: i2c_config_t
-  conf.mode = I2C_MODE_MASTER
+  conf.mode = mode
   conf.sda_io_num = sda_io_num
   conf.sda_pullup_en = sda_pullup_en
   conf.scl_io_num = scl_io_num
@@ -94,6 +90,11 @@ proc initI2CDriver(
   let ret = i2c_param_config(port, addr(conf))
   if ret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
+
+  TAG.logi("driver install: %s", $(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags, ) )
+  let iret = i2c_driver_install(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags)
+  if iret != ESP_OK:
+    raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(iret) & ")", iret)
 
 
 proc newI2CMaster*(
