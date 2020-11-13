@@ -199,7 +199,7 @@ proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t, ignore
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
   if ret != ESP_OK:
     if (ret == ESP_ERR_TIMEOUT) and ignoreTimeout:
-      return
+      return ret
     raise newEspError[I2CError]("cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc cmdBegin*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
