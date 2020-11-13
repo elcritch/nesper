@@ -13,6 +13,8 @@ export gpio.gpio_num_t
 
 const
   TAG = "i2cs"
+
+const
   ACK* = I2C_MASTER_ACK  ## !< I2C ack for each byte read
   NACK* = I2C_MASTER_NACK ## !< I2C nack for each byte read
   LAST_NACK* = I2C_MASTER_LAST_NACK ## !< I2C nack for the last byte
