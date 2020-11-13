@@ -195,7 +195,7 @@ proc read*(cmd: I2CCmd; data: var seq[byte], ack: i2c_ack_type_t) =
   if ret != ESP_OK:
     raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
-proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t, ignoreTimeout = false) =
+proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t, ignoreTimeout = false): esp_err_t {.discardable.} =
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
   if ret != ESP_OK:
     if (ret == ESP_ERR_TIMEOUT) and ignoreTimeout:
