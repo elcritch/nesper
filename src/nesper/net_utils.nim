@@ -69,11 +69,12 @@ proc toIpAddress*(ip: ip4_addr_t): IpAddress =
 proc toIpAddress*(ip: ip6_addr_t): IpAddress =
   toIpAddress(ip.address)
 
-proc toIpAddress*(ip: esp_ip4_addr_t): IpAddress =
-  toIpAddress(ip.address)
+when not defined(ESP_IDF_V4_0):
+  proc toIpAddress*(ip: esp_ip4_addr_t): IpAddress =
+    toIpAddress(ip.address)
 
-proc toIpAddress*(ip: esp_ip6_addr_t): IpAddress =
-  toIpAddress(ip.address)
+  proc toIpAddress*(ip: esp_ip6_addr_t): IpAddress =
+    toIpAddress(ip.address)
 
 ## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
 proc generate_hostname*(hostname: string): string =
