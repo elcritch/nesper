@@ -3,6 +3,8 @@
 Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP API support in Nim. 
 
 See [Releases](https://github.com/elcritch/nesper/releases) for updates. 
+
+P.S. it's recommended to use the ESP-IDF.py v4.0 branch
  
 ## Example Code 
 
@@ -39,10 +41,11 @@ proc run_http_server*() {.exportc.} =
 
 
 
-## Status
+## Why
 
 TLDR; Real reason? It's a bit of fun in a sometimes tricky field. 
 
+## Status 
 This is a Work in Progress (tm). I'm using it for a few work projects as I generally dislike programming C/C++ (despite C's elegance in the small). When you just want a hash table in C it's tedious and error prone. C++ is about 5 different languages and I have to idea how to use half of them anymore. Rust doesn't work on half of the boards I want to program. MicroPython? ... Nope - I need speed and efficiency. 
 
 ## Library
@@ -78,6 +81,7 @@ Things I'm not planning on (PR's welcome!)
 
 ## General Usage
 
+1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
 1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. nimble install https://github.com/elcritch/nesper
 3. It's recommend to copy `nesper/esp-idf-examples/simplewifi` example project initially, to get the proper build steps. 
