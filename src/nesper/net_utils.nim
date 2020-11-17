@@ -93,10 +93,9 @@ proc generate_sensor_id*(): string =
   var mac: array[6, uint8]
   check: esp_read_mac(cast[ptr uint8](addr(mac)), ESP_MAC_WIFI_STA)
 
-  var sensor_id = ""
+  var sensor_id = newSeqOfCap[string](6)
   for i in 0..5:
     sensor_id.add(mac[i].toHex(2))
-    sensor_id.add(":")
 
-  return sensor_id
+  return sensor_id.join(":")
 
