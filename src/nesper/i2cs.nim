@@ -42,19 +42,19 @@ type
 
 var i2c_err: esp_err_t # may be racey? We'll ignore it for now... 
 
-proc master_port_finalizer(cmd: I2CMasterPort) =
+proc `=destroy`(cmd: var typeof(I2CMasterPort()[])) =
   # TAG.logi("i2c port finalize")
   i2c_err = i2c_driver_delete(cmd.port)
   if i2c_err != ESP_OK:
     raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
 
-proc slave_port_finalizer(cmd: I2CSlavePort) =
+proc `=destroy`(cmd: var typeof(I2CSlavePort()[])) =
   # TAG.logi("i2c port finalize")
   i2c_err = i2c_driver_delete(cmd.port)
   if i2c_err != ESP_OK:
     raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
 
-proc cmd_finalizer(cmd: I2CCmd) =
+proc `=destroy`(cmd: var typeof(I2CCmd()[])) =
   # I2C_CHECK(i2c_num < I2C_NUM_MAX, I2C_NUM_ERROR_STR, ESP_ERR_INVALID_ARG);
   # I2C_CHECK(p_i2c_obj[i2c_num] != NULL, I2C_DRIVER_ERR_STR, ESP_FAIL);
   # TAG.logi("i2c cmd finalize")
@@ -108,7 +108,7 @@ proc newI2CMaster*(
     scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
     intr_alloc_flags: set[InterruptFlags]): I2CMasterPort =
 
-  new(result, master_port_finalizer)
+  new(result)
   initI2CDriver(result, port, I2C_MODE_MASTER,
                 sda_io_num, scl_io_num, clk_speed,
                 slv_rx_buf_len = 0, slv_tx_buf_len = 0,
@@ -126,7 +126,7 @@ proc newI2CSlave*(
     scl_pullup_en: bool = false, ## !< Internal GPIO pull mode for I2C scl signal
     intr_alloc_flags: set[InterruptFlags]): I2CSlavePort =
 
-  new(result, slave_port_finalizer)
+  new(result)
   initI2CDriver(result, port, I2C_MODE_SLAVE,
                 sda_io_num, scl_io_num, clk_speed,
                 slv_rx_buf_len = slv_rx_buf_len , slv_tx_buf_len = slv_tx_buf_len,
@@ -135,7 +135,7 @@ proc newI2CSlave*(
 
 proc newI2CCmd*(port: I2CPort): I2CCmd =
   # Creates a new I2C Command object
-  new(result, cmd_finalizer)
+  new(result)
   result.handle = i2c_cmd_link_create()
 
   # i2c_master_start(cmd)
