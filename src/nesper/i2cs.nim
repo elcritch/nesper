@@ -43,13 +43,13 @@ type
 var i2c_err: esp_err_t # may be racey? We'll ignore it for now... 
 
 proc `=destroy`(cmd: var typeof(I2CMasterPort()[])) =
-  # TAG.logi("i2c port finalize")
+  TAG.logi("i2c port finalize")
   i2c_err = i2c_driver_delete(cmd.port)
   if i2c_err != ESP_OK:
     raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
 
 proc `=destroy`(cmd: var typeof(I2CSlavePort()[])) =
-  # TAG.logi("i2c port finalize")
+  TAG.logi("i2c port finalize")
   i2c_err = i2c_driver_delete(cmd.port)
   if i2c_err != ESP_OK:
     raise newEspError[I2CError]("Error destroying i2c port", i2c_err)
@@ -57,7 +57,7 @@ proc `=destroy`(cmd: var typeof(I2CSlavePort()[])) =
 proc `=destroy`(cmd: var typeof(I2CCmd()[])) =
   # I2C_CHECK(i2c_num < I2C_NUM_MAX, I2C_NUM_ERROR_STR, ESP_ERR_INVALID_ARG);
   # I2C_CHECK(p_i2c_obj[i2c_num] != NULL, I2C_DRIVER_ERR_STR, ESP_FAIL);
-  # TAG.logi("i2c cmd finalize")
+  TAG.logi("i2c cmd finalize")
   if cmd.handle.pointer != nil:
     i2c_cmd_link_delete(cmd.handle)
 
