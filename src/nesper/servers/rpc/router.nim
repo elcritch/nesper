@@ -1,4 +1,5 @@
 import json, tables, strutils, macros, options
+import sequtils
 
 import marshal
 
@@ -116,7 +117,7 @@ proc wrapError*(code: int, msg: string, id: JsonNode,
   # Create standardised error json
   result = %* { "code": code,"id": id,"message": escapeJson(msg),"data":data }
   if err != nil:
-    result["stacktrace"] = % err.getStackTrace()
+    result["stacktrace"] = %* err.getStackTraceEntries().mapIt($it)
   echo "Error generated: ", "result: ", result, " id: ", id
 
 template wrapException(body: untyped) =
