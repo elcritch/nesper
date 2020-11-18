@@ -112,12 +112,19 @@ proc wrapReply*(id: JsonNode, value: JsonNode): JsonNode =
 proc wrapReplyError*(id: JsonNode, error: JsonNode): JsonNode =
   return %* {"jsonrpc":"2.0", "id": id, "error": error}
 
+proc `%`(err: ref StackTraceEntry): JsonNode =
+  # StackTraceEntry = object
+  # procname*: cstring         ## Name of the proc that is currently executing.
+  # line*: int                 ## Line number of the proc that is currently executing.
+  # filename*: cstring         ## Filename of the proc that is currently executing.
+  return %* (procname: err.procname, line: err.line, filename: err.filename)
+
 proc wrapError*(code: int, msg: string, id: JsonNode,
                 data: JsonNode = newJNull(), err: ref Exception = nil): JsonNode {.gcsafe.} =
   # Create standardised error json
   result = %* { "code": code,"id": id,"message": escapeJson(msg),"data":data }
   if err != nil:
-    result["stacktrace"] = %* err.getStackTraceEntries().mapIt($it)
+    result["stacktrace"] = %* err.getStackTraceEntries()
   echo "Error generated: ", "result: ", result, " id: ", id
 
 template wrapException(body: untyped) =
