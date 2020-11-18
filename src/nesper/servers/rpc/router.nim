@@ -112,17 +112,22 @@ proc wrapReply*(id: JsonNode, value: JsonNode): JsonNode =
 proc wrapReplyError*(id: JsonNode, error: JsonNode): JsonNode =
   return %* {"jsonrpc":"2.0", "id": id, "error": error}
 
-proc `%`(err: ref StackTraceEntry): JsonNode =
+proc `%`(err: StackTraceEntry): JsonNode =
   # StackTraceEntry = object
   # procname*: cstring         ## Name of the proc that is currently executing.
   # line*: int                 ## Line number of the proc that is currently executing.
   # filename*: cstring         ## Filename of the proc that is currently executing.
-  return %* (procname: err.procname, line: err.line, filename: err.filename)
+  let
+    pc: string = $err.procname
+    fl: string = $err.filename
+    ln: int = err.line.int
+
+  return %* (procname: pc, line: err.line, filename: fl)
 
 proc wrapError*(code: int, msg: string, id: JsonNode,
                 data: JsonNode = newJNull(), err: ref Exception = nil): JsonNode {.gcsafe.} =
   # Create standardised error json
-  result = %* { "code": code,"id": id,"message": escapeJson(msg),"data":data }
+  result = %* { "code": code, "id": id, "message": escapeJson(msg), "data": data }
   if err != nil:
     result["stacktrace"] = %* err.getStackTraceEntries()
   echo "Error generated: ", "result: ", result, " id: ", id
