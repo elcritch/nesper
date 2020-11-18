@@ -91,7 +91,7 @@ proc initI2CDriver(
   if ret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(ret) & ")", ret)
 
-  TAG.logi("driver install: %s", $(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags, ) )
+  TAG.logi("i2c driver install: %s", $(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags, ) )
   let iret = i2c_driver_install(port, mode, slv_rx_buf_len, slv_tx_buf_len, iflags)
   if iret != ESP_OK:
     raise newEspError[I2CError]("Error initializing i2c port (" & $esp_err_to_name(iret) & ")", iret)
@@ -151,61 +151,61 @@ proc newCmd*(port: I2CPort): I2CCmd = newI2CCmd(port)
 proc start*(cmd: I2CCmd) =
   let ret = i2c_master_start(cmd.handle)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("start cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c start cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc stop*(cmd: I2CCmd) =
   let ret = i2c_master_start(cmd.handle)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c stop cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc writeByte*(cmd: I2CCmd; data: byte; ack: bool = true) = 
   let ret = i2c_master_write_byte(cmd.handle, data, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc writeTo*(cmd: I2CCmd; data: byte; ack: bool = true) = 
   let ret = i2c_master_write_byte(cmd.handle, (data shl 1) or 0x00'u8, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc readFrom*(cmd: I2CCmd; data: byte; ack: bool = true) = 
   let ret = i2c_master_write_byte(cmd.handle, (data shl 1) or 0x01'u8, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c writebyte cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc write*(cmd: I2CCmd; data: byte; ack: bool = true) = 
   let ret = i2c_master_write_byte(cmd.handle, data, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc write*(cmd: I2CCmd; data: var seq[byte]; ack: bool = true) = 
   let ret = i2c_master_write(cmd.handle, addr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc write*(cmd: I2CCmd; data: openArray[byte]; ack: bool = true) = 
   let ret = i2c_master_write(cmd.handle, unsafeAddr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc read*(cmd: I2CCmd; data: var byte, ack: i2c_ack_type_t) = 
   ## Read byte into given byte address after the port.submit(cmd) is given (e.g. cmd_begin)
   let ret = i2c_master_read_byte(cmd.handle, addr(data), ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc read*(cmd: I2CCmd; data: var seq[byte], ack: i2c_ack_type_t) = 
   ## Read data into given seq address after the port.submit(cmd) is given (e.g. cmd_begin)
   let ret = i2c_master_read(cmd.handle, addr(data[0]), data.len().csize_t, ack)
   if ret != ESP_OK:
-    raise newEspError[I2CError]("write cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c write cmd error (" & $esp_err_to_name(ret) & ")", ret)
 
 proc submit*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t, ignoreError = false): esp_err_t {.discardable.} =
   let ret = i2c_master_cmd_begin(port.port, cmd.handle, ticks_to_wait)
   if ignoreError:
     return ret
   if ret != ESP_OK:
-    raise newEspError[I2CError]("cmd error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c execute error (" & $esp_err_to_name(ret) & ")", ret)
   return ret
 
 proc cmdBegin*(port: I2CMasterPort; cmd: I2CCmd; ticks_to_wait: TickType_t) =
@@ -224,13 +224,13 @@ template doI2cCommand*(port: I2CMasterPort, blk: untyped) =
 proc writeBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickType_t): cint =
   let ret = i2c_slave_write_buffer(port.port, addr(data[0]), data.len().cint, ticks_to_wait)
   if ret == ESP_FAIL:
-    raise newEspError[I2CError]("slave write error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c slave write error (" & $esp_err_to_name(ret) & ")", ret)
   return ret
 
 proc readBuffer*(port: I2CSlavePort; data: var seq[byte]; ticks_to_wait: TickType_t): cint =
   let ret = i2c_slave_read_buffer(port.port, addr(data[0]), data.len().csize_t, ticks_to_wait)
   if ret == ESP_FAIL:
-    raise newEspError[I2CError]("slave write error (" & $esp_err_to_name(ret) & ")", ret)
+    raise newEspError[I2CError]("i2c slave write error (" & $esp_err_to_name(ret) & ")", ret)
   return ret
 
 proc readBuffer*(port: I2CSlavePort; max_size: int; ticks_to_wait: TickType_t): seq[byte] =
