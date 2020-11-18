@@ -112,9 +112,10 @@ proc wrapReplyError*(id: JsonNode, error: JsonNode): JsonNode =
   return %* {"jsonrpc":"2.0", "id": id, "error": error}
 
 proc wrapError*(code: int, msg: string, id: JsonNode,
-                data: JsonNode = newJNull()): JsonNode {.gcsafe.} =
+                data: JsonNode = newJNull(), err: ref Exception): JsonNode {.gcsafe.} =
   # Create standardised error json
   result = %* { "code": code,"id": id,"message": escapeJson(msg),"data":data }
+  result["stacktrace"] = % err.getStackTrace()
   echo "Error generated: ", "result: ", result, " id: ", id
 
 template wrapException(body: untyped) =
