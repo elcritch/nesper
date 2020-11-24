@@ -13,7 +13,29 @@ export net, selectors, tables, posix
 
 export consts, general, timers
 
-const TAG = "socketrpc"
+const
+  TAG = "socketrpc"
+  MsgChunk {.intdefine.} = 1400
+
+proc sendChunks*(sourceClient: Socket, rmsg: string) =
+  let rN = rmsg.len()
+  # logd(TAG,"rpc handler send client: %d bytes", rN)
+  var i = 0
+  while i < rN:
+    var j = min(i + MsgChunk, rN) 
+    # logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
+    var sl = rmsg[i..<j]
+    sourceClient.send(move sl)
+    i = j
+
+proc sendLength*(sourceClient: Socket, rmsg: string) =
+  var rmsgN: int = rmsg.len()
+  var rmsgSz = newString(4)
+  for i in 0..3:
+    rmsgSz[i] = char(rmsgN and 0xFF)
+    rmsgN = rmsgN shr 8
+
+  sourceClient.send(move rmsgSz)
 
 type 
   TcpClientDisconnected* = object of OSError
