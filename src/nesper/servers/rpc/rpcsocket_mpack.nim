@@ -16,6 +16,10 @@ proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, so
   raise newException(OSError, "the request to the OS failed")
 
 proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
+  # TODO: improvement
+  # The incoming RPC call needs to be less than 1400 or the network buffer size.
+  # This could be improved, but is a bit finicky. In my usage, I only send small
+  # RPC calls with possibly larger responses. 
 
   try:
     logd(TAG, "rpc server handler: router: %x", rt.buffer)
@@ -31,7 +35,8 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
       var rmsg: string = msgpack2json.fromJsonNode(move res)
 
       logd(TAG, "sending to client: %s", $(sourceClient.getFd().int))
-      sourceClient.send(move rmsg)
+      sourceClient.sendLength(rmsg)
+      sourceClient.sendChunks(rmsg)
 
   except TimeoutError:
     echo("control server: error: socket timeout: ", $sourceClient.getFd().int)

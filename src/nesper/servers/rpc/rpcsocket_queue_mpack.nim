@@ -16,7 +16,6 @@ export tcpsocket, router
 
 const
   TAG = "socketrpc"
-  MsgChunk {.intdefine.} = 1400
   RpcOutQueueWaitTicks {.intdefine.} = 1_000 # can be adjusted for responsiveness
 
 type 
@@ -25,31 +24,14 @@ type
     inQueue: QueueHandle_t
     outQueue: QueueHandle_t
 
-
-proc sendChunks*(sourceClient: Socket, rmsg: string) =
-  let rN = rmsg.len()
-  # logd(TAG,"rpc handler send client: %d bytes", rN)
-  var i = 0
-  while i < rN:
-    var j = min(i + MsgChunk, rN) 
-    # logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
-    var sl = rmsg[i..<j]
-    sourceClient.send(move sl)
-    i = j
-
-proc sendLength*(sourceClient: Socket, rmsg: string) =
-  var rmsgN: int = rmsg.len()
-  var rmsgSz = newString(4)
-  for i in 0..3:
-    rmsgSz[i] = char(rmsgN and 0xFF)
-    rmsgN = rmsgN shr 8
-
-  sourceClient.send(move rmsgSz)
-
 proc rpcMsgPackQueueWriteHandler*(srv: TcpServerInfo[RpcQueueHandle], result: ReadyKey, sourceClient: Socket, qh: RpcQueueHandle) =
   raise newException(OSError, "the request to the OS failed")
 
 proc rpcMsgPackQueueReadHandler*(srv: TcpServerInfo[RpcQueueHandle], result: ReadyKey, sourceClient: Socket, qh: RpcQueueHandle) =
+  # TODO: improvement
+  # The incoming RPC call needs to be less than 1400 or the network buffer size.
+  # This could be improved, but is a bit finicky. In my usage, I only send small
+  # RPC calls with possibly larger responses. 
 
   try:
     let msg = sourceClient.recv(qh.router.buffer, -1)
