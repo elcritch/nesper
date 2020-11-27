@@ -1,11 +1,9 @@
 import nesper
-import nesper/consts
 import nesper/net_utils
+import nesper/nvs_utils
 import nesper/events
 import nesper/wifi
-import nesper/nvs
 import nesper/tasks
-import os
 
 import server
 
