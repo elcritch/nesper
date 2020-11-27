@@ -1,10 +1,18 @@
 # Nesper
 
-Nim wrappers for ESP-IDF (ESP32). This library builds on the new FreeRTOS/LwIP API support in Nim. 
+Program the ESP32 using Nim! This library builds on the `esp-idf`. Nim now has support for FreeRTOS & LwIP. Combined with the new ARC garbage collector makes Nim an excellent language for programming the ESP32.  
 
 See [Releases](https://github.com/elcritch/nesper/releases) for updates. 
- 
+
+## Status 
+
+This is a Work in Progress (TM), however it's already being used in a shipping hardware project. However, it may still require understanding the underlying ESP-IDF SDK for various use cases. 
+
+Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Branch v4.1 has multiple serious bugs in I2C. 
+
 ## Example Code 
+
+This code shows a short example of setting up an http server to toggle a GPIO pin. It uses the default async HTTP server in Nim's standard library. It still requires the code to initialize the ESP32 and WiFi or ethernet.  
 
 ```nim
 import asynchttpserver, asyncdispatch, net
@@ -27,23 +35,21 @@ proc http_cb*(req: Request) {.async.} =
     await req.respond(Http200, "Toggle MY_PIN_A: " & $level)
 
 proc run_http_server*() {.exportc.} =
-    echo "configure pins"
+    echo "Configure pins"
     {MY_PIN_A, MY_PIN_B}.configure(MODE_OUTPUT) 
     MY_PIN_A.setLevel(lastLevel)
     
-    echo "starting http server on port 8181"
+    echo "Starting http server on port 8181"
     var server = newAsyncHttpServer()
     waitFor server.serve(Port(8181), http_cb)
 
 ```
 
-
-
-## Status
+## Why
 
 TLDR; Real reason? It's a bit of fun in a sometimes tricky field. 
 
-This is a Work in Progress (tm). I'm using it for a few work projects as I generally dislike programming C/C++ (despite C's elegance in the small). When you just want a hash table in C it's tedious and error prone. C++ is about 5 different languages and I have to idea how to use half of them anymore. Rust doesn't work on half of the boards I want to program. MicroPython? ... Nope - I need speed and efficiency. 
+I generally dislike programming C/C++ (despite C's elegance in the small). When you just want a hash table in C it's tedious and error prone. C++ is about 5 different languages and I have to idea how to use half of them anymore. Rust doesn't work on half of the boards I want to program. MicroPython? ... Nope - I need speed and efficiency. 
 
 ## Library
 
@@ -53,14 +59,14 @@ Caveat: these features are tested as they're used for my use case. However, both
 
 Supported ESP-IDF drivers with Nim'ified interfaces: 
 
-- [x] Nim stdandard library support for most basic POSIX network api's!
+- [x] Nim stdandard library support for most basic POSIX network API's!
 - [x] Most of the basic `FreeRTOS.h` header 
 - [x] NVS Flash 
 - [x] UART 
-- [x] SPI
-- [?] I2C (untested on hardware)
+- [x] SPI (don't mix half-duplex & duplex devices)
+- [x] I2C 
 
-Things I'd like to get to:
+Other things:
 
 - [x] Nim standard library wrapping of FreeRTOS semaphore's, mutexes, etc
    - include `pthread` in your CMakeLists.txt file and use Nim's POSIX lock API's
@@ -78,6 +84,7 @@ Things I'm not planning on (PR's welcome!)
 
 ## General Usage
 
+1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
 1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. nimble install https://github.com/elcritch/nesper
 3. It's recommend to copy `nesper/esp-idf-examples/simplewifi` example project initially, to get the proper build steps. 
