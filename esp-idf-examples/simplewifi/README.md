@@ -28,7 +28,7 @@ idf.py build
 ```
 
 ```sh
-make build
+make
 ```
 
 This will build the project. Next use idf.py to flash and monitor:
