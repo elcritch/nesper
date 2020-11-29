@@ -54,8 +54,10 @@ Run it like:
 
 ## Notes on the RPC protocol
 
-The `rpc_cli` should give an example of the RPC protocol used. It's roughly based on JSON-RPC, however, using raw socket require a bit more work. Sending RPC messages are sent "raw", e.g. just the message. This limits RPC calls to 1400 bytes and could be fixed in the future. 
+The `rpc_cli` should give an example of the RPC protocol used for the message pack RPC versions. It's roughly based on JSON-RPC, however, using raw socket require a bit more work. Sending RPC messages are sent "raw", e.g. just the message. This limits RPC calls to 1400 bytes and could be fixed in the future. 
 
 For receiving the RPC responses, a very simple protocol is used based on the Erlang "ports" protocol. A 4-byte signed integer with the size of the RPC result is sent first, in network byte order. The RPC client must read these 4 bytes, then read the number of bytes sent. The `rpc_cli` provides an example of how to do this in Nim. This enables returning message that are larger than 1400 bytes. Ideally, this will be done for the incoming RPC message as well. 
 
-The JSON version of the rpc server currently returns a "raw" response. 
+For simplificity, the JSON version of the rpc server currently returns a "raw" response and are limited to 1400 bytes on both sending and receiving RPC messages.
+
+The 'echo' server likewise only sends raw data. You can use `netcat` to test the echo server. 
