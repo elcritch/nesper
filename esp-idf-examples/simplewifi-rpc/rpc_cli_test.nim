@@ -1,0 +1,1 @@
+../../tests/rpc_cli_test.nim
