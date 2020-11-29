@@ -4,19 +4,19 @@ ESP_IDF_VERSION ?= ESP_IDF_V4_0
 
 default: mpack_rpc_queue_server
 
-json_rpc_server:
+json_rpc_server: clean
 	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer -d:release && idf.py reconfigure 
 
-mpack_rpc_server:
+mpack_rpc_server: clean
 	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer -d:release && idf.py reconfigure 
 
-mpack_rpc_queue_server:
+mpack_rpc_queue_server: clean
 	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcQueueServer -d:release && idf.py reconfigure 
 
-tcp_echo_server:
+tcp_echo_server: clean
 	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpEchoServer -d:release && idf.py reconfigure 
 
-build: clean
+build: 
 	idf.py build
 
 clean:
@@ -26,4 +26,4 @@ fullclean: clean
 	rm -Rf build/
 	# idf.py fullclean
 
-
+.PHONY: clean build
