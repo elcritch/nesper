@@ -16,7 +16,7 @@ mpack_rpc_queue_server:
 tcp_echo_server:
 	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpEchoServer -d:release && idf.py reconfigure 
 
-build: clean default
+build: clean
 	idf.py build
 
 clean:
