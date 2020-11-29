@@ -113,21 +113,6 @@ var
   xmlWorker: Thread[void]
 
 
-proc showXmlWorker() {.thread.} =
-  {.cast(gcsafe).}:
-    echo green, "[xml]"
-    let client: Socket = newSocket(buffered=false)
-    client.connect(ipAddr, xmlPort)
-    echo green, "[connected to xml server]"
-
-    while true:
-      try:
-        var msg = client.recv(1_400, timeout = -1)
-        stdout.write(msg)
-        stdout.flushFile()
-      except TimeoutError:
-        discard "timed out, rerun"
-    
 proc execRpc(client: Socket, i: int, call: JsonNode, quiet=false): JsonNode = 
   {.cast(gcsafe).}:
     call["id"] = %* id
