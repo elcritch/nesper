@@ -2,6 +2,9 @@
 
 set -e
 
+echo ========= full clean ========= 
+make fullclean
+
 echo ========= json_rpc_server build ========= 
 make json_rpc_server build
 

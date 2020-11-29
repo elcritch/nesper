@@ -10,7 +10,7 @@ NIMCACHE := main/nimcache
 NIMFLAGS ?= 
 
 $(NIMBLE):
-	nimble install -y --nimbleDir:"$(NIMBLE)" msgpack4nim
+	nimble install -y --nimbleDir:"$(NIMBLE)" msgpack4nim stew
 
 default: mpack_rpc_queue_server
 

@@ -17,6 +17,10 @@ when defined(TcpMpackRpcQueueServer):
   import nesper/servers/rpc/rpcsocket_queue_mpack
 elif not defined(TcpEchoServer):
   import nesper/servers/rpc/rpcsocket_mpack
+elif defined(TcpEchoServer):
+  import nesper/servers/tcpsocket
+else:
+  {.fatal: "Compile this program with an rpc strategy!".}
 
 
 when defined(TcpEchoServer):
