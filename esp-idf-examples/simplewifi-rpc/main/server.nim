@@ -26,8 +26,8 @@ else:
 when defined(TcpEchoServer):
   proc run_rpc_server*() =
     echo "starting server on port 5555"
-    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
-    # startRpcSocketServer(Port(5555))
+    var msg = "echo: "
+    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data=msg)
 
 else:
 
