@@ -23,24 +23,21 @@ make json_rpc_server build
 
 This compiles the Nim code and updates the ESP-IDF project files. This example contains several variants which can be built by changing the make target like: `make tcp_echo_server build` then following the rest of the steps. The current options are: 
 
-- json_rpc_server
-- mpack_rpc_server
-- mpack_rpc_queue_server
-- tcp_echo_server
-
-You can then compile the ESP-IDF build by one of: 
-
 ```sh
-idf.py build
+make json_rpc_server build
+make mpack_rpc_server build
+make mpack_rpc_queue_server build
+make tcp_echo_server build
 ```
 
-```sh
-make build
-```
+The above will all compile the nim project and then run `idf.py build` for you. 
 
-This will build the project. Next use idf.py to flash and monitor:
+Once the project is built you can use `idf.py` tools for flashing and monitoring:
 
 ```shell
 idf.py -p [port] flash
 idf.py -p [port] monitor
+
+# or together:
+idf.py -p [port] flash monitor
 ```
