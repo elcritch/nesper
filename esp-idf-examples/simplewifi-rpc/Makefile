@@ -15,16 +15,16 @@ $(NIMBLE):
 default: mpack_rpc_queue_server
 
 json_rpc_server: clean
-	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
+	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
 
 mpack_rpc_server: clean
-	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
+	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
 
 mpack_rpc_queue_server: clean
-	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcQueueServer $(NIMFLAGS) && idf.py reconfigure 
+	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcQueueServer $(NIMFLAGS) && idf.py reconfigure 
 
 tcp_echo_server: clean
-	nim prepare main/wifi_example_main.nim -d:$(ESP_IDF_VERSION) -d:TcpEchoServer $(NIMFLAGS) && idf.py reconfigure 
+	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpEchoServer $(NIMFLAGS) && idf.py reconfigure 
 
 build: 
 	idf.py build
