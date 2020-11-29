@@ -4,3 +4,4 @@ src/server
 src/localnim/
 .env
 results.json
+main/nimble/
