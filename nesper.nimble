@@ -29,6 +29,12 @@ proc driver_tests() =
     if dtest.startsWith("t") and dtest.endsWith(".nim"):
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
+proc storage_tests() =
+  # Driver tests
+  for dtest in listFiles("tests/storage/"):
+    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+      exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
+
 proc exec_tests() =
   # Exec tests
   for dtest in listFiles("tests/exec_tests/"):
@@ -38,12 +44,15 @@ proc exec_tests() =
 task test, "Runs the test suite":
   general_tests()
   driver_tests()
+  storage_tests()
   exec_tests()
 
 task test_general, "Runs the test suite":
   general_tests()
 task test_drivers, "Runs the test suite":
   driver_tests()
+task test_storage, "Runs the test suite":
+  storage_tests()
 task test_execs, "Runs the test suite":
   exec_tests()
 
