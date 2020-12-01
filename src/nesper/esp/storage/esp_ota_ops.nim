@@ -31,7 +31,9 @@ var
   ESP_ERR_OTA_ROLLBACK_FAILED*  {.importc: "$1", header: chdr.}: uint32
   ESP_ERR_OTA_ROLLBACK_INVALID_STATE* {.importc: "$1", header: chdr.}: uint32
 
-## *
+
+
+## \*
 ##  @brief Opaque handle for an application OTA update
 ##
 ##  esp_ota_begin() returns a handle which is then used for subsequent
@@ -41,7 +43,9 @@ var
 type
   esp_ota_handle_t* = distinct uint32
 
-## *
+
+
+## \*
 ##  @brief   Return esp_app_desc structure. This structure includes app version.
 ##
 ##  Return description for running app.
@@ -50,7 +54,9 @@ type
 
 proc esp_ota_get_app_description*(): ptr esp_app_desc_t {.
     importc: "esp_ota_get_app_description", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief   Fill the provided buffer with SHA256 of the ELF file, formatted as hexadecimal, null-terminated.
 ##  If the buffer size is not sufficient to fit the entire SHA256 in hex plus a null terminator,
 ##  the largest possible number of bytes will be written followed by a null.
@@ -61,7 +67,11 @@ proc esp_ota_get_app_description*(): ptr esp_app_desc_t {.
 
 proc esp_ota_get_app_elf_sha256*(dst: cstring; size: csize_t): cint {.
     importc: "esp_ota_get_app_elf_sha256", header: "esp_ota_ops.h".}
-## *
+
+
+
+
+## \*
 ##  @brief   Commence an OTA update writing to the specified partition.
 ##
 ##  The specified partition is erased to the specified image size.
@@ -95,7 +105,9 @@ proc esp_ota_get_app_elf_sha256*(dst: cstring; size: csize_t): cint {.
 proc esp_ota_begin*(partition: ptr esp_partition_t; image_size: csize_t;
                    out_handle: ptr esp_ota_handle_t): esp_err_t {.
     importc: "esp_ota_begin", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief   Write OTA update data to partition
 ##
 ##  This function can be called multiple times as
@@ -116,7 +128,9 @@ proc esp_ota_begin*(partition: ptr esp_partition_t; image_size: csize_t;
 
 proc esp_ota_write*(handle: esp_ota_handle_t; data: pointer; size: csize_t): esp_err_t {.
     importc: "esp_ota_write", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Finish OTA update and validate newly written app image.
 ##
 ##  @param handle  Handle obtained from esp_ota_begin().
@@ -133,7 +147,9 @@ proc esp_ota_write*(handle: esp_ota_handle_t; data: pointer; size: csize_t): esp
 
 proc esp_ota_end*(handle: esp_ota_handle_t): esp_err_t {.importc: "esp_ota_end",
     header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Configure OTA data for a new boot partition
 ##
 ##  @note If this function returns ESP_OK, calling esp_restart() will boot the newly configured app partition.
@@ -150,7 +166,9 @@ proc esp_ota_end*(handle: esp_ota_handle_t): esp_err_t {.importc: "esp_ota_end",
 
 proc esp_ota_set_boot_partition*(partition: ptr esp_partition_t): esp_err_t {.
     importc: "esp_ota_set_boot_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Get partition info of currently configured boot app
 ##
 ##  If esp_ota_set_boot_partition() has been called, the partition which was set by that function will be returned.
@@ -170,7 +188,9 @@ proc esp_ota_set_boot_partition*(partition: ptr esp_partition_t): esp_err_t {.
 
 proc esp_ota_get_boot_partition*(): ptr esp_partition_t {.
     importc: "esp_ota_get_boot_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Get partition info of currently running app
 ##
 ##  This function is different to esp_ota_get_boot_partition() in that
@@ -186,7 +206,9 @@ proc esp_ota_get_boot_partition*(): ptr esp_partition_t {.
 
 proc esp_ota_get_running_partition*(): ptr esp_partition_t {.
     importc: "esp_ota_get_running_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Return the next OTA app partition which should be written with a new firmware.
 ##
 ##  Call this function to find an OTA app partition which can be passed to esp_ota_begin().
@@ -201,7 +223,9 @@ proc esp_ota_get_running_partition*(): ptr esp_partition_t {.
 
 proc esp_ota_get_next_update_partition*(start_from: ptr esp_partition_t): ptr esp_partition_t {.
     importc: "esp_ota_get_next_update_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Returns esp_app_desc structure for app partition. This structure includes app version.
 ##
 ##  Returns a description for the requested app partition.
@@ -219,7 +243,9 @@ proc esp_ota_get_next_update_partition*(start_from: ptr esp_partition_t): ptr es
 proc esp_ota_get_partition_description*(partition: ptr esp_partition_t;
                                        app_desc: ptr esp_app_desc_t): esp_err_t {.
     importc: "esp_ota_get_partition_description", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief This function is called to indicate that the running app is working well.
 ##
 ##  @return
@@ -228,7 +254,9 @@ proc esp_ota_get_partition_description*(partition: ptr esp_partition_t;
 
 proc esp_ota_mark_app_valid_cancel_rollback*(): esp_err_t {.
     importc: "esp_ota_mark_app_valid_cancel_rollback", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief This function is called to roll back to the previously workable app with reboot.
 ##
 ##  If rollback is successful then device will reset else API will return with error code.
@@ -242,7 +270,9 @@ proc esp_ota_mark_app_valid_cancel_rollback*(): esp_err_t {.
 proc esp_ota_mark_app_invalid_rollback_and_reboot*(): esp_err_t {.
     importc: "esp_ota_mark_app_invalid_rollback_and_reboot",
     header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Returns last partition with invalid state (ESP_OTA_IMG_INVALID or ESP_OTA_IMG_ABORTED).
 ##
 ##  @return partition.
@@ -250,7 +280,9 @@ proc esp_ota_mark_app_invalid_rollback_and_reboot*(): esp_err_t {.
 
 proc esp_ota_get_last_invalid_partition*(): ptr esp_partition_t {.
     importc: "esp_ota_get_last_invalid_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Returns state for given partition.
 ##
 ##  @param[in] partition  Pointer to partition.
@@ -265,7 +297,9 @@ proc esp_ota_get_last_invalid_partition*(): ptr esp_partition_t {.
 proc esp_ota_get_state_partition*(partition: ptr esp_partition_t;
                                  ota_state: ptr esp_ota_img_states_t): esp_err_t {.
     importc: "esp_ota_get_state_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Erase previous boot app partition and corresponding otadata select for this partition.
 ##
 ##  When current app is marked to as valid then you can erase previous app partition.
@@ -275,7 +309,9 @@ proc esp_ota_get_state_partition*(partition: ptr esp_partition_t;
 
 proc esp_ota_erase_last_boot_app_partition*(): esp_err_t {.
     importc: "esp_ota_erase_last_boot_app_partition", header: "esp_ota_ops.h".}
-## *
+
+
+## \*
 ##  @brief Checks applications on the slots which can be booted in case of rollback.
 ##
 ##  These applications should be valid (marked in otadata as not UNDEFINED, INVALID or ABORTED and crc is good) and be able booted,

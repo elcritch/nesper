@@ -18,7 +18,9 @@ type
   spi_flash_chip_t* {.importc: "spi_flash_chip_t", header: "esp_flash.h", bycopy.} = object
 
 
-## * @brief Structure for describing a region of flash
+
+
+## \* @brief Structure for describing a region of flash
 
 type
   esp_flash_region_t* {.importc: "esp_flash_region_t", header: "esp_flash.h", bycopy.} = object
@@ -26,25 +28,39 @@ type
     size* {.importc: "size".}: uint32 ## /< Size of the region
 
 
-## * OS-level integration hooks for accessing flash chips inside a running OS
+
+
+## \* OS-level integration hooks for accessing flash chips inside a running OS
 
 type
   esp_flash_os_functions_t* {.importc: "esp_flash_os_functions_t",
                              header: "esp_flash.h", bycopy.} = object
-    start* {.importc: "start".}: proc (arg: pointer): esp_err_t ## *
+    start* {.importc: "start".}: proc (arg: pointer): esp_err_t 
+
+## \*
                                                          ##  Called before commencing any flash operation. Does not need to be
                                                          ##  recursive (ie is called at most once for each call to 'end').
                                                          ##
-    ## * Called after completing any flash operation.
-    `end`* {.importc: "end".}: proc (arg: pointer): esp_err_t ## * Called before any erase/write operations to check whether the region is limited by the OS
+    
+
+## \* Called after completing any flash operation.
+    `end`* {.importc: "end".}: proc (arg: pointer): esp_err_t 
+
+## \* Called before any erase/write operations to check whether the region is limited by the OS
     region_protected* {.importc: "region_protected".}: proc (arg: pointer;
-        start_addr: csize_t; size: csize_t): esp_err_t ## * Delay for at least 'us' microseconds. Called in between 'start' and 'end'.
-    delay_us* {.importc: "delay_us".}: proc (arg: pointer; us: cuint): esp_err_t ## * Yield to other tasks. Called during erase
+        start_addr: csize_t; size: csize_t): esp_err_t 
+
+## \* Delay for at least 'us' microseconds. Called in between 'start' and 'end'.
+    delay_us* {.importc: "delay_us".}: proc (arg: pointer; us: cuint): esp_err_t 
+
+## \* Yield to other tasks. Called during erase
                                                                         ## operations.
     `yield`* {.importc: "yield".}: proc (arg: pointer): esp_err_t
 
 
-## * @brief Structure to describe a SPI flash chip connected to the system.
+
+
+## \* @brief Structure to describe a SPI flash chip connected to the system.
 ##
 ##     Structure must be initialized before use (passed to esp_flash_init()).
 ##
@@ -60,7 +76,9 @@ type
     # chip_id* {.importc: "chip_id".}: uint32 ## /< Detected chip id.
 
 
-## * @brief Initialise SPI flash chip interface.
+
+
+## \* @brief Initialise SPI flash chip interface.
 ##
 ##  This function must be called before any other API functions are called for this chip.
 ##
@@ -78,7 +96,9 @@ type
 
 proc esp_flash_init*(chip: ptr esp_flash_t): esp_err_t {.importc: "esp_flash_init",
     header: "esp_flash.h".}
-## *
+
+
+## \*
 ##  Check if appropriate chip driver is set.
 ##
 ##  @param chip Pointer to SPI flash chip to use. If NULL, esp_flash_default_chip is substituted.
@@ -88,7 +108,9 @@ proc esp_flash_init*(chip: ptr esp_flash_t): esp_err_t {.importc: "esp_flash_ini
 
 proc esp_flash_chip_driver_initialized*(chip: ptr esp_flash_t): bool {.
     importc: "esp_flash_chip_driver_initialized", header: "esp_flash.h".}
-## * @brief Read flash ID via the common "RDID" SPI flash command.
+
+
+## \* @brief Read flash ID via the common "RDID" SPI flash command.
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param[out] out_id Pointer to receive ID value.
@@ -100,7 +122,9 @@ proc esp_flash_chip_driver_initialized*(chip: ptr esp_flash_t): bool {.
 
 proc esp_flash_read_id*(chip: ptr esp_flash_t; out_id: ptr uint32): esp_err_t {.
     importc: "esp_flash_read_id", header: "esp_flash.h".}
-## * @brief Detect flash size based on flash ID.
+
+
+## \* @brief Detect flash size based on flash ID.
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param[out] out_size Detected size in bytes.
@@ -113,7 +137,9 @@ proc esp_flash_read_id*(chip: ptr esp_flash_t; out_id: ptr uint32): esp_err_t {.
 
 proc esp_flash_get_size*(chip: ptr esp_flash_t; out_size: ptr uint32): esp_err_t {.
     importc: "esp_flash_get_size", header: "esp_flash.h".}
-## * @brief Erase flash chip contents
+
+
+## \* @brief Erase flash chip contents
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##
@@ -123,7 +149,9 @@ proc esp_flash_get_size*(chip: ptr esp_flash_t; out_size: ptr uint32): esp_err_t
 
 proc esp_flash_erase_chip*(chip: ptr esp_flash_t): esp_err_t {.
     importc: "esp_flash_erase_chip", header: "esp_flash.h".}
-## * @brief Erase a region of the flash chip
+
+
+## \* @brief Erase a region of the flash chip
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param start Address to start erasing flash. Must be sector aligned.
@@ -141,7 +169,9 @@ proc esp_flash_erase_chip*(chip: ptr esp_flash_t): esp_err_t {.
 
 proc esp_flash_erase_region*(chip: ptr esp_flash_t; start: uint32; len: uint32): esp_err_t {.
     importc: "esp_flash_erase_region", header: "esp_flash.h".}
-## * @brief Read if the entire chip is write protected
+
+
+## \* @brief Read if the entire chip is write protected
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param[out] write_protected Pointer to boolean, set to the value of the write protect flag.
@@ -155,7 +185,9 @@ proc esp_flash_erase_region*(chip: ptr esp_flash_t; start: uint32; len: uint32):
 proc esp_flash_get_chip_write_protect*(chip: ptr esp_flash_t;
                                       write_protected: ptr bool): esp_err_t {.
     importc: "esp_flash_get_chip_write_protect", header: "esp_flash.h".}
-## * @brief Set write protection for the SPI flash chip
+
+
+## \* @brief Set write protection for the SPI flash chip
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param write_protect Boolean value for the write protect flag
@@ -171,7 +203,9 @@ proc esp_flash_get_chip_write_protect*(chip: ptr esp_flash_t;
 
 proc esp_flash_set_chip_write_protect*(chip: ptr esp_flash_t; write_protect: bool): esp_err_t {.
     importc: "esp_flash_set_chip_write_protect", header: "esp_flash.h".}
-## * @brief Read the list of individually protectable regions of this SPI flash chip.
+
+
+## \* @brief Read the list of individually protectable regions of this SPI flash chip.
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param[out] out_regions Pointer to receive a pointer to the array of protectable regions of the chip.
@@ -187,7 +221,9 @@ proc esp_flash_get_protectable_regions*(chip: ptr esp_flash_t;
                                        out_regions: ptr ptr esp_flash_region_t;
                                        out_num_regions: ptr uint32): esp_err_t {.
     importc: "esp_flash_get_protectable_regions", header: "esp_flash.h".}
-## * @brief Detect if a region of the SPI flash chip is protected
+
+
+## \* @brief Detect if a region of the SPI flash chip is protected
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param region Pointer to a struct describing a protected region. This must match one of the regions returned from esp_flash_get_protectable_regions(...).
@@ -205,7 +241,9 @@ proc esp_flash_get_protected_region*(chip: ptr esp_flash_t;
                                     region: ptr esp_flash_region_t;
                                     out_protected: ptr bool): esp_err_t {.
     importc: "esp_flash_get_protected_region", header: "esp_flash.h".}
-## * @brief Update the protected status for a region of the SPI flash chip
+
+
+## \* @brief Update the protected status for a region of the SPI flash chip
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param region Pointer to a struct describing a protected region. This must match one of the regions returned from esp_flash_get_protectable_regions(...).
@@ -222,7 +260,9 @@ proc esp_flash_get_protected_region*(chip: ptr esp_flash_t;
 proc esp_flash_set_protected_region*(chip: ptr esp_flash_t;
                                     region: ptr esp_flash_region_t; protect: bool): esp_err_t {.
     importc: "esp_flash_set_protected_region", header: "esp_flash.h".}
-## * @brief Read data from the SPI flash chip
+
+
+## \* @brief Read data from the SPI flash chip
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param buffer Pointer to a buffer where the data will be read. To get better performance, this should be in the DRAM and word aligned.
@@ -243,7 +283,9 @@ proc esp_flash_set_protected_region*(chip: ptr esp_flash_t;
 proc esp_flash_read*(chip: ptr esp_flash_t; buffer: pointer; address: uint32;
                     length: uint32): esp_err_t {.importc: "esp_flash_read",
     header: "esp_flash.h".}
-## * @brief Write data to the SPI flash chip
+
+
+## \* @brief Write data to the SPI flash chip
 ##
 ##  @param chip Pointer to identify flash chip. Must have been successfully initialised via esp_flash_init()
 ##  @param address Address on flash to write to. Must be previously erased (SPI NOR flash can only write bits 1->0).
@@ -258,7 +300,9 @@ proc esp_flash_read*(chip: ptr esp_flash_t; buffer: pointer; address: uint32;
 proc esp_flash_write*(chip: ptr esp_flash_t; buffer: pointer; address: uint32;
                      length: uint32): esp_err_t {.importc: "esp_flash_write",
     header: "esp_flash.h".}
-## * @brief Encrypted and write data to the SPI flash chip using on-chip hardware flash encryption
+
+
+## \* @brief Encrypted and write data to the SPI flash chip using on-chip hardware flash encryption
 ##
 ##  @param chip Pointer to identify flash chip. Must be NULL (the main flash chip). For other chips, encrypted write is not supported.
 ##  @param address Address on flash to write to. 16 byte aligned. Must be previously erased (SPI NOR flash can only write bits 1->0).
@@ -277,7 +321,9 @@ proc esp_flash_write*(chip: ptr esp_flash_t; buffer: pointer; address: uint32;
 proc esp_flash_write_encrypted*(chip: ptr esp_flash_t; address: uint32;
                                buffer: pointer; length: uint32): esp_err_t {.
     importc: "esp_flash_write_encrypted", header: "esp_flash.h".}
-## * @brief Read and decrypt data from the SPI flash chip using on-chip hardware flash encryption
+
+
+## \* @brief Read and decrypt data from the SPI flash chip using on-chip hardware flash encryption
 ##
 ##  @param chip Pointer to identify flash chip. Must be NULL (the main flash chip). For other chips, encrypted read is not supported.
 ##  @param address Address on flash to read from.
@@ -293,7 +339,9 @@ proc esp_flash_write_encrypted*(chip: ptr esp_flash_t; address: uint32;
 proc esp_flash_read_encrypted*(chip: ptr esp_flash_t; address: uint32;
                               out_buffer: pointer; length: uint32): esp_err_t {.
     importc: "esp_flash_read_encrypted", header: "esp_flash.h".}
-## * @brief Pointer to the "default" SPI flash chip, ie the main chip attached to the MCU.
+
+
+## \* @brief Pointer to the "default" SPI flash chip, ie the main chip attached to the MCU.
 ##
 ##    This chip is used if the 'chip' argument pass to esp_flash_xxx API functions is ever NULL.
 ##
@@ -301,10 +349,16 @@ proc esp_flash_read_encrypted*(chip: ptr esp_flash_t; address: uint32;
 var esp_flash_default_chip* {.importc: "esp_flash_default_chip",
                             header: "esp_flash.h".}: ptr esp_flash_t
 
-## ******************************************************************************
+
+
+## \******************************************************************************
 ##  Utility Functions
-## ****************************************************************************
-## *
+
+
+## \****************************************************************************
+
+
+## \*
 ##  @brief Returns true if chip is configured for Quad I/O or Quad Fast Read.
 ##
 ##  @param chip Pointer to SPI flash chip to use. If NULL, esp_flash_default_chip is substituted.
