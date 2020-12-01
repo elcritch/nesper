@@ -1,5 +1,6 @@
 import strutils
 import sequtils
+import options
 
 import consts
 import general
@@ -45,16 +46,21 @@ proc idfVerStr*(info: esp_app_desc_t): string =
 
 proc currentFirmwareInfo*(): esp_app_desc_t =
   let running: ptr esp_partition_t = esp_ota_get_running_partition()
-  let err = running.esp_ota_get_partition_description(addr result)
+  var info: esp_app_desc_t
+  let err = running.esp_ota_get_partition_description(addr info)
   if err != ESP_OK:
-    raise newEspError[OtaError]("failed to read current firmware info" & $esp_err_to_name(err), err)
+    raise newEspError[OtaError]("failed to read current firmware info " & $esp_err_to_name(err), err)
+  return info
 
-proc lastInvalidFirmwareInfo*(): esp_app_desc_t =
+proc lastInvalidFirmwareInfo*(): Option[esp_app_desc_t] =
   var last_invalid_app: ptr esp_partition_t = esp_ota_get_last_invalid_partition()
 
-  let err = last_invalid_app.esp_ota_get_partition_description(addr result)
+  var info: esp_app_desc_t
+  let err = last_invalid_app.esp_ota_get_partition_description(addr info)
   if err != ESP_OK:
-    raise newEspError[OtaError]("failed to read last failed firmware info" & $esp_err_to_name(err), err)
+    return none[esp_app_desc_t]()
+  else:
+    return some(info)
 
 
 proc newOtaUpdateHandle*(startFrom: ptr esp_partition_t = nil): OtaUpdateHandle =
@@ -122,13 +128,14 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = t
     var currApp: esp_app_desc_t = currentFirmwareInfo()
     TAG.logi("Running firmware version: %s on date: %s at %s", currApp.versionStr(), currApp.dateStr(), currApp.timeStr())
 
-    var lastInvApp: esp_app_desc_t = lastInvalidFirmwareInfo()
-    TAG.logi("Last invalid firmware version: %s", lastInvApp.versionStr())
+    var lastInvApp: Option[esp_app_desc_t] = lastInvalidFirmwareInfo()
+    if lastInvApp.isSome():
+      TAG.logi("Last invalid firmware version: %s", lastInvApp.get().versionStr())
 
-    if lastInvApp.version == currApp.version:
+    if lastInvApp.isSome() and lastInvApp.get().version == currApp.version:
       TAG.logw("New version is the same as invalid version.")
       TAG.logw("Previously, there was an attempt to launch the firmware with %s version, but it failed.",
-                lastInvApp.versionStr())
+                lastInvApp.get().versionStr())
       TAG.logw("The firmware has been rolled back to the previous version.")
       return (status: VersionMatchesPreviousInvalid, info: new_app_info)
 
@@ -179,6 +186,7 @@ proc firmware_verify*(diagnostic_callback: proc (): bool) =
   ##  get sha257 digest for running partition
   sha_256 = esp_ota_get_running_partition().get_sha256()
   TAG.logi("SHA-256 for current firmware: %s", $sha_256)
+
 
   var running: ptr esp_partition_t = esp_ota_get_running_partition()
   var ota_state: esp_ota_img_states_t
