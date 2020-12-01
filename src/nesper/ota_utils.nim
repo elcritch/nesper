@@ -53,7 +53,7 @@ proc newOtaUpdateHandle*(startFrom: ptr esp_partition_t = nil): OtaUpdateHandle 
   result.running = esp_ota_get_running_partition()
 
 
-proc printPartionInfo*(ota: OtaUpdateHandle) =
+proc logPartionInfo*(ota: OtaUpdateHandle) =
   if ota.configured != ota.running:
     TAG.logw("Configured OTA boot partition at offset 0x%08x, but running from offset 0x%08x",
              ota.configured.address, ota.running.address)
@@ -69,7 +69,7 @@ proc begin*(ota: OtaUpdateHandle) =
   let err = esp_ota_begin(ota.update, OTA_SIZE_UNKNOWN, addr(ota.handle))
   if err != ESP_OK:
     TAG.loge("esp_ota_begin failed (%s)", repr(ota.update))
-    raise newEspError[OtaError]("Error ota begin: %s" & $esp_err_to_name(err), err)
+    raise newEspError[OtaError]("Error ota begin: " & $esp_err_to_name(err), err)
 
 proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = true):
       tuple[status: OtaUpdateStatus, info: esp_app_desc_t] =
