@@ -1,0 +1,2 @@
+import nesper/esp/storage/esp_flash_partitions
+export esp_flash_partitions
