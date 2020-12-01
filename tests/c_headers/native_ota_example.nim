@@ -114,6 +114,7 @@ proc ota_example_task*(pvParameter: pointer) {.cdecl.} =
           TAG.loge("received package is not fit len")
           http_cleanup(client)
           task_fatal_error()
+
       err = esp_ota_write(update_handle, cast[pointer](ota_write_data), data_read)
       if err != ESP_OK:
         http_cleanup(client)

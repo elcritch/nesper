@@ -16,6 +16,7 @@ type
     update*: ptr esp_partition_t
     configured*: ptr esp_partition_t
     running*: ptr esp_partition_t
+    total_written*: int
 
   OtaError* = object of OSError
     code*: esp_err_t
@@ -29,8 +30,11 @@ type
 proc `=destroy`(ota: var typeof(OtaUpdateHandle()[])) =
   if ota.handle.uint32 != 0:
     let err = esp_ota_end(ota.handle)
+    if err.uint32 == ESP_ERR_OTA_VALIDATE_FAILED:
+      raise newEspError[OtaError]("Image validation failed, image is corrupted", err)
     if err != ESP_OK:
-      raise newEspError[OtaError]("Error ota end ", err)
+      raise newEspError[OtaError]("Error ota end: " & $esp_err_to_name(err), err)
+
 
 proc versionStr*(info: esp_app_desc_t): string =
   return info.version.join()
@@ -51,6 +55,7 @@ proc newOtaUpdateHandle*(startFrom: ptr esp_partition_t = nil): OtaUpdateHandle 
   result.update = esp_ota_get_next_update_partition(startFrom)
   result.configured = esp_ota_get_boot_partition()
   result.running = esp_ota_get_running_partition()
+  result.total_written = 0
 
 
 proc logPartionInfo*(ota: OtaUpdateHandle) =
@@ -116,3 +121,11 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = t
       return (status: VersionSameAsCurrent, info: new_app_info)
 
     return (status: VersionNewer, info: new_app_info)
+
+proc write*(ota: var OtaUpdateHandle, write_data: var string) =
+  let err = esp_ota_write(ota.handle, addr write_data[0], write_data.len().csize_t)
+  if err != ESP_OK:
+    raise newEspError[OtaError]("Error ota write: " & $esp_err_to_name(err), err)
+  ota.total_written.inc(write_data.len())
+
+
