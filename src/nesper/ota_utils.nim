@@ -55,7 +55,7 @@ proc newOtaUpdateHandle*(startFrom: ptr esp_partition_t = nil): OtaUpdateHandle 
 
 proc get_sha256*(partition: ptr esp_partition_t): OtaSha256 =
   result = new(OtaSha256)
-  let err = esp_partition_get_sha256(partition, result.data)
+  let err = esp_partition_get_sha256(partition, addr result.data[0])
   if err != ESP_OK:
     raise newEspError[OtaError]("parition sha256 failed: " & $esp_err_to_name(err), err)
 
@@ -170,7 +170,7 @@ proc firmware_verify*(diagnostic_callback: proc (): bool) =
 
   ##  get sha257 digest for running partition
   sha_256 = esp_ota_get_running_partition().get_sha256()
-  TAG.logi("SHA-256 for current firmware: ", $sha_256)
+  TAG.logi("SHA-256 for current firmware: %s", $sha_256)
 
   var running: ptr esp_partition_t = esp_ota_get_running_partition()
   var ota_state: esp_ota_img_states_t

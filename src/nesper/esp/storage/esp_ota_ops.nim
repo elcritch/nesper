@@ -23,8 +23,7 @@ export esp_app_format
 export esp_partition
 export esp_flash_partitions
 
-const
-    chdr = "<esp_https_ota.h>"
+const chdr = "esp_ota_ops.h"
 
 # var portMAX_DELAY* {.importc: "portMAX_DELAY", header: "<freertos/FreeRTOS.h>".}: TickType_t
 

@@ -418,8 +418,7 @@ proc spi_flash_guard_get*(): ptr spi_flash_guard_funcs_t {.
 ##  @brief Default OS-aware flash access guard functions
 ##
 
-var g_flash_guard_default_ops* {.importc: "g_flash_guard_default_ops",
-                               header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
+# var g_flash_guard_default_ops* {.importc: "g_flash_guard_default_ops", header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
 
 ## *
 ##  @brief Non-OS flash access guard functions
@@ -428,8 +427,7 @@ var g_flash_guard_default_ops* {.importc: "g_flash_guard_default_ops",
 ##        It does not use any OS primitives and IPC and implies that only calling CPU is active.
 ##
 
-var g_flash_guard_no_os_ops* {.importc: "g_flash_guard_no_os_ops",
-                             header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
+# var g_flash_guard_no_os_ops* {.importc: "g_flash_guard_no_os_ops", header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
 
 # when CONFIG_SPI_FLASH_ENABLE_COUNTERS:
   ## *
