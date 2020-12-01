@@ -358,7 +358,7 @@ proc esp_partition_mmap*(partition: ptr esp_partition_t; offset: csize_t;
 ##           - ESP_FAIL: An allocation error occurred.
 ##
 
-proc esp_partition_get_sha256*(partition: ptr esp_partition_t; sha_256: ptr uint8): esp_err_t {.
+proc esp_partition_get_sha256*(partition: ptr esp_partition_t; sha_256: openArray[uint8]): esp_err_t {.
     importc: "esp_partition_get_sha256", header: "esp_partition.h".}
 
 
