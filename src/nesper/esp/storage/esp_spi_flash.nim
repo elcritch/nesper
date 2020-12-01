@@ -11,8 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-import
-  esp_err, sdkconfig
+import ../../consts
 
 const
   ESP_ERR_FLASH_OP_FAIL* = (ESP_ERR_FLASH_BASE + 1)
@@ -385,15 +384,14 @@ type
 type
   spi_flash_guard_funcs_t* {.importc: "spi_flash_guard_funcs_t",
                             header: "esp_spi_flash.h", bycopy.} = object
-    start* {.importc: "start".}: spi_flash_guard_start_func_t ## *< critical section start function.
-    `end`* {.importc: "end".}: spi_flash_guard_end_func_t ## *< critical section end function.
+    start_cb* {.importc: "start".}: spi_flash_guard_start_func_t ## *< critical section start function.
+    end_cb* {.importc: "end".}: spi_flash_guard_end_func_t ## *< critical section end function.
     op_lock* {.importc: "op_lock".}: spi_flash_op_lock_func_t ## *< flash access API lock function.
     op_unlock* {.importc: "op_unlock".}: spi_flash_op_unlock_func_t ## *< flash access API unlock function.
-    when not CONFIG_SPI_FLASH_DANGEROUS_WRITE_ALLOWED:
-      var is_safe_write_address* {.importc: "is_safe_write_address",
-                                 header: "esp_spi_flash.h".}: spi_flash_is_safe_write_address_t
-      ## *< checks flash write addresses.
-    `yield`* {.importc: "yield".}: spi_flash_os_yield_t ## *< yield to the OS during flash erase
+    # when not CONFIG_SPI_FLASH_DANGEROUS_WRITE_ALLOWED:
+    is_safe_write_address* {.importc: "is_safe_write_address".}: spi_flash_is_safe_write_address_t
+    ## *< checks flash write addresses.
+    yield_cb* {.importc: "yield".}: spi_flash_os_yield_t ## *< yield to the OS during flash erase
 
 
 ## *
@@ -433,38 +431,39 @@ var g_flash_guard_default_ops* {.importc: "g_flash_guard_default_ops",
 var g_flash_guard_no_os_ops* {.importc: "g_flash_guard_no_os_ops",
                              header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
 
-when CONFIG_SPI_FLASH_ENABLE_COUNTERS:
+# when CONFIG_SPI_FLASH_ENABLE_COUNTERS:
   ## *
   ##  Structure holding statistics for one type of operation
   ##
-  type
-    spi_flash_counter_t* {.importc: "spi_flash_counter_t",
+type
+  spi_flash_counter_t* {.importc: "spi_flash_counter_t",
+                        header: "esp_spi_flash.h", bycopy.} = object
+    count* {.importc: "count".}: uint32 ##  number of times operation was executed
+    time* {.importc: "time".}: uint32 ##  total time taken, in microseconds
+    bytes* {.importc: "bytes".}: uint32 ##  total number of bytes
+
+  spi_flash_counters_t* {.importc: "spi_flash_counters_t",
                           header: "esp_spi_flash.h", bycopy.} = object
-      count* {.importc: "count".}: uint32 ##  number of times operation was executed
-      time* {.importc: "time".}: uint32 ##  total time taken, in microseconds
-      bytes* {.importc: "bytes".}: uint32 ##  total number of bytes
+    read* {.importc: "read".}: spi_flash_counter_t
+    write* {.importc: "write".}: spi_flash_counter_t
+    erase* {.importc: "erase".}: spi_flash_counter_t
 
-    spi_flash_counters_t* {.importc: "spi_flash_counters_t",
-                           header: "esp_spi_flash.h", bycopy.} = object
-      read* {.importc: "read".}: spi_flash_counter_t
-      write* {.importc: "write".}: spi_flash_counter_t
-      erase* {.importc: "erase".}: spi_flash_counter_t
-
-  ## *
-  ##  @brief  Reset SPI flash operation counters
-  ##
-  proc spi_flash_reset_counters*() {.importc: "spi_flash_reset_counters",
-                                   header: "esp_spi_flash.h".}
-  ## *
-  ##  @brief  Print SPI flash operation counters
-  ##
-  proc spi_flash_dump_counters*() {.importc: "spi_flash_dump_counters",
+## *
+##  @brief  Reset SPI flash operation counters
+##
+proc spi_flash_reset_counters*() {.importc: "spi_flash_reset_counters",
                                   header: "esp_spi_flash.h".}
-  ## *
-  ##  @brief  Return current SPI flash operation counters
-  ##
-  ##  @return  pointer to the spi_flash_counters_t structure holding values
-  ##           of the operation counters
-  ##
-  proc spi_flash_get_counters*(): ptr spi_flash_counters_t {.
-      importc: "spi_flash_get_counters", header: "esp_spi_flash.h".}
+## *
+##  @brief  Print SPI flash operation counters
+##
+proc spi_flash_dump_counters*() {.importc: "spi_flash_dump_counters",
+                                header: "esp_spi_flash.h".}
+## *
+##  @brief  Return current SPI flash operation counters
+##
+##  @return  pointer to the spi_flash_counters_t structure holding values
+##           of the operation counters
+##
+proc spi_flash_get_counters*(): ptr spi_flash_counters_t {.
+    importc: "spi_flash_get_counters", header: "esp_spi_flash.h".}
+
