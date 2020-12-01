@@ -35,29 +35,19 @@ type
 type
   esp_flash_os_functions_t* {.importc: "esp_flash_os_functions_t",
                              header: "esp_flash.h", bycopy.} = object
-    start* {.importc: "start".}: proc (arg: pointer): esp_err_t 
-
-## \*
-                                                         ##  Called before commencing any flash operation. Does not need to be
-                                                         ##  recursive (ie is called at most once for each call to 'end').
-                                                         ##
-    
-
-## \* Called after completing any flash operation.
-    `end`* {.importc: "end".}: proc (arg: pointer): esp_err_t 
-
-## \* Called before any erase/write operations to check whether the region is limited by the OS
+    start_cb* {.importc: "start".}: proc (arg: pointer): esp_err_t 
+    ##  Called before commencing any flash operation. Does not need to be
+    ##  recursive (ie is called at most once for each call to 'end').
+    ##
+    ## \* Called after completing any flash operation.
+    end_cb* {.importc: "end".}: proc (arg: pointer): esp_err_t 
+    ## \* Called before any erase/write operations to check whether the region is limited by the OS
     region_protected* {.importc: "region_protected".}: proc (arg: pointer;
         start_addr: csize_t; size: csize_t): esp_err_t 
-
-## \* Delay for at least 'us' microseconds. Called in between 'start' and 'end'.
+    ## \* Delay for at least 'us' microseconds. Called in between 'start' and 'end'.
     delay_us* {.importc: "delay_us".}: proc (arg: pointer; us: cuint): esp_err_t 
-
-## \* Yield to other tasks. Called during erase
-                                                                        ## operations.
-    `yield`* {.importc: "yield".}: proc (arg: pointer): esp_err_t
-
-
+    ## \* Yield to other tasks. Called during erase operations.
+    yield_cb* {.importc: "yield".}: proc (arg: pointer): esp_err_t
 
 
 ## \* @brief Structure to describe a SPI flash chip connected to the system.
@@ -73,7 +63,7 @@ type
     # os_func_data* {.importc: "os_func_data".}: pointer ## /< Pointer to argument for os-specific hooks. Left NULL and will be initialized with ``os_func``.
     # read_mode* {.importc: "read_mode".}: esp_flash_io_mode_t ## /< Configured SPI flash read mode. Set before ``esp_flash_init`` is called.
     # size* {.importc: "size".}: uint32 ## /< Size of SPI flash in bytes. If 0, size will be detected during initialisation.
-    # chip_id* {.importc: "chip_id".}: uint32 ## /< Detected chip id.
+    chip_id* {.importc: "chip_id".}: uint32 ## /< Detected chip id.
 
 
 

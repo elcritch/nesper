@@ -42,13 +42,16 @@ typedef enum {
     ESP_PARTITION_TYPE_DATA = 0x01,      //!< Data partition type
 } esp_partition_type_t;
 
+#define ESP_PARTITION_SUBTYPE_APP_OTA_MIN 0x00000010 // ## !< Base for OTA partition subtypes
+#define ESP_PARTITION_SUBTYPE_APP_OTA_MAX ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16 // ## !< Base for OTA partition subtypes
+
 /**
  * @brief Partition subtype
  * @note Keep this enum in sync with PartitionDefinition class gen_esp32part.py
  */
 typedef enum {
     ESP_PARTITION_SUBTYPE_APP_FACTORY = 0x00,                                 //!< Factory application partition
-    ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 0x10,                                 //!< Base for OTA partition subtypes
+    // ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 0x10,                                 //!< Base for OTA partition subtypes
     ESP_PARTITION_SUBTYPE_APP_OTA_0 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 0,  //!< OTA partition 0
     ESP_PARTITION_SUBTYPE_APP_OTA_1 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 1,  //!< OTA partition 1
     ESP_PARTITION_SUBTYPE_APP_OTA_2 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 2,  //!< OTA partition 2
@@ -65,7 +68,7 @@ typedef enum {
     ESP_PARTITION_SUBTYPE_APP_OTA_13 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 13,//!< OTA partition 13
     ESP_PARTITION_SUBTYPE_APP_OTA_14 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 14,//!< OTA partition 14
     ESP_PARTITION_SUBTYPE_APP_OTA_15 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 15,//!< OTA partition 15
-    ESP_PARTITION_SUBTYPE_APP_OTA_MAX = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16,//!< Max subtype of OTA partition
+    // ESP_PARTITION_SUBTYPE_APP_OTA_MAX = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16,//!< Max subtype of OTA partition
     ESP_PARTITION_SUBTYPE_APP_TEST = 0x20,                                    //!< Test application partition
 
     ESP_PARTITION_SUBTYPE_DATA_OTA = 0x00,                                    //!< OTA selection partition
@@ -85,7 +88,8 @@ typedef enum {
 /**
  * @brief Convenience macro to get esp_partition_subtype_t value for the i-th OTA partition
  */
-#define ESP_PARTITION_SUBTYPE_OTA(i) ((esp_partition_subtype_t)(ESP_PARTITION_SUBTYPE_APP_OTA_MIN + ((i) & 0xf)))
+// #define ESP_PARTITION_SUBTYPE_OTA(i) ((esp_partition_subtype_t)(ESP_PARTITION_SUBTYPE_APP_OTA_MIN + ((i) & 0xf)))
+uint32 ESP_PARTITION_SUBTYPE_OTA(uint32 i);
 
 /**
  * @brief Opaque partition iterator type
@@ -103,8 +107,8 @@ typedef struct {
     esp_flash_t* flash_chip;            /*!< SPI flash chip on which the partition resides */
     esp_partition_type_t type;          /*!< partition type (app/data) */
     esp_partition_subtype_t subtype;    /*!< partition subtype */
-    uint32_t address;                   /*!< starting address of the partition in flash */
-    uint32_t size;                      /*!< size of the partition, in bytes */
+    uint32 address;                   /*!< starting address of the partition in flash */
+    uint32 size;                      /*!< size of the partition, in bytes */
     char label[17];                     /*!< partition label, zero-terminated ASCII string */
     bool encrypted;                     /*!< flag is set to true if partition is encrypted */
 } esp_partition_t;
@@ -309,7 +313,7 @@ esp_err_t esp_partition_mmap(const esp_partition_t* partition, size_t offset, si
  *          - ESP_ERR_IMAGE_INVALID: App partition doesn't contain a valid app image.
  *          - ESP_FAIL: An allocation error occurred.
  */
-esp_err_t esp_partition_get_sha256(const esp_partition_t *partition, uint8_t *sha_256);
+esp_err_t esp_partition_get_sha256(const esp_partition_t *partition, uint8 *sha_256);
 
 /**
  * @brief Check for the identity of two partitions by SHA-256 digest.

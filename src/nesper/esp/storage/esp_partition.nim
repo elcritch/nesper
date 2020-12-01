@@ -11,17 +11,22 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
+import ../../consts
+import esp_flash
+import esp_spi_flash
+
+
 
 ## *
 ##  @file esp_partition.h
 ##  @brief Partition APIs
 ##
+
+
 ## *
 ##  @brief Partition type
 ##  @note Keep this enum in sync with PartitionDefinition class gen_esp32part.py
 ##
-
-const chdr = "esp_partition.h"
 
 type
   esp_partition_type_t* {.size: sizeof(cint).} = enum
@@ -29,13 +34,16 @@ type
     ESP_PARTITION_TYPE_DATA = 0x00000001 ## !< Data partition type
 
 
+const
+  ESP_PARTITION_SUBTYPE_APP_OTA_MIN* = 0x00000010
+  ESP_PARTITION_SUBTYPE_APP_OTA_MAX* = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16
+
+
+
 ## *
 ##  @brief Partition subtype
 ##  @note Keep this enum in sync with PartitionDefinition class gen_esp32part.py
 ##
-
-const
-    ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 0x00000010 ## !< Base for OTA partition subtypes
 
 type
   esp_partition_subtype_t* {.size: sizeof(cint).} = enum
@@ -45,7 +53,7 @@ type
     ESP_PARTITION_SUBTYPE_DATA_COREDUMP = 0x00000003, ## !< COREDUMP partition
     ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS = 0x00000004, ## !< Partition for NVS keys
     ESP_PARTITION_SUBTYPE_DATA_EFUSE_EM = 0x00000005, ## !< Partition for emulate eFuse bits
-    # ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 0x00000010, ## !< Base for OTA partition subtypes
+    ##  ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 0x10,                                 //!< Base for OTA partition subtypes
     ESP_PARTITION_SUBTYPE_APP_OTA_0 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 0, ## !< OTA partition 0
     ESP_PARTITION_SUBTYPE_APP_OTA_1 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 1, ## !< OTA partition 1
     ESP_PARTITION_SUBTYPE_APP_OTA_2 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 2, ## !< OTA partition 2
@@ -62,7 +70,7 @@ type
     ESP_PARTITION_SUBTYPE_APP_OTA_13 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 13, ## !< OTA partition 13
     ESP_PARTITION_SUBTYPE_APP_OTA_14 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 14, ## !< OTA partition 14
     ESP_PARTITION_SUBTYPE_APP_OTA_15 = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 15, ## !< OTA partition 15
-    # ESP_PARTITION_SUBTYPE_APP_OTA_MAX = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16, ## !< Max subtype of OTA partition
+    ##  ESP_PARTITION_SUBTYPE_APP_OTA_MAX = ESP_PARTITION_SUBTYPE_APP_OTA_MIN + 16,//!< Max subtype of OTA partition
     ESP_PARTITION_SUBTYPE_APP_TEST = 0x00000020, ## !< Test application partition
     ESP_PARTITION_SUBTYPE_DATA_ESPHTTPD = 0x00000080, ## !< ESPHTTPD partition
     ESP_PARTITION_SUBTYPE_DATA_FAT = 0x00000081, ## !< FAT partition
@@ -70,15 +78,18 @@ type
     ESP_PARTITION_SUBTYPE_ANY = 0x000000FF ## !< Used to search for partitions with any subtype
 
 const
-  ESP_PARTITION_SUBTYPE_DATA_OTA = ESP_PARTITION_SUBTYPE_APP_FACTORY
+  ESP_PARTITION_SUBTYPE_DATA_OTA* = ESP_PARTITION_SUBTYPE_APP_FACTORY
+
+
 
 ## *
 ##  @brief Convenience macro to get esp_partition_subtype_t value for the i-th OTA partition
 ##
+##  #define ESP_PARTITION_SUBTYPE_OTA(i) ((esp_partition_subtype_t)(ESP_PARTITION_SUBTYPE_APP_OTA_MIN + ((i) & 0xf)))
 
-# template ESP_PARTITION_SUBTYPE_OTA*(i: untyped): untyped =
-  # ((esp_partition_subtype_t)(ESP_PARTITION_SUBTYPE_APP_OTA_MIN +
-      # ((i) and 0x0000000F)))
+proc ESP_PARTITION_SUBTYPE_OTA*(i: uint32): uint32 {.
+    importc: "ESP_PARTITION_SUBTYPE_OTA", header: "esp_partition.h".}
+
 
 ## *
 ##  @brief Opaque partition iterator type
@@ -89,6 +100,8 @@ const
 
 type
   esp_partition_iterator_t* = distinct ptr 
+
+
 
 ## *
 ##  @brief partition information structure
@@ -103,10 +116,12 @@ type
     flash_chip* {.importc: "flash_chip".}: ptr esp_flash_t ## !< SPI flash chip on which the partition resides
     `type`* {.importc: "type".}: esp_partition_type_t ## !< partition type (app/data)
     subtype* {.importc: "subtype".}: esp_partition_subtype_t ## !< partition subtype
-    address* {.importc: "address".}: uint32_t ## !< starting address of the partition in flash
-    size* {.importc: "size".}: uint32_t ## !< size of the partition, in bytes
+    address* {.importc: "address".}: uint32 ## !< starting address of the partition in flash
+    size* {.importc: "size".}: uint32 ## !< size of the partition, in bytes
     label* {.importc: "label".}: array[17, char] ## !< partition label, zero-terminated ASCII string
     encrypted* {.importc: "encrypted".}: bool ## !< flag is set to true if partition is encrypted
+
+
 
 
 ## *
@@ -128,6 +143,8 @@ type
 proc esp_partition_find*(`type`: esp_partition_type_t;
                         subtype: esp_partition_subtype_t; label: cstring): esp_partition_iterator_t {.
     importc: "esp_partition_find", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Find first partition based on one or more parameters
 ##
@@ -145,6 +162,8 @@ proc esp_partition_find*(`type`: esp_partition_type_t;
 proc esp_partition_find_first*(`type`: esp_partition_type_t;
                               subtype: esp_partition_subtype_t; label: cstring): ptr esp_partition_t {.
     importc: "esp_partition_find_first", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Get esp_partition_t structure for given partition
 ##
@@ -156,6 +175,8 @@ proc esp_partition_find_first*(`type`: esp_partition_type_t;
 
 proc esp_partition_get*(`iterator`: esp_partition_iterator_t): ptr esp_partition_t {.
     importc: "esp_partition_get", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Move partition iterator to the next partition found
 ##
@@ -168,6 +189,8 @@ proc esp_partition_get*(`iterator`: esp_partition_iterator_t): ptr esp_partition
 
 proc esp_partition_next*(`iterator`: esp_partition_iterator_t): esp_partition_iterator_t {.
     importc: "esp_partition_next", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Release partition iterator
 ##
@@ -177,6 +200,8 @@ proc esp_partition_next*(`iterator`: esp_partition_iterator_t): esp_partition_it
 
 proc esp_partition_iterator_release*(`iterator`: esp_partition_iterator_t) {.
     importc: "esp_partition_iterator_release", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Verify partition data
 ##
@@ -198,6 +223,8 @@ proc esp_partition_iterator_release*(`iterator`: esp_partition_iterator_t) {.
 
 proc esp_partition_verify*(partition: ptr esp_partition_t): ptr esp_partition_t {.
     importc: "esp_partition_verify", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Read data from the partition
 ##
@@ -219,6 +246,8 @@ proc esp_partition_verify*(partition: ptr esp_partition_t): ptr esp_partition_t 
 proc esp_partition_read*(partition: ptr esp_partition_t; src_offset: csize_t;
                         dst: pointer; size: csize_t): esp_err_t {.
     importc: "esp_partition_read", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Write data to the partition
 ##
@@ -253,6 +282,8 @@ proc esp_partition_read*(partition: ptr esp_partition_t; src_offset: csize_t;
 proc esp_partition_write*(partition: ptr esp_partition_t; dst_offset: csize_t;
                          src: pointer; size: csize_t): esp_err_t {.
     importc: "esp_partition_write", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Erase part of the partition
 ##
@@ -273,6 +304,8 @@ proc esp_partition_write*(partition: ptr esp_partition_t; dst_offset: csize_t;
 proc esp_partition_erase_range*(partition: ptr esp_partition_t; offset: csize_t;
                                size: csize_t): esp_err_t {.
     importc: "esp_partition_erase_range", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Configure MMU to map partition into data memory
 ##
@@ -304,6 +337,8 @@ proc esp_partition_mmap*(partition: ptr esp_partition_t; offset: csize_t;
                         out_ptr: ptr pointer;
                         out_handle: ptr spi_flash_mmap_handle_t): esp_err_t {.
     importc: "esp_partition_mmap", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Get SHA-256 digest for required partition.
 ##
@@ -323,8 +358,10 @@ proc esp_partition_mmap*(partition: ptr esp_partition_t; offset: csize_t;
 ##           - ESP_FAIL: An allocation error occurred.
 ##
 
-proc esp_partition_get_sha256*(partition: ptr esp_partition_t; sha_256: ptr uint8_t): esp_err_t {.
+proc esp_partition_get_sha256*(partition: ptr esp_partition_t; sha_256: ptr uint8): esp_err_t {.
     importc: "esp_partition_get_sha256", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Check for the identity of two partitions by SHA-256 digest.
 ##
@@ -339,6 +376,8 @@ proc esp_partition_get_sha256*(partition: ptr esp_partition_t; sha_256: ptr uint
 proc esp_partition_check_identity*(partition_1: ptr esp_partition_t;
                                   partition_2: ptr esp_partition_t): bool {.
     importc: "esp_partition_check_identity", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Register a partition on an external flash chip
 ##
@@ -367,6 +406,8 @@ proc esp_partition_register_external*(flash_chip: ptr esp_flash_t; offset: csize
                                      subtype: esp_partition_subtype_t;
                                      out_partition: ptr ptr esp_partition_t): esp_err_t {.
     importc: "esp_partition_register_external", header: "esp_partition.h".}
+
+
 ## *
 ##  @brief Deregister the partition previously registered using esp_partition_register_external
 ##  @param partition  pointer to the partition structure obtained from esp_partition_register_external,

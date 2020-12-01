@@ -14,7 +14,9 @@
 # import
 #   esp_err, esp_partition, esp_image_format, esp_flash_partitions
 import ../../consts
+
 import esp_app_format
+import esp_partition
 
 const
     chdr = "<esp_https_ota.h>"
