@@ -483,7 +483,6 @@ proc spi_flash_guard_get*(): ptr spi_flash_guard_funcs_t {.
     importc: "spi_flash_guard_get", header: "esp_spi_flash.h".}
 
 
-
 ## *
 ##  @brief Default OS-aware flash access guard functions
 ##

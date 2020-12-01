@@ -102,7 +102,7 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = t
             addr data[sz_image_hdr + sz_image_seg_hdr],
             sizeof(esp_app_desc_t))
 
-    TAG.logi("New firmware version: %s", new_app_info.versionStr())
+    TAG.logw("Writing New firmware version: %s", new_app_info.versionStr())
     if not version_check:
       return (status: VersionUnchecked, info: new_app_info)
 
@@ -135,7 +135,7 @@ proc write*(ota: var OtaUpdateHandle, write_data: var string) =
     raise newEspError[OtaError]("Error ota write: " & $esp_err_to_name(err), err)
   ota.total_written.inc(write_data.len())
 
-proc finish*(ota: var OtaUpdateHandle, write_data: var string) =
+proc finish*(ota: var OtaUpdateHandle) =
   if ota.handle.uint32 != 0:
     let err = esp_ota_end(ota.handle)
     if err.uint32 == ESP_ERR_OTA_VALIDATE_FAILED:
