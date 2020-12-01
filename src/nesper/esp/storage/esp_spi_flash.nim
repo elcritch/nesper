@@ -443,25 +443,18 @@ type
   spi_flash_guard_funcs_t* {.importc: "spi_flash_guard_funcs_t",
                             header: "esp_spi_flash.h", bycopy.} = object
     start_cb* {.importc: "start".}: spi_flash_guard_start_func_t 
-
-## *< critical section start function.
+    ## *< critical section start function.
     end_cb* {.importc: "end".}: spi_flash_guard_end_func_t 
-
-## *< critical section end function.
+    ## *< critical section end function.
     op_lock* {.importc: "op_lock".}: spi_flash_op_lock_func_t 
-
-## *< flash access API lock function.
+    ## *< flash access API lock function.
     op_unlock* {.importc: "op_unlock".}: spi_flash_op_unlock_func_t 
-
-## *< flash access API unlock function.
+    ## *< flash access API unlock function.
     # when not CONFIG_SPI_FLASH_DANGEROUS_WRITE_ALLOWED:
     is_safe_write_address* {.importc: "is_safe_write_address".}: spi_flash_is_safe_write_address_t
-    
-
-## *< checks flash write addresses.
+    ## *< checks flash write addresses.
     yield_cb* {.importc: "yield".}: spi_flash_os_yield_t 
-
-## *< yield to the OS during flash erase
+    ## *< yield to the OS during flash erase
 
 
 
