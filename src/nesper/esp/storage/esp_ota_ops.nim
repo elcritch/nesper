@@ -19,6 +19,10 @@ import esp_app_format
 import esp_partition
 import esp_flash_partitions
 
+export esp_app_format
+export esp_partition
+export esp_flash_partitions
+
 const
     chdr = "<esp_https_ota.h>"
 
