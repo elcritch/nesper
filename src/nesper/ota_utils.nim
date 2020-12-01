@@ -43,6 +43,19 @@ proc dateStr*(info: esp_app_desc_t): string =
 proc idfVerStr*(info: esp_app_desc_t): string =
   return info.idf_ver.join()
 
+proc currentFirmwareInfo*(): esp_app_desc_t =
+  let running: ptr esp_partition_t = esp_ota_get_running_partition()
+  let err = running.esp_ota_get_partition_description(addr result)
+  if err != ESP_OK:
+    raise newEspError[OtaError]("failed to read current firmware info" & $esp_err_to_name(err), err)
+
+proc lastInvalidFirmwareInfo*(): esp_app_desc_t =
+  var last_invalid_app: ptr esp_partition_t = esp_ota_get_last_invalid_partition()
+
+  let err = last_invalid_app.esp_ota_get_partition_description(addr result)
+  if err != ESP_OK:
+    raise newEspError[OtaError]("failed to read last failed firmware info" & $esp_err_to_name(err), err)
+
 
 proc newOtaUpdateHandle*(startFrom: ptr esp_partition_t = nil): OtaUpdateHandle =
   result = new(OtaUpdateHandle)
@@ -106,25 +119,20 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = t
     if not version_check:
       return (status: VersionUnchecked, info: new_app_info)
 
-    var running_app_info: esp_app_desc_t
+    var currApp: esp_app_desc_t = currentFirmwareInfo()
+    TAG.logi("Running firmware version: %s on date: %s at %s", currApp.versionStr(), currApp.dateStr(), currApp.timeStr())
 
-    if ota.running.esp_ota_get_partition_description(addr running_app_info) == ESP_OK:
-      TAG.logi("Running firmware version: %s", running_app_info.versionStr())
+    var lastInvApp: esp_app_desc_t = lastInvalidFirmwareInfo()
+    TAG.logi("Last invalid firmware version: %s", lastInvApp.versionStr())
 
-    var last_invalid_app: ptr esp_partition_t = esp_ota_get_last_invalid_partition()
-    var invalid_app_info: esp_app_desc_t
-
-    if last_invalid_app.esp_ota_get_partition_description(addr invalid_app_info) == ESP_OK:
-      TAG.logi("Last invalid firmware version: %s", invalid_app_info.versionStr())
-
-    if last_invalid_app != nil and invalid_app_info.version == new_app_info.version:
+    if lastInvApp.version == currApp.version:
       TAG.logw("New version is the same as invalid version.")
       TAG.logw("Previously, there was an attempt to launch the firmware with %s version, but it failed.",
-                invalid_app_info.versionStr())
+                lastInvApp.versionStr())
       TAG.logw("The firmware has been rolled back to the previous version.")
       return (status: VersionMatchesPreviousInvalid, info: new_app_info)
 
-    if new_app_info.version == running_app_info.version:
+    if new_app_info.version == currApp.version:
       return (status: VersionSameAsCurrent, info: new_app_info)
 
     return (status: VersionNewer, info: new_app_info)
