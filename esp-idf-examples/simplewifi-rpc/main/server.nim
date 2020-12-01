@@ -17,13 +17,17 @@ when defined(TcpMpackRpcQueueServer):
   import nesper/servers/rpc/rpcsocket_queue_mpack
 elif not defined(TcpEchoServer):
   import nesper/servers/rpc/rpcsocket_mpack
+elif defined(TcpEchoServer):
+  import nesper/servers/tcpsocket
+else:
+  {.fatal: "Compile this program with an rpc strategy!".}
 
 
 when defined(TcpEchoServer):
   proc run_rpc_server*() =
     echo "starting server on port 5555"
-    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data="echo: ")
-    # startRpcSocketServer(Port(5555))
+    var msg = "echo: "
+    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data=msg)
 
 else:
 

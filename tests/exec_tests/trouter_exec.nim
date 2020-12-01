@@ -59,4 +59,6 @@ var call3 = %* {
 var res3 = rt1.route( call3 )
 echo "Result 3: "
 echo res3
+
+delete(res3["error"], "stacktrace")
 assert res3 == err_res

@@ -1,4 +1,5 @@
 import json, tables, strutils, macros, options
+import sequtils
 
 import marshal
 
@@ -111,10 +112,24 @@ proc wrapReply*(id: JsonNode, value: JsonNode): JsonNode =
 proc wrapReplyError*(id: JsonNode, error: JsonNode): JsonNode =
   return %* {"jsonrpc":"2.0", "id": id, "error": error}
 
+proc `%`(err: StackTraceEntry): JsonNode =
+  # StackTraceEntry = object
+  # procname*: cstring         ## Name of the proc that is currently executing.
+  # line*: int                 ## Line number of the proc that is currently executing.
+  # filename*: cstring         ## Filename of the proc that is currently executing.
+  let
+    pc: string = $err.procname
+    fl: string = $err.filename
+    ln: int = err.line.int
+
+  return %* (procname: pc, line: err.line, filename: fl)
+
 proc wrapError*(code: int, msg: string, id: JsonNode,
-                data: JsonNode = newJNull()): JsonNode {.gcsafe.} =
+                data: JsonNode = newJNull(), err: ref Exception = nil): JsonNode {.gcsafe.} =
   # Create standardised error json
-  result = %* { "code": code,"id": id,"message": escapeJson(msg),"data":data }
+  result = %* { "code": code, "id": id, "message": escapeJson(msg), "data": data }
+  if err != nil:
+    result["stacktrace"] = %* err.getStackTraceEntries()
   echo "Error generated: ", "result: ", result, " id: ", id
 
 template wrapException(body: untyped) =
@@ -147,7 +162,7 @@ proc route*(router: RpcRouter, node: JsonNode): JsonNode {.gcsafe.} =
     except CatchableError as err:
       # echo "Error occurred within RPC", " methodName: ", methodName, "errorMessage = ", err.msg
       let error = wrapError(SERVER_ERROR, methodName & " raised an exception",
-                            id, newJString(err.msg))
+                            id, % err.msg, err)
       result = wrapReplyError(id, error)
 
 proc makeProcName(s: string): string =
