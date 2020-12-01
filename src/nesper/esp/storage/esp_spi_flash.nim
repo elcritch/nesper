@@ -19,12 +19,18 @@ const
 
 var SPI_FLASH_SEC_SIZE* {.importc: "SPI_FLASH_SEC_SIZE", header: "esp_spi_flash.h".}: csize_t
 
+
+
 ## *< SPI Flash sector size
 
 var SPI_FLASH_MMU_PAGE_SIZE* {.importc: "SPI_FLASH_MMU_PAGE_SIZE",
                              header: "esp_spi_flash.h".}: csize_t
 
+
+
 ## *< Flash cache MMU mapping page size
+
+
 ## *
 ##  @brief  Initialize SPI flash access driver
 ##
@@ -36,6 +42,8 @@ var SPI_FLASH_MMU_PAGE_SIZE* {.importc: "SPI_FLASH_MMU_PAGE_SIZE",
 ##
 
 proc spi_flash_init*() {.importc: "spi_flash_init", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Get flash chip size, as set in binary image header
 ##
@@ -46,6 +54,8 @@ proc spi_flash_init*() {.importc: "spi_flash_init", header: "esp_spi_flash.h".}
 
 proc spi_flash_get_chip_size*(): csize_t {.importc: "spi_flash_get_chip_size",
                                         header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Erase the Flash sector.
 ##
@@ -56,6 +66,8 @@ proc spi_flash_get_chip_size*(): csize_t {.importc: "spi_flash_get_chip_size",
 
 proc spi_flash_erase_sector*(sector: csize_t): esp_err_t {.
     importc: "spi_flash_erase_sector", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Erase a range of flash sectors
 ##
@@ -68,6 +80,8 @@ proc spi_flash_erase_sector*(sector: csize_t): esp_err_t {.
 
 proc spi_flash_erase_range*(start_address: csize_t; size: csize_t): esp_err_t {.
     importc: "spi_flash_erase_range", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Write data to Flash.
 ##
@@ -87,6 +101,8 @@ proc spi_flash_erase_range*(start_address: csize_t; size: csize_t): esp_err_t {.
 
 proc spi_flash_write*(dest_addr: csize_t; src: pointer; size: csize_t): esp_err_t {.
     importc: "spi_flash_write", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Write data encrypted to Flash.
 ##
@@ -110,6 +126,8 @@ proc spi_flash_write*(dest_addr: csize_t; src: pointer; size: csize_t): esp_err_
 
 proc spi_flash_write_encrypted*(dest_addr: csize_t; src: pointer; size: csize_t): esp_err_t {.
     importc: "spi_flash_write_encrypted", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Read data from Flash.
 ##
@@ -134,6 +152,8 @@ proc spi_flash_write_encrypted*(dest_addr: csize_t; src: pointer; size: csize_t)
 
 proc spi_flash_read*(src_addr: csize_t; dest: pointer; size: csize_t): esp_err_t {.
     importc: "spi_flash_read", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Read data from Encrypted Flash.
 ##
@@ -151,14 +171,22 @@ proc spi_flash_read*(src_addr: csize_t; dest: pointer; size: csize_t): esp_err_t
 
 proc spi_flash_read_encrypted*(src: csize_t; dest: pointer; size: csize_t): esp_err_t {.
     importc: "spi_flash_read_encrypted", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief Enumeration which specifies memory space requested in an mmap call
 ##
 
 type
   spi_flash_mmap_memory_t* {.size: sizeof(cint).} = enum
-    SPI_FLASH_MMAP_DATA,      ## *< map to data memory (Vaddr0), allows byte-aligned access, 4 MB total
-    SPI_FLASH_MMAP_INST       ## *< map to instruction memory (Vaddr1-3), allows only 4-byte-aligned access, 11 MB total
+    SPI_FLASH_MMAP_DATA,      
+
+## *< map to data memory (Vaddr0), allows byte-aligned access, 4 MB total
+    SPI_FLASH_MMAP_INST       
+
+## *< map to instruction memory (Vaddr1-3), allows only 4-byte-aligned access, 11 MB total
+
+
 
 
 ## *
@@ -167,6 +195,8 @@ type
 
 type
   spi_flash_mmap_handle_t* = uint32
+
+
 
 ## *
 ##  @brief Map region of flash memory into data or instruction address space
@@ -195,6 +225,8 @@ proc spi_flash_mmap*(src_addr: csize_t; size: csize_t;
                     memory: spi_flash_mmap_memory_t; out_ptr: ptr pointer;
                     out_handle: ptr spi_flash_mmap_handle_t): esp_err_t {.
     importc: "spi_flash_mmap", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief Map sequences of pages of flash memory into data or instruction address space
 ##
@@ -223,6 +255,8 @@ proc spi_flash_mmap_pages*(pages: ptr cint; page_count: csize_t;
                           memory: spi_flash_mmap_memory_t; out_ptr: ptr pointer;
                           out_handle: ptr spi_flash_mmap_handle_t): esp_err_t {.
     importc: "spi_flash_mmap_pages", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief Release region previously obtained using spi_flash_mmap
 ##
@@ -236,6 +270,8 @@ proc spi_flash_mmap_pages*(pages: ptr cint; page_count: csize_t;
 
 proc spi_flash_munmap*(handle: spi_flash_mmap_handle_t) {.
     importc: "spi_flash_munmap", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief Display information about mapped regions
 ##
@@ -246,6 +282,8 @@ proc spi_flash_munmap*(handle: spi_flash_mmap_handle_t) {.
 
 proc spi_flash_mmap_dump*() {.importc: "spi_flash_mmap_dump",
                             header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief get free pages number which can be mmap
 ##
@@ -264,6 +302,8 @@ var SPI_FLASH_CACHE2PHYS_FAIL* {.importc: "SPI_FLASH_CACHE2PHYS_FAIL",
                                header: "esp_spi_flash.h".}: uint32
 
 ## <! Result from spi_flash_cache2phys() if flash cache address is invalid
+
+
 ## *
 ##  @brief Given a memory address where flash is mapped, return the corresponding physical flash offset.
 ##
@@ -278,6 +318,8 @@ var SPI_FLASH_CACHE2PHYS_FAIL* {.importc: "SPI_FLASH_CACHE2PHYS_FAIL",
 
 proc spi_flash_cache2phys*(cached: pointer): csize_t {.
     importc: "spi_flash_cache2phys", header: "esp_spi_flash.h".}
+
+
 ## * @brief Given a physical offset in flash, return the address where it is mapped in the memory space.
 ##
 ##  Physical address does not have to have been assigned via spi_flash_mmap(), any address in flash can be looked up.
@@ -299,6 +341,8 @@ proc spi_flash_cache2phys*(cached: pointer): csize_t {.
 
 proc spi_flash_phys2cache*(phys_offs: csize_t; memory: spi_flash_mmap_memory_t): pointer {.
     importc: "spi_flash_phys2cache", header: "esp_spi_flash.h".}
+
+
 ## * @brief Check at runtime if flash cache is enabled on both CPUs
 ##
 ##  @return true if both CPUs have flash cache enabled, false otherwise.
@@ -306,6 +350,8 @@ proc spi_flash_phys2cache*(phys_offs: csize_t; memory: spi_flash_mmap_memory_t):
 
 proc spi_flash_cache_enabled*(): bool {.importc: "spi_flash_cache_enabled",
                                      header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief SPI flash critical section enter function.
 ##
@@ -314,12 +360,16 @@ proc spi_flash_cache_enabled*(): bool {.importc: "spi_flash_cache_enabled",
 type
   spi_flash_guard_start_func_t* = proc ()
 
+
+
 ## *
 ##  @brief SPI flash critical section exit function.
 ##
 
 type
   spi_flash_guard_end_func_t* = proc ()
+
+
 
 ## *
 ##  @brief SPI flash operation lock function.
@@ -328,12 +378,16 @@ type
 type
   spi_flash_op_lock_func_t* = proc ()
 
+
+
 ## *
 ##  @brief SPI flash operation unlock function.
 ##
 
 type
   spi_flash_op_unlock_func_t* = proc ()
+
+
 
 ## *
 ##  @brief Function to protect SPI flash critical regions corruption.
@@ -342,12 +396,16 @@ type
 type
   spi_flash_is_safe_write_address_t* = proc (`addr`: csize_t; size: csize_t): bool
 
+
+
 ## *
 ##  @brief Function to yield to the OS during erase operation.
 ##
 
 type
   spi_flash_os_yield_t* = proc ()
+
+
 
 ## *
 ##  Structure holding SPI flash access critical sections management functions.
@@ -384,14 +442,28 @@ type
 type
   spi_flash_guard_funcs_t* {.importc: "spi_flash_guard_funcs_t",
                             header: "esp_spi_flash.h", bycopy.} = object
-    start_cb* {.importc: "start".}: spi_flash_guard_start_func_t ## *< critical section start function.
-    end_cb* {.importc: "end".}: spi_flash_guard_end_func_t ## *< critical section end function.
-    op_lock* {.importc: "op_lock".}: spi_flash_op_lock_func_t ## *< flash access API lock function.
-    op_unlock* {.importc: "op_unlock".}: spi_flash_op_unlock_func_t ## *< flash access API unlock function.
+    start_cb* {.importc: "start".}: spi_flash_guard_start_func_t 
+
+## *< critical section start function.
+    end_cb* {.importc: "end".}: spi_flash_guard_end_func_t 
+
+## *< critical section end function.
+    op_lock* {.importc: "op_lock".}: spi_flash_op_lock_func_t 
+
+## *< flash access API lock function.
+    op_unlock* {.importc: "op_unlock".}: spi_flash_op_unlock_func_t 
+
+## *< flash access API unlock function.
     # when not CONFIG_SPI_FLASH_DANGEROUS_WRITE_ALLOWED:
     is_safe_write_address* {.importc: "is_safe_write_address".}: spi_flash_is_safe_write_address_t
-    ## *< checks flash write addresses.
-    yield_cb* {.importc: "yield".}: spi_flash_os_yield_t ## *< yield to the OS during flash erase
+    
+
+## *< checks flash write addresses.
+    yield_cb* {.importc: "yield".}: spi_flash_os_yield_t 
+
+## *< yield to the OS during flash erase
+
+
 
 
 ## *
@@ -405,6 +477,8 @@ type
 
 proc spi_flash_guard_set*(funcs: ptr spi_flash_guard_funcs_t) {.
     importc: "spi_flash_guard_set", header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief Get the guard functions used for flash access
 ##
@@ -414,11 +488,16 @@ proc spi_flash_guard_set*(funcs: ptr spi_flash_guard_funcs_t) {.
 
 proc spi_flash_guard_get*(): ptr spi_flash_guard_funcs_t {.
     importc: "spi_flash_guard_get", header: "esp_spi_flash.h".}
+
+
+
 ## *
 ##  @brief Default OS-aware flash access guard functions
 ##
 
 # var g_flash_guard_default_ops* {.importc: "g_flash_guard_default_ops", header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
+
+
 
 ## *
 ##  @brief Non-OS flash access guard functions
@@ -430,9 +509,11 @@ proc spi_flash_guard_get*(): ptr spi_flash_guard_funcs_t {.
 # var g_flash_guard_no_os_ops* {.importc: "g_flash_guard_no_os_ops", header: "esp_spi_flash.h".}: spi_flash_guard_funcs_t
 
 # when CONFIG_SPI_FLASH_ENABLE_COUNTERS:
-  ## *
-  ##  Structure holding statistics for one type of operation
-  ##
+
+
+## *
+##  Structure holding statistics for one type of operation
+##
 type
   spi_flash_counter_t* {.importc: "spi_flash_counter_t",
                         header: "esp_spi_flash.h", bycopy.} = object
@@ -446,16 +527,22 @@ type
     write* {.importc: "write".}: spi_flash_counter_t
     erase* {.importc: "erase".}: spi_flash_counter_t
 
+
+
 ## *
 ##  @brief  Reset SPI flash operation counters
 ##
 proc spi_flash_reset_counters*() {.importc: "spi_flash_reset_counters",
                                   header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Print SPI flash operation counters
 ##
 proc spi_flash_dump_counters*() {.importc: "spi_flash_dump_counters",
                                 header: "esp_spi_flash.h".}
+
+
 ## *
 ##  @brief  Return current SPI flash operation counters
 ##
