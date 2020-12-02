@@ -34,15 +34,15 @@ type
 
 
 proc versionStr*(info: esp_app_desc_t): string =
-  return info.version.filterIt(it == char 0).join()
+  return info.version.filterIt(it != char 0).join()
 proc projectNameStr*(info: esp_app_desc_t): string =
-  return info.project_name.filterIt(it == char 0).join()
+  return info.project_name.filterIt(it != char 0).join()
 proc timeStr*(info: esp_app_desc_t): string =
-  return info.time.filterIt(it == char 0).join()
+  return info.time.filterIt(it != char 0).join()
 proc dateStr*(info: esp_app_desc_t): string =
-  return info.date.filterIt(it == char 0).join()
+  return info.date.filterIt(it != char 0).join()
 proc idfVerStr*(info: esp_app_desc_t): string =
-  return info.idf_ver.filterIt(it == char 0).join()
+  return info.idf_ver.filterIt(it != char 0).join()
 
 
 proc currentFirmwareInfo*(): esp_app_desc_t =
