@@ -301,13 +301,17 @@ proc releaseBus*(dev: SpiDev) {.inline.} =
 
 template withSpiBus*(dev: SpiDev, blk: untyped): untyped =
   dev.acquireBus()
-  blk
-  dev.releaseBus()
+  try:
+    blk
+  finally:
+    dev.releaseBus()
 
 template withSpiBus*(dev: SpiDev, wait: TickType_t, blk: untyped): untyped =
   dev.acquireBus(wait)
-  blk
-  dev.releaseBus()
+  try:
+    blk
+  finally:
+    dev.releaseBus()
 
 proc queue*(trn: var SpiTrans, ticks_to_wait: TickType_t = portMAX_DELAY) = 
   let ret: esp_err_t =
