@@ -15,8 +15,8 @@ $(NIMBLE):
 default: mpack_rpc_queue_server
 
 json_rpc_server: clean
-	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
-	nim c --nimblePath:$(NIMBLE)/pkgs -d:TcpMpackRpcServer -o:rpc_cli rpc_cli_test.nim 
+	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpJsonRpcServer $(NIMFLAGS) && idf.py reconfigure 
+	nim c --nimblePath:$(NIMBLE)/pkgs -d:TcpJsonRpcServer -o:rpc_cli rpc_cli_test.nim 
 
 mpack_rpc_server: clean
 	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpMpackRpcServer $(NIMFLAGS) && idf.py reconfigure 
