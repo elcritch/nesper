@@ -1,18 +1,16 @@
 import json, tables, strutils, macros, options
-import net, os
+import net, os, io, streams
 import times
 import stats
 import sequtils
 import locks
 import times
 
-# import nesper/servers/rpc/router
-
-when not defined(TcpJsonRpcServer):
-  import msgpack4nim
-  import msgpack4nim/msgpack2json
-
+import msgpack4nim
+import msgpack4nim/msgpack2json
 import parseopt
+
+import std/sha1
 
 # var p = initOptParser("-ab -e:5 --foo --bar=20 file.txt")
 var p = initOptParser()
@@ -52,32 +50,24 @@ proc echo*(color: CliColors, text: varargs[string]) =
   stdout.flushFile()
 
 
-var showstats = false
-var count = 1
-var delay = 0
-var jsonArg = ""
+var firmware_binary = ""
 var ipAddr = ""
+var forceUpload = false
 var port = Port(5555)
 var prettyPrint = false
 
 for kind, key, val in p.getopt():
   case kind
   of cmdArgument:
-    jsonArg = key
+    firmware_binary = key
   of cmdLongOption, cmdShortOption:
     case key
-    of "count", "c":
-      count = parseInt(val)
     of "ip", "i":
       ipAddr = val
+    of "force", "f":
+      forceUpload = parseBool(val)
     of "port", "p":
       port = Port(parseInt(val))
-    of "stats", "s":
-      showstats  = true
-    of "delay", "d":
-      delay = parseInt(val)
-    of "pretty", "q":
-      prettyPrint = parseBool(val)
   of cmdEnd: assert(false) # cannot happen
 
 if ipAddr == "":
@@ -100,20 +90,16 @@ template timeBlock(n: string, blk: untyped): untyped =
 
   let td = getTime() - t0
   echo grey, "[took: ", $(td.inMicroseconds().float() / 1e3), " millis]"
-  totalCalls.inc()
-  totalTime = totalTime + td.inMicroseconds()
-  allTimes.add(td.inMicroseconds())
   
-
 
 var
   id: int = 1
-  allTimes = newSeqOfCap[int64](count)
 
 
-proc execRpc(client: Socket, i: int, call: JsonNode, quiet=false): JsonNode = 
+proc execRpc(client: Socket, i: var int, call: JsonNode, quiet=false): JsonNode = 
   {.cast(gcsafe).}:
     call["id"] = %* id
+    call["jsonrpc"] = %* "2.0"
     inc(id)
 
     let mcall = 
@@ -124,22 +110,17 @@ proc execRpc(client: Socket, i: int, call: JsonNode, quiet=false): JsonNode =
 
     timeBlock("call"):
       client.send( mcall )
-      var msgLenBytes = client.recv(4, timeout = -1)
+      var msgLenBytes = client.recv(4, timeout = 10_000)
       var msgLen: int32 = 0
-      # echo grey, "[socket data:lenstr: " & repr(msgLenBytes) & "]"
+
       if msgLenBytes.len() == 0: return
       for i in countdown(3,0):
         msgLen = (msgLen shl 8) or int32(msgLenBytes[i])
 
       var msg = ""
       while msg.len() < msgLen:
-        let mb = client.recv(4*1024, timeout = -1)
-        # echo("[read bytes: " & $mb.len() & "]")
-        # if msg.len() == 0:
-          # return
+        let mb = client.recv(4*1024, timeout = 10_000)
         msg.add mb
-
-    # echo("[socket data: " & repr(msg) & "]")
 
     if not quiet:
       echo grey, "[read bytes: " & $msg.len() & "]"
@@ -167,47 +148,76 @@ proc execRpc(client: Socket, i: int, call: JsonNode, quiet=false): JsonNode =
 
     if not quiet:
       echo green, "[rpc done at " & $now() & "]"
-    if delay > 0:
-      os.sleep(delay)
 
     mnode
 
-proc runRpc() = 
+const BUFF_SZ* = 1024
+
+# proc sha1_hash*(val: string, hash: string) =
+    # let sh = $secureHash(val)
+    # if sh != hash:
+      # raise newException(ValueError, "incorrect hash")
+
+proc runFirmwareRpc(fw_strm: Stream) = 
   {.cast(gcsafe).}:
     var call: JsonNode
-    if jsonArg == "":
-      call = %* { "jsonrpc": "2.0", "id": 1, "method": "add", "params": [1, 2] }
-    else:
-      call = %* { "jsonrpc": "2.0", "id": 1 }
 
-    let m = parseJson(jsonArg)
-
-    for (f,v) in m.pairs():
-      call[f] = v
-
-    let client: Socket = newSocket(buffered=false)
+    let client: Socket = newSocket(buffered=true)
     client.connect(ipAddr, port)
     echo(yellow, "[connected to server ip addr: ", ipAddr,"]")
     echo(blue, "[call: ", $call, "]")
 
-    for i in 1..count:
-      discard client.execRpc(i, call)
+    echo blue, "Uploaded Firmware header..."
+    let
+      hdr_chunk = fw_strm.readStr(BUFF_SZ)
+      hdr_sh1 = $secureHash(hdr_chunk)
+      hdr_res_node: JsonNode = client.execRpc(id, %* {"method": "firmware-begin", "params": [hdr_chunk, hdr_sh1]})
+      res = to(hdr_res_node, seq[string])
+
+    if res[0] != "ok":
+      if forceUpload:
+        echo yellow, "Warning: trying to upload incorrect firmware version: " & $res[1]
+      else:
+        raise newException(ValueError, "trying to upload incorrect firmware version: " & $res[1])
+
+    while not fw_strm.atEnd():
+      let chunk = fw_strm.readStr(BUFF_SZ)
+      let chunk_sh1 = $secureHash(chunk)
+
+      echo blue, "Uploading bytes: " & $(chunk.len())
+      # This only works with MsgPack as written since the strings are raw binary -- you'd need base64 encoding to use JSON
+      let
+        chunk_res_node = client.execRpc(id, %* {"method": "firmware-chunk", "params": [chunk, chunk_sh1]}, quiet=true)
+        chunk_res = to(chunk_res_node, int)
+      
+      echo yellow, "Uploaded bytes: " & $chunk_res
+
+    let
+      fnl_res_node = client.execRpc(id, %* {"method": "firmware-finish", "params": [chunk_sh1]})
+      fnl_res = to(fnl_res_node, int)
+
+    echo yellow, "Uploaded total bytes: " & $fnl_res
+
+    echo red, "Rebooting..." & $fnl_res
+    try:
+      discard client.execRpc(id, %* {"method": "espReboot", "params": []}, quiet=false)
+    except:
+      discard "expect timeout..."
+
     client.close()
 
     echo("\n")
 
 
-runRpc()
-  
-if showstats: 
-  echo("[total time: " & $(totalTime.float() / 1e3) & " millis]", magenta)
-  echo("[total count: " & $(totalCalls) & " No]", magenta)
-  echo("[avg time: " & $(float(totalTime.float()/1e3)/(1.0 * float(totalCalls))) & " millis]", magenta)
+echo "Checking Firmware file: " & firmware_binary 
 
-  var ss: RunningStat ## Must be "var"
-  ss.push(allTimes.mapIt(float(it)/1000.0))
+if not firmware_binary.endsWith(".bin"):
+  echo "Firmware file doesn't end with `.bin`"
+  quit(1)
 
-  echo("[mean time: " & $(ss.mean()) & " millis]", magenta)
-  echo("[max time: " & $(allTimes.max().float()/1_000.0) & " millis]", magenta)
-  echo("[variance time: " & $(ss.variance()) & " millis]", magenta)
-  echo("[standardDeviation time: " & $(ss.standardDeviation()) & " millis], magenta")
+if not firmware_binary.fileExists():
+  echo "Firmware file doesn't exist!"
+
+var fw_strm = newFileStream(firmware_binary, fmRead)
+
+runFirmwareRpc(fw_strm)

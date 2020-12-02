@@ -18,6 +18,16 @@ proc checkSha1Hash*(val: string, hash: string) =
 
 proc addOTAMethods*(rt: var RpcRouter) =
 
+  # === Rpc Call: check === #
+  rpc(rt, "espCheck") do() -> string:
+    return "ok"
+
+  # === Rpc Call: Reboot === #
+  rpc(rt, "espReboot") do():
+    esp_restart()
+    raise newException(OSError, "Rebooting  ESP32")
+
+
   rpc(rt, "firmware-begin") do(img_head: string, sha1_hash: string) -> JsonNode:
     if ota != nil:
       raise newException(ValueError, "firmware update already started! reboot esp")
