@@ -34,15 +34,16 @@ type
 
 
 proc versionStr*(info: esp_app_desc_t): string =
-  return info.version.join()
+  return info.version.filterIt(it == char 0).join()
 proc projectNameStr*(info: esp_app_desc_t): string =
-  return info.project_name.join()
+  return info.project_name.filterIt(it == char 0).join()
 proc timeStr*(info: esp_app_desc_t): string =
-  return info.time.join()
+  return info.time.filterIt(it == char 0).join()
 proc dateStr*(info: esp_app_desc_t): string =
-  return info.date.join()
+  return info.date.filterIt(it == char 0).join()
 proc idfVerStr*(info: esp_app_desc_t): string =
-  return info.idf_ver.join()
+  return info.idf_ver.filterIt(it == char 0).join()
+
 
 proc currentFirmwareInfo*(): esp_app_desc_t =
   let running: ptr esp_partition_t = esp_ota_get_running_partition()
@@ -151,12 +152,12 @@ proc write*(ota: var OtaUpdateHandle, write_data: var string) =
   ota.total_written.inc(write_data.len())
 
 proc finish*(ota: var OtaUpdateHandle) =
-  if ota.handle.uint32 != 0:
-    let err = esp_ota_end(ota.handle)
-    if err.uint32 == ESP_ERR_OTA_VALIDATE_FAILED:
-      raise newEspError[OtaError]("Image validation failed, image is corrupted", err)
-    if err != ESP_OK:
-      raise newEspError[OtaError]("Error ota end: " & $esp_err_to_name(err), err)
+  let err = esp_ota_end(ota.handle)
+  if err.uint32 == ESP_ERR_OTA_VALIDATE_FAILED:
+    TAG.loge("Image validation failed, image is corrupted %s", $esp_err_to_name(err))
+    raise newEspError[OtaError]("Image validation failed, image is corrupted", err)
+  if err != ESP_OK:
+    raise newEspError[OtaError]("Error ota end: " & $esp_err_to_name(err), err)
 
 proc set_as_boot_partition*(ota: var OtaUpdateHandle) =
   let err = esp_ota_set_boot_partition(ota.update)
