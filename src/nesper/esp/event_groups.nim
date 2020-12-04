@@ -8,6 +8,8 @@ import FreeRTOS
 const evt_header = """#include <freertos/FreeRTOS.h>
                       #include "freertos/event_groups.h" """
 
+
+
 ## *
 ##  An event group is a collection of bits to which an application can assign a
 ##  meaning.  For example, an application may create an event group to convey
@@ -33,6 +35,8 @@ const evt_header = """#include <freertos/FreeRTOS.h>
 ##  'rendezvous').
 ##
 ##
+
+
 ## *
 ##  event_groups.h
 ##
@@ -56,6 +60,8 @@ type
 
 type
   EventBits_t* = TickType_t
+
+
 
 ## *
 ##  Create a new event group.
@@ -108,6 +114,8 @@ type
 proc xEventGroupCreate*(): EventGroupHandle_t {.importc: "xEventGroupCreate",
     header: evt_header.}
 ##  #endif
+
+
 ## *
 ##  Create a new event group.
 ##
@@ -157,6 +165,8 @@ proc xEventGroupCreate*(): EventGroupHandle_t {.importc: "xEventGroupCreate",
 proc xEventGroupCreateStatic*(pxEventGroupBuffer: ptr StaticEventGroup_t): EventGroupHandle_t {.
     importc: "xEventGroupCreateStatic", header: evt_header.}
 ##  #endif
+
+
 ## *
 ##  [Potentially] block to wait for one or more bits to be set within a
 ##  previously created event group.
@@ -244,6 +254,8 @@ proc xEventGroupWaitBits*(xEventGroup: EventGroupHandle_t;
                          uxBitsToWaitFor: EventBits_t; xClearOnExit: BaseType_t;
                          xWaitForAllBits: BaseType_t; xTicksToWait: TickType_t): EventBits_t {.
     importc: "xEventGroupWaitBits", header: evt_header.}
+
+
 ## *
 ##  Clear bits within an event group.  This function cannot be called from an
 ##  interrupt.
@@ -297,6 +309,8 @@ proc xEventGroupWaitBits*(xEventGroup: EventGroupHandle_t;
 proc xEventGroupClearBits*(xEventGroup: EventGroupHandle_t;
                           uxBitsToClear: EventBits_t): EventBits_t {.
     importc: "xEventGroupClearBits", header: evt_header.}
+
+
 ## *
 ##  A version of xEventGroupClearBits() that can be called from an interrupt.
 ##
@@ -348,6 +362,8 @@ proc xEventGroupClearBits*(xEventGroup: EventGroupHandle_t;
 proc xEventGroupClearBitsFromISR*(xEventGroup: EventGroupHandle_t;
                                   uxBitsToSet: EventBits_t): BaseType_t {.
     importc: "xEventGroupClearBitsFromISR", header: evt_header.}
+
+
 
 ## *
 ##  Set bits within an event group.
@@ -418,6 +434,8 @@ proc xEventGroupClearBitsFromISR*(xEventGroup: EventGroupHandle_t;
 
 proc xEventGroupSetBits*(xEventGroup: EventGroupHandle_t; uxBitsToSet: EventBits_t): EventBits_t {.
     importc: "xEventGroupSetBits", header: evt_header.}
+
+
 ## *
 ##  A version of xEventGroupSetBits() that can be called from an interrupt.
 ##
@@ -489,6 +507,8 @@ proc xEventGroupSetBitsFromISR*(xEventGroup: EventGroupHandle_t;
                                 uxBitsToSet: EventBits_t;
                                 pxHigherPriorityTaskWoken: ptr BaseType_t): BaseType_t {.
     importc: "xEventGroupSetBitsFromISR", header: evt_header.}
+
+
 
 ## *
 ##  Atomically set bits within an event group, then wait for a combination of
@@ -609,6 +629,8 @@ proc xEventGroupSetBitsFromISR*(xEventGroup: EventGroupHandle_t;
 proc xEventGroupSync*(xEventGroup: EventGroupHandle_t; uxBitsToSet: EventBits_t;
                      uxBitsToWaitFor: EventBits_t; xTicksToWait: TickType_t): EventBits_t {.
     importc: "xEventGroupSync", header: evt_header.}
+
+
 ## *
 ##  Returns the current value of the bits in an event group.  This function
 ##  cannot be used from an interrupt.
@@ -623,6 +645,8 @@ proc xEventGroupSync*(xEventGroup: EventGroupHandle_t; uxBitsToSet: EventBits_t;
 template xEventGroupGetBits*(xEventGroup: untyped): untyped =
   xEventGroupClearBits(xEventGroup, 0)
 
+
+
 ## *
 ##  A version of xEventGroupGetBits() that can be called from an ISR.
 ##
@@ -635,6 +659,8 @@ template xEventGroupGetBits*(xEventGroup: untyped): untyped =
 
 proc xEventGroupGetBitsFromISR*(xEventGroup: EventGroupHandle_t): EventBits_t {.
     importc: "xEventGroupGetBitsFromISR", header: evt_header.}
+
+
 ## *
 ##
 ##  Delete an event group that was previously created by a call to
@@ -646,6 +672,8 @@ proc xEventGroupGetBitsFromISR*(xEventGroup: EventGroupHandle_t): EventBits_t {.
 
 proc vEventGroupDelete*(xEventGroup: EventGroupHandle_t) {.
     importc: "vEventGroupDelete", header: evt_header.}
+
+
 ## * @cond
 ##  For internal use only.
 
@@ -657,4 +685,6 @@ proc vEventGroupClearBitsCallback*(pvEventGroup: pointer; ulBitsToClear: uint32)
 
 proc uxEventGroupGetNumber*(xEventGroup: pointer): UBaseType_t {.
     importc: "uxEventGroupGetNumber", header: evt_header.}
+
+
 ## * @endcond
