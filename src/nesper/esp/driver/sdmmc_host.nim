@@ -25,10 +25,10 @@ type
   ## Extra configuration for SDMMC peripheral slot
 
   sdmmc_slot_config_t* {.importc: "sdmmc_slot_config_t", header: theader, bycopy.} = object
-    gpio_cd : gpio_num_t  # GPIO number of card detect signal
-    gpio_wp : gpio_num_t  # GPIO number of write protect signal
-    width : uint8  #Bus width used by the slot (might be less than the max width supported)
-    flags : uint32  #Features used by this slot
+    gpio_cd* : gpio_num_t  # GPIO number of card detect signal
+    gpio_wp* : gpio_num_t  # GPIO number of write protect signal
+    width* : uint8  #Bus width used by the slot (might be less than the max width supported)
+    flags* : uint32  #Features used by this slot
 
 const
   SDMMC_SLOT_FLAG_INTERNAL_PULLUP* = BIT(0)

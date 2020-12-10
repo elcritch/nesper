@@ -84,8 +84,8 @@ type
         ## If FAT partition can not be mounted, and this parameter is true,
         ## create partition table and format the filesystem.
         ##
-        format_if_mount_failed  : bool
-        max_files               : int32 # Max number of open files
+        format_if_mount_failed*  : bool
+        max_files*               : int32 # Max number of open files
         ##
         ## If format_if_mount_failed is set, and mount fails, format the card
         ## with given allocation unit size. Must be a power of 2, between sector
@@ -99,7 +99,7 @@ type
         ## Setting this field to 0 will result in allocation unit set to the
         ## sector size.
         ##
-        allocation_unit_size    : uint32
+        allocation_unit_size*    : uint32
     
     # compatibility definition
     esp_vfs_fat_sdmmc_mount_config_t* = esp_vfs_fat_mount_config_t
