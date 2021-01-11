@@ -198,6 +198,29 @@ proc adc_read_config*(): seq[byte] =
 
 See more in the test [SPI Test](https://github.com/elcritch/nesper/blob/master/tests/tspi.nim) or the read the wrapper (probably best docs for now): [spis.nim](https://github.com/elcritch/nesper/blob/master/src/nesper/spis.nim). 
 
+## Wear levelling / Virtual FAT filesystem
+
+```nim
+import nesper, nesper/esp_vfs_fat
+
+var
+  base_path : cstring = "/spiflash"
+  s_wl_handle : wl_handle_t = WL_INVALID_HANDLE
+
+mount_config = esp_vfs_fat_mount_config_t(format_if_mount_failed: true,
+                                          max_files: 10, allocation_unit_size: 4096)
+err = esp_vfs_fat_spiflash_mount(base_path, "storage", mount_config.addr, s_wl_handle.addr)
+
+if err != ESP_OK:
+  echo "Failed to mount FATFS."
+else:
+  echo "FATFS mounted successfully!"
+
+writeFile("/spiflash/hello.txt", "Hello world!")
+echo readFile("/spiflash/hello.txt") # Hello world!
+```
+
+Notice: file extension of files on FAT filesystem is limited to maximum of 3 characters.
 
 ## Why Nim for Embedded?
 
