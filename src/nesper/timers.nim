@@ -3,7 +3,7 @@ import consts
 import general
 
 import esp/esp_timer
-import esp/driver/timer
+# import esp/driver/timer
 
 export consts, esp_timer
 
@@ -126,9 +126,10 @@ template timeBlockDebug*(n: string, blk: untyped): untyped =
     blk
 
 
-proc disableWdtForTask*() =
-  # Method to disable checking WDT on long running task:
-  # https://github.com/espressif/esp-idf/issues/1646#issuecomment-413829778
-  TIMERG0.wdt_wprotect = TIMG_WDT_WKEY_VALUE
-  TIMERG0.wdt_feed = 1
-  TIMERG0.wdt_wprotect = 0
+# proc disableWdtForTask*() =
+#   # Method to disable checking WDT on long running task:
+#   # https://github.com/espressif/esp-idf/issues/1646#issuecomment-413829778
+#   TIMERG0.wdt_wprotect = TIMG_WDT_WKEY_VALUE
+#   TIMERG0.wdt_feed = 1
+#   TIMERG0.wdt_wprotect = 0
+

@@ -56,7 +56,7 @@ type
     le_next* {.importc: "le_next".}: ptr esp_timer ##  next element
     le_prev* {.importc: "le_prev".}: ptr ptr esp_timer ##  address of previous next element
 
-  esp_timer* {.importc: "esp_timer", header: "esp_timer.h", bycopy.} = object
+  esp_timer* {.importc: "struct esp_timer", header: "esp_timer.h", bycopy.} = object
     alarm* {.importc: "alarm".}: uint64
     period* {.importc: "period".}: uint64
     ano_esp_timer_57* {.importc: "ano_esp_timer_57".}: INNER_C_UNION_esp_timer_55
