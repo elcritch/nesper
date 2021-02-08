@@ -22,7 +22,12 @@ proc createTimer*(
       ): esp_timer_handle_t =
   ## !< Timer name, used in esp_timer_dump function
 
-  var create_args: esp_timer_create_args_t
+  var create_args = esp_timer_create_args_t(
+    callback: callback,
+    arg: arg,
+    dispatch_method: dispatch_method,
+    name: name)
+
   var out_handle: esp_timer_handle_t
 
   let ret = esp_timer_create(addr(create_args), addr(out_handle))
