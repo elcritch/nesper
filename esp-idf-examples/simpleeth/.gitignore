@@ -1,0 +1,8 @@
+build/
+src/nimcache/
+src/server
+src/localnim/
+.env
+results.json
+main/nimble/
+rpc_cli
