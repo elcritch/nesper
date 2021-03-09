@@ -19,10 +19,11 @@ const
   GOT_IPV4_BIT* = EventBits_t(BIT(1))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
 
-const TAG*: cstring = "simplewifi"
-var sConnectEventGroup*: EventGroupHandle_t
-var sIpAddr*: IpAddress
-var sConnectionName*: cstring
+const TAG*: cstring = "wifi"
+
+var sConnectEventGroup: EventGroupHandle_t
+var sIpAddr: IpAddress
+var sConnectionName: cstring
 
 proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
               event_data: pointer) {.cdecl.} =
@@ -72,7 +73,7 @@ proc wifiStop*() =
   check: esp_wifiStop()
   check: esp_wifi_deinit()
 
-proc exampleConnect*(): esp_err_t =
+proc networkConnect*(): esp_err_t =
   if sConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
@@ -89,7 +90,7 @@ proc exampleConnect*(): esp_err_t =
 
   return ESP_OK
 
-proc exampleDisconnect*(): esp_err_t =
+proc networkDisconnect*(): esp_err_t =
   if sConnectEventGroup == nil:
     return ESP_ERR_INVALID_STATE
 
@@ -101,25 +102,3 @@ proc exampleDisconnect*(): esp_err_t =
 
   return ESP_OK
 
-app_main():
-  initNvs()
-  when defined(ESP_IDF_V4_0):
-    tcpip_adapter_init()
-  else:
-    # Initialize TCP/IP network interface (should be called only once in application)
-    check: esp_netif_init()
-
-
-  # Create default event loop that running in background
-  check: esp_event_loop_create_default()
-
-  logi(TAG, "wifi setup!\n")
-  check: exampleConnect()
-
-  ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
-  ##  and re-start it upon connection.
-  ##
-  # IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
-
-  echo("Wait done\n")
-  # vTaskDelay(10000 div portTICK_PERIOD_MS)
