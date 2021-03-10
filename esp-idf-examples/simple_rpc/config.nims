@@ -1,5 +1,5 @@
 import os, strutils
 
 
-import nesper/build_tasks
+import nesper/build_utils/tasks
 

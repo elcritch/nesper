@@ -122,11 +122,19 @@ task idf, "IDF Build Task":
   case nopts.args[0]:
   of "setup":
     echo "setting up project:"
-    echo "...writing cmake lists" 
-    writeFile("CMakeLists.txt", CMAKE_LISTS_TEMPLATE % [nopts.projname])
 
-    # if nopts.debug:
-      # echo "cmake: ", readFile("CMakeLists.txt")
+    nopts.forceclean = true
+    nopts.idfSetupNimCache()
+
+    echo "...writing cmake lists" 
+    let
+      (nesperPath, rcode) = system.gorgeEx("nimble --silent path nesper")
+    if rcode != 0:
+      raise newException( ValueError, "error running nimble path command")
+    let
+      cmake_template = readFile(nesperPath / "nesper/build_utils/CMakeLists.template.txt")
+
+    writeFile("CMakeLists.txt", cmake_template % [nopts.projname])
 
     return
 
