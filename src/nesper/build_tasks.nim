@@ -4,9 +4,18 @@ import os, strutils
 var 
   default_cache_dir = "." / srcDir / "nimcache"
 
-proc idfSetupNimCache(cachedir: string, forceUpdateCache=false) =
+type
+  NimbleArgs = object
+    args: seq[string]
+    cachedir: string
+    projdir: string
+    forceclean: bool
 
-  if forceUpdateCache:
+proc idfSetupNimCache(nopts: NimbleArgs) =
+  let
+    cachedir = nopts.cachedir
+
+  if nopts.forceclean:
     echo("...deleting cachedir")
     rmDir(cachedir)
 
@@ -49,9 +58,7 @@ proc idfBuild(cachedir: string, forceUpdateCache=false) =
   # echo("cmd: " & cmd)
   # exec(cmd)
 
-task idf, "IDF Build Task":
-  echo("Hello ESP-IDF!")
-
+proc parseNimbleArgs(): NimbleArgs =
   var
     idf_idx = -1
     pre_idf_cache_set = false
@@ -72,19 +79,34 @@ task idf, "IDF Build Task":
     projdir = thisDir()
     # forceupdatecache = "--forceUpdateCache" in idf_args
     forceclean = "--clean" in idf_args
+
+  return NimbleArgs(args: idf_args, cachedir: cachedir, projdir: projdir, forceclean: forceclean)
   
-  case idf_args[0]:
+
+task idf, "IDF Build Task":
+
+  var
+    nopts = parseNimbleArgs() 
+
+  echo("Hello ESP-IDF!")
+
+  case nopts.args[0]:
+  of "setup":
+    echo "cleaning.."
   of "compile":
     echo "compiling.."
-    cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
+    nopts.idfSetupNimCache()
   of "build":
     echo "building.."
-    cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
+    nopts.idfSetupNimCache()
   of "clean":
     echo "cleaning.."
 
-
+  echo "cmake: ", readFile("CMakeLists.txt")
   # setCommand
+
+task idfcompile, "IDF Build Task":
+  echo("Hello ESP-IDF compile!")
 
 
 
