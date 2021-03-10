@@ -61,14 +61,19 @@ task idf, "IDF Build Task":
 
   echo "idf params: " & $idf_args 
 
-
   let
     cachedir = if pre_idf_cache_set: nimCacheDir() else: default_cache_dir
     projdir = thisDir()
     forceupdatecache = "--forceUpdateCache" in idf_args
   
   case idf_args[0]:
-    if idf_args[0] in ["clean", "compile", "build"]
+  of "compile":
+    echo "compiling..."
+    cachedir.setupNimCache(forceUpdateCache=forceUpdateCache)
+  of "build":
+    echo "building..."
+  of "clean":
+    echo "cleaning..."
 
   echo("cachedir: ", cachedir)
   cachedir.setupNimCache(forceUpdateCache=forceUpdateCache)
