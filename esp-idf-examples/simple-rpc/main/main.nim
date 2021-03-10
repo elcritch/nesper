@@ -8,7 +8,6 @@ import os
 
 import server
 
-import setup_networking
 when defined(ESP32_ETHERNET):
   import setup_eth
 else:
@@ -27,8 +26,10 @@ app_main():
   # ...
 
   # Connect networking
-  logi(TAG, "network setup!\n")
-  check: networkConnect()
+  onNetworking():
+    logi(TAG, "Connected to %s", networkConnectionName)
+    logi(TAG, "IPv4 address: %s", $networkIpAddr)
+    logi(TAG, "network setup!\n")
+    run_rpc_server()
 
-  echo("Wait done\n")
-  # vTaskDelay(10000 div portTICK_PERIOD_MS)
+  assert false, "shouldn't reach here!"

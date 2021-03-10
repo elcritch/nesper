@@ -4,6 +4,14 @@ import nesper/nvs_utils
 import nesper/events
 import nesper/tasks
 
+const
+  GOT_IPV4_BIT* = EventBits_t(BIT(1))
+  CONNECTED_BITS* = (GOT_IPV4_BIT)
+
+var networkConnectEventGroup*: EventGroupHandle_t
+var networkIpAddr*: IpAddress
+var networkConnectionName*: cstring
+
 proc networkingStart*(startNvs=true) =
 
   # Networking will generally utilize NVS for storing net info
@@ -20,3 +28,8 @@ proc networkingStart*(startNvs=true) =
   # Create default event loop that runs in background
   check: esp_event_loop_create_default()
 
+
+template onNetworking*(code: untyped): =
+  discard xEventGroupWaitBits(networkConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
+
+  code
