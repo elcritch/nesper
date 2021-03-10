@@ -116,29 +116,36 @@ task idf, "IDF Build Task":
     printHelp()
     return
 
-  echo "[Got nimble args: ", $nopts, "]\n"
   if nopts.debug:
-    echo "got nimble args: ", $nopts
+    echo "[Got nimble args: ", $nopts, "]\n"
 
   case nopts.args[0]:
   of "setup":
-    echo "cleaning.."
-    # echo "cmake: ", readFile("CMakeLists.txt")
+    echo "setting up project:"
+    echo "...writing cmake lists" 
     writeFile("CMakeLists.txt", CMAKE_LISTS_TEMPLATE % [nopts.projname])
 
+    # if nopts.debug:
+      # echo "cmake: ", readFile("CMakeLists.txt")
+
     return
+
   of "compile":
-    echo "compiling.."
+    echo "compiling:"
     nopts.idfSetupNimCache()
     return
+
   of "build":
-    echo "building.."
+    echo "building:"
     nopts.idfSetupNimCache()
     return
+
   of "clean":
-    echo "cleaning.."
+    echo "cleaning:"
     return
+
   else:
+    echo "help:"
     printHelp()
     return
 
