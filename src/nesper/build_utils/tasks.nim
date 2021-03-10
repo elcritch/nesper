@@ -105,15 +105,26 @@ const
 
 proc idfSetupProject(nopts: var NimbleArgs) =
   echo "setting up project:"
+  let app_template_name = "esp32_networking"
 
   nopts.forceclean = true
   nopts.idfSetupNimCache()
 
   echo "...writing cmake lists" 
   let
-    cmake_template = readFile(nopts.nesperpath / "nesper/build_utils/templates/CMakeLists.txt")
+    cmake_template = readFile(nopts.nesperpath / "nesper" / "build_utils" / "templates" / "CMakeLists.txt")
+    template_files = listFiles(nopts.nesperpath / "nesper" / "build_utils" / "templates" / app_template_name )
+    tmplt_args = [
+      "NIMBLE_PROJ_NAME", nopts.projname,
+      "NIMBLE_NIMCACHE", srcDir,
+      ]
 
-  writeFile("CMakeLists.txt", cmake_template % [nopts.projname])
+  writeFile("CMakeLists.txt", cmake_template % tmplt_args)
+
+  for tmpltPth in template_files:
+    let fileName = tmpltPth.extractFilename()
+    echo "...copying template: ", fileName, " from: ", tmpltPth
+    writeFile(srcDir / fileName, cmake_template % tmplt_args )
 
 proc printHelp() =
   echo ""

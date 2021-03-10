@@ -8,7 +8,7 @@ set(EXTRA_COMPONENT_DIRS $$ENV{IDF_PATH}/examples/common_components/protocol_exa
 # set(EXTRA_COMPONENT_DIRS src)
 
 include($$ENV{IDF_PATH}/tools/cmake/project.cmake)
-project($1)
+project($NIMBLE_PROJ_NAME)
 
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=unused-label APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=parentheses APPEND)
