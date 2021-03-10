@@ -7,20 +7,21 @@ var
 proc setupNimCache(cachedir: string, forceUpdateCache=false) =
 
   if forceUpdateCache:
+    echo("...deleting cachedir")
     rmDir(cachedir)
 
-  if cachedir.dirExists():
-    echo("...cachedir already exists")
-    if fileExists(cachedir / "nimbase.h"):
-      echo("...cachedir already exists")
-
-  else:
+  if not cachedir.dirExists():
     mkDir(cachedir)
+  else:
+    echo("...cachedir already exists")
+
+  if not fileExists(cachedir / "nimbase.h"):
     let nimbasepath = selfExe().splitFile.dir.parentDir / "lib" / "nimbase.h"
 
-    echo("copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
+    echo("...copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
     cpFile(nimbasepath, cachedir / "nimbase.h")
-  
+  else:
+    echo("...nimbase.h already exists")
 
 
   # let params = commandLineParams()
@@ -64,21 +65,19 @@ task idf, "IDF Build Task":
   let
     cachedir = if pre_idf_cache_set: nimCacheDir() else: default_cache_dir
     projdir = thisDir()
-    forceupdatecache = "--forceUpdateCache" in idf_args
+    # forceupdatecache = "--forceUpdateCache" in idf_args
+    forceclean = "--clean" in idf_args
   
   case idf_args[0]:
   of "compile":
     echo "compiling..."
-    cachedir.setupNimCache(forceUpdateCache=forceUpdateCache)
+    cachedir.setupNimCache(forceUpdateCache=forceclean)
   of "build":
     echo "building..."
+    cachedir.setupNimCache(forceUpdateCache=forceclean)
   of "clean":
     echo "cleaning..."
 
-  echo("cachedir: ", cachedir)
-  cachedir.setupNimCache(forceUpdateCache=forceUpdateCache)
-
-  debugEcho("pre_idf_cache_set: ", pre_idf_cache_set)
 
   # setCommand
 
