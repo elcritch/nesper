@@ -15,5 +15,5 @@ requires "nesper >= 0.5.0"
 
 # nim prepare main/main.nim --nimblePath:main/nimble/pkgs -d:ESP_IDF_V4_0  -d:TcpEchoServer  && idf.py reconfigure 
 
-include nesper/build_tasks
+include nesper/build_utils/tasks
 
