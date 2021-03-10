@@ -75,13 +75,13 @@ task idf, "IDF Build Task":
   
   case idf_args[0]:
   of "compile":
-    echo "compiling..."
+    echo "compiling.."
     cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
   of "build":
-    echo "building..."
+    echo "building.."
     cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
   of "clean":
-    echo "cleaning..."
+    echo "cleaning.."
 
 
   # setCommand
