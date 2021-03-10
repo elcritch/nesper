@@ -23,11 +23,11 @@ const TAG*: cstring = "wifi"
 proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
               event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
-  logi TAG, "event.ip_info.ip: %s", $(event.ip_info.ip)
+  logi TAG, "event.ip_info.ip: %s", $$(event.ip_info.ip)
 
   networkIpAddr = toIpAddress(event.ip_info.ip)
   # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
-  logw TAG, "got event ip: %s", $networkIpAddr
+  logw TAG, "got event ip: %s", $$networkIpAddr
   discard xEventGroupSetBits(networkConnectEventGroup, GOT_IPV4_BIT)
 
 proc onWifiDisconnect*(arg: pointer;

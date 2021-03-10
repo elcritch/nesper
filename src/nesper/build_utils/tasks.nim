@@ -124,7 +124,7 @@ proc idfSetupProject(nopts: var NimbleArgs) =
   for tmpltPth in template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth
-    writeFile(srcDir / fileName, cmake_template % tmplt_args )
+    writeFile(srcDir / fileName, readFile(tmpltPth) % tmplt_args )
 
 proc printHelp() =
   echo ""

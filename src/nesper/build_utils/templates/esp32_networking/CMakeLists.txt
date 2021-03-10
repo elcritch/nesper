@@ -3,7 +3,7 @@ idf_component_register(SRC_DIRS "$NIMBLE_NIMCACHE"
                     INCLUDE_DIRS ""
                     REQUIRES lwip newlib nvs_flash app_update)
 
-# set(C_COMPILE_OPTIONS "${C_COMPILE_OPTIONS} -Wno-error=unused-label")
+# set(C_COMPILE_OPTIONS "$${C_COMPILE_OPTIONS} -Wno-error=unused-label")
 # list(APPEND C_COMPILE_OPTIONS "-Wno-error=unused-label ")
 
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)

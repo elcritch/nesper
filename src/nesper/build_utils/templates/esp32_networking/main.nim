@@ -28,7 +28,7 @@ app_main():
   # Connect networking
   onNetworking():
     logi(TAG, "Connected to %s", networkConnectionName)
-    logi(TAG, "IPv4 address: %s", $networkIpAddr)
+    logi(TAG, "IPv4 address: %s", $$networkIpAddr)
     logi(TAG, "network setup!\n")
     run_rpc_server()
 
