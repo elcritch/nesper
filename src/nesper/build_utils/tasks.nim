@@ -1,6 +1,8 @@
 
 import os, strutils
 
+include CMakeListsTemplate
+
 var 
   default_cache_dir = "." / srcDir / "nimcache"
 
@@ -36,10 +38,10 @@ proc idfSetupNimCache(nopts: NimbleArgs) =
     echo("...nimbase.h already exists")
 
 
-proc idfCompile(cachedir: string, forceUpdateCache=false) =
+proc idfCompileProject*(cachedir: string, forceUpdateCache=false) =
   discard "todo"
 
-proc idfBuild(cachedir: string, forceUpdateCache=false) =
+proc idfBuildProject*(cachedir: string, forceUpdateCache=false) =
   discard "todo"
   # let params = commandLineParams()
   # let file = params[1]
@@ -121,7 +123,9 @@ task idf, "IDF Build Task":
   case nopts.args[0]:
   of "setup":
     echo "cleaning.."
-    echo "cmake: ", readFile("CMakeLists.txt")
+    # echo "cmake: ", readFile("CMakeLists.txt")
+    writeFile("CMakeLists.txt", CMAKE_LISTS_TEMPLATE % [nopts.projname])
+
     return
   of "compile":
     echo "compiling.."
