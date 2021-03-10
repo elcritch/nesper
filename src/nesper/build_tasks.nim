@@ -4,7 +4,7 @@ import os, strutils
 var 
   default_cache_dir = "." / srcDir / "nimcache"
 
-proc setupNimCache(cachedir: string, forceUpdateCache=false) =
+proc idfSetupNimCache(cachedir: string, forceUpdateCache=false) =
 
   if forceUpdateCache:
     echo("...deleting cachedir")
@@ -24,6 +24,11 @@ proc setupNimCache(cachedir: string, forceUpdateCache=false) =
     echo("...nimbase.h already exists")
 
 
+proc idfCompile(cachedir: string, forceUpdateCache=false) =
+  discard "todo"
+
+proc idfBuild(cachedir: string, forceUpdateCache=false) =
+  discard "todo"
   # let params = commandLineParams()
   # let file = params[1]
   # let rest = params[2..high(params)].join(" ")
@@ -71,10 +76,10 @@ task idf, "IDF Build Task":
   case idf_args[0]:
   of "compile":
     echo "compiling..."
-    cachedir.setupNimCache(forceUpdateCache=forceclean)
+    cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
   of "build":
     echo "building..."
-    cachedir.setupNimCache(forceUpdateCache=forceclean)
+    cachedir.idfSetupNimCache(forceUpdateCache=forceclean)
   of "clean":
     echo "cleaning..."
 
