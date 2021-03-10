@@ -1,5 +1,5 @@
 
-idf_component_register(SRC_DIRS "./nimcache"
+idf_component_register(SRC_DIRS "$NIMCACHE"
                     INCLUDE_DIRS ""
                     REQUIRES lwip newlib nvs_flash app_update)
 
