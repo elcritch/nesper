@@ -111,7 +111,7 @@ proc idfSetupProject(nopts: var NimbleArgs) =
 
   echo "...writing cmake lists" 
   let
-    cmake_template = readFile(nopts.nesperpath / "nesper/build_utils/CMakeLists.template.txt")
+    cmake_template = readFile(nopts.nesperpath / "nesper/build_utils/templates/CMakeLists.txt")
 
   writeFile("CMakeLists.txt", cmake_template % [nopts.projname])
 
