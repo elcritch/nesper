@@ -1,8 +1,6 @@
 
 import os, strutils
 
-include CMakeListsTemplate
-
 var 
   default_cache_dir = "." / srcDir / "nimcache"
 
@@ -10,6 +8,7 @@ type
   NimbleArgs = object
     projdir: string
     projname: string
+    nesperpath: string
     args: seq[string]
     cachedir: string
     debug: bool
@@ -78,12 +77,18 @@ proc parseNimbleArgs(): NimbleArgs =
       pre_idf_cache_set = true
 
   # echo "idf params: " & $idf_args 
+  let
+    npathcmd = "nimble --silent path nesper"
+    (nesperPath, rcode) = system.gorgeEx(npathcmd)
+  if rcode != 0:
+    raise newException( ValueError, "error running getting Nesper path using: `%#`" % [npathcmd])
 
   return NimbleArgs(
     args: idf_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
     projname: projectName(),
+    nesperpath: nesperPath,
     # forceupdatecache = "--forceUpdateCache" in idf_args
     debug: "--idf-debug" in idf_args,
     forceclean: "--clean" in idf_args,
@@ -97,6 +102,18 @@ const
     ("build", "compile and then build esp-idf project"),
     ("clean", "clean esp-idf project and nim code"),
   ]
+
+proc idfSetupProject(nopts: var NimbleArgs) =
+  echo "setting up project:"
+
+  nopts.forceclean = true
+  nopts.idfSetupNimCache()
+
+  echo "...writing cmake lists" 
+  let
+    cmake_template = readFile(nopts.nesperpath / "nesper/build_utils/CMakeLists.template.txt")
+
+  writeFile("CMakeLists.txt", cmake_template % [nopts.projname])
 
 proc printHelp() =
   echo ""
@@ -120,42 +137,21 @@ task idf, "IDF Build Task":
     echo "[Got nimble args: ", $nopts, "]\n"
 
   case nopts.args[0]:
-  of "setup":
-    echo "setting up project:"
-
-    nopts.forceclean = true
-    nopts.idfSetupNimCache()
-
-    echo "...writing cmake lists" 
-    let
-      (nesperPath, rcode) = system.gorgeEx("nimble --silent path nesper")
-    if rcode != 0:
-      raise newException( ValueError, "error running nimble path command")
-    let
-      cmake_template = readFile(nesperPath / "nesper/build_utils/CMakeLists.template.txt")
-
-    writeFile("CMakeLists.txt", cmake_template % [nopts.projname])
-
-    return
-
+  of "setup": nopts.idfSetupProject()
   of "compile":
     echo "compiling:"
     nopts.idfSetupNimCache()
-    return
 
   of "build":
     echo "building:"
     nopts.idfSetupNimCache()
-    return
 
   of "clean":
     echo "cleaning:"
-    return
 
   else:
     echo "help:"
     printHelp()
-    return
 
 
 
