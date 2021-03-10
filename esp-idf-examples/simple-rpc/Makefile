@@ -27,8 +27,7 @@ mpack_rpc_queue_server: clean
 	nim c --nimblePath:$(NIMBLE)/pkgs -d:TcpMpackRpcQueueServer -o:rpc_cli rpc_cli_test.nim 
 
 tcp_echo_server: clean
-	nim prepare main/wifi_example_main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpEchoServer $(NIMFLAGS) && idf.py reconfigure 
-	nim c --nimblePath:$(NIMBLE)/pkgs -d:TcpEchoServer -o:rpc_clirpc_cli_test.nim 
+	nim prepare main/main.nim --nimblePath:$(NIMBLE)/pkgs -d:$(ESP_IDF_VERSION) -d:TcpEchoServer $(NIMFLAGS) && idf.py reconfigure 
 
 build: 
 	idf.py build

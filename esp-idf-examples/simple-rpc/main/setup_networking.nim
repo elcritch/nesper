@@ -1,5 +1,6 @@
 import nesper
 
+import nesper/net_utils
 import nesper/nvs_utils
 import nesper/events
 import nesper/tasks
@@ -29,7 +30,7 @@ proc networkingStart*(startNvs=true) =
   check: esp_event_loop_create_default()
 
 
-template onNetworking*(code: untyped): =
+template onNetworking*(code: untyped) =
   discard xEventGroupWaitBits(networkConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
 
   code
