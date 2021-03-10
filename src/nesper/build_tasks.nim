@@ -6,10 +6,13 @@ var
 
 type
   NimbleArgs = object
+    projdir: string
+    projname: string
     args: seq[string]
     cachedir: string
-    projdir: string
+    debug: bool
     forceclean: bool
+    help: bool
 
 proc idfSetupNimCache(nopts: NimbleArgs) =
   let
@@ -72,41 +75,70 @@ proc parseNimbleArgs(): NimbleArgs =
     elif paramStr(idx).startsWith("--nimcache"):
       pre_idf_cache_set = true
 
-  echo "idf params: " & $idf_args 
+  # echo "idf params: " & $idf_args 
 
-  let
-    cachedir = if pre_idf_cache_set: nimCacheDir() else: default_cache_dir
-    projdir = thisDir()
+  return NimbleArgs(
+    args: idf_args,
+    cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
+    projdir: thisDir(),
+    projname: projectName(),
     # forceupdatecache = "--forceUpdateCache" in idf_args
-    forceclean = "--clean" in idf_args
-
-  return NimbleArgs(args: idf_args, cachedir: cachedir, projdir: projdir, forceclean: forceclean)
+    debug: "--idf-debug" in idf_args,
+    forceclean: "--clean" in idf_args,
+    help: "--help" in idf_args or "-h" in idf_args
+    )
   
+const
+  idf_options = [
+    ("setup", "setup new project for compiling with esp-idf"),
+    ("compile", "compile nim code for esp-idf project"),
+    ("build", "compile and then build esp-idf project"),
+    ("clean", "clean esp-idf project and nim code"),
+  ]
+
+proc printHelp() =
+  echo ""
+  echo "No command found. The follow help describes the various available commands.\n"
+  echo "Nesper IDF Nimble Commands: "
+  for idx, (name, desc) in idf_options:
+    echo "   ", name, "\t=>\t", desc
 
 task idf, "IDF Build Task":
 
   var
     nopts = parseNimbleArgs() 
 
-  echo("Hello ESP-IDF!")
+  echo("\n\n=== Welcome to the Nimble ESP-IDF helper task! ===\n")
+
+  if nopts.help or nopts.args.len == 0:
+    printHelp()
+    return
+
+  echo "[Got nimble args: ", $nopts, "]\n"
+  if nopts.debug:
+    echo "got nimble args: ", $nopts
 
   case nopts.args[0]:
   of "setup":
     echo "cleaning.."
+    echo "cmake: ", readFile("CMakeLists.txt")
+    return
   of "compile":
     echo "compiling.."
     nopts.idfSetupNimCache()
+    return
   of "build":
     echo "building.."
     nopts.idfSetupNimCache()
+    return
   of "clean":
     echo "cleaning.."
+    return
+  else:
+    printHelp()
+    return
 
-  echo "cmake: ", readFile("CMakeLists.txt")
-  # setCommand
 
-task idfcompile, "IDF Build Task":
-  echo("Hello ESP-IDF compile!")
 
 
 
