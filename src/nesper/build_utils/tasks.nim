@@ -130,7 +130,7 @@ task idf_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain" ]
-    compiler_cmd = nimargs.join() & " " & nopts.projfile.quoteShell() 
+    compiler_cmd = nimargs.join(" ") & " " & nopts.projfile.quoteShell() 
 
   if nopts.debug:
     echo "idf compile: command: ", compiler_cmd  
