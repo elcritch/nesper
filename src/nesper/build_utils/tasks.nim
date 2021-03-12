@@ -5,6 +5,14 @@ import os, strutils
   # default_cache_dir = "." / srcDir / "nimcache"
   # progname = "main.nim"
 
+const
+  idf_options = [
+    ("setup", "setup new project for compiling with esp-idf"),
+    ("compile", "compile nim code for esp-idf project"),
+    ("build", "compile and then build esp-idf project"),
+    ("clean", "clean esp-idf project and nim code"),
+  ]
+
 type
   NimbleArgs = object
     projdir: string
@@ -41,43 +49,49 @@ proc idfSetupNimCache(nopts: NimbleArgs) =
     echo("...nimbase.h already exists")
 
 proc idfCompileProject*(nopts: NimbleArgs) =
+  echo "compiling:"
   # compile nim project
-
-  let wifi_ssid = getEnv("WIFI_SSID")
-  let wifi_pass = getEnv("WIFI_PASSWORD")
-
-  let wifidefs =
-    if wifi_ssid != "" and wifi_pass != "":
-      @["-d:WIFI_SSID=" & wifi_ssid.quoteShell(),
-        "-d:WIFI_PASSWORD=" & wifi_pass.quoteShell()]
-    else:
-      @[]
 
   let
     nimargs = @[
       "c",
       "--nomain",
-      "--nimcache:$1",
       "--compileOnly",
+      "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain" ]
-    compileargs = nimargs & wifidefs & @[nopts.projfile] 
+    compiler_args = nimargs & @[nopts.projfile.quoteShell()] 
+    compiler_cmd = selfExe() & " " & compiler_args.join(" ")
 
   # [nopts.cachedir, nopts.projfile, nopts.args[1 ..< nopts.args.len()].join(" "), wifidefs]
-  echo "cmd: ", compileargs 
+  echo "args: ", compiler_args  
+  echo "cmd: ", compiler_cmd  
+
+  let (outstr, outres) = gorgeEx(compiler_cmd)
+  echo "compile res: ", outres
+  echo "compile output: ", outstr
 
 proc idfBuildProject*(nopts: NimbleArgs) =
   # build idf project
-  echo("build: " )
+  echo("building esp-idf project: " )
   exec("idf.py reconfigure")
   exec("idf.py build")
+
+proc printHelp() =
+  echo ""
+  echo "No command found. The follow help describes the various available commands.\n"
+  echo "Nesper IDF Nimble Commands: "
+  for idx, (name, desc) in idf_options:
+    echo "   ", name, "\t=>\t", desc
 
 proc parseNimbleArgs(): NimbleArgs =
   echo "================================ Nesper ======================================="
   echo ""
 
+  echo("\n\n=== Welcome to the Nimble ESP-IDF helper task! ===\n")
+
   var
     default_cache_dir = "." / srcDir / "nimcache"
-    progfile = "." / srcDir / "main.nim"
+    progfile = thisDir() / srcDir / "main.nim"
 
   if bin.len() >= 1:
     progfile = bin[0]
@@ -110,7 +124,7 @@ proc parseNimbleArgs(): NimbleArgs =
   if rcode != 0:
     raise newException( ValueError, "error running getting Nesper path using: `%#`" % [npathcmd])
 
-  return NimbleArgs(
+  result = NimbleArgs(
     args: idf_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
@@ -123,14 +137,12 @@ proc parseNimbleArgs(): NimbleArgs =
     forceclean: "--clean" in idf_args,
     help: "--help" in idf_args or "-h" in idf_args
   )
-  
-const
-  idf_options = [
-    ("setup", "setup new project for compiling with esp-idf"),
-    ("compile", "compile nim code for esp-idf project"),
-    ("build", "compile and then build esp-idf project"),
-    ("clean", "clean esp-idf project and nim code"),
-  ]
+
+  if result.help or result.args.len == 0:
+    printHelp()
+    onExit()
+
+  if result.debug: echo "[Got nimble args: ", $result, "]\n"
 
 proc idfSetupProject(nopts: var NimbleArgs) =
   echo "setting up project:"
@@ -155,36 +167,19 @@ proc idfSetupProject(nopts: var NimbleArgs) =
     echo "...copying template: ", fileName, " from: ", tmpltPth
     writeFile(srcDir / fileName, readFile(tmpltPth) % tmplt_args )
 
-proc printHelp() =
-  echo ""
-  echo "No command found. The follow help describes the various available commands.\n"
-  echo "Nesper IDF Nimble Commands: "
-  for idx, (name, desc) in idf_options:
-    echo "   ", name, "\t=>\t", desc
-
 task idf, "IDF Build Task":
 
   var
     nopts = parseNimbleArgs() 
 
-  echo("\n\n=== Welcome to the Nimble ESP-IDF helper task! ===\n")
-
-  if nopts.help or nopts.args.len == 0:
-    printHelp()
-    return
-
-  if nopts.debug:
-    echo "[Got nimble args: ", $nopts, "]\n"
-
   case nopts.args[0]:
-  of "setup": nopts.idfSetupProject()
+  of "setup":
+    nopts.idfSetupProject()
+
   of "compile":
-    echo "compiling:"
-    nopts.idfSetupNimCache()
     nopts.idfCompileProject()
 
   of "build":
-    echo "building:"
     nopts.idfSetupNimCache()
 
   of "clean":
@@ -194,8 +189,20 @@ task idf, "IDF Build Task":
     echo "help:"
     printHelp()
 
+task idf_compile, "IDF Compile Task":
+  echo "idf compile task"
+  # selfExec("error")
+  selfExec("help")
+
+task idf_build, "IDF Build Task":
+  echo "idf build task"
+  # selfExec("error")
+  selfExec("help")
 
 
+after idf_compile:
+  echo "after compile!!!"
 
-
-
+before idf_build:
+  echo "before build!!!"
+  `idf_compile Task`()
