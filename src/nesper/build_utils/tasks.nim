@@ -1,18 +1,6 @@
 
 import os, strutils
 
-# var 
-  # default_cache_dir = "." / srcDir / "nimcache"
-  # progname = "main.nim"
-
-const
-  idf_options = [
-    ("setup", "setup new project for compiling with esp-idf"),
-    ("compile", "compile nim code for esp-idf project"),
-    ("build", "compile and then build esp-idf project"),
-    ("clean", "clean esp-idf project and nim code"),
-  ]
-
 type
   NimbleArgs = object
     projdir: string
@@ -80,7 +68,7 @@ proc parseNimbleArgs(): NimbleArgs =
 
   if result.debug: echo "[Got nimble args: ", $result, "]\n"
 
-task idfClean, "Clean nimcache":
+task idf_clean, "Clean nimcache":
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -92,7 +80,7 @@ task idfClean, "Clean nimcache":
     echo "...not removing nimcache, directory not found"
   
 
-task idfCopyNimBase, "Copy nimbase.h file after compiling":
+task idf_install_headers, "Install nim headers":
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -105,7 +93,7 @@ task idfCopyNimBase, "Copy nimbase.h file after compiling":
   else:
     echo("...nimbase.h already exists")
 
-task idfSetup, "IDF Setup Task":
+task idf_setup, "Setup a new esp-idf / nesper project structure":
   echo "setting up project:"
   let app_template_name = "esp32_networking"
   var nopts = parseNimbleArgs()
@@ -127,7 +115,7 @@ task idfSetup, "IDF Setup Task":
     writeFile(srcDir / fileName, readFile(tmpltPth) % tmplt_args )
 
 
-task idfCompile, "IDF Compile Task":
+task idf_compile, "Compile Nim project for esp-idf program":
   # compile nim project
   var nopts = parseNimbleArgs() 
 
@@ -154,15 +142,17 @@ task idfCompile, "IDF Compile Task":
   # selfExec("c " & nopts.projfile.quoteShell())
   selfExec(compiler_cmd)
 
-task idfBuild, "IDF Build Task":
+task idf_build, "Build esp-idf project":
   echo "idf build task"
   # selfExec("error")
   # selfExec("help")
 
 
+### Actions to ensure correct steps occur before/after certain tasks ###
+
 after idf_compile:
   echo "after compile!!!"
-  idfCopyNimBaseTask()
+  idfInstallHeadersTask()
 
 before idf_build:
   echo "before build!!!"
