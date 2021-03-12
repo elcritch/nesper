@@ -133,7 +133,8 @@ task esp_compile, "Compile Nim project for esp-idf program":
       "--nomain",
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
-      "-d:NimAppMain" ]
+      "-d:NimAppMain",
+      "-d:ESP_IDF_V4_0" ]
     compiler_cmd = nimargs.join(" ") & " " & nopts.projfile.quoteShell() 
 
   if nopts.debug:
