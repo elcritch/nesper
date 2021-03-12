@@ -15,8 +15,6 @@ type
     help: bool
 
 proc parseNimbleArgs(): NimbleArgs =
-  echo "\n================================ Nesper =======================================\n"
-
   var
     projsrc = if srcDir == "": "." / "main" else: srcDir
     default_cache_dir = "." / projsrc / "nimcache"
@@ -70,7 +68,7 @@ proc parseNimbleArgs(): NimbleArgs =
   if result.debug: echo "[Got nimble args: ", $result, "]\n"
 
 task esp_setup, "Setup a new esp-idf / nesper project structure":
-  echo "setting up project:"
+  echo "\n[Nesper ESP] setting up project:"
   let app_template_name = "esp32_networking"
   var nopts = parseNimbleArgs()
 
@@ -95,6 +93,7 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
 
 
 task esp_install_headers, "Install nim headers":
+  echo "\n[Nesper ESP] Installing nim headers:"
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -108,6 +107,7 @@ task esp_install_headers, "Install nim headers":
     echo("...nimbase.h already exists")
 
 task esp_clean, "Clean nimcache":
+  echo "\n[Nesper ESP] Cleaning nimcache:"
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -123,7 +123,7 @@ task esp_compile, "Compile Nim project for esp-idf program":
   # compile nim project
   var nopts = parseNimbleArgs() 
 
-  echo "compiling:"
+  echo "\n[Nesper ESP] Compiling:"
   let
     nimargs = @[
       "c",
@@ -148,10 +148,8 @@ task esp_build, "Build esp-idf project":
 
 ### Actions to ensure correct steps occur before/after certain tasks ###
 
-after idf_compile:
-  echo "after compile!!!"
+after esp_compile:
   espInstallHeadersTask()
 
-before idf_build:
-  echo "before build!!!"
+before esp_build:
   espCompileTask()
