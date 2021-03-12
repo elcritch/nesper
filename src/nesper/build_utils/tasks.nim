@@ -146,7 +146,8 @@ task esp_compile, "Compile Nim project for esp-idf program":
 task esp_build, "Build esp-idf project":
   echo "\n[Nesper ESP] Building ESP-IDF project:"
 
-  exec("idf.py reconfigure build")
+  exec("idf.py reconfigure")
+  exec("idf.py build")
   # selfExec("error")
   # selfExec("help")
 
