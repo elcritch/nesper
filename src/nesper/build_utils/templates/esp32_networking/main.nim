@@ -30,6 +30,6 @@ app_main():
     logi(TAG, "Connected to %s", networkConnectionName)
     logi(TAG, "IPv4 address: %s", $$networkIpAddr)
     logi(TAG, "network setup!\n")
-    run_rpc_server()
+    run_http_server()
 
   assert false, "shouldn't reach here!"

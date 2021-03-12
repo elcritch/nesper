@@ -3,11 +3,14 @@ import os, strutils
 
 var 
   default_cache_dir = "." / srcDir / "nimcache"
+  progname = "main.nim"
 
 type
   NimbleArgs = object
     projdir: string
     projname: string
+    projsrc: string
+    projfile: string
     nesperpath: string
     args: seq[string]
     cachedir: string
@@ -16,6 +19,7 @@ type
     help: bool
 
 proc idfSetupNimCache(nopts: NimbleArgs) =
+  # setup nim project with proper CMakeLists.txt and other files for an esp-idf project
   let
     cachedir = nopts.cachedir
 
@@ -36,31 +40,36 @@ proc idfSetupNimCache(nopts: NimbleArgs) =
   else:
     echo("...nimbase.h already exists")
 
+proc idfCompileProject*(nopts: NimbleArgs) =
+  # compile nim project
 
-proc idfCompileProject*(cachedir: string, forceUpdateCache=false) =
-  discard "todo"
+  let wifi_ssid = getEnv("WIFI_SSID")
+  let wifi_pass = getEnv("WIFI_PASSWORD")
 
-proc idfBuildProject*(cachedir: string, forceUpdateCache=false) =
-  discard "todo"
-  # let params = commandLineParams()
-  # let file = params[1]
-  # let rest = params[2..high(params)].join(" ")
-  
-  # let wifi_ssid = getEnv("WIFI_SSID")
-  # let wifi_pass = getEnv("WIFI_PASSWORD")
+  let wifidefs =
+    if wifi_ssid != "" and wifi_pass != "":
+      @["-d:WIFI_SSID=" & wifi_ssid.quoteShell(),
+        "-d:WIFI_PASSWORD=" & wifi_pass.quoteShell()]
+    else:
+      @[]
 
-  # let wifidefs =
-  #   if wifi_ssid != "" and wifi_pass != "":
-  #     "-d:WIFI_SSID=$1 -d:WIFI_PASSWORD=$2 " % [wifi_ssid, wifi_pass]
-  #   else:
-  #     ""
+  let
+    nimargs = @[
+      "c",
+      "--nomain",
+      "--nimcache:$1",
+      "--compileOnly",
+      "-d:NimAppMain" ]
+    compileargs = nimargs & wifidefs & @[nopts.projfile] 
 
-  # let
-  #   cmd = "nim c --os:freertos --cpu:esp --nomain --nimcache:$1 --compileOnly -d:NimAppMain $4 $3 $2 " %
-  #             [nimcachepath, file, rest, wifidefs]
+  # [nopts.cachedir, nopts.projfile, nopts.args[1 ..< nopts.args.len()].join(" "), wifidefs]
+  echo "cmd: ", compileargs 
 
-  # echo("cmd: " & cmd)
-  # exec(cmd)
+proc idfBuildProject*(nopts: NimbleArgs) =
+  # build idf project
+  echo("build: " )
+  exec("idf.py reconfigure")
+  exec("idf.py build")
 
 proc parseNimbleArgs(): NimbleArgs =
   var
@@ -87,13 +96,15 @@ proc parseNimbleArgs(): NimbleArgs =
     args: idf_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
+    projsrc: srcDir,
     projname: projectName(),
     nesperpath: nesperPath,
     # forceupdatecache = "--forceUpdateCache" in idf_args
     debug: "--idf-debug" in idf_args,
     forceclean: "--clean" in idf_args,
-    help: "--help" in idf_args or "-h" in idf_args
-    )
+    help: "--help" in idf_args or "-h" in idf_args,
+    projfile: relativePath(thisDir() / "main" / progname, thisDir())
+  )
   
 const
   idf_options = [
@@ -152,6 +163,7 @@ task idf, "IDF Build Task":
   of "compile":
     echo "compiling:"
     nopts.idfSetupNimCache()
+    nopts.idfCompileProject()
 
   of "build":
     echo "building:"
