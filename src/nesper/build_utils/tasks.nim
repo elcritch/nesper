@@ -77,6 +77,12 @@ proc parseNimbleArgs(): NimbleArgs =
 
   var
     default_cache_dir = "." / srcDir / "nimcache"
+    progfile = "." / srcDir / "main.nim"
+
+  if bin.len() >= 1:
+    progfile = bin[0]
+
+  var
     idf_idx = -1
     pre_idf_cache_set = false
     override_srcdir = false
@@ -110,12 +116,12 @@ proc parseNimbleArgs(): NimbleArgs =
     projdir: thisDir(),
     projsrc: srcDir,
     projname: projectName(),
+    projfile: progfile,
     nesperpath: nesperPath,
     # forceupdatecache = "--forceUpdateCache" in idf_args
     debug: "--idf-debug" in idf_args,
     forceclean: "--clean" in idf_args,
-    help: "--help" in idf_args or "-h" in idf_args,
-    projfile: relativePath(thisDir() / "main" / binDir, thisDir())
+    help: "--help" in idf_args or "-h" in idf_args
   )
   
 const
