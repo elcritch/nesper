@@ -1,77 +1,41 @@
-import nesper/consts
-import nesper/general
-import nesper/events
-import apps
-import volatile
-import strutils
-import json
 
-const TAG = "server"
-const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
+import asynchttpserver, asyncdispatch, net
 
-## Note:
-## Nim uses `when` compile time constructs
-## these are like ifdef's in C and don't really have an equivalent in Python
-## setting the flags can be done in the Makefile `simplewifi-rpc  Makefile
-## for example, to compile the example to use JSON, pass `-d:TcpJsonRpcServer` to Nim
-## the makefile has several example already defined for convenience
-## 
-when defined(TcpJsonRpcServer):
-  import nesper/servers/rpc/rpcsocket_json
-when defined(TcpMpackRpcQueueServer):
-  import ota_rpc_example
-  import nesper/servers/rpc/rpcsocket_queue_mpack
-elif not defined(TcpEchoServer): # This is the default 'msgpack' version -- set like this for nimsuggest
-  import ota_rpc_example
-  import nesper/servers/rpc/rpcsocket_mpack
-elif defined(TcpEchoServer):
-  import nesper/servers/tcpsocket
-else:
-  {.fatal: "Compile this program with an rpc strategy!".}
+var count = 0
 
+proc cb*(req: Request) {.async.} =
+    inc count
+    echo "req #", count
+    await req.respond(Http200, "Hello World from nim on ESP32\n")
+    # GC_fullCollect()
 
-when defined(TcpEchoServer):
-  proc run_rpc_server*() =
-    echo "starting server on port 5555"
-    var msg = "echo: "
-    startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data=msg)
+proc run_http_server*() {.exportc.} =
+    echo "starting http server on port 8181"
+    var server = newAsyncHttpServer()
 
-else:
+    waitFor server.serve(Port(8181), cb)
 
-  # Setup RPC Server #
-  proc run_rpc_server*() =
+import nesper/esp/esp_timer
 
-    # Setup an RPC router
-    var rpcRouter: RpcRouter 
-    var rt = createRpcRouter(MaxRpcReceiveBuffer)
+proc example_cb*(arg: pointer) {.cdecl.} = 
+  echo "Done!"
 
-    rpc(rt, "hello") do(input: string) -> string:
-      result = "Hello " & input
+proc timer_test*(arg: pointer) {.cdecl.} = 
+    var x = "hello"
 
-    rpc(rt, "add") do(a: int, b: int) -> int:
-      result = a + b
+    var timer_handle = esp_timer_create_args_t(
+    callback: example_cb,
+    arg: x.cstring,
+    dispatch_method: ESP_TIMER_TASK,
+    name: "timer1")
 
-    rpc(rt, "addAll") do(vals: seq[int]) -> int:
-      echo("run_rpc_server: done: " & repr(addr(vals)))
-      result = 0
-      for x in vals:
-        result += x
+    var timer1: esp_timer_handle_t
 
-    # this adds methods for Over-The-Air updates using RPC! 
-    # note, this isn't secured by default
-    rpcRouter.addOTAMethods()
+    discard esp_timer_create(addr timer_handle, addr timer1)
+    discard esp_timer_start_periodic(timer1, 1000.uint64)
 
-    echo "starting rpc server on port 5555"
-    logi(TAG,"starting rpc server buffer size: %s", $$(rt.buffer))
-
-    when defined(TcpMpackRpcQueueServer):
-      # Starts a separate task on CPU_1 (e.g. the "App CPU")
-      # This makes it reallly easy to add dedicated tasks to run on CPU_1
-      startRpcQueueSocketServer(Port(5555), router=rt) 
-    else:
-      # Starts RPC handler on the current task 
-      # Default for JSON, MsgPack, and TCP Echo
-      startRpcSocketServer(Port(5555), router=rt)
-
-
+when isMainModule:
+    echo "running server"
+    run_http_server()
+    timer_test()
 
