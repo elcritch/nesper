@@ -18,8 +18,9 @@ proc parseNimbleArgs(): NimbleArgs =
   echo "\n================================ Nesper =======================================\n"
 
   var
-    default_cache_dir = "." / srcDir / "nimcache"
-    progfile = thisDir() / srcDir / "main.nim"
+    projsrc = if srcDir == "": "." / "main" else: srcDir
+    default_cache_dir = "." / projsrc / "nimcache"
+    progfile = thisDir() / projsrc / "main.nim"
 
   if bin.len() >= 1:
     progfile = bin[0]
@@ -33,19 +34,19 @@ proc parseNimbleArgs(): NimbleArgs =
   for idx in 0..paramCount():
     if idf_idx > 0:
       idf_args.add(paramStr(idx))
-    elif paramStr(idx) == "idf":
+    elif paramStr(idx).startsWith("esp"):
       idf_idx = idx
     elif paramStr(idx).startsWith("--nimcache"):
       pre_idf_cache_set = true
 
-  if srcDir != "main":
+  if not projsrc.endsWith("main"):
     if override_srcdir:
       echo "  Warning: esp-idf assumes source files will be located in ./main/ folder "
     else:
       echo "  Error: esp-idf assumes source files will be located in ./main/ folder "
+      echo "  got source directory: ", projsrc
       quit(1)
 
-  # echo "idf params: " & $idf_args 
   let
     npathcmd = "nimble --silent path nesper"
     (nesperPath, rcode) = system.gorgeEx(npathcmd)
@@ -56,19 +57,19 @@ proc parseNimbleArgs(): NimbleArgs =
     args: idf_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
-    projsrc: srcDir,
+    projsrc: projsrc,
     projname: projectName(),
     projfile: progfile,
     nesperpath: nesperPath,
     # forceupdatecache = "--forceUpdateCache" in idf_args
-    debug: "--idf-debug" in idf_args,
+    debug: "--esp-debug" in idf_args,
     forceclean: "--clean" in idf_args,
     help: "--help" in idf_args or "-h" in idf_args
   )
 
   if result.debug: echo "[Got nimble args: ", $result, "]\n"
 
-task idf_setup, "Setup a new esp-idf / nesper project structure":
+task esp_setup, "Setup a new esp-idf / nesper project structure":
   echo "setting up project:"
   let app_template_name = "esp32_networking"
   var nopts = parseNimbleArgs()
@@ -93,7 +94,7 @@ task idf_setup, "Setup a new esp-idf / nesper project structure":
     writeFile(nopts.projsrc / fileName, readFile(tmpltPth) % tmplt_args )
 
 
-task idf_install_headers, "Install nim headers":
+task esp_install_headers, "Install nim headers":
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -106,7 +107,7 @@ task idf_install_headers, "Install nim headers":
   else:
     echo("...nimbase.h already exists")
 
-task idf_clean, "Clean nimcache":
+task esp_clean, "Clean nimcache":
   let
     nopts = parseNimbleArgs()
     cachedir = nopts.cachedir
@@ -118,7 +119,7 @@ task idf_clean, "Clean nimcache":
     echo "...not removing nimcache, directory not found"
   
 
-task idf_compile, "Compile Nim project for esp-idf program":
+task esp_compile, "Compile Nim project for esp-idf program":
   # compile nim project
   var nopts = parseNimbleArgs() 
 
@@ -139,7 +140,7 @@ task idf_compile, "Compile Nim project for esp-idf program":
   cd(nopts.projdir)
   selfExec(compiler_cmd)
 
-task idf_build, "Build esp-idf project":
+task esp_build, "Build esp-idf project":
   echo "idf build task"
   # selfExec("error")
   # selfExec("help")
@@ -149,8 +150,8 @@ task idf_build, "Build esp-idf project":
 
 after idf_compile:
   echo "after compile!!!"
-  idfInstallHeadersTask()
+  espInstallHeadersTask()
 
 before idf_build:
   echo "before build!!!"
-  idfCompileTask()
+  espCompileTask()
