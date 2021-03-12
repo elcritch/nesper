@@ -68,35 +68,13 @@ proc parseNimbleArgs(): NimbleArgs =
 
   if result.debug: echo "[Got nimble args: ", $result, "]\n"
 
-task idf_clean, "Clean nimcache":
-  let
-    nopts = parseNimbleArgs()
-    cachedir = nopts.cachedir
-  
-  if dirExists(cachedir):
-    echo "...removing nimcache"
-    rmDir(cachedir)
-  else:
-    echo "...not removing nimcache, directory not found"
-  
-
-task idf_install_headers, "Install nim headers":
-  let
-    nopts = parseNimbleArgs()
-    cachedir = nopts.cachedir
-
-  if not fileExists(cachedir / "nimbase.h"):
-    let nimbasepath = selfExe().splitFile.dir.parentDir / "lib" / "nimbase.h"
-
-    echo("...copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
-    cpFile(nimbasepath, cachedir / "nimbase.h")
-  else:
-    echo("...nimbase.h already exists")
-
 task idf_setup, "Setup a new esp-idf / nesper project structure":
   echo "setting up project:"
   let app_template_name = "esp32_networking"
   var nopts = parseNimbleArgs()
+
+  echo "...create project source directory" 
+  mkDir(nopts.projsrc)
 
   echo "...writing cmake lists" 
   let
@@ -111,9 +89,34 @@ task idf_setup, "Setup a new esp-idf / nesper project structure":
 
   for tmpltPth in template_files:
     let fileName = tmpltPth.extractFilename()
-    echo "...copying template: ", fileName, " from: ", tmpltPth
-    writeFile(srcDir / fileName, readFile(tmpltPth) % tmplt_args )
+    echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
+    writeFile(nopts.projsrc / fileName, readFile(tmpltPth) % tmplt_args )
 
+
+task idf_install_headers, "Install nim headers":
+  let
+    nopts = parseNimbleArgs()
+    cachedir = nopts.cachedir
+
+  if not fileExists(cachedir / "nimbase.h"):
+    let nimbasepath = selfExe().splitFile.dir.parentDir / "lib" / "nimbase.h"
+
+    echo("...copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
+    cpFile(nimbasepath, cachedir / "nimbase.h")
+  else:
+    echo("...nimbase.h already exists")
+
+task idf_clean, "Clean nimcache":
+  let
+    nopts = parseNimbleArgs()
+    cachedir = nopts.cachedir
+  
+  if dirExists(cachedir):
+    echo "...removing nimcache"
+    rmDir(cachedir)
+  else:
+    echo "...not removing nimcache, directory not found"
+  
 
 task idf_compile, "Compile Nim project for esp-idf program":
   # compile nim project
@@ -127,19 +130,13 @@ task idf_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain" ]
-    compiler_args = nimargs & @[nopts.projfile.quoteShell()] 
-    compiler_cmd = compiler_args.join(" ")
+    compiler_cmd = nimargs.join() & " " & nopts.projfile.quoteShell() 
 
-  # [nopts.cachedir, nopts.projfile, nopts.args[1 ..< nopts.args.len()].join(" "), wifidefs]
-  echo "args: ", compiler_args  
-  echo "cmd: ", compiler_cmd  
+  if nopts.debug:
+    echo "idf compile: command: ", compiler_cmd  
 
   # selfExec("error")
   cd(nopts.projdir)
-  switch "nimcache", nopts.cachedir.quoteShell()
-  switch "d", "NimAppMain"
-
-  # selfExec("c " & nopts.projfile.quoteShell())
   selfExec(compiler_cmd)
 
 task idf_build, "Build esp-idf project":
