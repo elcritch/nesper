@@ -1,9 +1,9 @@
 
 import os, strutils
 
-var 
-  default_cache_dir = "." / srcDir / "nimcache"
-  progname = "main.nim"
+# var 
+  # default_cache_dir = "." / srcDir / "nimcache"
+  # progname = "main.nim"
 
 type
   NimbleArgs = object
@@ -72,9 +72,14 @@ proc idfBuildProject*(nopts: NimbleArgs) =
   exec("idf.py build")
 
 proc parseNimbleArgs(): NimbleArgs =
+  echo "================================ Nesper ======================================="
+  echo ""
+
   var
+    default_cache_dir = "." / srcDir / "nimcache"
     idf_idx = -1
     pre_idf_cache_set = false
+    override_srcdir = false
     idf_args: seq[string] = @[]
 
   for idx in 0..paramCount():
@@ -84,6 +89,13 @@ proc parseNimbleArgs(): NimbleArgs =
       idf_idx = idx
     elif paramStr(idx).startsWith("--nimcache"):
       pre_idf_cache_set = true
+
+  if srcDir != "main":
+    if override_srcdir:
+      echo "  Warning: esp-idf assumes source files will be located in ./main/ folder "
+    else:
+      echo "  Error: esp-idf assumes source files will be located in ./main/ folder "
+      quit(1)
 
   # echo "idf params: " & $idf_args 
   let
@@ -103,7 +115,7 @@ proc parseNimbleArgs(): NimbleArgs =
     debug: "--idf-debug" in idf_args,
     forceclean: "--clean" in idf_args,
     help: "--help" in idf_args or "-h" in idf_args,
-    projfile: relativePath(thisDir() / "main" / progname, thisDir())
+    projfile: relativePath(thisDir() / "main" / binDir, thisDir())
   )
   
 const
