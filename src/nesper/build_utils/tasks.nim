@@ -1,5 +1,5 @@
 
-import os, strutils
+import os, strutils, sequtils
 
 type
   NimbleArgs = object
@@ -79,12 +79,15 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
   let
     cmake_template = readFile(nopts.nesperpath / "nesper" / "build_utils" / "templates" / "CMakeLists.txt")
     template_files = listFiles(nopts.nesperpath / "nesper" / "build_utils" / "templates" / app_template_name )
-    tmplt_args = [
+  var
+    tmplt_args = @[
       "NIMBLE_PROJ_NAME", nopts.projname,
-      "NIMBLE_NIMCACHE", srcDir,
+      "NIMBLE_NIMCACHE", nopts.cachedir,
       ]
 
   writeFile("CMakeLists.txt", cmake_template % tmplt_args)
+
+  tmplt_args.insert(["NIMBLE_NIMCACHE", nopts.cachedir.relativePath(nopts.projsrc) ], 0)
 
   for tmpltPth in template_files:
     let fileName = tmpltPth.extractFilename()
@@ -141,7 +144,9 @@ task esp_compile, "Compile Nim project for esp-idf program":
   selfExec(compiler_cmd)
 
 task esp_build, "Build esp-idf project":
-  echo "idf build task"
+  echo "\n[Nesper ESP] Building ESP-IDF project:"
+
+  exec("idf.py reconfigure build")
   # selfExec("error")
   # selfExec("help")
 
