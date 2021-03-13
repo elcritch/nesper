@@ -13,7 +13,7 @@ export setup_networking
 
 # Get Password
 const WIFI_SSID {.strdefine.}: string = "NOSSID"
-const WIFI_PASSWORD  {.strdefine.}: string = "" 
+const WIFI_PASS  {.strdefine.}: string = "" 
 
 # const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
 # const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
@@ -50,7 +50,7 @@ proc wifiStart*() =
 
   var wifi_config: wifi_config_t
   wifi_config.sta.ssid.setFromString(WIFI_SSID)
-  wifi_config.sta.password.setFromString(WIFI_PASSWORD)
+  wifi_config.sta.password.setFromString(WIFI_PASS)
 
   logi(TAG, "Connecting to %s...", wifi_config.sta.ssid)
   check: esp_wifi_set_mode(WIFI_MODE_STA)
@@ -68,7 +68,7 @@ proc wifiStop*() =
   check: esp_wifiStop()
   check: esp_wifi_deinit()
 
-proc networkConnect*(): esp_err_t =
+proc networkingConnect*(): esp_err_t =
   if networkConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
@@ -81,7 +81,7 @@ proc networkConnect*(): esp_err_t =
 
   # return ESP_OK
 
-proc networkDisconnect*(): esp_err_t =
+proc networkingDisconnect*(): esp_err_t =
   if networkConnectEventGroup == nil:
     return ESP_ERR_INVALID_STATE
 

@@ -10,7 +10,7 @@ task prepare, "Compile to C code":
   let rest = params[2..high(params)].join(" ")
   
   let wifi_ssid = getEnv("WIFI_SSID")
-  let wifi_pass = getEnv("WIFI_PASSWORD")
+  let wifi_pass = getEnv("WIFI_PASS")
 
   let wifidefs =
     if wifi_ssid != "" and wifi_pass != "":

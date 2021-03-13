@@ -11,6 +11,8 @@ type
     args: seq[string]
     child_args: seq[string]
     cachedir: string
+    esp_idf_version: string
+    wifi_args: string
     debug: bool
     forceclean: bool
     distclean: bool
@@ -64,6 +66,17 @@ proc parseNimbleArgs(): NimbleArgs =
   if rcode != 0:
     raise newException( ValueError, "error running getting Nesper path using: `%#`" % [npathcmd])
 
+  # Try setting wifi password
+  let wifi_ssid = getEnv("ESP_WIFI_SSID")
+  let wifi_pass = getEnv("ESP_WIFI_PASS")
+
+  let wifidefs =
+    if wifi_ssid != "" and wifi_pass != "":
+      echo "...found env variables for wifi credentials"
+      "-d:WIFI_SSID=$1 -d:WIFI_PASS=$2 " % [wifi_ssid.quoteShell(), wifi_pass.quoteShell()]
+    else:
+      ""
+
   result = NimbleArgs(
     args: idf_args,
     child_args: child_args,
@@ -74,6 +87,8 @@ proc parseNimbleArgs(): NimbleArgs =
     projfile: progfile,
     nesperpath: nesperPath,
     # forceupdatecache = "--forceUpdateCache" in idf_args
+    esp_idf_version: "ESP_IDF_V4_0", # FIXME
+    wifi_args: wifidefs,
     debug: "--esp-debug" in idf_args,
     forceclean: "--clean" in idf_args,
     distclean: "--dist-clean" in idf_args,
@@ -158,10 +173,13 @@ task esp_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain",
-      "-d:ESP_IDF_V4_0" ] 
+      "-d:" & nopts.esp_idf_version ].join(" ") 
     childargs = nopts.child_args.mapIt(it.quoteShell()).join(" ")
-
-    compiler_cmd = nimargs.join(" ") & " " & childargs & " " & nopts.projfile.quoteShell() 
+    wifidefs = nopts.wifi_args
+    compiler_cmd = nimargs & " " & wifidefs & " " & childargs & " " & nopts.projfile.quoteShell() 
+  
+  echo "compiler_cmd: ", compiler_cmd
+  echo "compiler_childargs: ", nopts.child_args
 
   if nopts.debug:
     echo "idf compile: command: ", compiler_cmd  
