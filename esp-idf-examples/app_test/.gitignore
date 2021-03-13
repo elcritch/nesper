@@ -3,3 +3,5 @@ main/
 *.nim
 *.cfg
 *.nims
+build/
+sdkconfig

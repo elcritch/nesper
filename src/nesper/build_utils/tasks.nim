@@ -191,6 +191,10 @@ task esp_compile, "Compile Nim project for esp-idf program":
 task esp_build, "Build esp-idf project":
   echo "\n[Nesper ESP] Building ESP-IDF project:"
 
+  if findExe("idf.py") == "":
+    echo "\nError: idf.py not found. Please run the esp-idf export commands: `. $IDF_PATH/export.sh` and try again.\n"
+    quit(2)
+
   exec("idf.py reconfigure")
   exec("idf.py build")
 
