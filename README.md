@@ -86,12 +86,16 @@ Things I'm not planning on (PR's welcome!)
 
 1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
 1. Install Nim 1.4+ with `asdf` or `choosenim`
-2. nimble install https://github.com/elcritch/nesper
+2. Install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
 3. It's recommend to copy `nesper/esp-idf-examples/simplewifi` example project initially, to get the proper build steps. 
-4. Nesper wrapper API names generally match the C names directly, usually in snake case
+     - `git clone https://github.com/elcritch/nesper`
+     - `cp -Rv nesper/esp-idf-examples/simplewifi/ ./nesper-simplewifi`
+     - `cd ./nesper-simplewifi/`
+     - `make build` (also `make esp_v40` or `make esp_v41` ) 
+5. Nesper wrapper API names generally match the C names directly, usually in snake case
   + FreeRTOS functions usually are camel case and start with an `x`, e.g. `xTaskDelay`
   + These api's are found under `nesper/esp/*` or `nesper/esp/net/*`, e.g. `nesper/esp/nvs`
-5. Nesper Nim friendly api, usually in camel case
+6. Nesper Nim friendly api, usually in camel case
   + These api's are found under `nesper/*`, e.g. `nesper/nvs`
 
 ## Example Async server on a ESP32-CAM (or other Esp32 Wifi board)
