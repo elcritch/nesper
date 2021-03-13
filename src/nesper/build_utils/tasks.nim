@@ -42,7 +42,7 @@ proc parseNimbleArgs(): NimbleArgs =
       post_idf_args = true
       continue
 
-    # setup to find all commands after "esp" command, deprecated
+    # setup to find all commands after "esp" commands
     if idf_idx > 0:
       idf_args.add(paramStr(idx))
     elif paramStr(idx).startsWith("esp"):
