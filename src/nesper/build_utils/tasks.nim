@@ -9,6 +9,7 @@ type
     projfile: string
     nesperpath: string
     args: seq[string]
+    child_args: seq[string]
     cachedir: string
     debug: bool
     forceclean: bool
@@ -28,9 +29,20 @@ proc parseNimbleArgs(): NimbleArgs =
     idf_idx = -1
     pre_idf_cache_set = false
     override_srcdir = false
+    post_idf_args = false
     idf_args: seq[string] = @[]
+    child_args: seq[string] = @[]
+
 
   for idx in 0..paramCount():
+    if post_idf_args:
+      child_args.add(paramStr(idx))
+      continue
+    elif paramStr(idx) == "--":
+      post_idf_args = true
+      continue
+
+    # setup to find all commands after "esp" command, deprecated
     if idf_idx > 0:
       idf_args.add(paramStr(idx))
     elif paramStr(idx).startsWith("esp"):
@@ -54,6 +66,7 @@ proc parseNimbleArgs(): NimbleArgs =
 
   result = NimbleArgs(
     args: idf_args,
+    child_args: child_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
     projsrc: projsrc,
@@ -145,8 +158,10 @@ task esp_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain",
-      "-d:ESP_IDF_V4_0" ]
-    compiler_cmd = nimargs.join(" ") & " " & nopts.projfile.quoteShell() 
+      "-d:ESP_IDF_V4_0" ] 
+    childargs = nopts.child_args.mapIt(it.quoteShell()).join(" ")
+
+    compiler_cmd = nimargs.join(" ") & " " & childargs & " " & nopts.projfile.quoteShell() 
 
   if nopts.debug:
     echo "idf compile: command: ", compiler_cmd  
@@ -160,8 +175,6 @@ task esp_build, "Build esp-idf project":
 
   exec("idf.py reconfigure")
   exec("idf.py build")
-  # selfExec("error")
-  # selfExec("help")
 
 
 ### Actions to ensure correct steps occur before/after certain tasks ###
