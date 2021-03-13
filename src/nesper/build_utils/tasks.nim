@@ -12,6 +12,7 @@ type
     cachedir: string
     debug: bool
     forceclean: bool
+    distclean: bool
     help: bool
 
 proc parseNimbleArgs(): NimbleArgs =
@@ -62,6 +63,7 @@ proc parseNimbleArgs(): NimbleArgs =
     # forceupdatecache = "--forceUpdateCache" in idf_args
     debug: "--esp-debug" in idf_args,
     forceclean: "--clean" in idf_args,
+    distclean: "--dist-clean" in idf_args,
     help: "--help" in idf_args or "-h" in idf_args
   )
 
@@ -127,6 +129,15 @@ task esp_compile, "Compile Nim project for esp-idf program":
   var nopts = parseNimbleArgs() 
 
   echo "\n[Nesper ESP] Compiling:"
+
+  if nopts.forceclean or nopts.distclean:
+    echo "...cleaning nim cache"
+    rmDir(nopts.cachedir)
+
+  if nopts.distclean:
+    echo "...cleaning esp-idf build cache"
+    rmDir(nopts.projdir / "build")
+
   let
     nimargs = @[
       "c",
@@ -160,3 +171,4 @@ after esp_compile:
 
 before esp_build:
   espCompileTask()
+  espInstallHeadersTask()
