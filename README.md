@@ -15,7 +15,7 @@ Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Bra
 1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf)
    + TLDR: `git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git`
    + esp-idf version 4.0 is recommended for now since its more stable
-   + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1`  
+   + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1` 
 2. Install [Nim 1.4+](https://nim-lang.org/install.html)
 3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
 4. Create a new Nimble project `nimble init --git esp32_nim_test` 
