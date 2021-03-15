@@ -82,9 +82,10 @@ proc parseNimbleArgs(): NimbleArgs =
 
   # TODO: make these configurable and add more examples...
   let
-    esp32_template = "networking"
-    app_template = "http_server"
+    esp32_template  = if not ("--esp32-template" in idf_args): "networking" else: idf_args[idf_args.find("--esp32-template")]
+    app_template = if not ("--app-template" in idf_args): "http_server" else: idf_args[idf_args.find("--app-template")]
 
+  
   result = NimbleArgs(
     args: idf_args,
     child_args: child_args,
@@ -107,6 +108,18 @@ proc parseNimbleArgs(): NimbleArgs =
   )
 
   if result.debug: echo "[Got nimble args: ", $result, "]\n"
+
+task esp_list_templates, "List templates available for setup":
+  echo "\n[Nesper ESP] Listing setup templates:\n"
+  var nopts = parseNimbleArgs()
+  let 
+    esp_template_dir = nopts.nesperpath / "nesper" / "build_utils" / "templates" / "esp32_templates" 
+    app_template_dir = nopts.nesperpath / "nesper" / "build_utils" / "templates" / "app_templates" 
+    esp_template_files = listDirs(esp_template_dir)
+    app_template_files = listDirs(app_template_dir)
+
+  echo "esp32 templates:\n", esp_template_files.mapIt(it.relativePath(esp_template_dir)).join("\n - ")
+  echo "app templates:\n", app_template_files.mapIt(it.relativePath(app_template_dir)).join("\n - ")
 
 task esp_setup, "Setup a new esp-idf / nesper project structure":
   echo "\n[Nesper ESP] setting up project:"
