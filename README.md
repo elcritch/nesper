@@ -88,17 +88,18 @@ Things I'm not planning on (PR's welcome!)
 1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. Install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
 3. Create a new Nimble project `nimble init --git esp32_test` and change into the new project directory (e.g. `./esp32_test/`)
-4. Edit the Nimble file in the project directory, e.g. `esp32_test/esp32_test.nimble`
-   a. Add the line `requires "nesper >= 0.5"` after the `requires "nim >= 1.4.4"`
-   b. Next, add the line `include nesper/build_utils/tasks`
-5. Verify it works by running `nimble tasks` in your project -- it should print new Nimble tasks like `esp_setup`, `esp_compile`, etc
-6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
-7. Run `nimble esp_compile` to compile your Nim code to C which the esp-idf project will use
-8. Run `nimble esp_build` to build the esp-idf project
+4. Edit the Nimble file in the project directory and add the following lines:
+```nim
+requires "nesper >= 0.5.0"
+# includes nimble tasks for building Nim esp-idf projects
+include nesper/build_utils/tasks
+````
+5. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
 
-Once the project is setup:
-1. Normal code recompile: `nimble esp_build`
-2. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
+### Compiling and Building
+
+2. Run `nimble esp_build` to build the esp-idf project
+4. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
 
 Notes:
 1. Running `nimble esp_build` will both compile the Nim code and then build the esp-idf project
