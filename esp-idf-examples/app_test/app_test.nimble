@@ -9,11 +9,5 @@ srcDir        = "src"
 # Dependencies
 requires "nim >= 1.4.0"
 requires "nesper >= 0.5.0"
-
-# nesperVersion = "ESP_IDF_V4_0"
-# import nesper/build_tasks
-
-# nim prepare main/main.nim --nimblePath:main/nimble/pkgs -d:ESP_IDF_V4_0  -d:TcpEchoServer  && idf.py reconfigure 
-
+# includes nimble tasks for building Nim esp-idf projects
 include nesper/build_utils/tasks
-
