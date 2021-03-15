@@ -118,8 +118,8 @@ task esp_list_templates, "List templates available for setup":
     esp_template_files = listDirs(esp_template_dir)
     app_template_files = listDirs(app_template_dir)
 
-  echo "esp32 templates:\n", esp_template_files.mapIt(it.relativePath(esp_template_dir)).join("\n - ")
-  echo "app templates:\n", app_template_files.mapIt(it.relativePath(app_template_dir)).join("\n - ")
+  echo (@["esp32 templates:"] & esp_template_files.mapIt(it.relativePath(esp_template_dir))).join("\n - ")
+  echo (@["app templates:"] & app_template_files.mapIt(it.relativePath(app_template_dir))).join("\n - ")
 
 task esp_setup, "Setup a new esp-idf / nesper project structure":
   echo "\n[Nesper ESP] setting up project:"
