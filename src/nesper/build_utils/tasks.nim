@@ -143,6 +143,8 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
 
   tmplt_args.insert(["NIMBLE_NIMCACHE", nopts.cachedir.relativePath(nopts.projsrc) ], 0)
 
+  # writeFile(".gitignore", readFile(".gitignore") & "\n" @["build/", "#main/nimcache/"].join("\n") & "\n")
+
   for tmpltPth in esp_template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
