@@ -6,13 +6,16 @@ See [Releases](https://github.com/elcritch/nesper/releases) for updates.
 
 ## Status 
 
-This project is fairly stable and even being used in shipping hardware project. The documentation is rough and primarily only includes this README. As such, it may still require understanding the underlying ESP-IDF SDK for various use cases. However, it is useable. 
+This project is fairly stable and even being used in shipping hardware project. The documentation is rough and primarily only includes this README. As such, it may still require understanding the underlying ESP-IDF SDK for various use cases. However, it is useable and several people unfamiliar with ESP-IDF and embedded programming have added wrappers for esp-idf modules. 
 
 Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Branch v4.1 has multiple serious bugs in I2C. 
 
 ## General Usage
 
-1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
+1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf)
+   + TLDR: `git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git`
+   + esp-idf version 4.0 is recommended for now since its more stable
+   + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1`  
 2. Install [Nim 1.4+](https://nim-lang.org/install.html)
 3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
 4. Create a new Nimble project `nimble init --git esp32_nim_test` 
