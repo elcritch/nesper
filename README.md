@@ -6,9 +6,35 @@ See [Releases](https://github.com/elcritch/nesper/releases) for updates.
 
 ## Status 
 
-This is a Work in Progress (TM), however it's already being used in a shipping hardware project. However, it may still require understanding the underlying ESP-IDF SDK for various use cases. 
+This project is fairly stable and even being used in shipping hardware project. The documentation is rough and primarily only includes this README. As such, it may still require understanding the underlying ESP-IDF SDK for various use cases. However, it is useable. 
 
 Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Branch v4.1 has multiple serious bugs in I2C. 
+
+## General Usage
+
+1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
+2. Install [Nim 1.4+](https://nim-lang.org/install.html)
+3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
+4. Create a new Nimble project `nimble init --git esp32_nim_test` 
+5. In the new project directory edit the Nimble file and add the lines:
+```nim
+requires "nesper >= 0.6.0"
+# includes nimble tasks for building Nim esp-idf projects
+include nesper/build_utils/tasks
+````
+6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
+
+### Compiling and Building
+
+1. Run `nimble esp_build` to build the esp-idf project
+2. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
+
+Notes:
+- Running `nimble esp_build` will both compile the Nim code and then build the esp-idf project
+- During development it's often handy just to run `nimble esp_compile` to check your Nim code works
+- Sometimes the Nim build cache gets out of sync, use `nimble esp_build --clean` to force a full Nim recompile
+- Sometimes the esp-idf build cache gets out of sync, use `nimble esp_build --dist-clean` to force a full Nim recompile
+
 
 ## Example Code 
 
@@ -81,31 +107,6 @@ Things I'm not planning on (PR's welcome!)
 - [ ] PWM 
 - [ ] LCDs 
 - [ ] Built-in ADC 
-
-## General Usage
-
-1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
-2. Install [Nim 1.4+](https://nim-lang.org/install.html)
-3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
-4. Create a new Nimble project `nimble init --git esp32_nim_test` 
-5. In the new project directory edit the Nimble file and add the lines:
-```nim
-requires "nesper >= 0.6.0"
-# includes nimble tasks for building Nim esp-idf projects
-include nesper/build_utils/tasks
-````
-6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
-
-### Compiling and Building
-
-1. Run `nimble esp_build` to build the esp-idf project
-2. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
-
-Notes:
-- Running `nimble esp_build` will both compile the Nim code and then build the esp-idf project
-- During development it's often handy just to run `nimble esp_compile` to check your Nim code works
-- Sometimes the Nim build cache gets out of sync, use `nimble esp_build --clean` to force a full Nim recompile
-- Sometimes the esp-idf build cache gets out of sync, use `nimble esp_build --dist-clean` to force a full Nim recompile
 
 ### Manual Setup 
 
