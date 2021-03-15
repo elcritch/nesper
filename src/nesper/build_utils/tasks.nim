@@ -175,6 +175,10 @@ task esp_compile, "Compile Nim project for esp-idf program":
 
   echo "\n[Nesper ESP] Compiling:"
 
+  if not dirExists("main/"):
+    echo "\nWarning! The `main/` directory is required but appear appear to exist\n"
+    echo "Did you run `nimble esp_setup` before trying to compile?\n"
+
   if nopts.forceclean or nopts.distclean:
     echo "...cleaning nim cache"
     rmDir(nopts.cachedir)
