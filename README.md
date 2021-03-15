@@ -91,7 +91,6 @@ Things I'm not planning on (PR's welcome!)
 4. Edit the Nimble file in the project directory, e.g. `esp32_test/esp32_test.nimble`
    a. Add the line `requires "nesper >= 0.5"` after the `requires "nim >= 1.4.4"`
    b. Next, add the line `include nesper/build_utils/tasks`
-   c. Finally delete the line `srcDir = "src"` (if it exists)
 5. Verify it works by running `nimble tasks` in your project -- it should print new Nimble tasks like `esp_setup`, `esp_compile`, etc
 6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
 7. Run `nimble esp_compile` to compile your Nim code to C which the esp-idf project will use
