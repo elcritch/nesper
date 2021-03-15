@@ -7,6 +7,9 @@ type
     projname: string
     projsrc: string
     projfile: string
+    appsrc: string
+    esp32_template: string
+    app_template: string
     nesperpath: string
     args: seq[string]
     child_args: seq[string]
@@ -20,7 +23,7 @@ type
 
 proc parseNimbleArgs(): NimbleArgs =
   var
-    projsrc = if srcDir == "": "." / "main" else: srcDir
+    projsrc = "main"
     default_cache_dir = "." / projsrc / "nimcache"
     progfile = thisDir() / projsrc / "main.nim"
 
@@ -77,15 +80,23 @@ proc parseNimbleArgs(): NimbleArgs =
     else:
       ""
 
+  # TODO: make these configurable and add more examples...
+  let
+    esp32_template = "networking"
+    app_template = "http_server"
+
   result = NimbleArgs(
     args: idf_args,
     child_args: child_args,
     cachedir: if pre_idf_cache_set: nimCacheDir() else: default_cache_dir,
     projdir: thisDir(),
     projsrc: projsrc,
+    appsrc: srcDir,
     projname: projectName(),
     projfile: progfile,
     nesperpath: nesperPath,
+    esp32_template: esp32_template,
+    app_template: app_template,
     # forceupdatecache = "--forceUpdateCache" in idf_args
     esp_idf_version: "ESP_IDF_V4_0", # FIXME
     wifi_args: wifidefs,
@@ -99,7 +110,6 @@ proc parseNimbleArgs(): NimbleArgs =
 
 task esp_setup, "Setup a new esp-idf / nesper project structure":
   echo "\n[Nesper ESP] setting up project:"
-  let app_template_name = "esp32_networking"
   var nopts = parseNimbleArgs()
 
   echo "...create project source directory" 
@@ -108,7 +118,8 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
   echo "...writing cmake lists" 
   let
     cmake_template = readFile(nopts.nesperpath / "nesper" / "build_utils" / "templates" / "CMakeLists.txt")
-    template_files = listFiles(nopts.nesperpath / "nesper" / "build_utils" / "templates" / app_template_name )
+    esp_template_files = listFiles(nopts.nesperpath / "nesper" / "build_utils" / "templates" / "esp32_templates" / nopts.esp32_template )
+    app_template_files = listFiles(nopts.nesperpath / "nesper" / "build_utils" / "templates" / "app_templates" / nopts.app_template )
   var
     tmplt_args = @[
       "NIMBLE_PROJ_NAME", nopts.projname,
@@ -119,10 +130,16 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
 
   tmplt_args.insert(["NIMBLE_NIMCACHE", nopts.cachedir.relativePath(nopts.projsrc) ], 0)
 
-  for tmpltPth in template_files:
+  for tmpltPth in esp_template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
     writeFile(nopts.projsrc / fileName, readFile(tmpltPth) % tmplt_args )
+  
+  mkdir(srcDir)
+  for tmpltPth in app_template_files:
+    let fileName = tmpltPth.extractFilename()
+    echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
+    writeFile(nopts.appsrc / fileName, readFile(tmpltPth) % tmplt_args )
 
 
 task esp_install_headers, "Install nim headers":
@@ -169,6 +186,7 @@ task esp_compile, "Compile Nim project for esp-idf program":
   let
     nimargs = @[
       "c",
+      "--path:" & thisDir() / nopts.appsrc,
       "--nomain",
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
