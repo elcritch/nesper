@@ -87,6 +87,31 @@ Things I'm not planning on (PR's welcome!)
 1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf) (version 4.0 is recommended for now, set the `-d:ESP_IDF_V4_0`)
 1. Install Nim 1.4+ with `asdf` or `choosenim`
 2. Install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
+3. Create a new Nimble project `nimble init --git esp32_test` and change into the new project directory (e.g. `./esp32_test/`)
+4. Edit the Nimble file in the project directory, e.g. `esp32_test/esp32_test.nimble`
+   a. Add the line `requires "nesper >= 0.5"` after the `requires "nim >= 1.4.4"`
+   b. Next, add the line `include nesper/build_utils/tasks`
+   c. Finally delete the line `srcDir = "src"` (if it exists)
+5. Verify it works by running `nimble tasks` in your project -- it should print new Nimble tasks like `esp_setup`, `esp_compile`, etc
+6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
+7. Run `nimble esp_compile` to compile your Nim code to C which the esp-idf project will use
+8. Run `nimble esp_build` to build the esp-idf project
+
+Once the project is setup:
+1. Normal code recompile: `nimble esp_build`
+2. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
+
+Notes:
+1. Running `nimble esp_build` will both compile the Nim code and then build the esp-idf project
+2. During development it's often handy just to run `nimble esp_compile` to check your Nim code works
+3. Sometimes the Nim build cache gets out of sync, use `nimble esp_build --clean` to force a full Nim recompile
+4. Sometimes the esp-idf build cache gets out of sync, use `nimble esp_build --dist-clean` to force a full Nim recompile
+
+
+### Manual Setup 
+
+This is the more manual setup approach: 
+
 3. It's recommend to copy `nesper/esp-idf-examples/simplewifi` example project initially, to get the proper build steps. 
      - `git clone https://github.com/elcritch/nesper`
      - `cp -Rv nesper/esp-idf-examples/simplewifi/ ./nesper-simplewifi`
