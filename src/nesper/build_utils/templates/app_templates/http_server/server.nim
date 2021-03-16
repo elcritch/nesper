@@ -9,7 +9,7 @@ proc cb*(req: Request) {.async.} =
     await req.respond(Http200, "Hello World from nim on ESP32\n")
     # GC_fullCollect()
 
-proc run_http_server*() {.exportc.} =
+proc run_server*() {.exportc.} =
     echo "starting http server on port 8181"
     var server = newAsyncHttpServer()
 

@@ -8,7 +8,7 @@ import json
 
 import nesper/servers/tcpsocket
 
-proc run_rpc_server*() =
+proc run_server*() =
   echo "starting server on port 5555"
   var msg = "echo: "
   startSocketServer[string](Port(5555), readHandler=echoReadHandler, writeHandler=nil, data=msg)

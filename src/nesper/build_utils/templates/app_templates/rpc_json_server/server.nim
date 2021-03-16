@@ -16,7 +16,7 @@ import nesper/servers/rpc/rpcsocket_json
 
 
 # Setup RPC Server #
-proc run_rpc_server*() =
+proc run_server*() =
 
   # Setup an RPC router
   var rpcRouter: RpcRouter 
@@ -36,10 +36,6 @@ proc run_rpc_server*() =
     result = 0
     for x in vals:
       result += x
-
-  # this adds methods for Over-The-Air updates using RPC! 
-  # note, this isn't secured by default
-  rpcRouter.addOTAMethods()
 
   echo "starting rpc server on port 5555"
   logi(TAG,"starting rpc server buffer size: %s", $$(rt.buffer))

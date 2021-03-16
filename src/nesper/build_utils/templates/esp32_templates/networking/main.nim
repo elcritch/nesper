@@ -34,7 +34,7 @@ app_main():
     logi(TAG, "Connected to %s", networkConnectionName)
     logi(TAG, "IPv4 address: %s", $$networkIpAddr)
     logi(TAG, "network setup!\n")
-    run_http_server()
+    run_server()
 
   # turn off networking 
   check:

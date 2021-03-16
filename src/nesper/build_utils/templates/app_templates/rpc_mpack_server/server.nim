@@ -12,7 +12,7 @@ const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
 import nesper/servers/rpc/rpcsocket_mpack
 
 # Setup RPC Server #
-proc run_rpc_server*() =
+proc run_server*() =
 
   # Setup an RPC router
   var rpcRouter: RpcRouter 
