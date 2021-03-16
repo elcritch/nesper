@@ -6,9 +6,6 @@ import volatile
 import strutils
 import json
 
-const TAG = "server"
-const MaxRpcReceiveBuffer {.intdefine.}: int = 4096
-
 import nesper/servers/tcpsocket
 
 proc run_rpc_server*() =

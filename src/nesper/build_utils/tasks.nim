@@ -1,5 +1,6 @@
 
 import os, strutils, sequtils
+import strformat, tables, sugar
 
 type
   NimbleArgs = object
@@ -82,9 +83,11 @@ proc parseNimbleArgs(): NimbleArgs =
 
   # TODO: make these configurable and add more examples...
   let
-    esp32_template  = if not ("--esp32-template" in idf_args): "networking" else: idf_args[idf_args.find("--esp32-template")]
-    app_template = if not ("--app-template" in idf_args): "http_server" else: idf_args[idf_args.find("--app-template")]
+    flags = idf_args.filterIt(it.contains(":")).mapIt(it.split(":")).mapIt( (it[0], it[1])).toTable()
+    esp32_template  = flags.getOrDefault("--esp32-template", "networking")
+    app_template  = flags.getOrDefault("--app-template", "http_server")
 
+  echo "APP_TEMPLATE ANY: ", idf_args.any(x => x.startsWith("--app-template"))
   
   result = NimbleArgs(
     args: idf_args,
@@ -145,11 +148,13 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
 
   # writeFile(".gitignore", readFile(".gitignore") & "\n" @["build/", "#main/nimcache/"].join("\n") & "\n")
 
+  echo fmt"...copying esp32 template files for `{nopts.esp32_template}`" 
   for tmpltPth in esp_template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
     writeFile(nopts.projsrc / fileName, readFile(tmpltPth) % tmplt_args )
   
+  echo fmt"...copying app template files for `{nopts.app_template}`" 
   mkdir(srcDir)
   for tmpltPth in app_template_files:
     let fileName = tmpltPth.extractFilename()
