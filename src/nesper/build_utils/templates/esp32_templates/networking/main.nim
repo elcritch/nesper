@@ -6,7 +6,7 @@ import nesper/wifi
 import nesper/tasks
 import os
 
-import server
+import $NIMBLE_PROJ_NAME/server
 
 when defined(ESP32_ETHERNET):
   import setup_eth

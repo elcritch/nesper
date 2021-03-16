@@ -148,18 +148,18 @@ task esp_setup, "Setup a new esp-idf / nesper project structure":
 
   # writeFile(".gitignore", readFile(".gitignore") & "\n" @["build/", "#main/nimcache/"].join("\n") & "\n")
 
-  echo fmt"...copying esp32 template files for `{nopts.esp32_template}`" 
+  echo fmt"{'\n'}Copying esp32 template files for `{nopts.esp32_template}`:" 
   for tmpltPth in esp_template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
     writeFile(nopts.projsrc / fileName, readFile(tmpltPth) % tmplt_args )
   
-  echo fmt"...copying app template files for `{nopts.app_template}`" 
-  mkdir(srcDir)
+  echo fmt"{'\n'}Copying app template files for `{nopts.app_template}`:" 
+  mkdir(nopts.appsrc / nopts.projname)
   for tmpltPth in app_template_files:
     let fileName = tmpltPth.extractFilename()
     echo "...copying template: ", fileName, " from: ", tmpltPth, " to: ", getCurrentDir()
-    writeFile(nopts.appsrc / fileName, readFile(tmpltPth) % tmplt_args )
+    writeFile(nopts.appsrc / nopts.projname / fileName, readFile(tmpltPth) % tmplt_args )
 
 
 task esp_install_headers, "Install nim headers":

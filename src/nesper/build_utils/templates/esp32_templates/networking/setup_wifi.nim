@@ -6,8 +6,6 @@ import nesper/wifi
 import nesper/tasks
 import os
 
-import server
-
 import setup_networking
 export setup_networking
 
