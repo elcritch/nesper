@@ -14,6 +14,8 @@
 import ../../consts
 import gpio_driver
 
+const hdr = "driver/adc.h"
+
 type
   adc_atten_t* {.size: sizeof(cint).} = enum
     ADC_ATTEN_DB_0 = 0,         ## !<The input voltage of ADC will be reduced to about 1/1
@@ -115,7 +117,7 @@ type
 ##
 
 proc adc1_pad_get_io_num*(channel: adc1_channel_t; gpio_num: ptr gpio_num_t): esp_err_t {.
-    importc: "adc1_pad_get_io_num", header: "adc.h".}
+    importc: "adc1_pad_get_io_num", header: hdr.}
 ## *
 ##  @brief Configure ADC1 capture width, meanwhile enable output invert for ADC1.
 ##  The configuration is for all channels of ADC1
@@ -127,7 +129,7 @@ proc adc1_pad_get_io_num*(channel: adc1_channel_t; gpio_num: ptr gpio_num_t): es
 ##
 
 proc adc1_config_width*(width_bit: adc_bits_width_t): esp_err_t {.
-    importc: "adc1_config_width", header: "adc.h".}
+    importc: "adc1_config_width", header: hdr.}
 ## *
 ##  @brief Configure ADC capture width.
 ##  @param adc_unit ADC unit index
@@ -138,7 +140,7 @@ proc adc1_config_width*(width_bit: adc_bits_width_t): esp_err_t {.
 ##
 
 proc adc_set_data_width*(adc_unit: adc_unit_t; width_bit: adc_bits_width_t): esp_err_t {.
-    importc: "adc_set_data_width", header: "adc.h".}
+    importc: "adc_set_data_width", header: hdr.}
 ## *
 ##  @brief Set the attenuation of a particular channel on ADC1, and configure its
 ##  associated GPIO pin mux.
@@ -183,7 +185,7 @@ proc adc_set_data_width*(adc_unit: adc_unit_t; width_bit: adc_bits_width_t): esp
 ##
 
 proc adc1_config_channel_atten*(channel: adc1_channel_t; atten: adc_atten_t): esp_err_t {.
-    importc: "adc1_config_channel_atten", header: "adc.h".}
+    importc: "adc1_config_channel_atten", header: hdr.}
 ## *
 ##  @brief Take an ADC1 reading from a single channel.
 ##  @note When the power switch of SARADC1, SARADC2, HALL sensor and AMP sensor is turned on,
@@ -206,18 +208,18 @@ proc adc1_config_channel_atten*(channel: adc1_channel_t; atten: adc_atten_t): es
 ##
 
 proc adc1_get_raw*(channel: adc1_channel_t): cint {.importc: "adc1_get_raw",
-    header: "adc.h".}
+    header: hdr.}
 ## *
 ##  @brief Enable ADC power
 ##
 
-proc adc_power_on*() {.importc: "adc_power_on", header: "adc.h".}
+proc adc_power_on*() {.importc: "adc_power_on", header: hdr.}
 ## *
 ##  @brief Power off SAR ADC
 ##  This function will force power down for ADC
 ##
 
-proc adc_power_off*() {.importc: "adc_power_off", header: "adc.h".}
+proc adc_power_off*() {.importc: "adc_power_off", header: hdr.}
 ## *
 ##  @brief Initialize ADC pad
 ##  @param adc_unit ADC unit index
@@ -228,7 +230,7 @@ proc adc_power_off*() {.importc: "adc_power_off", header: "adc.h".}
 ##
 
 proc adc_gpio_init*(adc_unit: adc_unit_t; channel: adc_channel_t): esp_err_t {.
-    importc: "adc_gpio_init", header: "adc.h".}
+    importc: "adc_gpio_init", header: hdr.}
 ## *
 ##  @brief Set ADC data invert
 ##  @param adc_unit ADC unit index
@@ -239,7 +241,7 @@ proc adc_gpio_init*(adc_unit: adc_unit_t; channel: adc_channel_t): esp_err_t {.
 ##
 
 proc adc_set_data_inv*(adc_unit: adc_unit_t; inv_en: bool): esp_err_t {.
-    importc: "adc_set_data_inv", header: "adc.h".}
+    importc: "adc_set_data_inv", header: hdr.}
 ## *
 ##  @brief Set ADC source clock
 ##  @param clk_div ADC clock divider, ADC clock is divided from APB clock
@@ -248,7 +250,7 @@ proc adc_set_data_inv*(adc_unit: adc_unit_t; inv_en: bool): esp_err_t {.
 ##
 
 proc adc_set_clk_div*(clk_div: uint8): esp_err_t {.importc: "adc_set_clk_div",
-    header: "adc.h".}
+    header: hdr.}
 ## *
 ##  @brief Set I2S data source
 ##  @param src I2S DMA data source, I2S DMA can get data from digital signals or from ADC.
@@ -257,7 +259,7 @@ proc adc_set_clk_div*(clk_div: uint8): esp_err_t {.importc: "adc_set_clk_div",
 ##
 
 proc adc_set_i2s_data_source*(src: adc_i2s_source_t): esp_err_t {.
-    importc: "adc_set_i2s_data_source", header: "adc.h".}
+    importc: "adc_set_i2s_data_source", header: hdr.}
 ## *
 ##  @brief Initialize I2S ADC mode
 ##  @param adc_unit ADC unit index
@@ -268,7 +270,7 @@ proc adc_set_i2s_data_source*(src: adc_i2s_source_t): esp_err_t {.
 ##
 
 proc adc_i2s_mode_init*(adc_unit: adc_unit_t; channel: adc_channel_t): esp_err_t {.
-    importc: "adc_i2s_mode_init", header: "adc.h".}
+    importc: "adc_i2s_mode_init", header: hdr.}
 ## *
 ##  @brief Configure ADC1 to be usable by the ULP
 ##
@@ -279,7 +281,7 @@ proc adc_i2s_mode_init*(adc_unit: adc_unit_t; channel: adc_channel_t): esp_err_t
 ##  to be called to configure ADC1 channels, before ADC1 is used by the ULP.
 ##
 
-proc adc1_ulp_enable*() {.importc: "adc1_ulp_enable", header: "adc.h".}
+proc adc1_ulp_enable*() {.importc: "adc1_ulp_enable", header: hdr.}
 ## *
 ##  @brief Read Hall Sensor
 ##
@@ -300,7 +302,7 @@ proc adc1_ulp_enable*() {.importc: "adc1_ulp_enable", header: "adc.h".}
 ##  @return The hall sensor reading.
 ##
 
-proc hall_sensor_read*(): cint {.importc: "hall_sensor_read", header: "adc.h".}
+proc hall_sensor_read*(): cint {.importc: "hall_sensor_read", header: hdr.}
 ## *
 ##  @brief Get the gpio number of a specific ADC2 channel.
 ##
@@ -314,7 +316,7 @@ proc hall_sensor_read*(): cint {.importc: "hall_sensor_read", header: "adc.h".}
 ##
 
 proc adc2_pad_get_io_num*(channel: adc2_channel_t; gpio_num: ptr gpio_num_t): esp_err_t {.
-    importc: "adc2_pad_get_io_num", header: "adc.h".}
+    importc: "adc2_pad_get_io_num", header: hdr.}
 ## *
 ##  @brief Configure the ADC2 channel, including setting attenuation.
 ##
@@ -347,7 +349,7 @@ proc adc2_pad_get_io_num*(channel: adc2_channel_t; gpio_num: ptr gpio_num_t): es
 ##
 
 proc adc2_config_channel_atten*(channel: adc2_channel_t; atten: adc_atten_t): esp_err_t {.
-    importc: "adc2_config_channel_atten", header: "adc.h".}
+    importc: "adc2_config_channel_atten", header: hdr.}
 ## *
 ##  @brief Take an ADC2 reading on a single channel
 ##
@@ -373,7 +375,7 @@ proc adc2_config_channel_atten*(channel: adc2_channel_t; atten: adc_atten_t): es
 
 proc adc2_get_raw*(channel: adc2_channel_t; width_bit: adc_bits_width_t;
                   raw_out: ptr cint): esp_err_t {.importc: "adc2_get_raw",
-    header: "adc.h".}
+    header: hdr.}
 ## *
 ##   @brief Output ADC2 reference voltage to gpio 25 or 26 or 27
 ##
@@ -390,4 +392,4 @@ proc adc2_get_raw*(channel: adc2_channel_t; width_bit: adc_bits_width_t;
 ##
 
 proc adc2_vref_to_gpio*(gpio: gpio_num_t): esp_err_t {.importc: "adc2_vref_to_gpio",
-    header: "adc.h".}
+    header: hdr.}
