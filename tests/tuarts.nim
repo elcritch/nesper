@@ -16,4 +16,6 @@ var urt0 = cfg0.newUart(UART_NUM_0,
 
 echo "urt0: ", $urt0.port
 
+var buff = urt0.read(1023.SzBytes)
 
+urt0.write(buff)
