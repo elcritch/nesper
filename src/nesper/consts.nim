@@ -64,7 +64,6 @@ type
 
 borrowBasicOperations(Micros)
 borrowBasicOperations(Millis)
-borrowBasicOperations(Millis)
 
 proc `or`* (x, y: esp_intr_flags): esp_intr_flags {.borrow.}
 

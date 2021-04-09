@@ -8,9 +8,10 @@ import esp/esp_intr_alloc
 import gpios
 
 export uart
+export consts
 export gpios.gpio_num_t
 
-import bytesequtils
+# import bytesequtils
 
 const TAG = "uarts"
 
@@ -69,25 +70,22 @@ proc newUart*(config: var uart_config_t;
                       cts_pin.cint)
 
   let
-    rx_sz: cint = if rx_buffer >= 0: rx_buffer.cint else: buffer.cint
-    tx_sz: cint = if tx_buffer >= 0: tx_buffer.cint else: buffer.cint
+    rx_sz: cint = if rx_buffer >= SzBytes(0): rx_buffer.cint else: buffer.cint
+    tx_sz: cint = if tx_buffer >= SzBytes(0): tx_buffer.cint else: buffer.cint
 
   var iflags = esp_intr_flags(0)
   for flg in intr_flags:
-    iflags = flg or iflags
+    iflags = iflags or flg.esp_intr_flags
 
   # // Setup UART buffered IO with event queue
   # // Install UART driver using an event queue here
-  check: uart_driver_install(uart_num,
+  check: uart_driver_install(result.port,
                              rx_sz,
                              tx_sz,
-                             event_sizes,
+                             event_sizes.cint,
                              addr result.events,
-                             esp_intr_flags)
+                             iflags)
   
-  result.rx_buffer = newString(rx_sz)
-  result.tx_buffer = newString(tx_sz)
-
   return
 
 proc read*(uart: var Uart;
