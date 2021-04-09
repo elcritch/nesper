@@ -96,3 +96,4 @@ proc splitBytes*[T](val: T, count: range[0..8], top=false): seq[byte] =
       result.add( byte(x shr (8*szT-8) ))
       x = x shl 8
 
+

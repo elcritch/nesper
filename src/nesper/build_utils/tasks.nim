@@ -79,6 +79,7 @@ proc parseNimbleArgs(): NimbleArgs =
       echo "...found env variables for wifi credentials"
       "-d:WIFI_SSID=$1 -d:WIFI_PASS=$2 " % [wifi_ssid.quoteShell(), wifi_pass.quoteShell()]
     else:
+      echo "note: no env variables found for wifi, set ESP_WIFI_SSID and ESP_WIFI_PASS to enable"
       ""
 
   # TODO: make these configurable and add more examples...
@@ -87,7 +88,7 @@ proc parseNimbleArgs(): NimbleArgs =
     esp32_template  = flags.getOrDefault("--esp32-template", "networking")
     app_template  = flags.getOrDefault("--app-template", "http_server")
 
-  echo "APP_TEMPLATE ANY: ", idf_args.any(x => x.startsWith("--app-template"))
+  # echo "APP_TEMPLATE ANY: ", idf_args.any(x => x.startsWith("--app-template"))
   
   result = NimbleArgs(
     args: idf_args,

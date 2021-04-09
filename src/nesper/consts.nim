@@ -35,28 +35,36 @@ template ESP_INTR_ENABLE*(inum: untyped): untyped =
 template ESP_INTR_DISABLE*(inum: untyped): untyped =
   xt_ints_off((1 shl inum))
 
+template borrowBasicOperations(typ: typedesc) =
+  proc `+` *(x, y: typ): typ {.borrow.}
+  proc `-` *(x, y: typ): typ {.borrow.}
+
+  proc `<` *(a, b: typ): bool {.borrow.}
+  proc `<=` *(a, b: typ): bool {.borrow.}
+  proc `==` *(a, b: typ): bool {.borrow.}
+
+  proc `$` *(v: typ): string {.borrow.}
+
+type 
+  SzBytes* = distinct int
+  SzKiloBytes* = distinct int
+  SzMegaBytes* = distinct int
+
+borrowBasicOperations(SzBytes)
+borrowBasicOperations(SzKiloBytes)
+borrowBasicOperations(SzMegaBytes)
+
+converter toSzBytes*(kb: SzKiloBytes): SzBytes = SzBytes(1024 * kb.int)
+converter toSzytes*(kb: SzMegaBytes): SzBytes = SzBytes(1024 * 1024 * kb.int)
+
 type 
   Millis* = distinct uint64
   Micros* = distinct uint64
   Hertz* = distinct uint32
 
-
-proc `+` *(a, b: Millis): Millis {.borrow.}
-proc `-` *(a, b: Millis): Millis {.borrow.}
-
-proc `<` *(a, b: Millis): bool {.borrow.}
-proc `<=` *(a, b: Millis): bool {.borrow.}
-proc `==` *(a, b: Millis): bool {.borrow.}
-
-proc `+` *(a, b: Micros): Micros {.borrow.}
-proc `-` *(a, b: Micros): Micros {.borrow.}
-
-proc `<` *(a, b: Micros): bool {.borrow.}
-proc `<=` *(a, b: Micros): bool {.borrow.}
-proc `==` *(a, b: Micros): bool {.borrow.}
-
-proc `$` *(v: Millis): string {.borrow.}
-proc `$` *(v: Micros): string {.borrow.}
+borrowBasicOperations(Micros)
+borrowBasicOperations(Millis)
+borrowBasicOperations(Millis)
 
 proc `or`* (x, y: esp_intr_flags): esp_intr_flags {.borrow.}
 
