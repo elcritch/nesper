@@ -17,21 +17,19 @@ const TAG = "uarts"
 
 
 type
-  SerialNoChangeTp* = distinct cint
-  SerialPin* = gpio_num_t | SerialNoChangeTp
-
   Uart* = ref object
     port*: uart_port_t
     config*: uart_config_t
     events*: QueueHandle_t
 
-const SerialNoChange* = SerialNoChangeTp(-1)
+const SerialNoChange* = gpio_num_t(-1)
 
 proc newUartConfig*(baud_rate: int = 115_200;
                     data_bits: uart_word_length_t = UART_DATA_8_BITS;
                     parity: uart_parity_t = UART_PARITY_DISABLE;
                     stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
-                    flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE
+                    flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
+                    rx_flow_ctrl_thresh: uint8 = 122,
                     ): uart_config_t =
 
   result = uart_config_t(
@@ -40,18 +38,19 @@ proc newUartConfig*(baud_rate: int = 115_200;
     parity: parity,
     stop_bits: stop_bits,
     flow_ctrl: flow_ctrl,
+    rx_flow_ctrl_thresh: rx_flow_ctrl_thresh
   )
 
 proc newUart*(config: var uart_config_t;
               uart_num: uart_port_t;
-              tx_pin: SerialPin; # UART TX pin GPIO number.
-              rx_pin: SerialPin; # UART TX pin GPIO number.
-              rts_pin: SerialPin = SerialNoChange; # UART TX pin GPIO number.
-              cts_pin: SerialPin = SerialNoChange; # UART TX pin GPIO number.
+              tx_pin: gpio_num_t; # UART TX pin GPIO number.
+              rx_pin: gpio_num_t; # UART TX pin GPIO number.
+              rts_pin: gpio_num_t = SerialNoChange; # UART TX pin GPIO number.
+              cts_pin: gpio_num_t = SerialNoChange; # UART TX pin GPIO number.
               buffer: SzBytes,
               rx_buffer = SzBytes(-1),
               tx_buffer = SzBytes(-1),
-              event_sizes: int = 0,
+              event_size: int = 0,
               intr_flags: set[InterruptFlags] = {}
               ): Uart =
 
@@ -82,8 +81,8 @@ proc newUart*(config: var uart_config_t;
   check: uart_driver_install(result.port,
                              rx_sz,
                              tx_sz,
-                             event_sizes.cint,
-                             addr result.events,
+                             event_size.cint,
+                             if event_size > 0: addr result.events else: nil,
                              iflags)
   
   return
@@ -94,12 +93,9 @@ proc read*(uart: var Uart;
 
   let sz = size.uint32
 
-  var buff = newSeqOfCap[byte](sz)
+  var buff = newSeq[byte](sz)
   let
-    bytes_read = uart_read_bytes(uart.port,
-                    addr(buff[0]),
-                    sz,
-                    wait)
+    bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
   
   if bytes_read < 0:
     raise newEspError[EspError]("uart error: " & $bytes_read, bytes_read)
