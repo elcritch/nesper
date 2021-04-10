@@ -96,11 +96,13 @@ proc read*(uart: var Uart;
   var buff = newSeq[byte](sz)
   let
     bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
+  echo "uart read: ", $bytes_read
   
   if bytes_read < 0:
     raise newEspError[EspError]("uart error: " & $bytes_read, bytes_read)
 
-  result = buff[0..bytes_read]
+  var nb = buff[0..<bytes_read]
+  result = nb
 
 proc write*(uart: var Uart;
             data: string,
