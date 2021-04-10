@@ -93,15 +93,22 @@ proc read*(uart: var Uart;
 
   let sz = size.uint32
 
-  var buff = newSeq[byte](sz)
-  let
-    bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
-  
-  if bytes_read < 0:
-    raise newEspError[EspError]("uart error: " & $bytes_read, bytes_read)
+  var bytes_avail = csize_t(0)
+  check: uart_get_buffered_data_len(uart.port, addr bytes_avail)
 
-  var nb = buff[0..<bytes_read]
-  result = nb
+  if bytes_avail == 0:
+    return @[]
+
+  else:
+    var buff = newSeq[byte](bytes_avail)
+    let
+      bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
+    
+    if bytes_read < 0:
+      raise newEspError[EspError]("uart error: " & $bytes_read, bytes_read)
+
+    var nb = buff[0..<bytes_read]
+    result = nb
 
 proc write*(uart: var Uart;
             data: string,
