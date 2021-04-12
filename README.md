@@ -18,13 +18,14 @@ Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Bra
    + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1` 
 2. Install [Nim 1.4+](https://nim-lang.org/install.html)
 3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
-4. Create a new Nimble project `nimble init --git esp32_nim_test` 
+4. Create a new Nimble project `nimble init --git esp32_nim_example` 
 5. In the new project directory edit the Nimble file and add the lines:
 ```nim
-requires "nesper >= 0.6.0"
+requires "nesper >= 0.6.1"
 # includes nimble tasks for building Nim esp-idf projects
 include nesper/build_utils/tasks
 ````
+   + Make sure _not_ to include a `bin` option like `bin = @["src/esp32_nim_example"]` as this will override the `nimble esp_build` and result in a broken idf.py build.  
 6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
 
 ### Compiling and Building
