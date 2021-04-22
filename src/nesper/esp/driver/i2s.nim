@@ -14,6 +14,10 @@
 import ../../consts
 import adc
 
+const i2s_header = """#include <freertos/FreeRTOS.h>
+                      #include "driver/i2s.h" """
+
+
 ## *
 ##  @brief I2S bit width per sample.
 ##
@@ -116,7 +120,7 @@ type
 ##
 
 type
-  i2s_config_t* {.importc: "i2s_config_t", header: "i2s.h", bycopy.} = object
+  i2s_config_t* {.importc: "i2s_config_t", header: i2s_header, bycopy.} = object
     mode* {.importc: "mode".}: i2s_mode_t ## !< I2S work mode
     sample_rate* {.importc: "sample_rate".}: cint ## !< I2S sample rate
     bits_per_sample* {.importc: "bits_per_sample".}: i2s_bits_per_sample_t ## !< I2S bits per sample
@@ -163,7 +167,7 @@ type
 ##
 
 type
-  i2s_event_t* {.importc: "i2s_event_t", header: "i2s.h", bycopy.} = object
+  i2s_event_t* {.importc: "i2s_event_t", header: i2s_header, bycopy.} = object
     `type`* {.importc: "type".}: i2s_event_type_t ## !< I2S event type
     size* {.importc: "size".}: csize_t ## !< I2S data size for I2S_DATA event
 
@@ -177,7 +181,7 @@ const
 ##
 
 type
-  i2s_pin_config_t* {.importc: "i2s_pin_config_t", header: "i2s.h", bycopy.} = object
+  i2s_pin_config_t* {.importc: "i2s_pin_config_t", header: i2s_header, bycopy.} = object
     bck_io_num* {.importc: "bck_io_num".}: cint ## !< BCK in out pin
     ws_io_num* {.importc: "ws_io_num".}: cint ## !< WS in out pin
     data_out_num* {.importc: "data_out_num".}: cint ## !< DATA out pin
@@ -220,7 +224,7 @@ type
 ##
 
 proc i2s_set_pin*(i2s_num: i2s_port_t; pin: ptr i2s_pin_config_t): esp_err_t {.
-    importc: "i2s_set_pin", header: "i2s.h".}
+    importc: "i2s_set_pin", header: i2s_header.}
 ## *
 ##  @brief Set PDM mode down-sample rate
 ##         In PDM RX mode, there would be 2 rounds of downsample process in hardware.
@@ -240,7 +244,7 @@ proc i2s_set_pin*(i2s_num: i2s_port_t; pin: ptr i2s_pin_config_t): esp_err_t {.
 ##
 
 proc i2s_set_pdm_rx_down_sample*(i2s_num: i2s_port_t; dsr: i2s_pdm_dsr_t): esp_err_t {.
-    importc: "i2s_set_pdm_rx_down_sample", header: "i2s.h".}
+    importc: "i2s_set_pdm_rx_down_sample", header: i2s_header.}
 ## *
 ##  @brief Set I2S dac mode, I2S built-in DAC is disabled by default
 ##
@@ -256,7 +260,7 @@ proc i2s_set_pdm_rx_down_sample*(i2s_num: i2s_port_t; dsr: i2s_pdm_dsr_t): esp_e
 ##
 
 proc i2s_set_dac_mode*(dac_mode: i2s_dac_mode_t): esp_err_t {.
-    importc: "i2s_set_dac_mode", header: "i2s.h".}
+    importc: "i2s_set_dac_mode", header: i2s_header.}
 ## *
 ##  @brief Install and start I2S driver.
 ##
@@ -278,7 +282,7 @@ proc i2s_set_dac_mode*(dac_mode: i2s_dac_mode_t): esp_err_t {.
 
 proc i2s_driver_install*(i2s_num: i2s_port_t; i2s_config: ptr i2s_config_t;
                         queue_size: cint; i2s_queue: pointer): esp_err_t {.
-    importc: "i2s_driver_install", header: "i2s.h".}
+    importc: "i2s_driver_install", header: i2s_header.}
 ## *
 ##  @brief Uninstall I2S driver.
 ##
@@ -290,7 +294,7 @@ proc i2s_driver_install*(i2s_num: i2s_port_t; i2s_config: ptr i2s_config_t;
 ##
 
 proc i2s_driver_uninstall*(i2s_num: i2s_port_t): esp_err_t {.
-    importc: "i2s_driver_uninstall", header: "i2s.h".}
+    importc: "i2s_driver_uninstall", header: i2s_header.}
 ## *
 ##  @brief Write data to I2S DMA transmit buffer.
 ##
@@ -316,7 +320,7 @@ proc i2s_driver_uninstall*(i2s_num: i2s_port_t): esp_err_t {.
 
 proc i2s_write*(i2s_num: i2s_port_t; src: pointer; size: csize_t;
                bytes_written: ptr csize_t; ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "i2s_write", header: "i2s.h".}
+    importc: "i2s_write", header: i2s_header.}
 ## *
 ##  @brief Write data to I2S DMA transmit buffer while expanding the number of bits per sample. For example, expanding 16-bit PCM to 32-bit PCM.
 ##
@@ -350,7 +354,7 @@ proc i2s_write*(i2s_num: i2s_port_t; src: pointer; size: csize_t;
 proc i2s_write_expand*(i2s_num: i2s_port_t; src: pointer; size: csize_t;
                       src_bits: csize_t; aim_bits: csize_t;
                       bytes_written: ptr csize_t; ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "i2s_write_expand", header: "i2s.h".}
+    importc: "i2s_write_expand", header: i2s_header.}
 ## *
 ##  @brief Read data from I2S DMA receive buffer
 ##
@@ -374,7 +378,7 @@ proc i2s_write_expand*(i2s_num: i2s_port_t; src: pointer; size: csize_t;
 
 proc i2s_read*(i2s_num: i2s_port_t; dest: pointer; size: csize_t;
               bytes_read: ptr csize_t; ticks_to_wait: TickType_t): esp_err_t {.
-    importc: "i2s_read", header: "i2s.h".}
+    importc: "i2s_read", header: i2s_header.}
 ## *
 ##  @brief Set sample rate used for I2S RX and TX.
 ##
@@ -393,7 +397,7 @@ proc i2s_read*(i2s_num: i2s_port_t; dest: pointer; size: csize_t;
 ##
 
 proc i2s_set_sample_rates*(i2s_num: i2s_port_t; rate: uint32): esp_err_t {.
-    importc: "i2s_set_sample_rates", header: "i2s.h".}
+    importc: "i2s_set_sample_rates", header: i2s_header.}
 ## *
 ##  @brief Stop I2S driver
 ##
@@ -406,7 +410,7 @@ proc i2s_set_sample_rates*(i2s_num: i2s_port_t; rate: uint32): esp_err_t {.
 ##      - ESP_ERR_INVALID_ARG Parameter error
 ##
 
-proc i2s_stop*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_stop", header: "i2s.h".}
+proc i2s_stop*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_stop", header: i2s_header.}
 ## *
 ##  @brief Start I2S driver
 ##
@@ -421,7 +425,7 @@ proc i2s_stop*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_stop", header: "i
 ##
 
 proc i2s_start*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_start",
-    header: "i2s.h".}
+    header: i2s_header.}
 ## *
 ##  @brief Zero the contents of the TX DMA buffer.
 ##
@@ -435,7 +439,7 @@ proc i2s_start*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_start",
 ##
 
 proc i2s_zero_dma_buffer*(i2s_num: i2s_port_t): esp_err_t {.
-    importc: "i2s_zero_dma_buffer", header: "i2s.h".}
+    importc: "i2s_zero_dma_buffer", header: i2s_header.}
 ## *
 ##  @brief Set clock & bit width used for I2S RX and TX.
 ##
@@ -457,7 +461,7 @@ proc i2s_zero_dma_buffer*(i2s_num: i2s_port_t): esp_err_t {.
 
 proc i2s_set_clk*(i2s_num: i2s_port_t; rate: uint32; bits: i2s_bits_per_sample_t;
                  ch: i2s_channel_t): esp_err_t {.importc: "i2s_set_clk",
-    header: "i2s.h".}
+    header: i2s_header.}
 ## *
 ##  @brief get clock set on particular port number.
 ##
@@ -468,7 +472,7 @@ proc i2s_set_clk*(i2s_num: i2s_port_t; rate: uint32; bits: i2s_bits_per_sample_t
 ##
 
 proc i2s_get_clk*(i2s_num: i2s_port_t): cfloat {.importc: "i2s_get_clk",
-    header: "i2s.h".}
+    header: i2s_header.}
 ## *
 ##  @brief Set built-in ADC mode for I2S DMA, this function will initialize ADC pad,
 ##         and set ADC parameters.
@@ -480,7 +484,7 @@ proc i2s_get_clk*(i2s_num: i2s_port_t): cfloat {.importc: "i2s_get_clk",
 ##
 
 proc i2s_set_adc_mode*(adc_unit: adc_unit_t; adc_channel: adc1_channel_t): esp_err_t {.
-    importc: "i2s_set_adc_mode", header: "i2s.h".}
+    importc: "i2s_set_adc_mode", header: i2s_header.}
 ## *
 ##  @brief Start to use I2S built-in ADC mode
 ##  @note This function would acquire the lock of ADC to prevent the data getting corrupted
@@ -494,7 +498,7 @@ proc i2s_set_adc_mode*(adc_unit: adc_unit_t; adc_channel: adc1_channel_t): esp_e
 ##
 
 proc i2s_adc_enable*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_adc_enable",
-    header: "i2s.h".}
+    header: i2s_header.}
 ## *
 ##  @brief Stop to use I2S built-in ADC mode
 ##  @param i2s_num i2s port index
@@ -506,4 +510,4 @@ proc i2s_adc_enable*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_adc_enable"
 ##
 
 proc i2s_adc_disable*(i2s_num: i2s_port_t): esp_err_t {.importc: "i2s_adc_disable",
-    header: "i2s.h".}
+    header: i2s_header.}
