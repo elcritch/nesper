@@ -72,6 +72,8 @@ type
   Ticks* = TickType_t
 
   #StaticSemaphore_t* = StaticQueue_t
+  SemaphoreHandle_t* = pointer
+
   portCHAR* = int8
   portFLOAT* = cfloat
   portDOUBLE* = cdouble
