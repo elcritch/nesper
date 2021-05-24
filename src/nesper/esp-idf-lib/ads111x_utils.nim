@@ -88,7 +88,7 @@ proc takeReadings*(cfg: Ads111xConfig): seq[Option[Ads111xReading]] =
 # // Main task
 proc initAds111xDevice*(
         i2cDev: I2CDevConfig,
-        i2cAddr: ads111x_addr_t = ADS111X_ADDR_GND
+        i2cAddr: ads111x_addr_t = ADS111X_ADDR_TO_GND
       ): Ads111xDevice = 
 
   # // Setup ICs
