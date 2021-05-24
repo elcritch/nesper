@@ -130,7 +130,7 @@ proc ads111xExample*() =
     muxes = @[ADS111X_MUX_0_GND, ADS111X_MUX_1_GND]
 
   var 
-    dev = initAds111xDevice(i2cCfg, ADS111X_ADDR_GND)
+    dev = initAds111xDevice(i2cCfg, ADS111X_ADDR_TO_GND)
     adc = newAds111xConfig(
         dev = dev,
         muxes = muxes,
