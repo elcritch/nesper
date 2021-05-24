@@ -105,26 +105,24 @@ proc read*(uart: var Uart;
       bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
     
     if bytes_read < 0:
-      raise newEspError[EspError]("uart error: " & $bytes_read, bytes_read)
+      var bytes_read_str = $bytes_read
+      raise newEspError[EspError]("uart error: " & $bytes_read_str, bytes_read)
 
     var nb = buff[0..<bytes_read]
     result = nb
 
 proc write*(uart: var Uart;
-            data: string,
-            wait: Ticks = 10.Millis): SzBytes {.discardable.} =
+            data: string): SzBytes {.discardable.} =
 
   # // Write data to UART.
   let bytes_written = uart_write_bytes(uart.port, data, data.len().csize_t)
   
-  check: bytes_written 
-
   result = bytes_written.SzBytes()
 
 proc write*(uart: var Uart;
             data: var seq[byte],
-            wait: Ticks = 10.Millis): SzBytes {.discardable.} =
+            ): SzBytes {.discardable.} =
   # var buff = data[0..data.len]
   var str = data.toStrBuf()
-  write(uart, str, wait)
+  write(uart, str)
 

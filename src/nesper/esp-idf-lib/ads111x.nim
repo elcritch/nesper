@@ -53,6 +53,7 @@ const
   ADS111X_ADDR_VCC* = 0x00000049
   ADS111X_ADDR_SDA* = 0x0000004A
   ADS111X_ADDR_SCL* = 0x0000004B
+
   ADS111X_MAX_VALUE* = 0x00007FFF
   ADS101X_MAX_VALUE* = 0x000007FF
 
@@ -475,3 +476,4 @@ proc ads111x_get_comp_high_thresh*(dev: ptr i2c_dev_t; th: ptr int16): esp_err_t
 proc ads111x_set_comp_high_thresh*(dev: ptr i2c_dev_t; th: int16): esp_err_t {.
     importc: "ads111x_set_comp_high_thresh", header: hdr.}
 ## *@}
+

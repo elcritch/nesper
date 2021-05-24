@@ -42,6 +42,9 @@ type
 
 var i2c_err: esp_err_t # may be racey? We'll ignore it for now... 
 
+converter toPort*(i2c_port: I2CPorts): i2c_port_t =
+  result = i2c_port_t(i2c_port)
+
 proc `=destroy`(cmd: var typeof(I2CMasterPort()[])) =
   # TAG.logi("i2c port finalize")
   i2c_err = i2c_driver_delete(cmd.port)
