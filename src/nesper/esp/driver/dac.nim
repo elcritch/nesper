@@ -14,6 +14,8 @@
 import ../../consts
 import gpio_driver
 
+const hdr = "driver/dac.h"
+
 type
   dac_channel_t* {.size: sizeof(cint).} = enum
     DAC_CHANNEL_1 = 1,          ## !< DAC channel 1 is GPIO25
@@ -34,7 +36,7 @@ type
 ##
 
 proc dac_pad_get_io_num*(channel: dac_channel_t; gpio_num: ptr gpio_num_t): esp_err_t {.
-    importc: "dac_pad_get_io_num", header: "dac.h".}
+    importc: "dac_pad_get_io_num", header: hdr.}
 ## *
 ##  @brief Set DAC output voltage.
 ##
@@ -52,7 +54,7 @@ proc dac_pad_get_io_num*(channel: dac_channel_t; gpio_num: ptr gpio_num_t): esp_
 ##
 
 proc dac_output_voltage*(channel: dac_channel_t; dac_value: uint8): esp_err_t {.
-    importc: "dac_output_voltage", header: "dac.h".}
+    importc: "dac_output_voltage", header: hdr.}
 ## *
 ##  @brief DAC pad output enable
 ##
@@ -63,7 +65,7 @@ proc dac_output_voltage*(channel: dac_channel_t; dac_value: uint8): esp_err_t {.
 ##
 
 proc dac_output_enable*(channel: dac_channel_t): esp_err_t {.
-    importc: "dac_output_enable", header: "dac.h".}
+    importc: "dac_output_enable", header: hdr.}
 ## *
 ##  @brief DAC pad output disable
 ##
@@ -72,14 +74,14 @@ proc dac_output_enable*(channel: dac_channel_t): esp_err_t {.
 ##
 
 proc dac_output_disable*(channel: dac_channel_t): esp_err_t {.
-    importc: "dac_output_disable", header: "dac.h".}
+    importc: "dac_output_disable", header: hdr.}
 ## *
 ##  @brief Enable DAC output data from I2S
 ##
 
-proc dac_i2s_enable*(): esp_err_t {.importc: "dac_i2s_enable", header: "dac.h".}
+proc dac_i2s_enable*(): esp_err_t {.importc: "dac_i2s_enable", header: hdr.}
 ## *
 ##  @brief Disable DAC output data from I2S
 ##
 
-proc dac_i2s_disable*(): esp_err_t {.importc: "dac_i2s_disable", header: "dac.h".}
+proc dac_i2s_disable*(): esp_err_t {.importc: "dac_i2s_disable", header: hdr.}
