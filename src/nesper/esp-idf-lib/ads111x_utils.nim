@@ -43,7 +43,7 @@ const
 
 const
   ADS111X_CHS_SINGLE_CH0*: Ads111xChannels =
-    @[ADS111X_MUX_0_GND, ADS111X_MUX_1_GND, ADS111X_MUX_2_GND, ADS111X_MUX_3_GND]
+    @[ADS111X_MUX_0_GND]
   ADS111X_CHS_ALL_SINGLE*: Ads111xChannels =
     @[ADS111X_MUX_0_GND, ADS111X_MUX_1_GND, ADS111X_MUX_2_GND, ADS111X_MUX_3_GND]
   ADS111X_CHS_ALL_DIFF_02*: Ads111xChannels =
@@ -93,9 +93,11 @@ proc takeReading*(cfg: Ads111xConfig, ch: int): Option[float32] =
     return none[float32]()
 
 proc takeReadings*(cfg: Ads111xConfig): seq[Option[float32]] =
-  result = newSeqOfCap[Option[float32]](cfg.muxes.len())
+  result = newSeq[Option[float32]](cfg.muxes.len())
   for idx in 0 ..< cfg.muxes.len():
-    result.add cfg.takeReading(idx)
+    let rd = cfg.takeReading(idx)
+    result[idx] = rd
+    # TAG.loge("READING: %s => %s (%s)", $idx, $rd, $cfg.muxes[idx])
 
 # // Main task
 proc initAds111xDevice*(
