@@ -104,6 +104,8 @@ proc initAds111xDevice*(
       ): Ads111xDevice = 
 
   # // Setup ICs
+  i2cDeviceInit()
+
   new(result)
 
   # initialize device
