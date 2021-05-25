@@ -109,10 +109,11 @@ proc takeReadings*(cfg: Ads111xConfig): seq[Option[float32]] =
   let stagger_time: Millis = Ads111xReadingTimes[cfg.data_rate]
 
   for idx in 0 ..< cfg.muxes.len():
+    discard cfg.takeReading(idx)
+    delay(stagger_time)
     let rd = cfg.takeReading(idx)
     result[idx] = rd
     # TAG.loge("READING: %s => %s (%s)", $idx, $rd, $cfg.muxes[idx])
-    delay(stagger_time)
 
 # // Main task
 proc initAds111xDevice*(
