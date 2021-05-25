@@ -7,6 +7,8 @@ import i2cdev_utils
 
 export ads111x, options, i2cdev_utils
 
+import nesper/timers
+
 const TAG = "ADS111X"
 
 type 
@@ -49,6 +51,16 @@ const
   ADS111X_CHS_ALL_DIFF_02*: Ads111xChannels =
     @[ADS111X_MUX_0_1, ADS111X_MUX_2_3]
 
+const Ads111xReadingTimes*: array[ads111x_data_rate_t, Millis] = [
+    Millis(125),    ## !< 8 samples per second
+    Millis(63),     ## !< 16 samples per second
+    Millis(32),     ## 100!< 32 samples per second
+    Millis(15),     ## 100!< 64 samples per second
+    Millis(8),    ## !100< 128 samples per second (default)
+    Millis(4),    ## !100< 250 samples per second
+    Millis(2),    ## !100< 475 samples per second
+    Millis(1),     ## !100< 860 samples per second
+]
 
 converter toDevice(cfg: Ads111xConfig): i2c_dev_ptr =
   result = addr cfg.dev.device
@@ -94,10 +106,13 @@ proc takeReading*(cfg: Ads111xConfig, ch: int): Option[float32] =
 
 proc takeReadings*(cfg: Ads111xConfig): seq[Option[float32]] =
   result = newSeq[Option[float32]](cfg.muxes.len())
+  let stagger_time: Millis = Ads111xReadingTimes[cfg.data_rate]
+
   for idx in 0 ..< cfg.muxes.len():
     let rd = cfg.takeReading(idx)
     result[idx] = rd
     # TAG.loge("READING: %s => %s (%s)", $idx, $rd, $cfg.muxes[idx])
+    delay(stagger_time)
 
 # // Main task
 proc initAds111xDevice*(
