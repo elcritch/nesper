@@ -15,7 +15,7 @@ type
 
 const
   ADS111X_ADDR_TO_GND* = ads111x_addr_t(0x48)
-  ADS111X_ADDR_TO_VTO_CC* = ads111x_addr_t(0x49)
+  ADS111X_ADDR_TO_VCC* = ads111x_addr_t(0x49)
   ADS111X_ADDR_TO_SDA* = ads111x_addr_t(0x4A)
   ADS111X_ADDR_TO_SCL* = ads111x_addr_t(0x4B)
 
@@ -33,7 +33,12 @@ type
     muxes*: Ads111xChannels
     gain*: ads111x_gain_t
 
+
   Ads111xReading* = tuple[voltage: float32, raw: int]
+
+const
+  fn: float32 = NaN
+  Ads111xReadingNone*: Ads111xReading = (voltage: fn, raw: 0)
 
 
 const
@@ -70,7 +75,7 @@ proc configureDevice*(cfg: Ads111xConfig, ch: int) =
   check: cfg.ads111x_set_input_mux(cfg.muxes[ch]) #;    // positive = AIN0, negative = GND
   check: cfg.ads111x_set_gain(cfg.gain)
 
-proc takeReading*(cfg: Ads111xConfig, ch: int): Option[Ads111xReading] =
+proc takeReadingFull*(cfg: Ads111xConfig, ch: int): Option[Ads111xReading] =
   #// (re)configure device - need to do it everytime you change mux channels 
   cfg.configureDevice(ch=ch)
 
@@ -80,8 +85,15 @@ proc takeReading*(cfg: Ads111xConfig, ch: int): Option[Ads111xReading] =
 
   return cfg.get_reading()
 
-proc takeReadings*(cfg: Ads111xConfig): seq[Option[Ads111xReading]] =
-  result = newSeqOfCap[Option[Ads111xReading]](cfg.muxes.len())
+proc takeReading*(cfg: Ads111xConfig, ch: int): Option[float32] =
+  let val = takeReadingFull(cfg, ch)
+  if val.isSome():
+    return some(val.get().voltage)
+  else:
+    return none[float32]()
+
+proc takeReadings*(cfg: Ads111xConfig): seq[Option[float32]] =
+  result = newSeqOfCap[Option[float32]](cfg.muxes.len())
   for idx in 0 ..< cfg.muxes.len():
     result.add cfg.takeReading(idx)
 
@@ -147,7 +159,7 @@ proc ads111xExample*() =
     delay(207.Millis)
 
     # measure(i)
-    let readingCh0 = adc.takeReading(0)
+    let readingCh0 = adc.takeReadingFull(0)
     if readingCh0.isSome():
       let rd = readingCh0.get()
       TAG.logi("Raw ADC ch0:: value: %d, voltage: %.04f volts", rd.raw, rd.voltage)
@@ -156,7 +168,7 @@ proc ads111xExample*() =
 
     delay(100.Millis)
 
-    let readingCh1 = adc.takeReading(0)
+    let readingCh1 = adc.takeReadingFull(0)
     if readingCh1.isSome():
       let rd = readingCh1.get()
       TAG.logi("Raw ADC ch0:: value: %d, voltage: %.04f volts", rd.raw, rd.voltage)
