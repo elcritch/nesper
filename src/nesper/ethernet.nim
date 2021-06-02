@@ -1,5 +1,9 @@
 
+import nesper
 import nesper/gpios
+import nesper/spis
+import esp/driver/spi
+
 import nesper/esp/net/esp_eth_com
 import nesper/esp/net/esp_eth_mac
 import nesper/esp/net/esp_eth
@@ -12,63 +16,78 @@ export tcpip_adapter
 
 type
   EthernetConfigType* = concept x
-    initEthernet(x) is EthernetObj
+    x.config is EthernetConfig
+    setupEthernet(x) is EthernetObj
   
-  EthernetConfigInternalType* = concept x
-    x.phy_config is eth_phy_config_t
-    x.mac_config is eth_mac_config_t
-    initEthernet(x) is EthernetObj
-  
+  EthernetConfig* = ref object
+    mac*: eth_mac_config_t
+    phy*: eth_phy_config_t
+
   EthernetObj* = object
     phy*: ptr esp_eth_phy_t
     mac*: ptr esp_eth_mac_t
 
   # Internal Ethernet
   EthConfigIP101* = ref object
-    mac_config*: eth_mac_config_t
-    phy_config*: eth_phy_config_t
+    config*: EthernetConfig
     
   EthConfigRTL8201* = ref object
-    mac_config*: eth_mac_config_t
-    phy_config*: eth_phy_config_t
+    config*: EthernetConfig
 
   # External Ethernet
   EthConfigDM9051* = ref object
-    config*: eth_dm9051_config_t
-    phy_config*: eth_phy_config_t
+    config*: EthernetConfig
+    dma_channel: range[0..2]
+    spi_host*: spi_host_device_t
+    spi_miso*: GpioPin
+    spi_mosi*: GpioPin
+    spi_sclk*: GpioPin
+    spi_cs*: GpioPin
+    spi_mhz*: range[20..80]
 
-proc initDefaults*(eth: EthernetConfigInternalType) =
-  eth.mac_config = ETH_MAC_DEFAULT_CONFIG()
-  eth.phy_config = eth_phy_config_t(
-        phy_addr: high(uint32),
-        reset_timeout_ms: 100,
-        autonego_timeout_ms: 4000,
-        reset_gpio_num: -1)         
+proc ethernetDefaults*(): EthernetConfig =
+  new(result)
+  result.mac = ETH_MAC_DEFAULT_CONFIG()
+  result.phy = ETH_PHY_DEFAULT_CONFIG()
 
+proc setupEthernet*(eth: var EthConfigIP101): EthernetObj = 
+  result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
+  result.phy = esp_eth_phy_new_ip101(addr eth.config.phy)
 
-proc initEthernet*(
-      eth: var EthConfigIP101,
-      phy_addr: range[1..31] = 1,
-      reset_gpio = GpioPin(-1)
-    ): EthernetObj =
-  eth.initDefaults()
-  eth.phy_config.reset_gpio_num = reset_gpio.int32
+proc setupEthernet*(eth: var EthConfigRTL8201): EthernetObj = 
+  result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
+  result.phy = esp_eth_phy_new_rtl8201(addr eth.config.phy)
 
-proc initEthernet*(
-      eth: var EthConfigRTL8201,
-      phy_addr: range[1..31] = 1,
-      reset_gpio = GpioPin(-1)
-    ): ptr esp_eth_mac_t = 
-  eth.phy_config.phy_addr = phy_addr.uint32
-  eth.phy_config.reset_gpio_num = reset_gpio.int32
-  eth.mac_config.smi_mdc_gpio_num = -1
-  eth.mac_config.smi_mdio_gpio_num = -1
+proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj = 
+  check: gpio_install_isr_service(0.esp_intr_flags)
 
-proc setupEthernet*(eth: EthernetConfigInternalType) = 
-  assert eth.smi_mdc_gpio_num >= 0
-  assert eth.smi_mdio_gpio_num >= 0
-  eth.smi_mdio_gpio_num = 18
+  var
+    spi_handle: spi_device_handle_t = nil
+    buscfg = spi_bus_config_t(
+      miso_io_num: eth.spi_miso.cint,
+      mosi_io_num: eth.spi_mosi.cint,
+      sclk_io_num: eth.spi_sclk.cint,
+      quadwp_io_num: -1,
+      quadhd_io_num: -1
+    )
 
+  check: spi_bus_initialize(eth.spi_host, addr buscfg, eth.dma_channel)
 
-proc setupEthernet*(eth: EthConfigIP101) = 
-  discard "todo"
+  var
+    devcfg = spi_device_interface_config_t(
+      command_bits: 1,
+      address_bits: 7,
+      mode: 0,
+      clock_speed_hz: 1_000_000'i32 * eth.spi_mhz.int32,
+      spics_io_num: eth.spi_cs.cint,
+      queue_size: 20
+    )
+
+  check: spi_bus_add_device(eth.spi_host, addr devcfg, addr spi_handle)
+
+  ##  dm9051 ethernet driver is based on spi driver
+  var dm9051_config: eth_dm9051_config_t = ETH_DM9051_DEFAULT_CONFIG(spi_handle)
+  dm9051_config.int_gpio_num = CONFIG_EXAMPLE_DM9051_INT_GPIO
+  var mac: ptr esp_eth_mac_t = esp_eth_mac_new_dm9051(addr(dm9051_config),
+      addr(mac_config))
+  var phy: ptr esp_eth_phy_t = esp_eth_phy_new_dm9051(addr(phy_config))

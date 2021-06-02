@@ -63,9 +63,7 @@ proc onEthernetDisconnect*(arg: pointer;
   # check: esp_wifi_connect()
 
 
-proc ethernetStart*(
-      eth: EthernetType
-    ) =
+proc ethernetStart*(eth: var EthernetConfig) =
   networkConnectionName = "eth0" 
 
   check: tcpip_adapter_set_default_eth_handlers()
