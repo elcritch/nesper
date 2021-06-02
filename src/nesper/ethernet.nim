@@ -37,6 +37,7 @@ type
   # External Ethernet
   EthConfigDM9051* = ref object
     config*: EthernetConfig
+    intr_pin: GpioPin
     dma_channel: range[0..2]
     spi_host*: spi_host_device_t
     spi_miso*: GpioPin
@@ -86,8 +87,7 @@ proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj =
   check: spi_bus_add_device(eth.spi_host, addr devcfg, addr spi_handle)
 
   ##  dm9051 ethernet driver is based on spi driver
-  var dm9051_config: eth_dm9051_config_t = ETH_DM9051_DEFAULT_CONFIG(spi_handle)
-  dm9051_config.int_gpio_num = CONFIG_EXAMPLE_DM9051_INT_GPIO
-  var mac: ptr esp_eth_mac_t = esp_eth_mac_new_dm9051(addr(dm9051_config),
-      addr(mac_config))
-  var phy: ptr esp_eth_phy_t = esp_eth_phy_new_dm9051(addr(phy_config))
+  var dm9051_config = eth_dm9051_config_t(spi_hdl: spi_handle, int_gpio_num: eth.intr_pin.int32)
+
+  result.mac = esp_eth_mac_new_dm9051(addr dm9051_config, addr eth.config.mac)
+  result.phy = esp_eth_phy_new_dm9051(addr eth.config.phy)
