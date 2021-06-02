@@ -15,9 +15,9 @@ export esp_eth
 export tcpip_adapter
 
 type
-  EthernetConfigType* = concept x
-    x.config is EthernetConfig
-    setupEthernet(x) is EthernetObj
+  # EthernetConfigType* = concept x
+  #   x.config is EthernetConfig
+  #   setupEthernet(x) is EthernetObj
   
   EthernetConfig* = ref object
     mac*: eth_mac_config_t
@@ -35,18 +35,22 @@ type
     config*: EthernetConfig
 
   # External Ethernet
-  EthConfigDM9051* = ref object
-    config*: EthernetConfig
+  EthernetSpiConfig* = ref object
     intr_pin: GpioPin
     dma_channel: range[0..2]
-    spi_host*: spi_host_device_t
-    spi_miso*: GpioPin
-    spi_mosi*: GpioPin
-    spi_sclk*: GpioPin
-    spi_cs*: GpioPin
-    spi_mhz*: range[20..80]
+    host*: spi_host_device_t
+    miso*: GpioPin
+    mosi*: GpioPin
+    sclk*: GpioPin
+    cs*: GpioPin
+    mhz*: range[20..80]
 
-proc ethernetDefaults*(): EthernetConfig =
+  EthConfigDM9051* = ref object
+    config*: EthernetConfig
+    spi*: EthernetSpiConfig
+
+
+proc initEthernetConfig*(): EthernetConfig =
   new(result)
   result.mac = ETH_MAC_DEFAULT_CONFIG()
   result.phy = ETH_PHY_DEFAULT_CONFIG()
@@ -65,29 +69,29 @@ proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj =
   var
     spi_handle: spi_device_handle_t = nil
     buscfg = spi_bus_config_t(
-      miso_io_num: eth.spi_miso.cint,
-      mosi_io_num: eth.spi_mosi.cint,
-      sclk_io_num: eth.spi_sclk.cint,
+      miso_io_num: eth.spi.miso.cint,
+      mosi_io_num: eth.spi.mosi.cint,
+      sclk_io_num: eth.spi.sclk.cint,
       quadwp_io_num: -1,
       quadhd_io_num: -1
     )
 
-  check: spi_bus_initialize(eth.spi_host, addr buscfg, eth.dma_channel)
+  check: spi_bus_initialize(eth.spi.host, addr buscfg, eth.spi.dma_channel)
 
   var
     devcfg = spi_device_interface_config_t(
       command_bits: 1,
       address_bits: 7,
       mode: 0,
-      clock_speed_hz: 1_000_000'i32 * eth.spi_mhz.int32,
-      spics_io_num: eth.spi_cs.cint,
+      clock_speed_hz: 1_000_000'i32 * eth.spi.mhz.int32,
+      spics_io_num: eth.spi.cs.cint,
       queue_size: 20
     )
 
-  check: spi_bus_add_device(eth.spi_host, addr devcfg, addr spi_handle)
+  check: spi_bus_add_device(eth.spi.host, addr devcfg, addr spi_handle)
 
   ##  dm9051 ethernet driver is based on spi driver
-  var dm9051_config = eth_dm9051_config_t(spi_hdl: spi_handle, int_gpio_num: eth.intr_pin.int32)
+  var dm9051_config = eth_dm9051_config_t(spi_hdl: spi_handle, int_gpio_num: eth.spi.intr_pin.int32)
 
   result.mac = esp_eth_mac_new_dm9051(addr dm9051_config, addr eth.config.mac)
   result.phy = esp_eth_phy_new_dm9051(addr eth.config.phy)

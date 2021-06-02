@@ -6,6 +6,7 @@ import nesper/ethernet
 
 import setup_networking
 export setup_networking
+export ethernet
 
 # Get Password
 
@@ -52,8 +53,6 @@ proc ethEventHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int3
     TAG.logi "Ethernet Started"
   of ETHERNET_EVENT_STOP:
     TAG.logi "Ethernet Stopped"
-  else:
-    discard
 
 proc onEthernetDisconnect*(arg: pointer;
                           event_base: esp_event_base_t;
@@ -86,14 +85,12 @@ proc ethernetStop*() =
 
   discard "TODO: fixme... how do we stop the ethernets?"
 
-proc networkingConnect*(): esp_err_t =
+proc networkingConnect*[ET](eth: var ET) =
   if networkConnectEventGroup != nil:
     return ESP_ERR_INVALID_STATE
 
   networkConnectEventGroup = xEventGroupCreate()
-  ethernetStart()
-  # discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
-  return ESP_OK
+  eth.ethernetStart()
 
 proc networkingDisconnect*(): esp_err_t =
   if networkConnectEventGroup == nil:
