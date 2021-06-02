@@ -32,8 +32,10 @@ template eventRegister*[EVT](
             WIFI_EVENT
         elif typeof(EVT) is ip_event_t:
             IP_EVENT
+        elif typeof(EVT) is eth_event_t:
+            ETH_EVENT
         else:
-            UNKNOWN_TYPE_EVENT_TYPE
+            {.fatal: "Uknown event type, don't know how to unregister automatically".}
 
     let ret = 
             esp_event_handler_register(
@@ -118,8 +120,10 @@ template eventUnregister*[EVT](
             WIFI_EVENT
         elif typeof(EVT) is ip_event_t:
             IP_EVENT
+        elif typeof(EVT) is eth_event_t:
+            ETH_EVENT
         else:
-            UNKNOWN_TYPE_EVENT_TYPE
+            {.fatal: "Uknown event type, don't know how to unregister automatically".}
 
     let ret = esp_event_handler_unregister(
         event_base = evt_base,

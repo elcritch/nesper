@@ -15,6 +15,8 @@ export ethernet
 
 const TAG*: cstring = "eth"
 
+var eth_handle: esp_eth_handle_t
+
 proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
               event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
@@ -67,40 +69,46 @@ proc ethernetStart*[ET](eth: var ET) =
 
   check: tcpip_adapter_set_default_eth_handlers()
 
-  ETH_EVENT.eventRegister(ESP_EVENT_ANY_ID, ethEventHandler)
+  ETH_EVENT.eventRegister(ETHERNET_EVENT_START, ethEventHandler)
+  ETH_EVENT.eventRegister(ETHERNET_EVENT_STOP, ethEventHandler)
+  ETH_EVENT.eventRegister(ETHERNET_EVENT_CONNECTED, ethEventHandler)
+  ETH_EVENT.eventRegister(ETHERNET_EVENT_DISCONNECTED, ethEventHandler)
   IP_EVENT.eventRegister(IP_EVENT_ETH_GOT_IP, ipReceivedHandler)
 
   var
     ethobj = eth.setupEthernet()
     config: esp_eth_config_t = eth_default_config(ethobj.mac, ethobj.phy)
 
-  var eth_handle: esp_eth_handle_t = nil
-  check: esp_eth_driver_install(addr(config), addr(eth_handle)))
-  ESP_ERROR_CHECK(esp_eth_start(eth_handle)
+  check: esp_eth_driver_install(addr config, addr eth_handle)
+  check: esp_eth_start(eth_handle)
 
-proc ethernetStop*() =
+proc ethernetStop*(uninstall=false) =
   ##  tear down connection, release resources
-  ETH_EVENT.eventUnregister(ESP_EVENT_ANY_ID, ethEventHandler)
-  IP_EVENT.eventUnregister(IP_EVENT_ETH_GOT_IP, ipReceivedHandler)
+  eventUnregister(ETHERNET_EVENT_START, ethEventHandler)
+  eventUnregister(ETHERNET_EVENT_STOP, ethEventHandler)
+  eventUnregister(ETHERNET_EVENT_CONNECTED, ethEventHandler)
+  eventUnregister(ETHERNET_EVENT_DISCONNECTED, ethEventHandler)
+  eventUnregister(IP_EVENT_ETH_GOT_IP, ipReceivedHandler)
+  check: esp_eth_stop(eth_handle)
+  if uninstall:
+    check: esp_eth_driver_uninstall(eth_handle)
 
-  discard "TODO: fixme... how do we stop the ethernets?"
 
 proc networkingConnect*[ET](eth: var ET) =
   if networkConnectEventGroup != nil:
-    return ESP_ERR_INVALID_STATE
+    raise newException(ValueError, "missing net conn group")
 
   networkConnectEventGroup = xEventGroupCreate()
   eth.ethernetStart()
 
 proc networkingDisconnect*(): esp_err_t =
   if networkConnectEventGroup == nil:
-    return ESP_ERR_INVALID_STATE
+    raise newException(ValueError, "missing net conn group")
 
   vEventGroupDelete(networkConnectEventGroup)
   networkConnectEventGroup = nil
-  wifiStop()
+
+  ethernetStop()
   logi(TAG, "Disconnected from %s", networkConnectionName)
   networkConnectionName = nil
-
-  return ESP_OK
 
