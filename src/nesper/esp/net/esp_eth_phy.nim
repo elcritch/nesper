@@ -202,3 +202,16 @@ proc esp_eth_phy_new_dp83848*(config: ptr eth_phy_config_t): ptr esp_eth_phy_t {
 ##
 proc esp_eth_phy_new_dm9051*(config: ptr eth_phy_config_t): ptr esp_eth_phy_t {.
     importc: "esp_eth_phy_new_dm9051", header: "esp_eth_phy.h".}
+
+## /**
+## * @brief Create a PHY instance of W5500
+## *
+## * @param[in] config: configuration of PHY
+## *
+## * @return
+## *      - instance: create PHY instance successfully
+## *      - NULL: create PHY instance failed because some error occurred
+## */
+
+proc esp_eth_phy_new_w5500*(config: ptr eth_phy_config_t):
+        ptr esp_eth_phy_t {.importc: "$1", header: "esp_eth_phy.h".}

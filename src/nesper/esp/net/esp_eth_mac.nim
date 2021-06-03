@@ -239,3 +239,31 @@ proc esp_eth_mac_new_dm9051*(dm9051_config: ptr eth_dm9051_config_t;
     importc: "esp_eth_mac_new_dm9051", header: "esp_eth_mac.h".}
 
 
+
+type
+  eth_w5500_config_t* {.bycopy.} = object
+    spi_hdl*: pointer        ## !< Handle of SPI device driver
+    int_gpio_num*: cint      ## !< Interrupt GPIO number
+
+  ## *
+  ##  @brief Default W5500 specific configuration
+  ##
+  ##
+proc ETH_W5500_DEFAULT_CONFIG*(spi_device: spi_device_handle_t) {.
+    importc: "$1", header: "esp_eth_mac.h".}
+
+  ## *
+  ##  @brief Create W5500 Ethernet MAC instance
+  ##
+  ##  @param w5500_config: W5500 specific configuration
+  ##  @param mac_config: Ethernet MAC configuration
+  ##
+  ##  @return
+  ##       - instance: create MAC instance successfully
+  ##       - NULL: create MAC instance failed because some error occurred
+  ##
+proc esp_eth_mac_new_w5500*(
+        w5500_config: ptr eth_w5500_config_t;
+        mac_config: ptr eth_mac_config_t
+      ): ptr esp_eth_mac_t {.importc: "$1", header: "esp_eth_mac.h".}
+
