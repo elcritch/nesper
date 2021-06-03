@@ -55,6 +55,14 @@ proc initEthernetConfig*(): EthernetConfig =
   result.mac = ETH_MAC_DEFAULT_CONFIG()
   result.phy = ETH_PHY_DEFAULT_CONFIG()
 
+# proc initEthernet*[T](): T =
+#   new(result)
+#   result.config = initEthernetConfig()
+
+template initEthernet*[T](eth: var T, code: untyped) =
+  eth.config = initEthernetConfig()
+  code
+
 proc setupEthernet*(eth: var EthConfigIP101): EthernetObj = 
   result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
   result.phy = esp_eth_phy_new_ip101(addr eth.config.phy)

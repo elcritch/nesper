@@ -43,9 +43,6 @@ proc networkingInitDhcp*(
 
 proc networkingInit*(
       startNvs=true,
-      dhcp_client=true,
-      dhcp_server=false,
-      tcp_adapters: openArray[TcpIpAdaptersHandles],
     ) =
 
   # Networking will generally utilize NVS for storing net info
@@ -54,7 +51,8 @@ proc networkingInit*(
     initNvs()
 
   # configure dhcp clients and servers
-  networkingInitDhcp(dhcp_client=dhcp_client, dhcp_server=dhcp_server, tcp_adapters)
+  # networkingInitDhcp(dhcp_client=dhcp_client, dhcp_server=dhcp_server, tcp_adapters)
+
   # Create default event loop that runs in background
   check: esp_event_loop_create_default()
 
@@ -76,6 +74,8 @@ template setStaticIpAddress*(
   ip_info.ip = joinBytes32(ip.address_v4, 4)
   ip_info.gw = joinBytes32(gateway.address_v4, 4)
   ip_info.netmask = joinBytes32(netmask.address_v4, 4)
+
+  networkingInitDhcp(dhcp_client=false, dhcp_server=false, tcp_adapters)
 
   for tcp_adp in tcp_adapters:
     when defined(ESP_IDF_V4_0):
