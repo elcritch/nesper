@@ -3,12 +3,13 @@ import strutils
 import general
 import esp/esp_system
 
+import net
+export net 
+
 when not defined(ESP_IDF_V4_0):
   import esp/net/esp_netif
+  export esp_netif 
 
-import net
-
-export net 
 
 ## * This is the aligned version of ip4_addr_t,
 ##    used as local variable, on the stack, etc.
@@ -51,6 +52,17 @@ type
     ESP_IF_WIFI_AP,           ## *< ESP32 soft-AP interface
     ESP_IF_ETH,               ## *< ESP32 ethernet interface
     ESP_IF_MAX
+  wifi_mode_t* {.size: sizeof(cint).} = enum
+    WIFI_MODE_NULL = 0,         ## *< null mode
+    WIFI_MODE_STA,            ## *< WiFi station mode
+    WIFI_MODE_AP,             ## *< WiFi soft-AP mode
+    WIFI_MODE_APSTA,          ## *< WiFi station + soft-AP mode
+    WIFI_MODE_MAX
+  wifi_interface_t* = esp_interface_t
+
+const
+  WIFI_IF_STA* = ESP_IF_WIFI_STA
+  WIFI_IF_AP* = ESP_IF_WIFI_AP
 
 proc toIpAddress*(address: uint32): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv4)
