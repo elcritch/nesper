@@ -13,54 +13,73 @@ var networkConnectEventGroup*: EventGroupHandle_t
 var networkIpAddr*: IpAddress
 var networkConnectionName*: cstring
 
-template networkingInit*(
+when defined(ESP_IDF_V4_0):
+  type
+    TcpIpAdaptersHandles* = tcpip_adapter_if_t
+    TcpIpAdaptersInfoHandles* = ptr tcpip_adapter_ip_info_t
+else:
+  type
+    TcpIpAdaptersHandles* = ptr esp_netif_t
+    TcpIpAdaptersInfoHandles* = esp_netif_ip_info_t
+
+proc networkingInitDhcp*(
+      dhcp_client=true,
+      dhcp_server=false,
+      tcp_adapters: openArray[TcpIpAdaptersHandles],
+    ) =
+  if not dhcp_server:
+    for tcp_adp in tcp_adapters:
+      when defined(ESP_IDF_V4_0):
+        check: tcpip_adapter_dhcps_stop(tcp_adp)
+      else:
+        check: esp_netif_dhcps_stop(tcp_adp)
+
+  if not dhcp_client:
+    for tcp_adp in tcp_adapters:
+      when defined(ESP_IDF_V4_0):
+        check: tcpip_adapter_dhcpc_stop(tcp_adp)
+      else:
+        check: esp_netif_dhcpc_stop(tcp_adp)
+
+proc networkingInit*(
       startNvs=true,
       dhcp_client=true,
       dhcp_server=false,
-      wifi_adapters=true,
-      eth_adapters=true,
-      test_adapters=true
+      tcp_adapters: openArray[TcpIpAdaptersHandles],
     ) =
 
   # Networking will generally utilize NVS for storing net info
   # so it's best to start it first
-  when startNvs == true:
+  if startNvs == true:
     initNvs()
 
-  # Initialize TCP/IP network interface (should be called only once in application)
-  when defined(ESP_IDF_V4_0):
-    tcpip_adapter_init()
-
-    when dhcp_server:
-      when wifi_adapters:
-        check: tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP)
-      when eth_adapters:
-        check: tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_ETH)
-      when test_adapters:
-        check: tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_TEST)
-
-    when dhcp_client:
-      when wifi_adapters:
-        check: tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA)
-      when eth_adapters:
-        check: tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_ETH)
-      when test_adapters:
-        check: tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_TEST)
-
-  else:
-    # Support for networking setup on ESP-IDF v4.1+ (v4.2+?)
-    check: esp_netif_init()
-    when dhcp_client:
-      # check: tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP)
-      # check: tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA)
-      discard "TODO: implement"
-
-
+  # configure dhcp clients and servers
+  networkingInitDhcp(dhcp_client=dhcp_client, dhcp_server=dhcp_server, tcp_adapters)
   # Create default event loop that runs in background
   check: esp_event_loop_create_default()
 
-
 template onNetworking*(code: untyped) =
   discard xEventGroupWaitBits(networkConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
-
+  # execute user code
   code
+
+
+template setStaticIpAddress*(
+      ip: IpAddress,
+      gateway: IpAddress,
+      netmask: IpAddress,
+      tcp_adapters: openArray[TcpIpAdaptersHandles],
+    ) = 
+
+  var ip_info: TcpIpAdaptersInfoHandles 
+
+  ip_info.ip = joinBytes32(ip.address_v4, 4)
+  ip_info.gw = joinBytes32(gateway.address_v4, 4)
+  ip_info.netmask = joinBytes32(netmask.address_v4, 4)
+
+  for tcp_adp in tcp_adapters:
+    when defined(ESP_IDF_V4_0):
+      check: tcpip_adapter_set_ip_info(tcpip_if, ip_info)
+    else:
+      check: esp_netif_set_ip_info(tcp_adp, addr ip_info)
+
