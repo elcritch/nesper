@@ -212,6 +212,8 @@ proc esp_eth_phy_new_dm9051*(config: ptr eth_phy_config_t): ptr esp_eth_phy_t {.
 ## *      - instance: create PHY instance successfully
 ## *      - NULL: create PHY instance failed because some error occurred
 ## */
+## 
+## Set 'CONFIG_ETH_SPI_ETHERNET_W5500=y' in sdkconfig if you want to use
 
 proc esp_eth_phy_new_w5500*(config: ptr eth_phy_config_t):
         ptr esp_eth_phy_t {.importc: "$1", header: "esp_eth_phy.h".}
