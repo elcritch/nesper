@@ -36,8 +36,8 @@ type
 
   # External Ethernet
   EthernetSpiConfig* = ref object
-    intr_pin: GpioPin
-    dma_channel: range[0..2]
+    intr_pin*: GpioPin
+    dma_channel*: range[0..2]
     host*: spi_host_device_t
     miso*: GpioPin
     mosi*: GpioPin
