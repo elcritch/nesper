@@ -36,20 +36,26 @@ type
 ##
 ##
 
+##  @brief Input frame buffer to user's stack
+##
+##  @param[in] eth_handle: handle of Ethernet driver
+##  @param[in] buffer: frame buffer that will get input to upper stack
+##  @param[in] length: length of the frame buffer
+##
+##  @return
+##       - ESP_OK: input frame buffer to upper stack successfully
+##       - ESP_FAIL: error occurred when inputting buffer to upper stack
+##
+##
+when defined(ESP_IDF_V4_0):
+  type
+    stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.}
+else:
+  type
+    stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32, priv: pointer): esp_err_t {.cdecl.}
+
+
 type
-  
-  ##  @brief Input frame buffer to user's stack
-  ##
-  ##  @param[in] eth_handle: handle of Ethernet driver
-  ##  @param[in] buffer: frame buffer that will get input to upper stack
-  ##  @param[in] length: length of the frame buffer
-  ##
-  ##  @return
-  ##       - ESP_OK: input frame buffer to upper stack successfully
-  ##       - ESP_FAIL: error occurred when inputting buffer to upper stack
-  ##
-  ##
-  stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.}
 
   ##  @brief Callback function invoked when lowlevel initialization is finished
   ##

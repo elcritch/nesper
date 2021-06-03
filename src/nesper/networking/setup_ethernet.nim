@@ -20,11 +20,12 @@ var eth_handle: esp_eth_handle_t
 proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
               event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
-  TAG.logi "event.ip_info.ip: %s", $(event.ip_info.ip)
 
+  TAG.logi "event.ip_info.ip: %s", $(event.ip_info.ip)
   networkIpAddr = toIpAddress(event.ip_info.ip)
   # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
   TAG.logw "got event ip: %s", $networkIpAddr
+
 
   # var ip_info: ptr tcpip_adapter_ip_info_t = addr(event.ip_info)
   # TAG.logi "Ethernet Got IP Address")
@@ -67,7 +68,15 @@ proc onEthernetDisconnect*(arg: pointer;
 proc ethernetStart*[ET](eth: var ET) =
   networkConnectionName = "eth0" 
 
-  check: tcpip_adapter_set_default_eth_handlers()
+  when defined(ESP_IDF_V4_0):
+    check: tcpip_adapter_set_default_eth_handlers()
+  else:
+    var
+      cfg: esp_netif_config_t = ESP_NETIF_DEFAULT_ETH()
+      eth_netif: ptr esp_netif_t = esp_netif_new(addr cfg)
+
+    check: esp_eth_set_default_handlers(eth_netif)
+
 
   ETH_EVENT.eventRegister(ETHERNET_EVENT_START, ethEventHandler)
   ETH_EVENT.eventRegister(ETHERNET_EVENT_STOP, ethEventHandler)

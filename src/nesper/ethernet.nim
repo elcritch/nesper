@@ -7,12 +7,14 @@ import esp/driver/spi
 import nesper/esp/net/esp_eth_com
 import nesper/esp/net/esp_eth_mac
 import nesper/esp/net/esp_eth
-import nesper/esp/net/tcpip_adapter
 
 export esp_eth_com
 export esp_eth_mac
 export esp_eth
-export tcpip_adapter
+
+when defined(ESP_IDF_V4_0):
+  import nesper/esp/net/tcpip_adapter
+  export tcpip_adapter
 
 type
   # EthernetConfigType* = concept x
@@ -58,10 +60,6 @@ proc initEthernetConfig*(): EthernetConfig =
 # proc initEthernet*[T](): T =
 #   new(result)
 #   result.config = initEthernetConfig()
-
-template initEthernet*[T](eth: var T, code: untyped) =
-  eth.config = initEthernetConfig()
-  code
 
 proc setupEthernet*(eth: var EthConfigIP101): EthernetObj = 
   result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)

@@ -87,8 +87,10 @@ proc parseNimbleArgs(): NimbleArgs =
     flags = idf_args.filterIt(it.contains(":")).mapIt(it.split(":")).mapIt( (it[0], it[1])).toTable()
     esp32_template  = flags.getOrDefault("--esp32-template", "networking")
     app_template  = flags.getOrDefault("--app-template", "http_server")
+    esp_idf_ver  = flags.getOrDefault("--esp-idf-version", "V4.0").replace(".", "_").toUpper()
 
   # echo "APP_TEMPLATE ANY: ", idf_args.any(x => x.startsWith("--app-template"))
+  # echo "APP_IDF_ARGS: ", idf_args, " ", "--dist-clean" in idf_args
   
   result = NimbleArgs(
     args: idf_args,
@@ -103,11 +105,11 @@ proc parseNimbleArgs(): NimbleArgs =
     esp32_template: esp32_template,
     app_template: app_template,
     # forceupdatecache = "--forceUpdateCache" in idf_args
-    esp_idf_version: "ESP_IDF_V4_0", # FIXME
+    esp_idf_version: "ESP_IDF_$1" % [esp_idf_ver], # FIXME
     wifi_args: wifidefs,
     debug: "--esp-debug" in idf_args,
     forceclean: "--clean" in idf_args,
-    distclean: "--dist-clean" in idf_args,
+    distclean: "--dist-clean" in idf_args or "--clean-build" in idf_args,
     help: "--help" in idf_args or "-h" in idf_args
   )
 
@@ -188,6 +190,15 @@ task esp_clean, "Clean nimcache":
     rmDir(cachedir)
   else:
     echo "...not removing nimcache, directory not found"
+
+  if nopts.forceclean or nopts.distclean:
+    echo "...cleaning nim cache"
+    rmDir(nopts.cachedir)
+
+  if nopts.distclean:
+    echo "...cleaning esp-idf build cache"
+    rmDir(nopts.projdir / "build")
+
   
 
 task esp_compile, "Compile Nim project for esp-idf program":
@@ -216,7 +227,8 @@ task esp_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain",
-      "-d:" & nopts.esp_idf_version ].join(" ") 
+      "-d:" & nopts.esp_idf_version
+    ].join(" ") 
     childargs = nopts.child_args.mapIt(it.quoteShell()).join(" ")
     wifidefs = nopts.wifi_args
     compiler_cmd = nimargs & " " & wifidefs & " " & childargs & " " & nopts.projfile.quoteShell() 

@@ -63,11 +63,12 @@ proc toIpAddress*(address: array[4, uint32]): IpAddress =
     for i in 0..3:
       result.address_v6[i] = uint8(address[i] shr (i*8))
 
-proc toIpAddress*(ip: ip4_addr_t): IpAddress =
-  toIpAddress(ip.address)
+when defined(ESP_IDF_V4_0):
+  proc toIpAddress*(ip: ip4_addr_t): IpAddress =
+    toIpAddress(ip.address)
 
-proc toIpAddress*(ip: ip6_addr_t): IpAddress =
-  toIpAddress(ip.address)
+  proc toIpAddress*(ip: ip6_addr_t): IpAddress =
+    toIpAddress(ip.address)
 
 when not defined(ESP_IDF_V4_0):
   proc toIpAddress*(ip: esp_ip4_addr_t): IpAddress =
