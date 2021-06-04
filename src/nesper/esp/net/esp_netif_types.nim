@@ -193,6 +193,13 @@ type
     driver_free_rx_buffer* {.importc: "driver_free_rx_buffer".}: proc (h: pointer;
         buffer: pointer)
 
+  esp_netif_netstack_lwip_vanilla_config* {.bycopy.} = object
+    init_fn*: proc (a1: pointer): esp_err_t
+    input_fn*: proc (netif: pointer; buffer: pointer; len: csize_t; eb: pointer)
+
+  esp_netif_netstack_config_t* {.importc: "$1", header: hdr, bycopy.} = object
+    lwip: esp_netif_netstack_lwip_vanilla_config
+
   ##  @brief  Generic esp_netif configuration
   esp_netif_config_t* {.importc: "esp_netif_config_t", header: hdr,
                      bycopy.} = object
@@ -200,7 +207,6 @@ type
     driver* {.importc: "driver".}: ptr esp_netif_driver_ifconfig_t
     stack* {.importc: "stack".}: ptr esp_netif_netstack_config_t
 
-  esp_netif_netstack_config_t* {.importc: "$1", header: hdr, bycopy.} = object
 
 
   ##  @brief  Specific L3 network stack configuration

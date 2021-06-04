@@ -54,6 +54,7 @@
 import ../../consts
 import ../../general
 import ../esp_event_legacy
+import ../../net_utils
 import esp_wifi_types
 
 type 

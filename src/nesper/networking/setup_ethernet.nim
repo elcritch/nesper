@@ -68,22 +68,27 @@ proc onEthernetDisconnect*(arg: pointer;
 proc ethernetStart*[ET](eth: var ET) =
   networkConnectionName = "eth0" 
 
+  TAG.logi("ethernetStart")
+
   when defined(ESP_IDF_V4_0):
     check: tcpip_adapter_set_default_eth_handlers()
   else:
+    TAG.logi("esp_netif_new")
     var
       cfg: esp_netif_config_t = ESP_NETIF_DEFAULT_ETH()
       eth_netif: ptr esp_netif_t = esp_netif_new(addr cfg)
 
+    TAG.logi("esp_eth_set_default_handlers")
     check: esp_eth_set_default_handlers(eth_netif)
 
-
+  TAG.logi("eventRegister")
   ETH_EVENT.eventRegister(ETHERNET_EVENT_START, ethEventHandler)
-  ETH_EVENT.eventRegister(ETHERNET_EVENT_STOP, ethEventHandler)
-  ETH_EVENT.eventRegister(ETHERNET_EVENT_CONNECTED, ethEventHandler)
-  ETH_EVENT.eventRegister(ETHERNET_EVENT_DISCONNECTED, ethEventHandler)
+  # ETH_EVENT.eventRegister(ETHERNET_EVENT_STOP, ethEventHandler)
+  # ETH_EVENT.eventRegister(ETHERNET_EVENT_CONNECTED, ethEventHandler)
+  # ETH_EVENT.eventRegister(ETHERNET_EVENT_DISCONNECTED, ethEventHandler)
   IP_EVENT.eventRegister(IP_EVENT_ETH_GOT_IP, ipReceivedHandler)
 
+  TAG.logi("setupEthernet")
   var
     ethobj = eth.setupEthernet()
     config: esp_eth_config_t = eth_default_config(ethobj.mac, ethobj.phy)
@@ -108,6 +113,23 @@ proc networkingConnect*[ET](eth: var ET) =
     raise newException(ValueError, "missing net conn group")
 
   networkConnectEventGroup = xEventGroupCreate()
+  TAG.logi("networkingConnect running")
+
+  # var 
+  #   cfg: esp_netif_config_t = ESP_NETIF_DEFAULT_ETH()
+  
+  # var
+  #   scfg_b = $(cfg.base[])
+  #   scfg_d = "" # $(cfg.driver[])
+  #   scfg_s = "" # $(cfg.stack[])
+  # TAG.logi("esp_netif_new: cfg:%x => base:%s driver:%s stack:%s", addr cfg, scfg_b, scfg_d, scfg_s)
+
+  # var
+  #   eth_netif: ptr esp_netif_t = esp_netif_new(addr cfg)
+  # # // Set default handlers to process TCP/IP stuffs
+  # TAG.logi("esp_eth_set_default_handlers")
+  # check: esp_eth_set_default_handlers(eth_netif)
+
   eth.ethernetStart()
 
 proc networkingDisconnect*(): esp_err_t =

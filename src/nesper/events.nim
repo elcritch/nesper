@@ -8,6 +8,7 @@ else:
     import esp/net/esp_netif
     export esp_netif
 
+import esp/net/esp_eth_com
 import esp/net/esp_wifi_types
 import esp/esp_event
 import esp/event_groups

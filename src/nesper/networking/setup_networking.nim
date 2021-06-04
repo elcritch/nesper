@@ -8,6 +8,7 @@ import nesper/tasks
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(1))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
+  TAG: cstring = "setup_net"
 
 var networkConnectEventGroup*: EventGroupHandle_t
 var networkIpAddr*: IpAddress
@@ -50,10 +51,19 @@ proc networkingInit*(
   if startNvs == true:
     initNvs()
 
+  # Initialize TCP/IP network interface (should be called only once in application)
+  when defined(ESP_IDF_V4_0):
+    TAG.logi("tcpip_adapter_init")
+    tcpip_adapter_init()
+  else:
+    TAG.logi("esp_netif_init")
+    check: esp_netif_init()
+
   # configure dhcp clients and servers
   # networkingInitDhcp(dhcp_client=dhcp_client, dhcp_server=dhcp_server, tcp_adapters)
 
   # Create default event loop that runs in background
+  TAG.logi("esp_event_loop_create_default")
   check: esp_event_loop_create_default()
 
 template onNetworking*(code: untyped) =
