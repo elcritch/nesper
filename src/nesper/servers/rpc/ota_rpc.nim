@@ -1,11 +1,14 @@
-import std/sha1, strutils, json, strformat
+import std/sha1, json
 
 import router
 
 import nesper
 import nesper/events
 import nesper/tasks
+import nesper/timers
 import nesper/ota_utils
+
+import strutils
 
 const
   FW_CHECK_BITS* = EventBits_t(BIT(9))
@@ -24,7 +27,7 @@ proc checkSha1Hash*(val: string, hash: string) =
     if sh != hash:
       raise newException(ValueError, "incorrect hash")
 
-proc addOTAMethods*(rt: RpcRouter, ota_validation_cb = proc(): bool = true) =
+proc addOTAMethods*(rt: var RpcRouter, ota_validation_cb = proc(): bool = true) =
 
   rpc(rt, "firmware-begin") do(img_head: string, sha1_hash: string) -> JsonNode:
     # Call to begin writing a firmware update to the OTA
@@ -61,11 +64,11 @@ proc addOTAMethods*(rt: RpcRouter, ota_validation_cb = proc(): bool = true) =
     ota_buff.add(img_chunk)
 
     if ota_buff.len() >= 4096:
-      TAG.logd(fmt"writing firmware chunk: idx: {id} of size: {ota_buff.len()}")
+      TAG.logd("writing firmware chunk: idx: %d of size: %d", id, ota_buff.len())
       ota.write(ota_buff)
       ota_buff = ""
     else:
-      TAG.logd(fmt"appending firmware chunk: idx: {id} of size: {ota_buff.len()}")
+      TAG.logd("appending firmware chunk: idx:%d of size:%d", id, ota_buff.len())
 
     ota_id.inc()
     result = ota.total_written
@@ -84,11 +87,9 @@ proc addOTAMethods*(rt: RpcRouter, ota_validation_cb = proc(): bool = true) =
     ota.set_as_boot_partition()
 
     TAG.logd("Finalized FW OTA update")
-    result = ota.total_written
+    result = $ota.total_written
     ota = nil
     ota_id = 0
-
-    return "ok"
 
   rpc(rt, "firmware-verify") do() -> string:
     TAG.logd("Remotely Verified FW update")
