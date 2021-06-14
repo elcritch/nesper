@@ -5,6 +5,8 @@ import nesper/nvs_utils
 import nesper/events
 import nesper/tasks
 
+import algorithm 
+
 const
   GOT_IPV4_BIT* = EventBits_t(BIT(1))
   CONNECTED_BITS* = (GOT_IPV4_BIT)
@@ -71,8 +73,7 @@ template onNetworking*(code: untyped) =
   # execute user code
   code
 
-
-template setStaticIpAddress*(
+proc setStaticIpAddress*(
       ip: IpAddress,
       gateway: IpAddress,
       netmask: IpAddress,
@@ -81,9 +82,14 @@ template setStaticIpAddress*(
 
   var ip_info: TcpIpAdaptersInfoHandles 
 
-  ip_info.ip = joinBytes32(ip.address_v4, 4)
-  ip_info.gw = joinBytes32(gateway.address_v4, 4)
-  ip_info.netmask = joinBytes32(netmask.address_v4, 4)
+  let
+    rip4 = ip.address_v4.reversed()
+    rgw4 = gateway.address_v4.reversed()
+    rnm4 = netmask.address_v4.reversed()
+
+  ip_info.ip = joinBytes32[esp_ip4_addr_t](rip4, 4, top=true)
+  ip_info.gw = joinBytes32[esp_ip4_addr_t](rgw4, 4, top=true)
+  ip_info.netmask = joinBytes32[esp_ip4_addr_t](rnm4, 4, top=true)
 
   networkingInitDhcp(dhcp_client=false, dhcp_server=false, tcp_adapters)
 
