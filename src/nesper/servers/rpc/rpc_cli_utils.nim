@@ -2,6 +2,10 @@ import json, tables, strutils, macros, options
 import net, os, times, stats
 import sequtils, locks
 
+when RpcServerType == "mpack":
+  import msgpack4nim
+  import msgpack4nim/msgpack2json
+
 import parseopt
 
 type
@@ -148,8 +152,7 @@ elif RpcServerType == "mpack":
     call["id"] = %* args.id
     inc(args.id)
 
-    let mcall = 
-        $call
+    let mcall = call.fromJsonNode()
 
     timeBlock("call", args):
       client.send( mcall )
@@ -220,4 +223,8 @@ proc runRpc*(args: var RpcCli) =
 
 
 # runRpc()
-  
+
+proc defaultRpcCliArgs*(): RpcCli =
+  var p = initOptParser()
+  return p.rpcOptions()
+

@@ -78,6 +78,7 @@ proc setStaticIpAddress*(
       gateway: IpAddress,
       netmask: IpAddress,
       tcp_adapters: openArray[TcpIpAdaptersHandles],
+      dhcp_config = true,
     ) = 
 
   var ip_info: TcpIpAdaptersInfoHandles 
@@ -91,7 +92,8 @@ proc setStaticIpAddress*(
   ip_info.gw = joinBytes32[esp_ip4_addr_t](rgw4, 4, top=true)
   ip_info.netmask = joinBytes32[esp_ip4_addr_t](rnm4, 4, top=true)
 
-  networkingInitDhcp(dhcp_client=false, dhcp_server=false, tcp_adapters)
+  if dhcp_config:
+    networkingInitDhcp(dhcp_client=false, dhcp_server=false, tcp_adapters)
 
   for tcp_adp in tcp_adapters:
     when defined(ESP_IDF_V4_0):
