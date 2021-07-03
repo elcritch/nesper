@@ -48,7 +48,7 @@ type
   i2c_dev_t* {.importc: "i2c_dev_t", header: hdr, bycopy.} = object
     port* {.importc: "port".}: i2c_port_t ## !< I2C port number
     cfg* {.importc: "cfg".}: i2c_config_t ## !< I2C driver configuration
-    `addr`* {.importc: "addr".}: uint8 ## !< Unshifted address
+    devAddr* {.importc: "addr".}: uint8 ## !< Unshifted address
     mutex* {.importc: "mutex".}: SemaphoreHandle_t ## !< Device mutex
     timeout_ticks* {.importc: "timeout_ticks".}: uint32 ## !< HW I2C bus timeout (stretch time), in ticks. 80MHz APB clock
                                                       ##                                   ticks for ESP-IDF, CPU ticks for ESP8266.
