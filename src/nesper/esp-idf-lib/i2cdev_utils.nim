@@ -103,7 +103,7 @@ proc writeRegister*(dev: I2CDevice; reg: uint8; value: uint8) =
 
 proc readRegister16*(dev: I2CDevice; reg: uint8): uint16 =
   let devptr = addr dev.dev
-  var value: uint8
+  var value: uint16
   
   discard I2C_DEV_TAKE_MUTEX(devptr)
   let
