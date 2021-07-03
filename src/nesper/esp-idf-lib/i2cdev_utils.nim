@@ -15,6 +15,8 @@ const
   TAG = "I2CD"
 
 type
+  I2CErrorType* = tuple[val: uint8, err: esp_err_t]
+
   I2CDevConfig* = object
     port*: i2c_port_t
     sda*: gpio_num_t
@@ -36,51 +38,91 @@ proc i2cDeviceInit*() =
 
 i2cDeviceInit()
 
-proc i2c_read_reg*(dev: ptr i2c_dev_t; reg: uint8): uint8 =
+proc i2c_read_reg*(dev: ptr i2c_dev_t; reg: uint8, val: var uint8): esp_err_t =
+  var buf: array[2, uint8]
+  var res: esp_err_t = i2c_dev_read_reg(dev, reg, addr buf[0], 2)
+  if res != ESP_OK:
+    TAG.logd("Could not read from register 0x%02x", reg)
+    return res
+
+  val = (buf[0] shl 8) or buf[1]
+  return ESP_OK
+
+proc i2c_write_reg*(dev: ptr i2c_dev_t; reg: uint8; val: uint8): esp_err_t =
+  var buf: array[2, uint8] = [uint8(val shr 8), val.uint8]
+  var res: esp_err_t = i2c_dev_write_reg(dev, reg, addr buf[0], 2)
+  if res != ESP_OK:
+    TAG.logd("Could not write 0x%04x to register 0x%02x", val, reg)
+    return res
+  return ESP_OK
+
+proc i2c_read_reg16*(dev: ptr i2c_dev_t; reg: uint8, val: var uint16): esp_err_t =
   var buf: array[2, uint8]
   var res: esp_err_t = i2c_dev_read_reg(dev, reg, addr buf[0], 2)
   if res != ESP_OK:
     TAG.loge("Could not read from register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    return res
+  val = (buf[0] shl 8) or buf[1]
+  return ESP_OK
 
-  result = (buf[0] shl 8) or buf[1]
-
-proc i2c_write_reg*(dev: ptr i2c_dev_t; reg: uint8; val: uint8) =
+proc i2c_write_reg16*(dev: ptr i2c_dev_t; reg: uint8; val: uint16): esp_err_t =
   var buf: array[2, uint8] = [uint8(val shr 8), val.uint8]
   var res: esp_err_t = i2c_dev_write_reg(dev, reg, addr buf[0], 2)
   if res != ESP_OK:
     TAG.loge("Could not write 0x%04x to register 0x%02x", val, reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    return res
+  return ESP_OK
 
-proc i2c_read_reg16*(dev: ptr i2c_dev_t; reg: uint8): uint16 =
-  var buf: array[2, uint8]
-  var res: esp_err_t = i2c_dev_read_reg(dev, reg, addr buf[0], 2)
-  if res != ESP_OK:
-    TAG.loge("Could not read from register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
-
-  result = (buf[0] shl 8) or buf[1]
-
-proc i2c_write_reg16*(dev: ptr i2c_dev_t; reg: uint8; val: uint16) =
-  var buf: array[2, uint8] = [uint8(val shr 8), val.uint8]
-  var res: esp_err_t = i2c_dev_write_reg(dev, reg, addr buf[0], 2)
-  if res != ESP_OK:
-    TAG.loge("Could not write 0x%04x to register 0x%02x", val, reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
 
 proc readRegister*(dev: I2CDevice; reg: uint8): uint8 =
+  let devptr = addr dev.dev
+  var value: uint8
   
-  I2C_DEV_TAKE_MUTEX(dev)
-  result = i2c_read_reg(addr dev.dev, reg)
-  I2C_DEV_GIVE_MUTEX(dev)
+  discard I2C_DEV_TAKE_MUTEX(devptr)
+  let
+    res = i2c_read_reg(addr dev.dev, reg, value)
 
+  discard I2C_DEV_GIVE_MUTEX(devptr)
 
-proc writeRegister*(dev: I2CDevice; reg: uint8; val: uint8) =
-  i2c_write_reg(addr dev.dev, reg, val)
+  if result != ESP_OK:
+    TAG.logd("Could not read from register 0x%02x", reg)
+    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+
+proc writeRegister*(dev: I2CDevice; reg: uint8; value: uint8) =
+  let devptr = addr dev.dev
+  
+  discard I2C_DEV_TAKE_MUTEX(devptr)
+  let res = i2c_write_reg(addr dev.dev, reg, value)
+
+  discard I2C_DEV_GIVE_MUTEX(devptr)
+
+  if res != ESP_OK:
+    TAG.logd("Could not write to register 0x%02x", reg)
+    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+
 
 proc readRegister16*(dev: I2CDevice; reg: uint8): uint16 =
-  return i2c_read_reg16(addr dev.dev, reg)
+  let devptr = addr dev.dev
+  var value: uint8
+  
+  discard I2C_DEV_TAKE_MUTEX(devptr)
+  let
+    res = i2c_read_reg16(addr dev.dev, reg, value)
 
-proc writeRegister16*(dev: I2CDevice; reg: uint8; val: uint16) =
-  i2c_write_reg16(addr dev.dev, reg, val)
+  discard I2C_DEV_GIVE_MUTEX(devptr)
 
+  if result != ESP_OK:
+    TAG.logd("Could not read from register 0x%02x", reg)
+    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+
+proc writeRegister16*(dev: I2CDevice; reg: uint8; value: uint16) =
+  let devptr = addr dev.dev
+  
+  discard I2C_DEV_TAKE_MUTEX(devptr)
+  let res = i2c_write_reg16(addr dev.dev, reg, value)
+
+  discard I2C_DEV_GIVE_MUTEX(devptr)
+
+  if res != ESP_OK:
+    TAG.logd("Could not write to register 0x%02x", reg)
+    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
