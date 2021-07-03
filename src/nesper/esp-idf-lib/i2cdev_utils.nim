@@ -69,7 +69,11 @@ proc i2c_write_reg16*(dev: ptr i2c_dev_t; reg: uint8; val: uint16) =
     raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
 
 proc readRegister*(dev: I2CDevice; reg: uint8): uint8 =
-  return i2c_read_reg(addr dev.dev, reg)
+  
+  I2C_DEV_TAKE_MUTEX(dev)
+  result = i2c_read_reg(addr dev.dev, reg)
+  I2C_DEV_GIVE_MUTEX(dev)
+
 
 proc writeRegister*(dev: I2CDevice; reg: uint8; val: uint8) =
   i2c_write_reg(addr dev.dev, reg, val)

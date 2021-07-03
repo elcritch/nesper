@@ -40,6 +40,7 @@ const hdr = "<i2cdev.h>"
 var I2CDEV_MAX_STRETCH_TIME* {.importc: "I2CDEV_MAX_STRETCH_TIME", header: hdr.}: cint
 
 
+
 ## *
 ##  I2C device descriptor
 ##
@@ -184,3 +185,8 @@ proc i2c_dev_write_reg*(dev: ptr i2c_dev_t; reg: uint8; out_data: pointer;
                        out_size: csize_t): esp_err_t {.
     importc: "i2c_dev_write_reg", header: hdr.}
 ## *@}
+
+proc I2C_DEV_TAKE_MUTEX*(dev: ptr i2c_dev_t): esp_err_t {.importc: "$1", header: hdr.}
+proc I2C_DEV_GIVE_MUTEX*(dev: ptr i2c_dev_t): esp_err_t {.importc: "$1", header: hdr.}
+proc I2C_DEV_CHECK*(dev: ptr i2c_dev_t, x: esp_err_t): esp_err_t {.importc: "$1", header: hdr.}
+# proc I2C_DEV_CHECK_LOGE*(dev: ptr i2c_dev_t): esp_err_t {.importc: "$1", header: hdr.}
