@@ -1,4 +1,4 @@
-import locks
+import locks, strutils
 
 import nesper
 import nesper/gpios
@@ -76,17 +76,15 @@ proc i2c_write_reg16*(dev: ptr i2c_dev_t; reg: uint8; val: uint16): esp_err_t =
 
 proc readRegister*(dev: I2CDevice; reg: uint8): uint8 =
   let devptr = addr dev.dev
-  var value: uint8
   
   discard I2C_DEV_TAKE_MUTEX(devptr)
-  let
-    res = i2c_read_reg(addr dev.dev, reg, value)
+  let res = i2c_read_reg(addr dev.dev, reg, result)
 
   discard I2C_DEV_GIVE_MUTEX(devptr)
 
   if result != ESP_OK:
-    TAG.logd("Could not read from register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    # TAG.logd("Could not read from register 0x%02x", reg)
+    raise newEspError[I2CDevError]("could not read register: " & reg.toHex() & "ret:" & $esp_err_to_name(res), res)
 
 proc writeRegister*(dev: I2CDevice; reg: uint8; value: uint8) =
   let devptr = addr dev.dev
@@ -97,23 +95,21 @@ proc writeRegister*(dev: I2CDevice; reg: uint8; value: uint8) =
   discard I2C_DEV_GIVE_MUTEX(devptr)
 
   if res != ESP_OK:
-    TAG.logd("Could not write to register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    # TAG.logd("Could not write to register 0x%02x", reg)
+    raise newEspError[I2CDevError]("could not write register: " & reg.toHex() & "ret:" & $esp_err_to_name(res), res)
 
 
 proc readRegister16*(dev: I2CDevice; reg: uint8): uint16 =
   let devptr = addr dev.dev
-  var value: uint16
   
   discard I2C_DEV_TAKE_MUTEX(devptr)
-  let
-    res = i2c_read_reg16(addr dev.dev, reg, value)
+  let res = i2c_read_reg16(addr dev.dev, reg, result)
 
   discard I2C_DEV_GIVE_MUTEX(devptr)
 
   if result != ESP_OK:
-    TAG.logd("Could not read from register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    # TAG.logd("Could not read from register 0x%02x", reg)
+    raise newEspError[I2CDevError]("could not read register: " & reg.toHex() & "ret:" & $esp_err_to_name(res), res)
 
 proc writeRegister16*(dev: I2CDevice; reg: uint8; value: uint16) =
   let devptr = addr dev.dev
@@ -124,5 +120,5 @@ proc writeRegister16*(dev: I2CDevice; reg: uint8; value: uint16) =
   discard I2C_DEV_GIVE_MUTEX(devptr)
 
   if res != ESP_OK:
-    TAG.logd("Could not write to register 0x%02x", reg)
-    raise newEspError[I2CDevError]("register: " & $esp_err_to_name(res), res)
+    # TAG.logd("Could not write to register 0x%02x", reg)
+    raise newEspError[I2CDevError]("could not write register: " & reg.toHex() & "ret:" & $esp_err_to_name(res), res)
