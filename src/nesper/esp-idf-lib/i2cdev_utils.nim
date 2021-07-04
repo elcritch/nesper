@@ -94,9 +94,9 @@ proc writeRegister*[T: uint8 | uint16](dev: I2CDevice; reg: uint8; value: T) =
   let devptr = addr dev.dev
   
   discard I2C_DEV_TAKE_MUTEX(devptr)
-  when T == uint8:
+  when T is uint8:
     let res = i2c_write_reg(addr dev.dev, reg, value)
-  elif T == uint16:
+  elif T is uint16:
     let res = i2c_write_reg16(addr dev.dev, reg, value)
   else:
     {.fatal: "incorrect type".}

@@ -16,5 +16,8 @@ FetchContent_MakeAvailable(espidflib)
 
 ...
 
+set(EXTRA_COMPONENT_DIRS ${espidflib_SOURCE_DIR}/components $ENV{IDF_PATH}/examples/common_components/protocol_examples_common)
+
+
 ```
 
