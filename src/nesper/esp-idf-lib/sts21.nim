@@ -34,6 +34,12 @@ proc takeReading*(cfg: var ConfigSTS21): float =
     devptr = addr cfg.device.dev
 
   # check: i2c_dev_take_mutex(devptr)
+
+  var rst_data = @[0xFE'u8]
+  check: i2c_dev_write(devptr, nil, 0, addr rst_data[0], 1)
+
+  delayMillis(20)
+
   var in_data = @[0xF3'u8]
   check: i2c_dev_write(devptr, nil, 0, addr in_data[0], 1)
   # check: i2c_dev_give_mutex(devptr)
