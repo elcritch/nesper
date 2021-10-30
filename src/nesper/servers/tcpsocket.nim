@@ -17,6 +17,24 @@ const
   TAG = "socketrpc"
   MsgChunk {.intdefine.} = 1400
 
+type 
+  TcpClientDisconnected* = object of OSError
+  TcpClientError* = object of OSError
+
+template sendWrap*(socket: Socket, data: untyped) =
+  # Checks for disconnect errors when sending
+  # This makes it easy to handle dirty disconnects
+  try:
+    socket.send(data)
+  except OSError as err:
+    if err.errorCode == ENOTCONN:
+      var etcp = newException(TcpClientDisconnected, "")
+      etcp.errorCode = err.errorCode
+      raise etcp
+    else:
+      raise err
+
+
 proc sendChunks*(sourceClient: Socket, rmsg: string) =
   let rN = rmsg.len()
   # logd(TAG,"rpc handler send client: %d bytes", rN)
@@ -25,7 +43,7 @@ proc sendChunks*(sourceClient: Socket, rmsg: string) =
     var j = min(i + MsgChunk, rN) 
     # logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
     var sl = rmsg[i..<j]
-    sourceClient.send(move sl)
+    sourceClient.sendWrap(move sl)
     i = j
 
 proc sendLength*(sourceClient: Socket, rmsg: string) =
@@ -35,7 +53,7 @@ proc sendLength*(sourceClient: Socket, rmsg: string) =
     rmsgSz[i] = char(rmsgN and 0xFF)
     rmsgN = rmsgN shr 8
 
-  sourceClient.send(move rmsgSz)
+  sourceClient.sendWrap(move rmsgSz)
 
 type 
   TcpClientDisconnected* = object of OSError
@@ -112,9 +130,7 @@ proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient
     logd(TAG, "received from client: %s", message)
 
     for cfd, client in srv.clients:
-      # if sourceClient.getFd() == cfd.getFd():
-        # continue
-      client.send(data & message & "\r\L")
+      client.sendWrap(data & message & "\r\L")
 
 proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: var T) =
   var server: Socket = newSocket()
