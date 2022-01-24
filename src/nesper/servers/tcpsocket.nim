@@ -56,8 +56,6 @@ proc sendLength*(sourceClient: Socket, rmsg: string) =
   sourceClient.sendWrap(move rmsgSz)
 
 type 
-  TcpClientDisconnected* = object of OSError
-  TcpClientError* = object of OSError
 
   TcpServerInfo*[T] = ref object 
     select*: Selector[T]
