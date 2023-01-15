@@ -108,8 +108,13 @@ const
 ##  @brief Description about application.
 ##
 
+when defined(ESP_IDF_V4_0):
+  const hdr = "esp_app_format.h"
+else:
+  const hdr = "esp_app_desc.h"
+
 type
-  esp_app_desc_t* {.importc: "esp_app_desc_t", header: "esp_app_format.h", bycopy.} = object
+  esp_app_desc_t* {.importc: "esp_app_desc_t", header: hdr, bycopy.} = object
     magic_word* {.importc: "magic_word".}: uint32 ## !< Magic word ESP_APP_DESC_MAGIC_WORD
     secure_version* {.importc: "secure_version".}: uint32 ## !< Secure version
     reserv1* {.importc: "reserv1".}: array[2, uint32] ## !< reserv1

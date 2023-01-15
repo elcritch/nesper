@@ -171,30 +171,46 @@ type
 
 ##  @brief Configuration of Ethernet MAC object
 type
-  eth_mac_config_t* {.importc: "eth_mac_config_t", header: "esp_eth_mac.h", bycopy.} = object
+  eth_mac_config_t* {.importc: "eth_mac_config_t", header: "esp_eth_mac.h", bycopy, incompleteStruct.} = object
     sw_reset_timeout_ms* {.importc: "sw_reset_timeout_ms".}: uint32 ## !< Software reset timeout value (Unit: ms)
     rx_task_stack_size* {.importc: "rx_task_stack_size".}: uint32 ## !< Stack size of the receive task
     rx_task_prio* {.importc: "rx_task_prio".}: uint32 ## !< Priority of the receive task
-    smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
-    smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
     flags* {.importc: "flags".}: uint32 ## !< Flags that specify extra capability for mac driver
+    when defined(ESP_IDF_V4_0):
+      smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
+      smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
 
-proc ETH_MAC_DEFAULT_CONFIG*(
-          sw_reset_timeout_ms = 100,
-          rx_task_stack_size = 4096,
-          rx_task_prio = 15,
-          smi_mdc_gpio_num = 23,
-          smi_mdio_gpio_num = 18,
-          flags: uint32 = 0
-        ): eth_mac_config_t {.inline.} =
-  
-  return eth_mac_config_t(
-            sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
-            rx_task_stack_size: rx_task_stack_size.uint32(), 
-            rx_task_prio: rx_task_prio.uint32(),         
-            smi_mdc_gpio_num: smi_mdc_gpio_num.cint(),     
-            smi_mdio_gpio_num: smi_mdio_gpio_num.cint(),    
-            flags: flags)
+when defined(ESP_IDF_V4_0):
+  proc ETH_MAC_DEFAULT_CONFIG*(
+            sw_reset_timeout_ms = 100,
+            rx_task_stack_size = 4096,
+            rx_task_prio = 15,
+            smi_mdc_gpio_num = 23,
+            smi_mdio_gpio_num = 18,
+            flags: uint32 = 0
+          ): eth_mac_config_t {.inline.} =
+    
+    return eth_mac_config_t(
+              sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
+              rx_task_stack_size: rx_task_stack_size.uint32(), 
+              rx_task_prio: rx_task_prio.uint32(),         
+              smi_mdc_gpio_num: smi_mdc_gpio_num.cint(),     
+              smi_mdio_gpio_num: smi_mdio_gpio_num.cint(),    
+              flags: flags)
+
+else:
+  proc ETH_MAC_DEFAULT_CONFIG*(
+            sw_reset_timeout_ms = 100,
+            rx_task_stack_size = 4096,
+            rx_task_prio = 15,
+            flags: uint32 = 0
+          ): eth_mac_config_t {.inline.} =
+    
+    return eth_mac_config_t(
+              sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
+              rx_task_stack_size: rx_task_stack_size.uint32(), 
+              rx_task_prio: rx_task_prio.uint32(),         
+              flags: flags)
 
 ##  @brief Default configuration for Ethernet MAC object
 ##  #define ETH_MAC_DEFAULT_CONFIG()    \
@@ -213,6 +229,15 @@ proc ETH_MAC_DEFAULT_CONFIG*(
 ##       - NULL: create MAC instance failed because some error occurred
 proc esp_eth_mac_new_esp32*(config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
     importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
+
+
+when not defined(ESP_IDF_V4_0):
+  type
+    eth_esp32_emac_config_t* {.importc: "eth_esp32_emac_config_t", header: "esp_eth_mac.h", bycopy, incompleteStruct.} = object
+      smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
+      smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
+
+  proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
 
 ##  @brief DM9051 specific configuration
 type

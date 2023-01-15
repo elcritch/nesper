@@ -17,6 +17,9 @@ import ../esp/esp_event_legacy
 
 import ../esp/net/esp_netif
 
+const hdr = "lwip/apps/mdns.h"
+# const hdr = hdr
+
 type
   mdns_type* = enum
     MDNS_TYPE_A = 0x00000001
@@ -43,7 +46,7 @@ type
 ##
 
 type
-  mdns_txt_item_t* {.importc: "mdns_txt_item_t", header: "mdns.h", bycopy.} = object
+  mdns_txt_item_t* {.importc: "mdns_txt_item_t", header: hdr, bycopy.} = object
     key* {.importc: "key".}: cstring ## !< item key name
     value* {.importc: "value".}: cstring ## !< item value string
 
@@ -53,7 +56,7 @@ type
 ##
 
 type
-  mdns_ip_addr_t* {.importc: "mdns_ip_addr_t", header: "mdns.h", bycopy.} = object
+  mdns_ip_addr_t* {.importc: "mdns_ip_addr_t", header: hdr, bycopy.} = object
     when defined(ESP_IDF_V4_0):
       `addr`* {.importc: "addr".}: ip_addr_t ## !< IP address
     else:
@@ -72,7 +75,7 @@ type
 ##
 
 type
-  mdns_result_t* {.importc: "mdns_result_t", header: "mdns.h", bycopy.} = object
+  mdns_result_t* {.importc: "mdns_result_t", header: hdr, bycopy.} = object
     next* {.importc: "next".}: ptr mdns_result_t ## !< next result, or NULL for the last result in the list
     when defined(ESP_IDF_V4_0):
         tcpip_if* {.importc: "tcpip_if".}: tcpip_adapter_if_t ## !< interface on which the result came (AP/STA/ETH)
@@ -101,13 +104,13 @@ type
 ##      - ESP_FAIL when failed to start mdns task
 ##
 
-proc mdns_init*(): esp_err_t {.importc: "mdns_init", header: "mdns.h".}
+proc mdns_init*(): esp_err_t {.importc: "mdns_init", header: hdr.}
 ## *
 ##  @brief  Stop and free mDNS server
 ##
 ##
 
-proc mdns_free*() {.importc: "mdns_free", header: "mdns.h".}
+proc mdns_free*() {.importc: "mdns_free", header: hdr.}
 ## *
 ##  @brief  Set the hostname for mDNS server
 ##          required if you want to advertise services
@@ -121,7 +124,7 @@ proc mdns_free*() {.importc: "mdns_free", header: "mdns.h".}
 ##
 
 proc mdns_hostname_set*(hostname: cstring): esp_err_t {.
-    importc: "mdns_hostname_set", header: "mdns.h".}
+    importc: "mdns_hostname_set", header: hdr.}
 ## *
 ##  @brief  Set the default instance name for mDNS server
 ##
@@ -134,7 +137,7 @@ proc mdns_hostname_set*(hostname: cstring): esp_err_t {.
 ##
 
 proc mdns_instance_name_set*(instance_name: cstring): esp_err_t {.
-    importc: "mdns_instance_name_set", header: "mdns.h".}
+    importc: "mdns_instance_name_set", header: hdr.}
 ## *
 ##  @brief  Add service to mDNS server
 ##
@@ -155,7 +158,7 @@ proc mdns_instance_name_set*(instance_name: cstring): esp_err_t {.
 
 proc mdns_service_add*(instance_name: cstring; service_type: cstring; proto: cstring;
                       port: uint16; txt: ptr mdns_txt_item_t; num_items: csize_t): esp_err_t {.
-    importc: "mdns_service_add", header: "mdns.h".}
+    importc: "mdns_service_add", header: hdr.}
 ## *
 ##  @brief  Remove service from mDNS server
 ##
@@ -170,7 +173,7 @@ proc mdns_service_add*(instance_name: cstring; service_type: cstring; proto: cst
 ##
 
 proc mdns_service_remove*(service_type: cstring; proto: cstring): esp_err_t {.
-    importc: "mdns_service_remove", header: "mdns.h".}
+    importc: "mdns_service_remove", header: hdr.}
 ## *
 ##  @brief  Set instance name for service
 ##
@@ -187,7 +190,7 @@ proc mdns_service_remove*(service_type: cstring; proto: cstring): esp_err_t {.
 
 proc mdns_service_instance_name_set*(service_type: cstring; proto: cstring;
                                     instance_name: cstring): esp_err_t {.
-    importc: "mdns_service_instance_name_set", header: "mdns.h".}
+    importc: "mdns_service_instance_name_set", header: hdr.}
 ## *
 ##  @brief  Set service port
 ##
@@ -203,7 +206,7 @@ proc mdns_service_instance_name_set*(service_type: cstring; proto: cstring;
 ##
 
 proc mdns_service_port_set*(service_type: cstring; proto: cstring; port: uint16): esp_err_t {.
-    importc: "mdns_service_port_set", header: "mdns.h".}
+    importc: "mdns_service_port_set", header: hdr.}
 ## *
 ##  @brief  Replace all TXT items for service
 ##
@@ -221,7 +224,7 @@ proc mdns_service_port_set*(service_type: cstring; proto: cstring; port: uint16)
 
 proc mdns_service_txt_set*(service_type: cstring; proto: cstring;
                           txt: ptr mdns_txt_item_t; num_items: uint8): esp_err_t {.
-    importc: "mdns_service_txt_set", header: "mdns.h".}
+    importc: "mdns_service_txt_set", header: hdr.}
 ## *
 ##  @brief  Set/Add TXT item for service TXT record
 ##
@@ -239,7 +242,7 @@ proc mdns_service_txt_set*(service_type: cstring; proto: cstring;
 
 proc mdns_service_txt_item_set*(service_type: cstring; proto: cstring; key: cstring;
                                value: cstring): esp_err_t {.
-    importc: "mdns_service_txt_item_set", header: "mdns.h".}
+    importc: "mdns_service_txt_item_set", header: hdr.}
 ## *
 ##  @brief  Remove TXT item for service TXT record
 ##
@@ -256,7 +259,7 @@ proc mdns_service_txt_item_set*(service_type: cstring; proto: cstring; key: cstr
 
 proc mdns_service_txt_item_remove*(service_type: cstring; proto: cstring;
                                   key: cstring): esp_err_t {.
-    importc: "mdns_service_txt_item_remove", header: "mdns.h".}
+    importc: "mdns_service_txt_item_remove", header: hdr.}
 ## *
 ##  @brief  Remove and free all services from mDNS server
 ##
@@ -266,7 +269,7 @@ proc mdns_service_txt_item_remove*(service_type: cstring; proto: cstring;
 ##
 
 proc mdns_service_remove_all*(): esp_err_t {.importc: "mdns_service_remove_all",
-    header: "mdns.h".}
+    header: hdr.}
 ## *
 ##  @brief  Query mDNS for host or service
 ##          All following query methods are derived from this one
@@ -290,7 +293,7 @@ proc mdns_service_remove_all*(): esp_err_t {.importc: "mdns_service_remove_all",
 proc mdns_query*(name: cstring; service_type: cstring; proto: cstring;
                 `type`: uint16; timeout: uint32; max_results: csize_t;
                 results: ptr ptr mdns_result_t): esp_err_t {.importc: "mdns_query",
-    header: "mdns.h".}
+    header: hdr.}
 ## *
 ##  @brief  Free query results
 ##
@@ -298,7 +301,7 @@ proc mdns_query*(name: cstring; service_type: cstring; proto: cstring;
 ##
 
 proc mdns_query_results_free*(results: ptr mdns_result_t) {.
-    importc: "mdns_query_results_free", header: "mdns.h".}
+    importc: "mdns_query_results_free", header: hdr.}
 ## *
 ##  @brief  Query mDNS for service
 ##
@@ -317,7 +320,7 @@ proc mdns_query_results_free*(results: ptr mdns_result_t) {.
 
 proc mdns_query_ptr*(service_type: cstring; proto: cstring; timeout: uint32;
                     max_results: csize_t; results: ptr ptr mdns_result_t): esp_err_t {.
-    importc: "mdns_query_ptr", header: "mdns.h".}
+    importc: "mdns_query_ptr", header: hdr.}
 ## *
 ##  @brief  Query mDNS for SRV record
 ##
@@ -336,7 +339,7 @@ proc mdns_query_ptr*(service_type: cstring; proto: cstring; timeout: uint32;
 
 proc mdns_query_srv*(instance_name: cstring; service_type: cstring; proto: cstring;
                     timeout: uint32; result: ptr ptr mdns_result_t): esp_err_t {.
-    importc: "mdns_query_srv", header: "mdns.h".}
+    importc: "mdns_query_srv", header: hdr.}
 ## *
 ##  @brief  Query mDNS for TXT record
 ##
@@ -355,7 +358,7 @@ proc mdns_query_srv*(instance_name: cstring; service_type: cstring; proto: cstri
 
 proc mdns_query_txt*(instance_name: cstring; service_type: cstring; proto: cstring;
                     timeout: uint32; result: ptr ptr mdns_result_t): esp_err_t {.
-    importc: "mdns_query_txt", header: "mdns.h".}
+    importc: "mdns_query_txt", header: hdr.}
 ## *
 ##  @brief  Query mDNS for A record
 ##
@@ -371,7 +374,7 @@ proc mdns_query_txt*(instance_name: cstring; service_type: cstring; proto: cstri
 ##
 
 proc mdns_query_a*(host_name: cstring; timeout: uint32; `addr`: ptr ip4_addr_t): esp_err_t {.
-    importc: "mdns_query_a", header: "mdns.h".}
+    importc: "mdns_query_a", header: hdr.}
 ## *
 ##  @brief  Query mDNS for A record
 ##
@@ -387,7 +390,7 @@ proc mdns_query_a*(host_name: cstring; timeout: uint32; `addr`: ptr ip4_addr_t):
 ##
 
 proc mdns_query_aaaa*(host_name: cstring; timeout: uint32; `addr`: ptr ip6_addr_t): esp_err_t {.
-    importc: "mdns_query_aaaa", header: "mdns.h".}
+    importc: "mdns_query_aaaa", header: hdr.}
 ## *
 ##  @brief   System event handler
 ##           This method controls the service state on all active interfaces and applications are required
@@ -398,4 +401,4 @@ proc mdns_query_aaaa*(host_name: cstring; timeout: uint32; `addr`: ptr ip6_addr_
 ##
 
 proc mdns_handle_system_event*(ctx: pointer; event: ptr system_event_t): esp_err_t {.
-    importc: "mdns_handle_system_event", header: "mdns.h".}
+    importc: "mdns_handle_system_event", header: hdr.}
