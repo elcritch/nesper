@@ -17,7 +17,7 @@ import ../esp/esp_event_legacy
 
 import ../esp/net/esp_netif
 
-const hdr = "lwip/apps/mdns.h"
+const hdr = "<mdns.h>"
 # const hdr = hdr
 
 type
@@ -30,6 +30,9 @@ type
     MDNS_TYPE_OPT = 0x00000029
     MDNS_TYPE_NSEC = 0x0000002F
     MDNS_TYPE_ANY = 0x000000FF
+
+type
+  mdns_service* {.importc: "$1", header: hdr, bycopy, incompleteStruct.} = object
 
 ## *
 ##  @brief   mDNS enum to specify the ip_protocol type
@@ -105,6 +108,7 @@ type
 ##
 
 proc mdns_init*(): esp_err_t {.importc: "mdns_init", header: hdr.}
+
 ## *
 ##  @brief  Stop and free mDNS server
 ##
@@ -156,144 +160,165 @@ proc mdns_instance_name_set*(instance_name: cstring): esp_err_t {.
 ##      - ESP_FAIL failed to add serivce
 ##
 
-proc mdns_service_add*(instance_name: cstring; service_type: cstring; proto: cstring;
-                      port: uint16; txt: ptr mdns_txt_item_t; num_items: csize_t): esp_err_t {.
-    importc: "mdns_service_add", header: hdr.}
-## *
-##  @brief  Remove service from mDNS server
-##
-##  @param  service_type service type (_http, _ftp, etc)
-##  @param  proto        service protocol (_tcp, _udp)
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+when defined(ESP_V4):
+    proc mdns_service_add*(instance_name: cstring; service_type: cstring; proto: cstring;
+                        port: uint16; txt: ptr mdns_txt_item_t; num_items: csize_t): esp_err_t {.
+        importc: "mdns_service_add", header: hdr.}
 
-proc mdns_service_remove*(service_type: cstring; proto: cstring): esp_err_t {.
-    importc: "mdns_service_remove", header: hdr.}
-## *
-##  @brief  Set instance name for service
-##
-##  @param  service_type     service type (_http, _ftp, etc)
-##  @param  proto            service protocol (_tcp, _udp)
-##  @param  instance_name    instance name to set
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+    ## *
+    ##  @brief  Remove service from mDNS server
+    ##
+    ##  @param  service_type service type (_http, _ftp, etc)
+    ##  @param  proto        service protocol (_tcp, _udp)
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
 
-proc mdns_service_instance_name_set*(service_type: cstring; proto: cstring;
-                                    instance_name: cstring): esp_err_t {.
-    importc: "mdns_service_instance_name_set", header: hdr.}
-## *
-##  @brief  Set service port
-##
-##  @param  service_type service type (_http, _ftp, etc)
-##  @param  proto        service protocol (_tcp, _udp)
-##  @param  port         service port
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+    proc mdns_service_remove*(service_type: cstring; proto: cstring): esp_err_t {.
+        importc: "mdns_service_remove", header: hdr.}
 
-proc mdns_service_port_set*(service_type: cstring; proto: cstring; port: uint16): esp_err_t {.
-    importc: "mdns_service_port_set", header: hdr.}
-## *
-##  @brief  Replace all TXT items for service
-##
-##  @param  service_type service type (_http, _ftp, etc)
-##  @param  proto        service protocol (_tcp, _udp)
-##  @param  txt          array of TXT data (eg. {{"var","val"},{"other","2"}})
-##  @param  num_items    number of items in TXT data
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+    ## *
+    ##  @brief  Set instance name for service
+    ##
+    ##  @param  service_type     service type (_http, _ftp, etc)
+    ##  @param  proto            service protocol (_tcp, _udp)
+    ##  @param  instance_name    instance name to set
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
 
-proc mdns_service_txt_set*(service_type: cstring; proto: cstring;
-                          txt: ptr mdns_txt_item_t; num_items: uint8): esp_err_t {.
-    importc: "mdns_service_txt_set", header: hdr.}
-## *
-##  @brief  Set/Add TXT item for service TXT record
-##
-##  @param  service_type service type (_http, _ftp, etc)
-##  @param  proto        service protocol (_tcp, _udp)
-##  @param  key          the key that you want to add/update
-##  @param  value        the new value of the key
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+    proc mdns_service_instance_name_set*(service_type: cstring; proto: cstring;
+                                        instance_name: cstring): esp_err_t {.
+        importc: "mdns_service_instance_name_set", header: hdr.}
+    ## *
+    ##  @brief  Set service port
+    ##
+    ##  @param  service_type service type (_http, _ftp, etc)
+    ##  @param  proto        service protocol (_tcp, _udp)
+    ##  @param  port         service port
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
 
-proc mdns_service_txt_item_set*(service_type: cstring; proto: cstring; key: cstring;
-                               value: cstring): esp_err_t {.
-    importc: "mdns_service_txt_item_set", header: hdr.}
-## *
-##  @brief  Remove TXT item for service TXT record
-##
-##  @param  service_type service type (_http, _ftp, etc)
-##  @param  proto        service protocol (_tcp, _udp)
-##  @param  key          the key that you want to remove
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##      - ESP_ERR_NOT_FOUND Service not found
-##      - ESP_ERR_NO_MEM memory error
-##
+    proc mdns_service_port_set*(service_type: cstring; proto: cstring; port: uint16): esp_err_t {.
+        importc: "mdns_service_port_set", header: hdr.}
+    ## *
+    ##  @brief  Replace all TXT items for service
+    ##
+    ##  @param  service_type service type (_http, _ftp, etc)
+    ##  @param  proto        service protocol (_tcp, _udp)
+    ##  @param  txt          array of TXT data (eg. {{"var","val"},{"other","2"}})
+    ##  @param  num_items    number of items in TXT data
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
 
-proc mdns_service_txt_item_remove*(service_type: cstring; proto: cstring;
-                                  key: cstring): esp_err_t {.
-    importc: "mdns_service_txt_item_remove", header: hdr.}
-## *
-##  @brief  Remove and free all services from mDNS server
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_ARG Parameter error
-##
+    proc mdns_service_txt_set*(service_type: cstring; proto: cstring;
+                            txt: ptr mdns_txt_item_t; num_items: uint8): esp_err_t {.
+        importc: "mdns_service_txt_set", header: hdr.}
 
-proc mdns_service_remove_all*(): esp_err_t {.importc: "mdns_service_remove_all",
-    header: hdr.}
-## *
-##  @brief  Query mDNS for host or service
-##          All following query methods are derived from this one
-##
-##  @param  name         service instance or host name (NULL for PTR queries)
-##  @param  service_type service type (_http, _arduino, _ftp etc.) (NULL for host queries)
-##  @param  proto        service protocol (_tcp, _udp, etc.) (NULL for host queries)
-##  @param  type         type of query (MDNS_TYPE_*)
-##  @param  timeout      time in milliseconds to wait for answers.
-##  @param  max_results  maximum results to be collected
-##  @param  results      pointer to the results of the query
-##                       results must be freed using mdns_query_results_free below
-##
-##  @return
-##      - ESP_OK success
-##      - ESP_ERR_INVALID_STATE  mDNS is not running
-##      - ESP_ERR_NO_MEM         memory error
-##      - ESP_ERR_INVALID_ARG    timeout was not given
-##
+    ## *
+    ##  @brief  Set/Add TXT item for service TXT record
+    ##
+    ##  @param  service_type service type (_http, _ftp, etc)
+    ##  @param  proto        service protocol (_tcp, _udp)
+    ##  @param  key          the key that you want to add/update
+    ##  @param  value        the new value of the key
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
+
+    proc mdns_service_txt_item_set*(service_type: cstring; proto: cstring; key: cstring;
+                                value: cstring): esp_err_t {.
+        importc: "mdns_service_txt_item_set", header: hdr.}
+    ## *
+    ##  @brief  Remove TXT item for service TXT record
+    ##
+    ##  @param  service_type service type (_http, _ftp, etc)
+    ##  @param  proto        service protocol (_tcp, _udp)
+    ##  @param  key          the key that you want to remove
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##      - ESP_ERR_NOT_FOUND Service not found
+    ##      - ESP_ERR_NO_MEM memory error
+    ##
+
+    proc mdns_service_txt_item_remove*(service_type: cstring; proto: cstring;
+                                    key: cstring): esp_err_t {.
+        importc: "mdns_service_txt_item_remove", header: hdr.}
+    ## *
+    ##  @brief  Remove and free all services from mDNS server
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_ARG Parameter error
+    ##
+
+    proc mdns_service_remove_all*(): esp_err_t {.importc: "mdns_service_remove_all",
+        header: hdr.}
+
+
+else:
+    type
+        # typedef void (*service_get_txt_fn_t)(struct mdns_service *service, void *txt_userdata);
+        service_get_txt_fn_t* = proc(service: ptr mdns_service, txt_userdata: pointer)
+
+        mdns_sd_proto* {.size: sizeof(cint).} = enum
+            DNSSD_PROTO_UDP = 0,
+            DNSSD_PROTO_TCP = 1
+    # err_t mdns_resp_add_service_txtitem(struct mdns_service *service, const char *txt, u8_t txt_len);
+    proc mdns_resp_add_service_txtitem*(service: ptr mdns_service, txt: cstring, txt_len: uint8): esp_err_t {.importc: "$1", header: hdr.}
+    # s8_t  mdns_resp_add_service(struct netif *netif, const char *name, const char *service, enum mdns_sd_proto proto, u16_t port, u32_t dns_ttl, service_get_txt_fn_t txt_fn, void *txt_userdata);
+    proc mdns_resp_add_service*(netif: ptr esp_netif_t, name: cstring, service: cstring, proto: mdns_sd_proto, port: uint16, dns_ttl: uint32, txt_fn: service_get_txt_fn_t, txt_userdata: pointer) {.importc: "$1", header: hdr.}
+
 
 proc mdns_query*(name: cstring; service_type: cstring; proto: cstring;
                 `type`: uint16; timeout: uint32; max_results: csize_t;
                 results: ptr ptr mdns_result_t): esp_err_t {.importc: "mdns_query",
     header: hdr.}
+    ## *
+    ##  @brief  Query mDNS for host or service
+    ##          All following query methods are derived from this one
+    ##
+    ##  @param  name         service instance or host name (NULL for PTR queries)
+    ##  @param  service_type service type (_http, _arduino, _ftp etc.) (NULL for host queries)
+    ##  @param  proto        service protocol (_tcp, _udp, etc.) (NULL for host queries)
+    ##  @param  type         type of query (MDNS_TYPE_*)
+    ##  @param  timeout      time in milliseconds to wait for answers.
+    ##  @param  max_results  maximum results to be collected
+    ##  @param  results      pointer to the results of the query
+    ##                       results must be freed using mdns_query_results_free below
+    ##
+    ##  @return
+    ##      - ESP_OK success
+    ##      - ESP_ERR_INVALID_STATE  mDNS is not running
+    ##      - ESP_ERR_NO_MEM         memory error
+    ##      - ESP_ERR_INVALID_ARG    timeout was not given
+    ##
+
+
 ## *
 ##  @brief  Free query results
 ##
