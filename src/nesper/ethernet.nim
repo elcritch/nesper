@@ -66,13 +66,13 @@ proc initEthernetConfig*(): EthernetConfig =
 #   new(result)
 #   result.config = initEthernetConfig()
 
-proc setupEthernet*(eth: var EthConfigIP101): EthernetObj = 
-  result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
-  result.phy = esp_eth_phy_new_ip101(addr eth.config.phy)
+# proc setupEthernet*(eth: var EthConfigIP101): EthernetObj = 
+#   result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
+#   result.phy = esp_eth_phy_new_ip101(addr eth.config.phy)
 
-proc setupEthernet*(eth: var EthConfigRTL8201): EthernetObj = 
-  result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
-  result.phy = esp_eth_phy_new_rtl8201(addr eth.config.phy)
+# proc setupEthernet*(eth: var EthConfigRTL8201): EthernetObj = 
+#   result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
+#   result.phy = esp_eth_phy_new_rtl8201(addr eth.config.phy)
 
 proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj = 
   check: gpio_install_isr_service(0.esp_intr_flags)

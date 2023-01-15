@@ -227,9 +227,6 @@ else:
 ##  @return
 ##       - instance: create MAC instance successfully
 ##       - NULL: create MAC instance failed because some error occurred
-proc esp_eth_mac_new_esp32*(config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
-    importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
-
 
 when not defined(ESP_IDF_V4_0):
   type
@@ -237,7 +234,22 @@ when not defined(ESP_IDF_V4_0):
       smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
       smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
 
-  proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
+  # proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
+
+  # proc ETH_ESP32_EMAC_DEFAULT_CONFIG(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
+  proc eth_esp32_emac_default_config*(): eth_esp32_emac_config_t =
+    {.emit: """
+    eth_esp32_emac_config_t res = ETH_ESP32_EMAC_DEFAULT_CONFIG();
+    """.}
+    {.emit: ["", result, " = res;"].}
+
+when defined(ESP_IDF_V4_0):
+  proc esp_eth_mac_new_esp32*(config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
+      importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
+else:
+  proc esp_eth_mac_new_esp32*(esp32_config: ptr eth_esp32_emac_config_t, config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
+      importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
+
 
 ##  @brief DM9051 specific configuration
 type
