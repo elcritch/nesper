@@ -31,8 +31,6 @@ type
     MDNS_TYPE_NSEC = 0x0000002F
     MDNS_TYPE_ANY = 0x000000FF
 
-type
-  mdns_service* {.importc: "struct $1", header: hdr, bycopy, incompleteStruct.} = object
 
 ## *
 ##  @brief   mDNS enum to specify the ip_protocol type
@@ -281,7 +279,12 @@ when defined(ESP_V4):
 
 
 else:
+    # proc service_get_txt_fn*(service: ptr mdns_service, txt_userdata: pointer) {.cdecl, importc: "$1", header: hdr.}
+
     type
+        # mdns_service* {.importc: "$1", header: hdr, bycopy, incompleteStruct.} = object
+        mdns_service* {.exportc, incompleteStruct, bycopy.} = object
+
         # typedef void (*service_get_txt_fn_t)(struct mdns_service *service, void *txt_userdata);
         service_get_txt_fn_t* = proc(service: ptr mdns_service, txt_userdata: pointer) {.cdecl.}
 
@@ -289,7 +292,6 @@ else:
             DNSSD_PROTO_UDP = 0,
             DNSSD_PROTO_TCP = 1
         
-        # mdns_service* {.importc: "$1", header: hdr, bycopy, incompleteStruct.} = object
     
     # err_t mdns_resp_add_service_txtitem(struct mdns_service *service, const char *txt, u8_t txt_len);
     proc mdns_resp_add_service_txtitem*(service: ptr mdns_service, txt: cstring, txt_len: uint8): esp_err_t {.importc: "$1", header: hdr.}
