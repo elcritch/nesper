@@ -17,8 +17,8 @@ import ../esp/esp_event_legacy
 
 import ../esp/net/esp_netif
 
-const hdr = "<mdns.h>"
-# const hdr = hdr
+# const hdr = "mdns.h"
+const hdr = "lwip/apps/mdns.h"
 
 type
   mdns_type* = enum
@@ -32,7 +32,7 @@ type
     MDNS_TYPE_ANY = 0x000000FF
 
 type
-  mdns_service* {.importc: "$1", header: hdr, bycopy, incompleteStruct.} = object
+  mdns_service* {.importc: "struct $1", header: hdr, bycopy, incompleteStruct.} = object
 
 ## *
 ##  @brief   mDNS enum to specify the ip_protocol type
@@ -283,11 +283,14 @@ when defined(ESP_V4):
 else:
     type
         # typedef void (*service_get_txt_fn_t)(struct mdns_service *service, void *txt_userdata);
-        service_get_txt_fn_t* = proc(service: ptr mdns_service, txt_userdata: pointer)
+        service_get_txt_fn_t* = proc(service: ptr mdns_service, txt_userdata: pointer) {.cdecl.}
 
         mdns_sd_proto* {.size: sizeof(cint).} = enum
             DNSSD_PROTO_UDP = 0,
             DNSSD_PROTO_TCP = 1
+        
+        # mdns_service* {.importc: "$1", header: hdr, bycopy, incompleteStruct.} = object
+    
     # err_t mdns_resp_add_service_txtitem(struct mdns_service *service, const char *txt, u8_t txt_len);
     proc mdns_resp_add_service_txtitem*(service: ptr mdns_service, txt: cstring, txt_len: uint8): esp_err_t {.importc: "$1", header: hdr.}
     # s8_t  mdns_resp_add_service(struct netif *netif, const char *name, const char *service, enum mdns_sd_proto proto, u16_t port, u32_t dns_ttl, service_get_txt_fn_t txt_fn, void *txt_userdata);
