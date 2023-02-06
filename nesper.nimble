@@ -23,26 +23,29 @@ import os, strutils
 proc general_tests() =
   # Regular tests
   for dtest in listFiles("tests/"):
-    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+    if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
       echo("Testing: " & $dtest)
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
 proc driver_tests() =
   # Driver tests
   for dtest in listFiles("tests/driver/"):
-    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+    if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
+      echo("Testing: " & $dtest)
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
 proc storage_tests() =
   # Driver tests
   for dtest in listFiles("tests/storage/"):
-    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+    if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
+      echo("Testing: " & $dtest)
       exec "nim c --compileOnly:on --cincludes:c_headers/mock/ --os:freertos $1" % [dtest]
 
 proc exec_tests() =
   # Exec tests
   for dtest in listFiles("tests/exec_tests/"):
-    if dtest.startsWith("t") and dtest.endsWith(".nim"):
+    if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
+      echo("Testing: " & $dtest)
       exec "nim c -r --cincludes:$2/tests/c_headers/mock/ $1" % [dtest, getCurrentDir()]
 
 task test, "Runs the test suite":

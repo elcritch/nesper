@@ -39,7 +39,7 @@ proc handleReads(selected: ReadyKey, srv: ServerInfo) =
       var client: Socket
       discard srv.clients.pop(sourceClient.getFd(), client)
       srv.select.unregister(sourceClient.getFd())
-      stdout.writeLine("Server: client disconnected: " & $(sourceClient.getFd().getSockName()))
+      stdout.writeLine("Server: client disconnected: " & $(sourceClient.getLocalAddr()[0]))
 
     else:
       stdout.writeLine("Server: received from client: ", message)
