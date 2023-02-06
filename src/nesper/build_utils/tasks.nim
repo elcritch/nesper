@@ -227,7 +227,7 @@ task esp_compile, "Compile Nim project for esp-idf program":
       "--compileOnly",
       "--nimcache:" & nopts.cachedir.quoteShell(),
       "-d:NimAppMain",
-      "-d:" & nopts.esp_idf_version
+      # "-d:" & nopts.esp_idf_version
     ].join(" ") 
     childargs = nopts.child_args.mapIt(it.quoteShell()).join(" ")
     wifidefs = nopts.wifi_args
