@@ -16,6 +16,9 @@ import ../../consts
 import esp_netif_ip_addr
 import esp_netif_types
 
+export esp_netif_ip_addr
+export esp_netif_types
+
 ##
 ##  Note: tcpip_adapter legacy API has to be included by default to provide full compatibility
 ##   for applications that used tcpip_adapter API without explicit inclusion of tcpip_adapter.h
