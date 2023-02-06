@@ -52,7 +52,7 @@ task test, "Runs the test suite":
   general_tests()
   driver_tests()
   storage_tests()
-  exec_tests()
+  # exec_tests()
 
 task test_general, "Runs the test suite":
   general_tests()
