@@ -1,0 +1,57 @@
+name: Build Firmware
+
+on:
+  push:
+    branches: 
+      - "devel-*"
+      - "release-*"
+      - "container-*"
+  pull_request:
+    branches: [ "*" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/lucentwater/esp32_sensor_router:container-debian11-nim1.6.11
+
+    steps:
+
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Install Nesper Devel
+      run: nimble install -y nesper@\#devel
+
+    - name: Install Nimble
+      run: nimble install -d -y
+
+    - name: Build
+      # Build your program with the given configuration
+      run: |
+        . $IDF_PATH/export.sh
+        nimble esp_build --esp-idf-version=v5.0
+
+    - name: Set Tag
+      run: |
+        RTAG=$(cat .git/HEAD | tr '/' ' ' | cut -d ' ' -f 4)
+        echo "RTAG=$RTAG" >> $GITHUB_ENV
+        echo "ENV:"
+        cat $GITHUB_ENV
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.RTAG }}
+        files: |
+          build/esp32_sensor_router.bin
+          build/esp32_sensor_router.elf
+          build/esp32_sensor_router.map
+          build/flash_app_args
+          build/flasher_args.json
