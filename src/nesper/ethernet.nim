@@ -20,9 +20,9 @@ when defined(ESP_IDF_V4_0):
   export tcpip_adapter
 else:
   import nesper/esp/net/esp_netif_types
-  import nesper/esp/net/esp_netif_impl
+  import nesper/esp/net/esp_netif
   export esp_netif_types
-  export esp_netif_impl
+  export esp_netif
 
 type
   # EthernetConfigType* = concept x

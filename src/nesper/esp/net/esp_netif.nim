@@ -29,8 +29,11 @@ else:
   import esp_netif_types
   import esp_eth_netif_glue
 
-  include esp_netif_impl
-  include esp_netif_defaults
+  import esp_netif_impl
+  import esp_netif_defaults
+
+  export esp_netif_impl
+  export esp_netif_defaults
 
   export esp_wifi_types
   export esp_netif_ip_addr

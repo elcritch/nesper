@@ -11,6 +11,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
+import esp_netif_types
+
 const netif_def_headers = """#include "esp_netif.h" 
                              #include "esp_netif_defaults.h" """
 
