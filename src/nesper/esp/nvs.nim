@@ -581,7 +581,7 @@ proc nvs_get_used_entry_count*(handle: nvs_handle_t; used_entries: ptr csize_t):
 ##           using nvs_release_iterator when not used any more.
 ##
 
-when defined(ESP_IDF_V4_0):
+when ESP_IDF_MAJOR == 4:
     proc nvs_entry_find*(part_name: cstring; namespace_name: cstring; `type`: nvs_type_t): nvs_iterator_t {.
         cdecl, importc: "nvs_entry_find", header: "nvs.h".}
 else:

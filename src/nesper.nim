@@ -2,6 +2,8 @@
 # exports the main API in this file. Note that you cannot rename this file
 # but you can remove it if you wish.
 
+import strutils
+
 import nesper/consts
 import nesper/general
 import nesper/esp/esp_log

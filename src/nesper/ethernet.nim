@@ -67,7 +67,7 @@ when not defined(ESP_IDF_V4_0):
 
 proc initEthernetConfig*(): EthernetConfig =
   new(result)
-  result.mac = ETH_MAC_DEFAULT_CONFIG()
+  result.mac = ethMacDefaultConfig()
   result.phy = ETH_PHY_DEFAULT_CONFIG()
 
 # proc initEthernet*[T](): T =

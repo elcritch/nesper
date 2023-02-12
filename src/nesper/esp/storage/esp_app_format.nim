@@ -11,7 +11,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-# import ../../consts
+import ../../consts
 ## *
 ##  @brief ESP chip ID
 ##
@@ -108,10 +108,12 @@ const
 ##  @brief Description about application.
 ##
 
-when defined(ESP_IDF_V4_0):
+when ESP_IDF_MAJOR == 4:
   const hdr = "esp_app_format.h"
-else:
+elif ESP_IDF_MAJOR == 5:
   const hdr = "esp_app_desc.h"
+else:
+  {.error: "unhandled ESP_IDF_MAJOR version".}
 
 type
   esp_app_desc_t* {.importc: "esp_app_desc_t", header: hdr, bycopy.} = object

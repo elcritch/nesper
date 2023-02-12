@@ -6,8 +6,14 @@ type
   esp_intr_flags* = distinct uint32
 
 
-##  Definitions for error constants.
+import strutils
+const
+  ESP_IDF_VERSION* {.strdefine.} = "4.4"
+  ESP_IDF_MAJOR* {.intdefine.} = ESP_IDF_VERSION.split(".")[0].parseInt()
+  ESP_IDF_MINOR* {.intdefine.} = ESP_IDF_VERSION.split(".")[1].parseInt()
 
+
+##  Definitions for error constants.
 const
   ESP_OK* = 0
   ESP_FAIL* = -1

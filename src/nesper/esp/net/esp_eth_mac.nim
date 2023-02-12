@@ -171,64 +171,24 @@ type
 
 ##  @brief Configuration of Ethernet MAC object
 type
-  eth_mac_config_t* {.importc: "eth_mac_config_t", header: "esp_eth_mac.h", bycopy, incompleteStruct.} = object
+  eth_mac_config_t* {.importc: "eth_mac_config_t", header: "esp_eth_mac.h", bycopy.} = object
     sw_reset_timeout_ms* {.importc: "sw_reset_timeout_ms".}: uint32 ## !< Software reset timeout value (Unit: ms)
     rx_task_stack_size* {.importc: "rx_task_stack_size".}: uint32 ## !< Stack size of the receive task
     rx_task_prio* {.importc: "rx_task_prio".}: uint32 ## !< Priority of the receive task
     flags* {.importc: "flags".}: uint32 ## !< Flags that specify extra capability for mac driver
-    when defined(ESP_IDF_V4_0):
+    when ESP_IDF_MAJOR == 4:
       smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
       smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
 
-when defined(ESP_IDF_V4_0):
-  proc ETH_MAC_DEFAULT_CONFIG*(
-            sw_reset_timeout_ms = 100,
-            rx_task_stack_size = 4096,
-            rx_task_prio = 15,
-            smi_mdc_gpio_num = 23,
-            smi_mdio_gpio_num = 18,
-            flags: uint32 = 0
-          ): eth_mac_config_t {.inline.} =
-    
-    return eth_mac_config_t(
-              sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
-              rx_task_stack_size: rx_task_stack_size.uint32(), 
-              rx_task_prio: rx_task_prio.uint32(),         
-              smi_mdc_gpio_num: smi_mdc_gpio_num.cint(),     
-              smi_mdio_gpio_num: smi_mdio_gpio_num.cint(),    
-              flags: flags)
+# proc ETH_MAC_DEFAULT_CONFIG*(): eth_mac_config_t {.importc: "ETH_MAC_DEFAULT_CONFIG", header: "esp_eth_mac.h".}
 
-else:
-  proc ETH_MAC_DEFAULT_CONFIG*(
-            sw_reset_timeout_ms = 100,
-            rx_task_stack_size = 4096,
-            rx_task_prio = 15,
-            flags: uint32 = 0
-          ): eth_mac_config_t {.inline.} =
-    
-    return eth_mac_config_t(
-              sw_reset_timeout_ms: sw_reset_timeout_ms.uint32(), 
-              rx_task_stack_size: rx_task_stack_size.uint32(), 
-              rx_task_prio: rx_task_prio.uint32(),         
-              flags: flags)
+proc ethMacDefaultConfig*(): eth_mac_config_t =
+  {.emit: """
+  eth_mac_config_t cfg = ETH_MAC_DEFAULT_CONFIG();
+  result = cfg;
+  """.}
 
-##  @brief Default configuration for Ethernet MAC object
-##  #define ETH_MAC_DEFAULT_CONFIG()    \
-##      {                               \
-##          .sw_reset_timeout_ms = 100, \
-##          .rx_task_stack_size = 4096, \
-##          .rx_task_prio = 15,         \
-##          .smi_mdc_gpio_num = 23,     \
-##          .smi_mdio_gpio_num = 18,    \
-##          .flags = 0,                 \
-##      }
-##  @brief Create ESP32 Ethernet MAC instance
-##  @param config: Ethernet MAC configuration
-##  @return
-##       - instance: create MAC instance successfully
-##       - NULL: create MAC instance failed because some error occurred
-
-when not defined(ESP_IDF_V4_0):
+when ESP_IDF_MAJOR == 5:
   type
     eth_esp32_emac_config_t* {.importc: "eth_esp32_emac_config_t", header: "esp_eth_mac.h", bycopy, incompleteStruct.} = object
       smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
@@ -236,17 +196,12 @@ when not defined(ESP_IDF_V4_0):
 
   # proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
 
-  # proc ETH_ESP32_EMAC_DEFAULT_CONFIG(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
-  proc eth_esp32_emac_default_config*(): eth_esp32_emac_config_t =
-    {.emit: """
-    eth_esp32_emac_config_t res = ETH_ESP32_EMAC_DEFAULT_CONFIG();
-    """.}
-    {.emit: ["", result, " = res;"].}
+  proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "esp_eth_mac.h".}
 
-when defined(ESP_IDF_V4_0):
+when ESP_IDF_MAJOR == 4:
   proc esp_eth_mac_new_esp32*(config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
       importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
-else:
+elif ESP_IDF_MAJOR == 5:
   proc esp_eth_mac_new_esp32*(esp32_config: ptr eth_esp32_emac_config_t, config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
       importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
 
