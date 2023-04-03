@@ -19,7 +19,7 @@ proc input*(pin: Pin)= discard pin.gpio.gpio_set_direction GPIO_MODE_INPUT
   ##Sets the pin to input mode 
 
 
-proc output*(pin: Pin,openDrain=false): EspError = 
+proc output*(pin: Pin,openDrain=false) = 
   ##Sets the pin to output mode 
   let mode = if openDrain: GPIO_MODE_INPUT_OUTPUT_OD else: GPIO_MODE_INPUT_OUTPUT
   discard pin.gpio.gpio_set_direction mode
