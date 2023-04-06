@@ -1,5 +1,6 @@
-import gpio
+import pin
 import times
+import os
 type ButtonState* = enum
   ##The states a button can be in
   Press,
@@ -13,7 +14,8 @@ type Button* = object
   pressedTime*: Time
   pressLeeway*: int64
   down*: bool
-  held*: bool
+  transitioned*: bool
+
   pin*: Pin
 
 proc isDown*(btnState: ButtonState): bool{.inline.} = btnState == Hold or btnState == Press
@@ -35,24 +37,40 @@ proc getButtonState*(button: var Button): ButtonState =
   let down =
     if button.highIsDown: button.pin.isHigh()
     else: button.pin.isLow()
-
   if down:
+    #We know this must be the first press
+    if not button.down:
+      button.pressedTime=getTime()
+      button.transitioned = false
+      button.down=true
+      return Press
+    #if the button is still held, no change
+    if button.transitioned: return Hold
     
-    if button.held: return Hold
-
     let newMillis = getTime()
     
-    result =
-      if button.down and (newMillis-button.pressedTime).inMilliseconds() > button.pressLeeway:
-        button.held = true
-        Hold
-      else:
-        Press
+    if button.down and (newMillis-button.pressedTime).inMilliseconds() > button.pressLeeway:
+      button.transitioned = true
+      return Hold
+    else:
+      return Press
 
-    button.down = true
 
   else:
-    result = if button.down: Release else: Up
-    button.held = false
-    button.down = false
+    #TODO: do leeway checking for release just like press
+    if button.down:
+      button.pressedTime=getTime()
+      button.transitioned = false
+      button.down=false
+      return Release 
+    #if the button is transitioned
+    if button.transitioned: return Up
+    
+    let newMillis = getTime()
+    
+    if (newMillis-button.pressedTime).inMilliseconds() > button.pressLeeway:
+      button.transitioned = true
+      return Up
+    else:
+      return Release 
 
