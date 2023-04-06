@@ -12,6 +12,7 @@ export esp_log
 
 # nimmy wrapper
 import nesper/nimy/errors
+import nesper/nimy/button
 
 export errors
 
