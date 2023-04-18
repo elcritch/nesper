@@ -1,0 +1,15 @@
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Start docker
+      run: docker run -itd -e IDF_TARGET=esp32 -v "${GITHUB_WORKSPACE}:/nesper" --name container espressif/idf:v4.4
+    - name: Install nim
+      run: docker exec container bash -c "curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y"
+    - name: Install nesper
+      run: docker exec container bash -c 'cd /nesper && PATH=/root/.nimble/bin:$PATH nimble install -y'
+    - name: I2S example
+      run: docker exec -w /nesper/esp-idf-examples/i2s container bash -c '. /opt/esp/idf/export.sh && PATH=/root/.nimble/bin:$PATH nimble esp_build'
