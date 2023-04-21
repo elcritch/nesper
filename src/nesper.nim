@@ -10,6 +10,12 @@ export consts
 export general
 export esp_log
 
+# nimmy wrapper
+import nesper/nimy/errors
+import nesper/nimy/button
+
+export errors
+
 #{.emit: """/*TYPESECTION*/
 ##include <freertos/FreeRTOS.h>
 #""".}
