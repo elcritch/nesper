@@ -1,7 +1,6 @@
 ###
 # ESP32 specific io_mux_reg.h port
 ##
-arsoienieonrstg
 
 const hdr = "soc/io_mux_reg.h"
 
