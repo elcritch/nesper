@@ -1,0 +1,26 @@
+{
+	"name": "esp-idf",
+	"image": "ghcr.io/embeddednim/esp-idf:4.4-latest",
+	"remoteUser": "root",
+	"postCreateCommand": "git config --global --add safe.directory '*' && sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --skip-chsh\" ",
+	// "postStartCommand": "",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"nimsaem.nimvscode",
+				"twxs.cmake",
+				"ms-vscode.cpptools"
+			]
+		},
+		"settings": {
+			"terminal.integrated.profiles.linux": {
+				"zsh login": {
+					"path": "/bin/zsh",
+					"args": ["-l"],
+					"icon": "terminal-bash"
+				}
+			},
+			"terminal.integrated.defaultProfile.linux": "zsh login"
+		}
+	}
+}

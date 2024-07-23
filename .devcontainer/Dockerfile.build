@@ -1,0 +1,14 @@
+ARG IDF_VERSION=4.4
+ARG IMAGE=ghcr.io/embeddednim/esp-idf:${IDF_VERSION}-latest
+
+FROM $IMAGE AS build
+
+ARG IDF_VERSION=4.4
+
+COPY . /app/
+
+WORKDIR /app/
+RUN nimble develop -y
+
+RUN : \
+  && nimble test
