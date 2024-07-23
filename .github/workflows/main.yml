@@ -1,57 +1,61 @@
+
 name: Build Firmware
 
 on:
   push:
     branches: 
-      - "devel-*"
-      - "release-*"
-      - "container-*"
-  pull_request:
-    branches: [ "*" ]
+      - "*"
+    tags:
+      - "v*"
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  REPO: ghcr.io/elcritch/nesper
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    container:
-      image: ghcr.io/lucentwater/esp32_sensor_router:container-debian11-nim1.6.11
+  build: !test
+    runs-on: ubuntu-22.04
 
     steps:
 
+    - name: Env
+      run: env
+    
     - uses: actions/checkout@v3
       with:
         submodules: recursive
     
-    - name: Install Nesper Devel
-      run: nimble install -y nesper@\#devel
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install Nimble
-      run: nimble install -d -y
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-    - name: Build
-      # Build your program with the given configuration
-      run: |
-        . $IDF_PATH/export.sh
-        nimble esp_build --esp-idf-version=v5.0
-
+    # Extract metadata (tags, labels) for Docker
     - name: Set Tag
       run: |
+        VERSION=$(cat esp32_sensor_router.nimble | grep version | awk '{print $3}' | tr -d '"')
+        DATE=$(date --iso-8601)
         RTAG=$(cat .git/HEAD | tr '/' ' ' | cut -d ' ' -f 4)
-        echo "RTAG=$RTAG" >> $GITHUB_ENV
-        echo "ENV:"
-        cat $GITHUB_ENV
 
-    - name: Release
-      uses: softprops/action-gh-release@v1
+        ITAG=$REPO:$RTAG-$DATE
+        ITAG=$ITAG,$REPO:version-$VERSION
+        ITAG=$ITAG,$REPO:ref-$GITHUB_SHA
+        echo "ITAG=$ITAG" >> $GITHUB_ENV
+
+    # Build and push Docker image with Buildx (don't push on PR)
+    # https://github.com/docker/build-push-action
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@v4
       with:
-        tag_name: ${{ env.RTAG }}
-        files: |
-          build/esp32_sensor_router.bin
-          build/esp32_sensor_router.elf
-          build/esp32_sensor_router.map
-          build/flash_app_args
-          build/flasher_args.json
+        context: .
+        file: .devcontainer/Dockerfile.build
+        push: false
+        platforms: linux/amd64
+        tags: ${{ env.ITAG }}
+        secrets: |
+          GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}

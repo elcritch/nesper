@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.6.1"
+version       = "0.7.0"
 author        = "Jaremy Creechley"
 description   = "Nim wrappers for ESP-IDF (ESP32)"
 license       = "Apache-2.0"
