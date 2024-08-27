@@ -72,7 +72,7 @@ proc toIpAddress*(address: uint32): IpAddress =
 proc toIpAddress*(address: array[4, uint32]): IpAddress =
   result = IpAddress(family: IpAddressFamily.IPv6)
   for i in 0..3:
-    for i in 0..3:
+    for j in 0..3:
       result.address_v6[i] = uint8(address[i] shr (i*8))
 
 when defined(ESP_IDF_V4_0):
