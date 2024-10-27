@@ -130,13 +130,13 @@ proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient
     for cfd, client in srv.clients:
       client.sendWrap(data & message & "\r\L")
 
-proc startSocketServer*[T](port: Port, readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: var T) =
+proc startSocketServer*[T](port: Port, address: string = "", readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: var T) =
   var server: Socket = newSocket()
   var select: Selector[T] = newSelector[T]()
 
   server.setSockOpt(OptReuseAddr, true)
   server.getFd().setBlocking(false)
-  server.bindAddr(port)
+  server.bindAddr(port, address=address)
   server.listen()
 
   logi TAG, "Server: started. Listening to new connections on port: %s", $port
