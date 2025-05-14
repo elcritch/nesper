@@ -76,7 +76,7 @@ task esp, "esp commands app":
       espBuildTask()
     of "monitor":
       espMonitorTask()
-    of "zipartifacts":
+    of "zip", "zipartifacts":
       espZipPackageTask()
     of "clean":
       espCleanTask()
