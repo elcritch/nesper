@@ -66,10 +66,15 @@ proc parseNimbleArgs(): NimbleArgs =
       quit(1)
 
   let
-    npathcmd = "nimble --silent path nesper"
-    (nesperPath, rcode) = system.gorgeEx(npathcmd)
-  if rcode != 0:
-    raise newException( ValueError, "error running getting Nesper path using: `%#`" % [npathcmd])
+    nesperPath =
+      if dirExists("deps"/"nesper"/"src"/"nesper"):
+        "deps"/"nesper"/"src"/"nesper"
+      else:
+        let npathcmd = "nimble --silent path nesper"
+        let (np, rcode) = system.gorgeEx(npathcmd)
+        if rcode != 0:
+          raise newException( ValueError, "error running getting Nesper path using: `%#`" % [npathcmd])
+        np
 
   # Try setting wifi password
   let wifi_ssid = getEnv("ESP_WIFI_SSID")
@@ -247,7 +252,12 @@ task esp_compile, "Compile Nim project for esp-idf program":
   cd(nopts.projdir)
   selfExec(compiler_cmd)
 
+  espInstallHeadersTask()
+
 task esp_build, "Build esp-idf project":
+  espCompileTask()
+  espInstallHeadersTask()
+
   echo "\n[Nesper ESP] Building ESP-IDF project:"
 
   if findExe("idf.py") == "":
@@ -260,9 +270,9 @@ task esp_build, "Build esp-idf project":
 
 ### Actions to ensure correct steps occur before/after certain tasks ###
 
-after esp_compile:
-  espInstallHeadersTask()
+# after esp_compile:
+#   espInstallHeadersTask()
 
-before esp_build:
-  espCompileTask()
-  espInstallHeadersTask()
+# before esp_build:
+#   espCompileTask()
+#   espInstallHeadersTask()
