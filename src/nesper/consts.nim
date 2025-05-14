@@ -41,6 +41,8 @@ static:
   if ESP_IDF_VERSION == ESP_IDF_VERSION_VAL(0, 0, 0):
     warning("ESP_IDF_VERSION: " & ESP_IDF_VER)
     error("Must set esp-idf version using `-d:ESP_IDF_VERSION=4.4` or using an environment variable `export ESP_IDF_VERSION=4.4`")
+  else:
+    warning("Using ESP_IDF_VERSION: " & ESP_IDF_VER)
   if ESP_IDF_MAJOR notin [4, 5]:
     error("Incorrect esp-idf major version: " & $ESP_IDF_MAJOR)
 
