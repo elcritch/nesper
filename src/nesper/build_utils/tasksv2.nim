@@ -84,6 +84,11 @@ task esp, "esp commands app":
     of "help":
       espHelpTask()
     of "flash":
+      if args.len == 2:
+        echo "Error running: ", args.join(" ")
+        echo "Error Message: must provide a usb port\n"
+        quit(1)
+
       let usb = args[2].quoteShell()
       assert usb != "", "must provide a usb port"
       echo "using usb: ", usb
