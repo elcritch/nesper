@@ -1,4 +1,4 @@
-import std/[os, strutils, strformat]
+import std/[os, strutils, strformat, json, sets]
 
 const CCompilerParams = [
   "idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)",
@@ -56,8 +56,21 @@ task espCheckSetup, "check esp app":
 
 
 task espCompile, "compile esp app":
-  exec "rm -Rf main/nimcache"
+  # exec "rm -Rf main/nimcache"
   exec "nim c main/main.nim"
+
+  var cfiles = initHashSet[string]()
+  let nimcacheJson = parseJson(readFile("main"/"nimcache"/"main.json"))
+  for comp in nimcacheJson["compile"]:
+    let cfile = comp[0].getStr()
+    let (dir, name, ext) = cfile.splitFile
+    cfiles.incl(name)
+
+  for file in listFiles("main/nimcache"):
+    let (dir, name, ext) = file.splitFile
+    if ext == ".c" and name notin cfiles:
+      rmFile(file)
+
   espInstallHeadersTask()
 
 task espBuild, "build esp app using idf.py":
@@ -141,6 +154,8 @@ task esp, "esp commands app":
       let cmd = &"idf.py -p {usb} flash"
       echo "executing: ", cmd
       exec cmd
+    of "compile", "c":
+      espBuildTask()
     of "build":
       espBuildTask()
     of "monitor":
