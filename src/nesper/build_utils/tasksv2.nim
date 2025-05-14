@@ -49,9 +49,6 @@ task espZipPackage, "package esp app":
   exec "zip -r build/artifacts.zip build/artifacts"
   echo "Done Copying files"
 
-task espMonitor, "monitor esp app":
-  exec "idf.py monitor"
-
 task espClean, "clean esp app":
   exec "rm -Rf main/nimcache"
   exec "rm -Rf build"
@@ -69,13 +66,16 @@ task esp, "esp commands app":
       let usb = args[2].quoteShell()
       assert usb != "", "must provide a usb port"
       echo "using usb: ", usb
-      let cmd = "idf.py -p " & usb & " flash"
+      let cmd = &"idf.py -p {usb} flash"
       echo "executing: ", cmd
       exec cmd
     of "build":
       espBuildTask()
     of "monitor":
-      espMonitorTask()
+      let usb = args[2].quoteShell()
+      assert usb != "", "must provide a usb port"
+      echo "using usb: ", usb
+      exec &"idf.py -p {usb} monitor"
     of "zip", "zipartifacts":
       espZipPackageTask()
     of "clean":
