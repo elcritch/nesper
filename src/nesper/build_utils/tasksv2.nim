@@ -1,4 +1,4 @@
-import std/[os, strutils]
+import std/[os, strutils, strformat]
 
 task espInstallHeaders, "install esp headers":
   let cachedir = "main"/"nimcache"
@@ -19,6 +19,35 @@ task espBuild, "build esp app using idf.py":
   espCompileTask()
   exec "idf.py build"
 
+task espZipPackage, "package esp app":
+  var projectName = ""
+  for file in listFiles("."):
+    let (dir, name, ext) = file.splitFile
+    if ext == ".nimble":
+      projectName = name
+      break
+  assert projectName != "", "project name not found!"
+
+  echo "Using project name: ", projectName
+
+  mkDir("build"/"artifacts")
+  mkDir("build"/"artifacts"/"bootloader")
+  mkDir("build"/"artifacts"/"partition_table")
+
+  cpFile("build" / "flasher_args.json", "build" / "artifacts" / "flasher_args.json")
+  cpFile("build" / &"{projectName}.bin", "build" / "artifacts" / &"{projectName}.bin")
+  cpFile("build" / &"{projectName}.map", "build" / "artifacts" / &"{projectName}.map")
+  cpFile("build" / &"{projectName}.elf", "build" / "artifacts" / &"{projectName}.elf")
+  if fileExists("build" / "ota_data_initial.bin"):
+    cpFile("build" / "ota_data_initial.bin", "build" / "artifacts" / "ota_data_initial.bin")
+  cpFile("build" / "bootloader" / "bootloader.bin", "build" / "artifacts" / "bootloader" / "bootloader.bin")
+  cpFile("build" / "bootloader" / "bootloader.elf", "build" / "artifacts" / "bootloader" / "bootloader.elf")
+  cpFile("build" / "bootloader" / "bootloader.map", "build" / "artifacts" / "bootloader" / "bootloader.map")
+  cpFile("build" / "partition_table" / "partition-table.bin", "build" / "artifacts" / "partition_table" / "partition-table.bin")
+
+  exec "zip -r build/artifacts.zip build/artifacts"
+  echo "Done Copying files"
+
 task espMonitor, "monitor esp app":
   exec "idf.py monitor"
 
@@ -32,18 +61,23 @@ task esp, "esp commands app":
 
   assert args[0] == "esp"
 
-  if args[1] == "flash":
-    let usb = args[2].quoteShell()
-    assert usb != "", "must provide a usb port"
-    echo "using usb: ", usb
-    let cmd = "idf.py -p " & usb & " flash"
-    echo "executing: ", cmd
-    exec cmd
-  elif args[1] == "build":
-    espBuildTask()
-  elif args[1] == "monitor":
-    espMonitorTask()
-  elif args[1] == "clean":
-    espCleanTask()
-  else:
-    echo "unknown esp-idf command: ", args[1]
+  let cmdArg = args[1].toLowerAscii()
+
+  case cmdArg:
+    of "flash":
+      let usb = args[2].quoteShell()
+      assert usb != "", "must provide a usb port"
+      echo "using usb: ", usb
+      let cmd = "idf.py -p " & usb & " flash"
+      echo "executing: ", cmd
+      exec cmd
+    of "build":
+      espBuildTask()
+    of "monitor":
+      espMonitorTask()
+    of "zipartifacts":
+      espZipPackageTask()
+    of "clean":
+      espCleanTask()
+    else:
+      echo "unknown esp-idf command: ", cmdArg
