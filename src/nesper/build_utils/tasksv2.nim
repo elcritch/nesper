@@ -19,10 +19,10 @@ task espInstallHeaders, "install esp headers":
   if not fileExists(cachedir / "nimbase.h"):
     let nimbasepath = selfExe().splitFile.dir.parentDir / "lib" / "nimbase.h"
 
-    echo("...copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
+    echo("... copying nimbase file into the Nim cache directory ($#)" % [cachedir/"nimbase.h"])
     cpFile(nimbasepath, cachedir / "nimbase.h")
   else:
-    echo("...nimbase.h already exists")
+    echo("... nimbase.h already exists")
 
 task espCheckSetup, "check esp app":
   if not fileExists("main/main.nim"):
@@ -71,6 +71,7 @@ task espCompile, "compile esp app":
     if ext == ".c" and name notin cfiles:
       rmFile(file)
 
+  echo "... Compiled Nim project"
   espInstallHeadersTask()
 
 task espBuild, "build esp app using idf.py":
