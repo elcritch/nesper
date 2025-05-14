@@ -55,13 +55,19 @@ task espClean, "clean esp app":
 
 task esp, "esp commands app":
   let args = commandLineParams()
-  echo "commandLineParams: ", commandLineParams()
-
   assert args[0] == "esp"
-
   let cmdArg = args[1].toLowerAscii()
 
   case cmdArg:
+    of "help":
+      echo "ESP NimScript Helper"
+      echo "Usage: nimble esp <command>"
+      echo "Commands:"
+      echo "  flash <usb> - flash the esp app to the given usb port"
+      echo "  build - build the esp app"
+      echo "  monitor <usb> - monitor the esp app on the given usb port"
+      echo "  zip - zip the esp app"
+      echo "  clean - clean the esp app"
     of "flash":
       let usb = args[2].quoteShell()
       assert usb != "", "must provide a usb port"
