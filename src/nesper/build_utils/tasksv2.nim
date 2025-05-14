@@ -85,8 +85,8 @@ task esp, "esp commands app":
       espHelpTask()
     of "flash":
       if args.len == 2:
-        echo "Error running: ", args.join(" ")
-        echo "Error Message: must provide a usb port\n"
+        echo "Warning: no usb port provided, listing possible usb ports"
+        espListUsbTask()
         quit(1)
 
       let usb = args[2].quoteShell()
