@@ -1,5 +1,19 @@
 import std/[os, strutils, strformat]
 
+const CCompilerParams = [
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-discarded-qualifiers APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-ignored-qualifiers APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=unused-label APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=parentheses APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=implicit-function-declaration APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=maybe-uninitialized APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=nonnull APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=address APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-but-set-variable APPEND)",
+  "idf_build_set_property(C_COMPILE_OPTIONS -Wno-maybe-uninitialized APPEND)"
+]
+
 task espInstallHeaders, "install esp headers":
   let cachedir = "main"/"nimcache"
   if not fileExists(cachedir / "nimbase.h"):
@@ -9,6 +23,37 @@ task espInstallHeaders, "install esp headers":
     cpFile(nimbasepath, cachedir / "nimbase.h")
   else:
     echo("...nimbase.h already exists")
+
+task espCheckSetup, "check esp app":
+  if not fileExists("main/main.nim"):
+    echo "Error: main/main.nim not found"
+    echo "       the recommended setup is to use `main/main.nim` as the entry point"
+  else:
+    echo "main/main.nim found"
+
+  if not fileExists("CMakeLists.txt"):
+    echo "Error: CMakeLists.txt not found"
+    echo "       a top level CMakeLists.txt is required to build the project"
+  else:
+    echo "CMakeLists.txt found"
+  
+  if not fileExists("main/CMakeLists.txt"):
+    echo "Error: main/CMakeLists.txt not found"
+    echo "       a main/CMakeLists.txt is required to build the project"
+  else:
+    echo "main/CMakeLists.txt found; checking contents..."
+    let  cmakelist = readFile("main/CMakeLists.txt")
+    var missingParams = false
+    for ccp in CCompilerParams:
+      if ccp notin cmakelist:
+        missingParams = true
+    
+    if missingParams:
+      echo "Warning: some recommended compiler options are not set in `main/CMakeLists.txt`"
+      echo "         this is recommended to build the project without warnings for Nim generated C code"
+      echo "         the following options are recommended:"
+      echo CCompilerParams.join("\n")
+
 
 task espCompile, "compile esp app":
   exec "rm -Rf main/nimcache"
