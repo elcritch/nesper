@@ -284,7 +284,7 @@ const
 ##  @brief The structure represents information about the chip
 ##
 type
-  esp_chip_info_t* {.importc: "struct esp_chip_info_t", header: "esp_system.h", bycopy.} = object
+  esp_chip_info_t* {.importc: "esp_chip_info_t", header: "esp_chip_info.h", bycopy.} = object
     model* {.importc: "model".}: esp_chip_model_t ## !< chip model, one of esp_chip_model_t
     features* {.importc: "features".}: uint32 ## !< bit mask of CHIP_FEATURE_x feature flags
     revision* {.importc: "revision".}: uint16 ## !< chip revision number (in format MXX; where M - wafer major version, XX - wafer minor version)
