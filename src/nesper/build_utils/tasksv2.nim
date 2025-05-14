@@ -130,6 +130,7 @@ task espHelp, "show help":
   echo "Usage: nimble esp <command>"
   echo "Commands:"
   echo "  flash <usb> - flash the esp app to the given usb port"
+  echo "  compile - compile the esp app"
   echo "  build - build the esp app"
   echo "  monitor <usb> - monitor the esp app on the given usb port"
   echo "  zip - zip the esp app"
