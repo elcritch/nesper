@@ -45,6 +45,7 @@ task espZipPackage, "package esp app":
   if fileExists("build" / "ota_data_initial.bin"):
     cpFile("build" / "ota_data_initial.bin", "build" / "artifacts" / "ota_data_initial.bin")
 
+  exec "rm -Rf build/artifacts.zip"
   exec "zip -r build/artifacts.zip build/artifacts"
   echo "Done Copying files"
 
