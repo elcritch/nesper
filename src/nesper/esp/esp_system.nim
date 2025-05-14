@@ -256,8 +256,19 @@ proc esp_derive_local_mac*(local_mac: ptr uint8; universal_mac: ptr uint8): esp_
 ##
 type
   esp_chip_model_t* {.size: sizeof(cint).} = enum
-    CHIP_ESP32 = 1              ## !< ESP32
-
+    CHIP_ESP32 = 1,              ## !< ESP32
+    CHIP_ESP32S2 = 2,            ## !< ESP32-S2
+    CHIP_ESP32S3 = 9,            ## !< ESP32-S3
+    CHIP_ESP32C3 = 5,            ## !< ESP32-C3
+    CHIP_ESP32C2 = 12,           ## !< ESP32-C2
+    CHIP_ESP32C6 = 13,           ## !< ESP32-C6
+    CHIP_ESP32H2 = 16,           ## !< ESP32-H2
+    CHIP_ESP32P4 = 18,           ## !< ESP32-P4
+    CHIP_ESP32C61 = 20,          ## !< ESP32-C61
+    CHIP_ESP32C5 = 23,           ## !< ESP32-C5
+    CHIP_ESP32H21 = 25,          ## !< ESP32-H21
+    CHIP_ESP32H4 = 28,           ## !< ESP32-H4
+    CHIP_POSIX_LINUX = 999       ## !< The code is running on POSIX/Linux simulator
 
 ##  Chip feature flags, used in esp_chip_info_t
 const
@@ -265,6 +276,9 @@ const
   CHIP_FEATURE_WIFI_BGN* = BIT(1) ## !< Chip has 2.4GHz WiFi
   CHIP_FEATURE_BLE* = BIT(4)    ## !< Chip has Bluetooth LE
   CHIP_FEATURE_BT* = BIT(5)     ## !< Chip has Bluetooth Classic
+  CHIP_FEATURE_IEEE802154* = BIT(6)      ## !< Chip has IEEE 802.15.4
+  CHIP_FEATURE_EMB_PSRAM* = BIT(7)      ## !< Chip has embedded psram
+
 
 ## *
 ##  @brief The structure represents information about the chip
