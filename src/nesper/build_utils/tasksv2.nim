@@ -157,7 +157,7 @@ task esp, "esp commands app":
       echo "executing: ", cmd
       exec cmd
     of "compile", "c":
-      espBuildTask()
+      espCompileTask()
     of "build":
       espBuildTask()
     of "monitor":
