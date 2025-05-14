@@ -53,6 +53,18 @@ task espClean, "clean esp app":
   exec "rm -Rf main/nimcache"
   exec "rm -Rf build"
 
+task espListUsb, "list possible usb ports":
+  echo "Listing possible usb ports:\n"
+  when defined(macosx):
+    exec "ls -1 /dev/cu.*"
+  elif defined(linux):
+    exec "ls -1 /dev/tty.*"
+  elif defined(windows):
+    exec "wmic path win32_pnpevent where EventType = 2 | findstr /i \"USB\" | findstr /i /v \"ROOT\\"
+  else:
+    echo "Unsupported platform -- you're on your own!"
+  echo "\n"
+
 task espHelp, "show help":
   echo "ESP NimScript Helper"
   echo "Usage: nimble esp <command>"
@@ -87,6 +99,8 @@ task esp, "esp commands app":
       exec &"idf.py -p {usb} monitor"
     of "zip", "zipartifacts":
       espZipPackageTask()
+    of "listusb":
+      espListUsbTask()
     of "clean":
       espCleanTask()
     else:
