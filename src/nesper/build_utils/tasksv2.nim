@@ -47,6 +47,7 @@ task espZipPackage, "package esp app":
 
   exec "rm -Rf build/artifacts.zip"
   exec "zip -r build/artifacts.zip build/artifacts"
+  mvFile("build" / "artifacts.zip", "artifacts.zip")
   echo "Done Copying files"
 
 task espClean, "clean esp app":
