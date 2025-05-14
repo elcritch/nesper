@@ -38,12 +38,12 @@ task espZipPackage, "package esp app":
   cpFile("build" / &"{projectName}.bin", "build" / "artifacts" / &"{projectName}.bin")
   cpFile("build" / &"{projectName}.map", "build" / "artifacts" / &"{projectName}.map")
   cpFile("build" / &"{projectName}.elf", "build" / "artifacts" / &"{projectName}.elf")
-  if fileExists("build" / "ota_data_initial.bin"):
-    cpFile("build" / "ota_data_initial.bin", "build" / "artifacts" / "ota_data_initial.bin")
   cpFile("build" / "bootloader" / "bootloader.bin", "build" / "artifacts" / "bootloader" / "bootloader.bin")
   cpFile("build" / "bootloader" / "bootloader.elf", "build" / "artifacts" / "bootloader" / "bootloader.elf")
   cpFile("build" / "bootloader" / "bootloader.map", "build" / "artifacts" / "bootloader" / "bootloader.map")
   cpFile("build" / "partition_table" / "partition-table.bin", "build" / "artifacts" / "partition_table" / "partition-table.bin")
+  if fileExists("build" / "ota_data_initial.bin"):
+    cpFile("build" / "ota_data_initial.bin", "build" / "artifacts" / "ota_data_initial.bin")
 
   exec "zip -r build/artifacts.zip build/artifacts"
   echo "Done Copying files"
