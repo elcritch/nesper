@@ -64,15 +64,19 @@ type
 
 type
 
-  i2c_master_bus_handle_t* = ptr i2c_master_bus_t ##
+  i2c_master_bus_config_tt* {.importc: "i2c_master_bus_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
+  i2c_master_dev_tt* {.importc: "i2c_master_dev_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
+  i2c_slave_dev_tt* {.importc: "i2c_slave_dev_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
+
+  i2c_master_bus_handle_t* = ptr i2c_master_bus_config_tt ##
                                                   ##  @brief Type of I2C master bus handle
                                                   ##
 
-  i2c_master_dev_handle_t* = ptr i2c_master_dev_t ##
+  i2c_master_dev_handle_t* = ptr i2c_master_dev_tt ##
                                                   ##  @brief Type of I2C master bus device handle
                                                   ##
 
-  i2c_slave_dev_handle_t* = ptr i2c_slave_dev_t ##
+  i2c_slave_dev_handle_t* = ptr i2c_slave_dev_tt ##
                                                 ##  @brief Type of I2C slave device handle
                                                 ##
 
@@ -105,7 +109,7 @@ type
                               ##
     buffer* {.importc: "buffer".}: ptr uint8 ## < Pointer for buffer received in callback.
 
-    length* {.header: "i2c_types.h".}: uint32
+    length*: uint32
     ## < Length for buffer received in callback.
 
 
@@ -121,7 +125,7 @@ type
                               ##  @return Whether a high priority task has been waken up by this function
                               ##
 
-when SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE:
+when defined(SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE):
   ##
   ##  @brief Stretch cause event structure used in I2C slave
   ##
@@ -146,6 +150,7 @@ when SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE:
     i2c_slave_stretch_callback_t* = proc (i2c_slave: i2c_slave_dev_handle_t;
         evt_cause: ptr i2c_slave_stretch_event_data_t; arg: pointer): bool {.
         cdecl.}
+
 type
 
   i2c_slave_request_event_data_t* {.importc: "i2c_slave_request_event_data_t",
