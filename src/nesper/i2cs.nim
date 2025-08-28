@@ -70,6 +70,7 @@ else:
   proc newI2cMasterBus*(
       i2cPort: i2c_port_num_t,
       sda, scl: gpio_num_t,
+      clkSource: i2c_clock_source_t = I2C_CLK_SRC_DEFAULT,
       enableInternalPullup: bool = false,
       glitchIgnoreCnt: uint8 = 7'u8,
       intrPriority: cint = 0,
@@ -83,6 +84,7 @@ else:
     result.conf.glitch_ignore_cnt = glitchIgnoreCnt
     result.conf.intr_priority = intrPriority
     result.conf.trans_queue_depth = transQueueDepth
+    result.conf.clk_source = clkSource
     result.conf.flags.enable_internal_pullup = (if enableInternalPullup: 1'u32 else: 0'u32)
 
     var h: i2c_master_bus_handle_t
