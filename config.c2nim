@@ -2,6 +2,7 @@
 #importc
 #cdecl
 #header
+#stdints
 
 #reordercomments
 #mergeDuplicates
@@ -10,16 +11,11 @@
 
 #mergeblocks
 #stdints
-#cppSkipCallOp
-#cppSkipConverter
-#cppskipconverter
 
 #render nonNep1Imports
 #render extranewlines
 #render reindentlongcomments
 
 #mangle "'va_list'" "varargs[pointer]"
-#mangle "'_Bool'" "bool"
+#anonymousAsFields
 
-#delete "RCUTILS_ERROR_STATE_FILE_MAX_LENGTH"
-#delete "'rcutils/stdatomic_helper'"
