@@ -93,5 +93,8 @@ type
 
 
 type
-  i2c_clock_source_t* {.importc: "i2c_clock_source_t", incompleteStruct, header: "<hal/i2c_types.h>".} = object
+  i2c_clock_source_t* {.importc: "i2c_clock_source_t", incompleteStruct, header: "<hal/i2c_types.h>".} = cint
   
+var I2C_CLK_SRC_XTAL* {.importc: "I2C_CLK_SRC_XTAL", header: "<hal/i2c_types.h>".}: cint
+var I2C_CLK_SRC_RC_FAST* {.importc: "I2C_CLK_SRC_RC_FAST", header: "<hal/i2c_types.h>".}: cint
+var I2C_CLK_SRC_DEFAULT* {.importc: "I2C_CLK_SRC_DEFAULT", header: "<hal/i2c_types.h>".}: cint
