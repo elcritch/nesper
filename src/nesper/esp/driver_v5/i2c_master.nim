@@ -12,10 +12,12 @@ import ./i2c_types
 export i2c_types
 export i2c_hal_types
 
+{.push header: "<driver/i2c_master.h>".}
+
 type
 
   INNER_C_STRUCT_i2c_master_3* {.importc: "i2c_master_bus_config_t::no_name",
-                                 header: "i2c_master.h", bycopy.} = object ##
+                                  bycopy.} = object ##
                               ##
                               ##  @brief I2C master bus specific configurations
                               ##
@@ -28,7 +30,7 @@ type
 
 
   i2c_master_bus_config_t* {.importc: "i2c_master_bus_config_t",
-                             header: "i2c_master.h", bycopy.} = object
+                              bycopy.} = object
     i2c_port* {.importc: "i2c_port".}: i2c_port_num_t ##
                               ## !< I2C port number, `-1` for auto selecting, (not include LP I2C instance)
     sda_io_num* {.importc: "sda_io_num".}: gpio_num_t ##
@@ -61,7 +63,7 @@ const
 type
 
   INNER_C_STRUCT_i2c_master_5* {.importc: "i2c_device_config_t::no_name",
-                                 header: "i2c_master.h", bycopy.} = object ##
+                                  bycopy.} = object ##
                               ##
                               ##  @brief I2C device configuration
                               ##
@@ -69,7 +71,7 @@ type
     ## !< Disable ACK check. If this is set false, that means ack check is enabled, the transaction will be stopped and API returns error when nack is detected.
 
 
-  i2c_device_config_t* {.importc: "i2c_device_config_t", header: "i2c_master.h",
+  i2c_device_config_t* {.importc: "i2c_device_config_t", 
                          bycopy.} = object
     dev_addr_length* {.importc: "dev_addr_length".}: i2c_addr_bit_len_t ##
                               ## !< Select the address length of the slave device.
@@ -84,7 +86,7 @@ type
 
 
   INNER_C_STRUCT_i2c_master_10* {.importc: "i2c_operation_job_t::no_name",
-                                  header: "i2c_master.h", bycopy.} = object ##
+                                   bycopy.} = object ##
                               ##
                               ##  @brief Structure representing an I2C operation job
                               ##
@@ -98,7 +100,7 @@ type
 
 
   INNER_C_STRUCT_i2c_master_11* {.importc: "i2c_operation_job_t::no_name",
-                                  header: "i2c_master.h", bycopy.} = object
+                                   bycopy.} = object
     ack_value* {.importc: "ack_value".}: i2c_ack_value_t ##
                               ## < ACK value to send after the read (ACK or NACK)
     data* {.importc: "data".}: ptr uint8 ## < Pointer to the buffer for storing the data read from the bus
@@ -106,7 +108,7 @@ type
     ## < Total number of bytes to read
 
 
-  i2c_operation_job_t* {.importc: "i2c_operation_job_t", header: "i2c_master.h",
+  i2c_operation_job_t* {.importc: "i2c_operation_job_t", 
                          bycopy.} = object
     command* {.importc: "command".}: i2c_master_command_t ##
                               ## < I2C command indicating the type of operation (START, WRITE, READ, or STOP)
@@ -126,7 +128,7 @@ type
 
   i2c_master_transmit_multi_buffer_info_t* {.
       importc: "i2c_master_transmit_multi_buffer_info_t",
-      header: "i2c_master.h", bycopy.} = object ##
+       bycopy.} = object ##
                                                  ##  @brief I2C master transmit buffer information structure
                                                  ##
     write_buffer* {.importc: "write_buffer".}: ptr uint8 ##
@@ -136,7 +138,7 @@ type
 
 
   i2c_master_event_callbacks_t* {.importc: "i2c_master_event_callbacks_t",
-                                  header: "i2c_master.h", bycopy.} = object ##
+                                   bycopy.} = object ##
                               ##
                               ##  @brief Group of I2C master callbacks, can be used to get status during transaction or doing other small things. But take care potential concurrency issues.
                               ##  @note The callbacks are all running under ISR context

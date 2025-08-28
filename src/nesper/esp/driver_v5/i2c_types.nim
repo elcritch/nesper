@@ -4,6 +4,8 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+{.push header: "<driver/i2c_types.h>".}
+
 type
 
   i2c_port_num_t* = cint     ##
@@ -64,7 +66,7 @@ type
 
 type
 
-  i2c_master_bus_config_tt* {.importc: "i2c_master_bus_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
+  i2c_master_bus_config_tt* {.importc: "i2c_master_bus_config_t", incompleteStruct.} = object
 
   i2c_master_bus_handle_t* = ptr i2c_master_bus_config_tt ##
                                                   ##  @brief Type of I2C master bus handle
@@ -79,7 +81,7 @@ type
                                                 ##
 
   i2c_master_event_data_t* {.importc: "i2c_master_event_data_t",
-                             header: "i2c_types.h", bycopy.} = object ##
+                             bycopy.} = object ##
                               ##
                               ##  @brief Data type used in I2C event callback
                               ##
@@ -101,7 +103,7 @@ type
                               ##
 
   i2c_slave_rx_done_event_data_t* {.importc: "i2c_slave_rx_done_event_data_t",
-                                    header: "i2c_types.h", bycopy.} = object ##
+                                    bycopy.} = object ##
                               ##
                               ##  @brief Event structure used in I2C slave
                               ##
@@ -130,7 +132,7 @@ when defined(SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE):
   type
 
     i2c_slave_stretch_event_data_t* {.importc: "i2c_slave_stretch_event_data_t",
-                                      header: "i2c_types.h", bycopy.} = object
+                                      bycopy.} = object
       stretch_cause* {.importc: "stretch_cause".}: i2c_slave_stretch_cause_t
       ## !< Stretch cause can be got in callback
 
@@ -152,7 +154,7 @@ when defined(SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE):
 type
 
   i2c_slave_request_event_data_t* {.importc: "i2c_slave_request_event_data_t",
-                                    header: "i2c_types.h", bycopy.} = object ##
+                                    bycopy.} = object ##
                               ##
                               ##  @brief Event structure used in I2C slave request.
                               ##

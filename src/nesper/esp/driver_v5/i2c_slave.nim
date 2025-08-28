@@ -4,13 +4,20 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
-when not CONFIG_I2C_ENABLE_SLAVE_DRIVER_VERSION_2:
+import ../../consts
+import ../driver/gpio_driver
+import ../hal/i2c_types as i2c_hal_types
+import ./i2c_types
+
+{.push header: "<driver/i2c_slave.h>".}
+
+when not defined(CONFIG_I2C_ENABLE_SLAVE_DRIVER_VERSION_2):
   ##
   ##  @brief I2C slave specific configurations
   ##
   type
     INNER_C_STRUCT_i2c_slave_1* {.importc: "i2c_slave_config_t::no_name",
-                                  header: "i2c_slave.h", bycopy.} = object
+                                  bycopy.} = object
       stretch_en* {.importc: "stretch_en", bitsize: 1.}: uint32
       ## !< Enable slave stretch
       broadcast_en* {.importc: "broadcast_en", bitsize: 1.}: uint32
@@ -54,7 +61,7 @@ when not CONFIG_I2C_ENABLE_SLAVE_DRIVER_VERSION_2:
   ##
   type
     i2c_slave_event_callbacks_t* {.importc: "i2c_slave_event_callbacks_t",
-                                   header: "i2c_slave.h", bycopy.} = object
+                                   bycopy.} = object
       on_recv_done* {.importc: "on_recv_done".}: i2c_slave_received_callback_t
       ## !< I2C slave receive done callback
 
@@ -95,7 +102,7 @@ when not CONFIG_I2C_ENABLE_SLAVE_DRIVER_VERSION_2:
   proc i2c_slave_transmit*(i2c_slave: i2c_slave_dev_handle_t; data: ptr uint8;
                            size: cint; xfer_timeout_ms: cint): esp_err_t {.
       cdecl, importc: "i2c_slave_transmit", header: "i2c_slave.h".}
-  when SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS:
+  when defined(SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS):
     ##
     ##  @brief Read bytes from I2C internal ram. This can be only used when `access_ram_en` in configuration structure set to true.
     ##
@@ -134,7 +141,7 @@ else:
   ##
   type
     INNER_C_STRUCT_i2c_slave_3* {.importc: "i2c_slave_config_t::no_name",
-                                  header: "i2c_slave.h", bycopy.} = object
+                                  bycopy.} = object
       allow_pd* {.importc: "allow_pd", bitsize: 1.}: uint32
       ## !< If set, the driver will backup/restore the I2C registers before/after entering/exist sleep mode.
       ##                                               By this approach, the system can power off I2C's power domain.
@@ -176,7 +183,7 @@ else:
   ##
   type
     i2c_slave_event_callbacks_t* {.importc: "i2c_slave_event_callbacks_t",
-                                   header: "i2c_slave.h", bycopy.} = object
+                                   bycopy.} = object
       on_request* {.importc: "on_request".}: i2c_slave_request_callback_t
       ## !< Callback for when a master requests data from the slave
       on_receive* {.importc: "on_receive".}: i2c_slave_received_callback_t
