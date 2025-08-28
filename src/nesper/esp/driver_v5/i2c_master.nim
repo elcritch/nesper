@@ -40,7 +40,7 @@ type
     # anonymous union begin
     clk_source* {.importc: "clk_source".}: i2c_clock_source_t ##
                               ## !< Clock source of I2C master bus
-                              
+
     when defined(SOC_LP_I2C_SUPPORTED):
       lp_source_clk* {.header: "i2c_master.h".}: lp_i2c_clock_source_t
                               ## !< LP_UART source clock selection
