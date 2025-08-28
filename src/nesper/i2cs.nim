@@ -44,6 +44,24 @@ else:
       discard i2c_del_master_bus(b.handle)
       b.handle = nil
 
+  proc repr*(bus: i2c_master_bus_config_t): string =
+    result = "I2cMasterBus("
+    result &= "i2cPort: " & $bus.i2c_port & ", "
+    result &= "sda: " & $bus.sda_io_num & ", "
+    result &= "scl: " & $bus.scl_io_num & ", "
+    result &= "glitchIgnoreCnt: " & $bus.glitch_ignore_cnt & ", "
+    result &= "intrPriority: " & $bus.intr_priority & ", "
+    result &= "transQueueDepth: " & $bus.trans_queue_depth & ", "
+    result &= "flags: " & $cast[uint32](bus.flags) & ") "
+
+  proc repr*(dev: i2c_device_config_t): string =
+    result = "I2cDevice("
+    result &= "deviceAddress: " & $dev.device_address & ", "
+    result &= "sclSpeedHz: " & $dev.scl_speed_hz & ", "
+    result &= "addrLen: " & $dev.dev_addr_length & ", "
+    result &= "sclWaitUs: " & $dev.scl_wait_us & ", "
+    result &= "disableAckCheck: " & $dev.flags.disable_ack_check & ")"
+
   # Bus / Device creation
   proc newI2cMasterBus*(
       i2cPort: i2c_port_num_t,
