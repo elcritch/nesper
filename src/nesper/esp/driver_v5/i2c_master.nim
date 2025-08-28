@@ -6,10 +6,11 @@
 
 import ../../consts
 import ../driver/gpio_driver
-import ../hal/i2c_types
+import ../hal/i2c_types as i2c_hal_types
 
 import ./i2c_types
 export i2c_types
+export i2c_hal_types
 
 type
 
