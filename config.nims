@@ -51,4 +51,9 @@ task test, "Runs the test suite":
   test_generalTask()
   test_driverTask()
   test_storageTask()
+
+task test_all, "Runs the test suite":
+  test_generalTask()
+  test_driverTask()
+  test_storageTask()
   test_execsTask()
