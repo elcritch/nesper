@@ -16,8 +16,7 @@ export i2c_hal_types
 
 type
 
-  INNER_C_STRUCT_i2c_master_3* {.importc: "i2c_master_bus_config_t::no_name",
-                                  bycopy.} = object ##
+  INNER_C_STRUCT_i2c_master_3* {.bycopy.} = object ##
                               ##
                               ##  @brief I2C master bus specific configurations
                               ##
@@ -62,8 +61,7 @@ const
 
 type
 
-  INNER_C_STRUCT_i2c_master_5* {.importc: "i2c_device_config_t::no_name",
-                                  bycopy.} = object ##
+  INNER_C_STRUCT_i2c_master_5* {.bycopy.} = object ##
                               ##
                               ##  @brief I2C device configuration
                               ##
@@ -85,8 +83,7 @@ type
     ## !< I2C device config flags
 
 
-  INNER_C_STRUCT_i2c_master_10* {.importc: "i2c_operation_job_t::no_name",
-                                   bycopy.} = object ##
+  INNER_C_STRUCT_i2c_master_10* {.bycopy.} = object ##
                               ##
                               ##  @brief Structure representing an I2C operation job
                               ##
@@ -99,8 +96,7 @@ type
     ## < Total number of bytes to write
 
 
-  INNER_C_STRUCT_i2c_master_11* {.importc: "i2c_operation_job_t::no_name",
-                                   bycopy.} = object
+  INNER_C_STRUCT_i2c_master_11* {.bycopy.} = object
     ack_value* {.importc: "ack_value".}: i2c_ack_value_t ##
                               ## < ACK value to send after the read (ACK or NACK)
     data* {.importc: "data".}: ptr uint8 ## < Pointer to the buffer for storing the data read from the bus
