@@ -1,9 +1,9 @@
 
-import consts
-import general
-import esp/gpio
-import esp/esp_intr_alloc
-import esp/driver/i2c
+import ../consts
+import ../general
+import ../esp/gpio
+import ../esp/esp_intr_alloc
+import ../esp/driver/i2c
 
 # export spi_host_device_t, spi_device_t, spi_bus_config_t, spi_transaction_t, spi_device_handle_t
 export i2c
