@@ -12,14 +12,8 @@ import
 ##
 
 type
-  INNER_C_UNION_i2c_master_3* {.bycopy, union.} = object
-    clk_source*: i2c_clock_source_t
-    ## !< Clock source of I2C master bus
-    when SOC_LP_I2C_SUPPORTED:
-      var lp_source_clk*: lp_i2c_clock_source_t
-      ## !< LP_UART source clock selection
 
-  INNER_C_STRUCT_i2c_master_5* {.bycopy.} = object
+  i2c_master_flags* {.bycopy.} = object
     enable_internal_pullup* {.bitsize: 1.}: uint32_t
     ## !< Enable internal pullups. Note: This is not strong enough to pullup buses under high-speed frequency. Recommend proper external pull-up if possible
     allow_pd* {.bitsize: 1.}: uint32_t
@@ -34,14 +28,16 @@ type
     ## !< GPIO number of I2C SDA signal, pulled-up internally
     scl_io_num*: gpio_num_t
     ## !< GPIO number of I2C SCL signal, pulled-up internally
-    ano_i2c_master_4*: INNER_C_UNION_i2c_master_3
+    clk_source*: i2c_clock_source_t
+    lp_source_clk*: lp_i2c_clock_source_t
+
     glitch_ignore_cnt*: uint8_t
     ## !< If the glitch period on the line is less than this value, it can be filtered out, typically value is 7 (unit: I2C module clock cycle)
     intr_priority*: cint
     ## !< I2C interrupt priority, if set to 0, driver will select the default priority (1,2,3).
     trans_queue_depth*: csize_t
     ## !< Depth of internal transfer queue, increase this value can support more transfers pending in the background, only valid in asynchronous transaction. (Typically max_device_num * per_transaction)
-    flags*: INNER_C_STRUCT_i2c_master_5
+    flags*: i2c_master_flags
     ## !< I2C master config flags
 
 
@@ -53,7 +49,7 @@ const
 ##
 
 type
-  INNER_C_STRUCT_i2c_master_7* {.bycopy.} = object
+  i2c_device_flags* {.bycopy.} = object
     disable_ack_check* {.bitsize: 1.}: uint32_t
     ## !< Disable ACK check. If this is set false, that means ack check is enabled, the transaction will be stopped and API returns error when nack is detected.
 
@@ -66,7 +62,7 @@ type
     ## !< I2C SCL line frequency.
     scl_wait_us*: uint32_t
     ## !< Timeout value. (unit: us). Please note this value should not be so small that it can handle stretch/disturbance properly. If 0 is set, that means use the default reg value
-    flags*: INNER_C_STRUCT_i2c_master_7
+    flags*: i2c_device_flags
     ## !< I2C device config flags
 
 
