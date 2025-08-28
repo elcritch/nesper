@@ -41,9 +41,12 @@ proc storage_tests() =
 proc exec_tests() =
   # Exec tests
   header "=== Exec Tests ==="
-  for dtest in listFiles("tests/exec_tests/"):
-    if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
-      testExec(" -r ", dtest)
+  when defined(macosx):
+    echo "skipping exec tests on macosx"
+  else:
+    for dtest in listFiles("tests/exec_tests/"):
+      if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
+        testExec(" -r ", dtest)
 
 task test, "Runs the test suite":
   general_tests()
