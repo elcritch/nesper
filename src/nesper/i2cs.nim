@@ -1,6 +1,6 @@
 import ./consts
 
-when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
+when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0) or defined(nesperLegacyI2C):
   import ./legacy/i2cs
 else:
 
