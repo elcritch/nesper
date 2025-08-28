@@ -4,6 +4,10 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+import ../../consts
+import ../driver/gpio_driver
+import ../hal/i2c_types
+
 import ./i2c_types
 export i2c_types
 
@@ -34,7 +38,9 @@ type
     # anonymous union begin
     clk_source* {.importc: "clk_source".}: i2c_clock_source_t ##
                               ## !< Clock source of I2C master bus
-    lp_source_clk* {.header: "i2c_master.h".}: lp_i2c_clock_source_t
+                              
+    when defined(SOC_LP_I2C_SUPPORTED):
+      lp_source_clk* {.header: "i2c_master.h".}: lp_i2c_clock_source_t
                               ## !< LP_UART source clock selection
     # anonymous union end
 
