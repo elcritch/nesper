@@ -2,9 +2,7 @@
 # Tasks
 import os, strutils
 
-const NFLAGS="--verbosity:0 -d:ESP_IDF_VERSION=" &
-              getEnv("ESP_IDF_VERSION", "4.4") &
-              " --cincludes:" & (getCurrentDir() / "tests" / "c_headers" / "mock")
+const NFLAGS=" --cincludes:" & (getCurrentDir() / "tests" / "c_headers" / "mock")
 
 proc header(msg: string) =
   echo "\n\n", msg, "\n"
