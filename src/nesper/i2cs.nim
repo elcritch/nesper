@@ -52,7 +52,8 @@ else:
     result &= "glitchIgnoreCnt: " & $bus.glitch_ignore_cnt & ", "
     result &= "intrPriority: " & $bus.intr_priority & ", "
     result &= "transQueueDepth: " & $bus.trans_queue_depth & ", "
-    result &= "flags: " & $cast[uint32](bus.flags) & ") "
+    let fl = cast[ptr uint32](addr(bus.flags))
+    result &= "flags: " & $fl[] & ") "
 
   proc repr*(dev: i2c_device_config_t): string =
     result = "I2cDevice("
