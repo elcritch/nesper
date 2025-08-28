@@ -30,3 +30,4 @@ block:
   let _ = dev.readReg(0x75'u8, 1, timeoutMs = 100)
   discard dev.writeReg(0x6B'u8, [0x80'u8], timeoutMs = 100)
 
+  echo repr(dev)
