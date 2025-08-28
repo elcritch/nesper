@@ -4,6 +4,9 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+import ./i2c_types
+export i2c_types
+
 type
 
   INNER_C_STRUCT_i2c_master_3* {.importc: "i2c_master_bus_config_t::no_name",

@@ -104,9 +104,9 @@ type
                               ##  @brief Event structure used in I2C slave
                               ##
     buffer* {.importc: "buffer".}: ptr uint8 ## < Pointer for buffer received in callback.
-    when CONFIG_I2C_ENABLE_SLAVE_DRIVER_VERSION_2:
-      var length* {.header: "i2c_types.h".}: uint32
-      ## < Length for buffer received in callback.
+
+    length* {.header: "i2c_types.h".}: uint32
+    ## < Length for buffer received in callback.
 
 
   i2c_slave_received_callback_t* = proc (i2c_slave: i2c_slave_dev_handle_t;
