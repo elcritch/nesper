@@ -3,6 +3,7 @@
 #cdecl
 #header
 #stdints
+#skipinclude
 
 #reordercomments
 #mergeDuplicates
@@ -10,7 +11,6 @@
 #importFuncDefines
 
 #mergeblocks
-#stdints
 
 #render nonNep1Imports
 #render extranewlines
@@ -19,3 +19,4 @@
 #mangle "'va_list'" "varargs[pointer]"
 #anonymousAsFields
 
+#mangle "'__attribute__((packed))'" ""
