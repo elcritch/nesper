@@ -1,3 +1,4 @@
+import std/strutils
 import ./consts
 
 when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0) or defined(nesperLegacyI2C):
@@ -53,7 +54,7 @@ else:
     result &= "intrPriority: " & $bus.intr_priority & ", "
     result &= "transQueueDepth: " & $bus.trans_queue_depth & ", "
     let fl = cast[ptr uint32](addr(bus.flags))
-    result &= "flags: " & $fl[] & ") "
+    result &= "flags: " & $toHex(fl[], 8) & ") "
 
   proc repr*(dev: i2c_device_config_t): string =
     result = "I2cDevice("
@@ -61,7 +62,8 @@ else:
     result &= "sclSpeedHz: " & $dev.scl_speed_hz & ", "
     result &= "addrLen: " & $dev.dev_addr_length & ", "
     result &= "sclWaitUs: " & $dev.scl_wait_us & ", "
-    result &= "disableAckCheck: " & $dev.flags.disable_ack_check & ")"
+    let fl = cast[ptr uint32](addr(dev.flags))
+    result &= "flags: " & $toHex(fl[], 8) & ") "
 
   # Bus / Device creation
   proc newI2cMasterBus*(
