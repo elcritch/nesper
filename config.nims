@@ -41,8 +41,8 @@ task test_general, "Runs the test suite":
 task test_execs, "Runs the test suite":
   # Exec tests
   header "=== Exec Tests ==="
-  when defined(macosx):
-    echo "skipping exec tests on macosx"
+  when defined(macos):
+    echo "skipping exec tests on macos"
   else:
     for dtest in listFiles("tests/exec_tests/"):
       if dtest.splitFile()[1].startsWith("t") and dtest.endsWith(".nim"):
