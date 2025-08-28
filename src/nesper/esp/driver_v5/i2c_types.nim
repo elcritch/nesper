@@ -65,18 +65,16 @@ type
 type
 
   i2c_master_bus_config_tt* {.importc: "i2c_master_bus_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
-  i2c_master_dev_tt* {.importc: "i2c_master_dev_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
-  i2c_slave_dev_tt* {.importc: "i2c_slave_dev_config_t", incompleteStruct, header: "<driver/i2c_types.h>".} = object
 
   i2c_master_bus_handle_t* = ptr i2c_master_bus_config_tt ##
                                                   ##  @brief Type of I2C master bus handle
                                                   ##
 
-  i2c_master_dev_handle_t* = ptr i2c_master_dev_tt ##
+  i2c_master_dev_handle_t* = pointer ##
                                                   ##  @brief Type of I2C master bus device handle
                                                   ##
 
-  i2c_slave_dev_handle_t* = ptr i2c_slave_dev_tt ##
+  i2c_slave_dev_handle_t* = pointer ##
                                                 ##  @brief Type of I2C slave device handle
                                                 ##
 

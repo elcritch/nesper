@@ -145,8 +145,8 @@ type
     on_trans_done* {.importc: "on_trans_done".}: i2c_master_callback_t
     ## !< I2C master transaction finish callback
 
-# converter toHandle*(s: ptr i2c_master_bus_config_t): i2c_master_bus_handle_t {.inline.} = cast[i2c_master_bus_handle_t](s)
-# converter toHandle*(s: ptr i2c_device_config_t): i2c_master_dev_handle_t {.inline.} = cast[i2c_master_dev_handle_t](s)
+converter toHandle*(s: i2c_master_bus_config_tt): i2c_master_bus_config_t {.inline.} = cast[typeof(result)](s)
+converter toHandle*(s: i2c_master_bus_config_t): i2c_master_bus_config_tt {.inline.} = cast[typeof(result)](s)
 
 proc i2c_new_master_bus*(bus_config: ptr i2c_master_bus_config_t;
                          ret_bus_handle: ptr i2c_master_bus_handle_t): esp_err_t {.
