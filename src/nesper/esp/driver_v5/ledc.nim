@@ -26,8 +26,7 @@ type
 
 type
 
-  INNER_C_STRUCT_ledc_1* {.importc: "ledc_channel_config_t::no_name",
-                           header: hdr, bycopy.} = object ##
+  INNER_C_STRUCT_ledc_1* = object ##
                               ##
                               ##  @brief Configuration parameters of LEDC channel for ledc_channel_config function
                               ##
