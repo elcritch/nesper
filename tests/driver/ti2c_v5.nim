@@ -14,7 +14,7 @@ block:
   )
 
   let dev = bus.addDevice(
-    deviceAddress = 0x68'u16,
+    deviceAddress = 0x68'i2c,
     sclSpeedHz = 100_000.Hertz,
     addrLen = I2C_ADDR_BIT_LEN_7
   )

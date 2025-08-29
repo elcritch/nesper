@@ -105,7 +105,7 @@ else:
     result = I2cDevice()
     result.bus = bus
     result.conf.dev_addr_length = addrLen
-    result.conf.device_address = deviceAddress.uint16
+    result.conf.device_address = deviceAddress
     result.conf.scl_speed_hz = sclSpeedHz
     result.conf.scl_wait_us = sclWaitUs.uint32
     result.conf.flags.disable_ack_check = (if disableAckCheck: 1'u32 else: 0'u32)

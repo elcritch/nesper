@@ -16,7 +16,9 @@ export i2c_hal_types
 {.push header: "<driver/i2c_master.h>".}
 
 type
-  I2cAddr = distinct uint16
+  I2cAddr* = distinct uint16
+
+template i2c(num: untyped): I2cAddr = I2cAddr(num)
 
 proc `$`*(a: I2cAddr): string = 
   result = toHex(a.uint16, 2)
