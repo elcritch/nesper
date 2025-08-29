@@ -18,7 +18,7 @@ export i2c_hal_types
 type
   I2cAddr* = distinct uint16
 
-template i2c(num: untyped): I2cAddr = I2cAddr(num)
+template `'i2c`*(num: untyped): I2cAddr = I2cAddr((parseInt(num) and 0x0F).uint16)
 
 proc `$`*(a: I2cAddr): string = 
   result = toHex(a.uint16, 2)
