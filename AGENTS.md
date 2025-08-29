@@ -40,14 +40,16 @@
 - ESP‑IDF version is controlled via `ESP_IDF_VERSION` (defaults to `4.4`) and Nim defines in `config.nims`/`nim.cfg`.
 - Ensure your ESP‑IDF toolchain is installed and on PATH before building examples.
 
-## ESP‑IDF Header Wrapping
-- Enums with conditional members/values: wrap as `distinct cint` types and import members as `let` constants with `{.importc, header: hdr.}`. Examples: `i2c_port_t`, `i2c_mode_t`, `ledc_mode_t`, `ledc_intr_type_t`, `ledc_duty_direction_t`, and clock source selections. This avoids baking SoC/IDF‑specific numeric values.
-- Stable, contiguous enums: use Nim `enum` with `{.size: sizeof(cint).}` when definitions don’t vary across SoCs. Examples: `i2c_rw_t`, `i2c_trans_mode_t`, `i2c_ack_type_t`, `i2c_slave_stretch_cause_t`, `ledc_timer_t`, `ledc_channel_t`, `ledc_timer_bit_t`, `ledc_fade_mode_t`.
-- Typedef passthroughs to varying backends: prefer `distinct cint`/`cint` plus imported constants for items like `i2c_clock_source_t`, `ledc_clk_cfg_t`, `ledc_clk_src_t`. Use `{.importc, header: hdr.}` and, if needed to break cycles, alias via an `importc` type (e.g., `= soc_periph_*`), or a plain `cint` placeholder with separately imported constants.
-- Structs: import C structs as `{.importc, bycopy.}` Nim `object`s with matching fields and integer widths (e.g., `i2c_hal_clk_config_t`).
-- Sentinels and macros: `*_MAX` or alias members may be imported as `let` with `distinct cint` types and can be omitted if unstable across targets. Favor names over values; let ESP‑IDF supply the numeric mapping.
-- Header binding: set `const hdr = "<hal/<name>.h>"` and annotate all imports with `header: hdr` to bind directly to ESP‑IDF headers.
+## ESP‑IDF Wrapping (HAL & Drivers)
+- Header binding: for HAL, set `const hdr = "<hal/<name>.h>"` and annotate imports with `header: hdr`. For drivers, use `{.push header: "<driver/<name>.h>".}` at the top of the module.
+- Enums: if stable and contiguous across SoCs, use Nim `enum` with `{.size: sizeof(cint).}`. If members/values vary or are `#if`-guarded, define a `distinct cint` type and import each member as a `let` with `{.importc, header: hdr.}` (or module header).
+- Typedef passthroughs: where C uses typedefs to SoC‑specific sources, use `distinct cint`/`cint` plus imported constants, or alias to the ESP‑IDF typedef via `importc` (e.g., `= soc_periph_*`). Treat `*_MAX` sentinels as imported constants if needed, avoiding hardcoded values.
+- Structs: import C structs as `{.importc, bycopy.}` Nim `object`s with matching field types. Represent bitfields with inner objects using `bitsize`, and flatten anonymous unions while guarding alternatives with `when defined(...)`.
+- Opaque handles: model `typedef struct X* handle_t` as a pointer to an imported incomplete Nim object to avoid include loops. For cycles, use a placeholder in the types module and the real struct in another module, bridged with converters that cast between the two. Example: `i2c_master_bus_config_tt` (placeholder) ↔ `i2c_master_bus_config_t` (real) with `converter toHandle*` both ways.
+- Callbacks: map function pointer typedefs to Nim proc types with `{.cdecl.}` and import associated payload structs by copy.
+- Macros/constants: convert `#define` to Nim `const` (e.g., `I2C_DEVICE_ADDRESS_NOT_USED = 0xffff`). Use `csize_t` for `size_t`, and `uint8/uint16/uint32` for fixed‑width integers.
+- Procs: import driver/HAL functions verbatim with `{.cdecl, importc.}`, using `ptr` for out‑params/buffers and `csize_t` for sizes.
 
 Reference patterns:
-- `tests/c_headers/hal/i2c_types.h` → `src/nesper/esp/hal/i2c_types.nim`: ports/modes as `distinct cint` + `let`; stable I2C enums as Nim enums; clock source typedef mapped via `cint` + imported constants.
-- `tests/c_headers/hal/ledc_types.h` → `src/nesper/esp/hal/ledc_types.nim`: modes/interrupts/duty‑dir/clock sources as `distinct cint` + `let`; timers/channels/bit‑width/fade mode as Nim enums.
+- HAL: `tests/c_headers/hal/i2c_types.h` → `src/nesper/esp/hal/i2c_types.nim` (ports/modes as `distinct cint` + `let`; stable enums as Nim enums; clock source typedef as `cint` + imported constants). `tests/c_headers/hal/ledc_types.h` → `src/nesper/esp/hal/ledc_types.nim` (modes/interrupts/duty‑dir/clock sources as `distinct cint` + `let`; timers/channels/bit‑width/fade mode as Nim enums).
+- Drivers v5: `tests/c_headers/i2c_types.h` → `src/nesper/esp/driver_v5/i2c_types.nim` (stable enums; opaque handles via placeholder incomplete type; callback typedefs). `tests/c_headers/i2c_master.h` → `src/nesper/esp/driver_v5/i2c_master.nim` (full struct mapping, bitfields, anonymous union guard, `I2C_DEVICE_ADDRESS_NOT_USED` const, converters between placeholder and real config type; driver procs imported verbatim).
