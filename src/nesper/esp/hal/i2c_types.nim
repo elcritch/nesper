@@ -10,6 +10,7 @@ type
 
   i2c_port_t* = distinct cint
 
+let
   I2C_NUM_0* {.importc: "I2C_NUM_0", header: hdr.}: i2c_port_t
   I2C_NUM_1* {.importc: "I2C_NUM_1", header: hdr.}: i2c_port_t
   LP_I2C_NUM_0* {.importc: "LP_I2C_NUM_0", header: hdr.}: i2c_port_t
