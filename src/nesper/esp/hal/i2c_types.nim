@@ -45,12 +45,14 @@ type                        ##  #if SOC_I2C_SUPPORT_SLAVE
     ## !< I2C bus timeout period
 
 
-  i2c_mode_t* {.size: sizeof(cint).} = enum
-    I2C_MODE_SLAVE = 0,     ## !< I2C slave mode
-                             ##  #endif
-    I2C_MODE_MASTER,        ## !< I2C master mode
-    I2C_MODE_MAX
+  i2c_mode_t* = distinct cint
 
+let
+  I2C_MODE_SLAVE* {.importc: "I2C_MODE_SLAVE", header: hdr.}: i2c_mode_t
+  I2C_MODE_MASTER* {.importc: "I2C_MODE_MASTER", header: hdr.}: i2c_mode_t
+  I2C_MODE_MAX* {.importc: "I2C_MODE_MAX", header: hdr.}: i2c_mode_t
+
+type
   i2c_rw_t* {.size: sizeof(cint).} = enum
     I2C_MASTER_WRITE = 0,   ## !< I2C write data
     I2C_MASTER_READ          ## !< I2C read data
