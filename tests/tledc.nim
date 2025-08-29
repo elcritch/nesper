@@ -1,5 +1,5 @@
 
-import nesper/esp/driver/ledc
+import nesper/esp/driver/ledc_legacy
 
-export ledc
+export ledc_legacy
 
