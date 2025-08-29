@@ -9,22 +9,22 @@ const hdr = "<hal/ledc_types.h>"
 type
   ledc_mode_t* = distinct cint
 
-let LEDC_HIGH_SPEED_MODE {.importc: "LEDC_HIGH_SPEED_MODE", header: hdr.}: ledc_mode_t
-let LEDC_LOW_SPEED_MODE {.importc: "LEDC_LOW_SPEED_MODE", header: hdr.}: ledc_mode_t
-let LEDC_SPEED_MODE_MAX {.importc: "LEDC_SPEED_MODE_MAX", header: hdr.}: ledc_mode_t
+let LEDC_HIGH_SPEED_MODE* {.importc: "LEDC_HIGH_SPEED_MODE", header: hdr.}: ledc_mode_t
+let LEDC_LOW_SPEED_MODE* {.importc: "LEDC_LOW_SPEED_MODE", header: hdr.}: ledc_mode_t
+let LEDC_SPEED_MODE_MAX* {.importc: "LEDC_SPEED_MODE_MAX", header: hdr.}: ledc_mode_t
 
 type
   ledc_intr_type_t* = distinct cint
   ledc_duty_direction_t* = distinct cint
 
-let LEDC_INTR_DISABLE {.importc: "LEDC_INTR_DISABLE", header: hdr.}: ledc_intr_type_t
-let LEDC_INTR_FADE_END {.importc: "LEDC_INTR_FADE_END", header: hdr.}: ledc_intr_type_t
-let LEDC_INTR_MAX {.importc: "LEDC_INTR_MAX", header: hdr.}: ledc_intr_type_t
-let LEDC_DUTY_DIR_DECREASE {.importc: "LEDC_DUTY_DIR_DECREASE", header: hdr.}: ledc_duty_direction_t
-let LEDC_DUTY_DIR_INCREASE {.importc: "LEDC_DUTY_DIR_INCREASE", header: hdr.}: ledc_duty_direction_t
-let LEDC_DUTY_DIR_MAX {.importc: "LEDC_DUTY_DIR_MAX", header: hdr.}: ledc_duty_direction_t
+let LEDC_INTR_DISABLE* {.importc: "LEDC_INTR_DISABLE", header: hdr.}: ledc_intr_type_t
+let LEDC_INTR_FADE_END* {.importc: "LEDC_INTR_FADE_END", header: hdr.}: ledc_intr_type_t
+let LEDC_INTR_MAX* {.importc: "LEDC_INTR_MAX", header: hdr.}: ledc_intr_type_t
+let LEDC_DUTY_DIR_DECREASE* {.importc: "LEDC_DUTY_DIR_DECREASE", header: hdr.}: ledc_duty_direction_t
+let LEDC_DUTY_DIR_INCREASE* {.importc: "LEDC_DUTY_DIR_INCREASE", header: hdr.}: ledc_duty_direction_t
+let LEDC_DUTY_DIR_MAX* {.importc: "LEDC_DUTY_DIR_MAX", header: hdr.}: ledc_duty_direction_t
 
-when SOC_LEDC_SUPPORTED:
+when defined(SOC_LEDC_SUPPORTED):
   ##
   ##  @brief LEDC global clock sources
   ##
@@ -32,18 +32,11 @@ when SOC_LEDC_SUPPORTED:
 
     ledc_slow_clk_sel_t* = distinct cint
   
-  let LEDC_SLOW_CLK_RC_FAST {.importc: "LEDC_SLOW_CLK_RC_FAST", header: hdr.}
-                              ## !< LEDC low speed timer clock source is RC_FAST clock
-                              ##  #if SOC_LEDC_SUPPORT_APB_CLOCK
-      LEDC_SLOW_CLK_APB = LEDC_USE_APB_CLK, ## !< LEDC low speed timer clock source is 80MHz APB clock
-                                             ##  #endif
-                                             ##  #if SOC_LEDC_SUPPORT_PLL_DIV_CLOCK
-      LEDC_SLOW_CLK_PLL_DIV = LEDC_USE_PLL_DIV_CLK, ##
-                              ## !< LEDC low speed timer clock source is a PLL_DIV clock
-                              ##  #endif
-                              ##  #if SOC_LEDC_SUPPORT_XTAL_CLOCK
-      LEDC_SLOW_CLK_XTAL = LEDC_USE_XTAL_CLK ## !< LEDC low speed timer clock source XTAL clock
-                                             ##  #endif
+  let
+    LEDC_SLOW_CLK_RC_FAST {.importc: "LEDC_SLOW_CLK_RC_FAST", header: hdr.}: ledc_slow_clk_sel_t ## !< LEDC low speed timer clock source is RC_FAST clock
+    LEDC_SLOW_CLK_APB {.importc: "LEDC_SLOW_CLK_APB", header: hdr.}: ledc_slow_clk_sel_t ## !< LEDC low speed timer clock source is 80MHz APB clock
+    LEDC_SLOW_CLK_PLL_DIV {.importc: "LEDC_SLOW_CLK_PLL_DIV", header: hdr.}: ledc_slow_clk_sel_t ## !< LEDC low speed timer clock source is a PLL_DIV clock
+    LEDC_SLOW_CLK_XTAL {.importc: "LEDC_SLOW_CLK_XTAL", header: hdr.}: ledc_slow_clk_sel_t ## !< LEDC low speed timer clock source XTAL clock
 
   ##
   ##  @brief LEDC clock source configuration struct
@@ -68,11 +61,11 @@ when SOC_LEDC_SUPPORTED:
 
     ledc_clk_src_t* = distinct cint
 
-  let LEDC_REF_TICK {.importc: "LEDC_REF_TICK", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from reference tick (1Mhz)
+  let LEDC_REF_TICK* {.importc: "LEDC_REF_TICK", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from reference tick (1Mhz)
                                           ##  #endif
                                           ##  #if SOC_LEDC_SUPPORT_APB_CLOCK
-  let LEDC_APB_CLK {.importc: "LEDC_APB_CLK ", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from APB clock (80Mhz)
-  let LEDC_SCLK {.importc: "LEDC_SCLK ", header: hdr.}: ledc_clk_src_t ## !< Selecting this value for LEDC_TICK_SEL_TIMER let the hardware take its source clock from LEDC_APB_CLK_SEL
+  let LEDC_APB_CLK* {.importc: "LEDC_APB_CLK ", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from APB clock (80Mhz)
+  let LEDC_SCLK* {.importc: "LEDC_SCLK ", header: hdr.}: ledc_clk_src_t ## !< Selecting this value for LEDC_TICK_SEL_TIMER let the hardware take its source clock from LEDC_APB_CLK_SEL
 
 else:
   type
