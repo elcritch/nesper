@@ -6,6 +6,12 @@
 
 const hdr = "<hal/ledc_types.h>"
 
+let LEDC_AUTO_CLK {.importc: "LEDC_AUTO_CLK", header: hdr.}: cint                               ##*!< LEDC source clock will be automatically selected based on the giving resolution and duty parameter when init the timer*/
+let LEDC_USE_APB_CLK {.importc: "LEDC_USE_APB_CLK", header: hdr.}: cint             ##*!< Select APB as the source clock */
+let LEDC_USE_RC_FAST_CLK {.importc: "LEDC_USE_RC_FAST_CLK", header: hdr.}: cint     ##*!< Select RC_FAST as the source clock */
+let LEDC_USE_REF_TICK {.importc: "LEDC_USE_REF_TICK", header: hdr.}: cint       ##*!< Select REF_TICK as the source clock */
+let LEDC_USE_RTC8M_CLK {.importc: "LEDC_USE_RTC8M_CLK", header: hdr.}: cint   ##*!< Alias of 'LEDC_USE_RC_FAST_CLK' */
+
 type
   ledc_mode_t* = distinct cint
 
