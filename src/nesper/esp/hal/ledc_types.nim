@@ -7,19 +7,18 @@
 const hdr = "<hal/ledc_types.h>"
 
 type
-  ledc_mode_t*: cint
+  ledc_mode_t* = distinct cint
 
 let LEDC_HIGH_SPEED_MODE {.importc: "LEDC_HIGH_SPEED_MODE", header: hdr.}: ledc_mode_t
 let LEDC_LOW_SPEED_MODE {.importc: "LEDC_LOW_SPEED_MODE", header: hdr.}: ledc_mode_t
 let LEDC_SPEED_MODE_MAX {.importc: "LEDC_SPEED_MODE_MAX", header: hdr.}: ledc_mode_t
 
 type
-
-  ledc_intr_type_t*: cint
-  ledc_duty_direction_t*: cint
+  ledc_intr_type_t* = distinct cint
+  ledc_duty_direction_t* = distinct cint
 
 let LEDC_INTR_DISABLE {.importc: "LEDC_INTR_DISABLE", header: hdr.}: ledc_intr_type_t
-let LEDC_INTR_FADE_END,     ## !< Enable LEDC interrupt
+let LEDC_INTR_FADE_END {.importc: "LEDC_INTR_FADE_END", header: hdr.}: ledc_intr_type_t
 let LEDC_INTR_MAX {.importc: "LEDC_INTR_MAX", header: hdr.}: ledc_intr_type_t
 let LEDC_DUTY_DIR_DECREASE {.importc: "LEDC_DUTY_DIR_DECREASE", header: hdr.}: ledc_duty_direction_t
 let LEDC_DUTY_DIR_INCREASE {.importc: "LEDC_DUTY_DIR_INCREASE", header: hdr.}: ledc_duty_direction_t
@@ -31,7 +30,7 @@ when SOC_LEDC_SUPPORTED:
   ##
   type
 
-    ledc_slow_clk_sel_t* {.size: sizeof(cint).} = enum
+    ledc_slow_clk_sel_t* = distinct cint
   
   let LEDC_SLOW_CLK_RC_FAST {.importc: "LEDC_SLOW_CLK_RC_FAST", header: hdr.}
                               ## !< LEDC low speed timer clock source is RC_FAST clock
@@ -67,7 +66,7 @@ when SOC_LEDC_SUPPORTED:
   ##
   type                      ##  #if SOC_LEDC_SUPPORT_REF_TICK
 
-    ledc_clk_src_t*: cint
+    ledc_clk_src_t* = distinct cint
 
   let LEDC_REF_TICK {.importc: "LEDC_REF_TICK", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from reference tick (1Mhz)
                                           ##  #endif
@@ -78,9 +77,9 @@ when SOC_LEDC_SUPPORTED:
 else:
   type
 
-    ledc_clk_cfg_t* = cint
+    ledc_clk_cfg_t* = distinct cint
 
-    ledc_clk_src_t* = cint
+    ledc_clk_src_t* = distinct cint
 
 
 type
