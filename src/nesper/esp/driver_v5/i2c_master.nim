@@ -3,6 +3,7 @@
 ##
 ##  SPDX-License-Identifier: Apache-2.0
 ##
+import std/strutils
 
 import ../../consts
 import ../driver/gpio_driver
@@ -13,6 +14,13 @@ export i2c_types
 export i2c_hal_types
 
 {.push header: "<driver/i2c_master.h>".}
+
+type
+  I2cAddr = distinct uint16
+
+proc `$`*(a: I2cAddr): string = 
+  result = toHex(a.uint16, 2)
+proc `==`*(a, b: I2cAddr): bool {.borrow.}
 
 type
 
@@ -73,7 +81,7 @@ type
                          bycopy.} = object
     dev_addr_length* {.importc: "dev_addr_length".}: i2c_addr_bit_len_t ##
                               ## !< Select the address length of the slave device.
-    device_address* {.importc: "device_address".}: uint16 ##
+    device_address* {.importc: "device_address".}: I2cAddr ##
                               ## !< I2C device raw address. (The 7/10 bit address without read/write bit). Macro I2C_DEVICE_ADDRESS_NOT_USED (0xFFFF) stands for skip the address config inside driver.
     scl_speed_hz* {.importc: "scl_speed_hz".}: Hertz ##
                               ## !< I2C SCL line frequency.

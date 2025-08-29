@@ -95,7 +95,7 @@ else:
 
   proc addDevice*(
       bus: I2cMasterBus,
-      deviceAddress: uint16,
+      deviceAddress: I2cAddr,
       sclSpeedHz: Hertz,
       addrLen: i2c_addr_bit_len_t = I2C_ADDR_BIT_LEN_7,
       sclWaitUs: Micros = 0.Micros,
@@ -105,7 +105,7 @@ else:
     result = I2cDevice()
     result.bus = bus
     result.conf.dev_addr_length = addrLen
-    result.conf.device_address = deviceAddress
+    result.conf.device_address = deviceAddress.uint16
     result.conf.scl_speed_hz = sclSpeedHz
     result.conf.scl_wait_us = sclWaitUs.uint32
     result.conf.flags.disable_ack_check = (if disableAckCheck: 1'u32 else: 0'u32)
