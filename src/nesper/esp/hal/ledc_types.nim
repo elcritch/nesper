@@ -66,9 +66,6 @@ when defined(SOC_LEDC_SUPPORTED):
   ##  these values and to avoid mutual inclusion of the headers, we must define it
   ##  here.
   ##
-  type
-
-    ledc_clk_cfg_t* = soc_periph_ledc_clk_src_legacy_t
 
   ##
   ##  @brief LEDC timer-specific clock sources
