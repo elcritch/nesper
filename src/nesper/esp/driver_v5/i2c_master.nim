@@ -75,7 +75,7 @@ type
                               ## !< Select the address length of the slave device.
     device_address* {.importc: "device_address".}: uint16 ##
                               ## !< I2C device raw address. (The 7/10 bit address without read/write bit). Macro I2C_DEVICE_ADDRESS_NOT_USED (0xFFFF) stands for skip the address config inside driver.
-    scl_speed_hz* {.importc: "scl_speed_hz".}: uint32 ##
+    scl_speed_hz* {.importc: "scl_speed_hz".}: Hertz ##
                               ## !< I2C SCL line frequency.
     scl_wait_us* {.importc: "scl_wait_us".}: uint32 ##
                               ## !< Timeout value. (unit: us). Please note this value should not be so small that it can handle stretch/disturbance properly. If 0 is set, that means use the default reg value
