@@ -4,6 +4,9 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+import ../../consts
+import ../hal/ledc_types
+
 const hdr = "<driver/ledc.h>"
 
 const
@@ -575,7 +578,7 @@ proc ledc_fade_start*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
                                                   ##      - ESP_ERR_INVALID_STATE Channel not initialized or fade function not installed.
                                                   ##      - ESP_ERR_INVALID_ARG Parameter error.
                                                   ##
-when SOC_LEDC_SUPPORT_FADE_STOP:
+when defined(SOC_LEDC_SUPPORT_FADE_STOP):
 
   proc ledc_fade_stop*(speed_mode: ledc_mode_t; channel: ledc_channel_t): esp_err_t {.
       cdecl, importc: "ledc_fade_stop", header: hdr.}
