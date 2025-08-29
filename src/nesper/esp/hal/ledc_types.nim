@@ -35,6 +35,15 @@ let LEDC_DUTY_DIR_DECREASE* {.importc: "LEDC_DUTY_DIR_DECREASE", header: hdr.}: 
 let LEDC_DUTY_DIR_INCREASE* {.importc: "LEDC_DUTY_DIR_INCREASE", header: hdr.}: ledc_duty_direction_t
 let LEDC_DUTY_DIR_MAX* {.importc: "LEDC_DUTY_DIR_MAX", header: hdr.}: ledc_duty_direction_t
 
+type
+
+  ledc_clk_cfg_t* = distinct cint
+
+  ledc_clk_src_t* = distinct cint
+
+proc `$`*(m: ledc_clk_src_t): string {.borrow.}
+proc `$`*(m: ledc_clk_cfg_t): string {.borrow.}
+
 when defined(SOC_LEDC_SUPPORTED):
   ##
   ##  @brief LEDC global clock sources
@@ -68,25 +77,11 @@ when defined(SOC_LEDC_SUPPORTED):
   ##  LEDC_AUTO_CLK in the driver, as these enums have very similar names and user may pass
   ##  one of these by mistake.
   ##
-  type                      ##  #if SOC_LEDC_SUPPORT_REF_TICK
-
-    ledc_clk_src_t* = distinct cint
-
   let LEDC_REF_TICK* {.importc: "LEDC_REF_TICK", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from reference tick (1Mhz)
                                           ##  #endif
                                           ##  #if SOC_LEDC_SUPPORT_APB_CLOCK
   let LEDC_APB_CLK* {.importc: "LEDC_APB_CLK ", header: hdr.}: ledc_clk_src_t ## !< LEDC timer clock divided from APB clock (80Mhz)
   let LEDC_SCLK* {.importc: "LEDC_SCLK ", header: hdr.}: ledc_clk_src_t ## !< Selecting this value for LEDC_TICK_SEL_TIMER let the hardware take its source clock from LEDC_APB_CLK_SEL
-
-else:
-  type
-
-    ledc_clk_cfg_t* = distinct cint
-
-    ledc_clk_src_t* = distinct cint
-
-  proc `$`*(m: ledc_clk_src_t): string {.borrow.}
-  proc `$`*(m: ledc_clk_cfg_t): string {.borrow.}
 
 type
 
