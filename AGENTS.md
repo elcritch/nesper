@@ -39,3 +39,15 @@
 ## Security & Configuration
 - ESP‑IDF version is controlled via `ESP_IDF_VERSION` (defaults to `4.4`) and Nim defines in `config.nims`/`nim.cfg`.
 - Ensure your ESP‑IDF toolchain is installed and on PATH before building examples.
+
+## ESP‑IDF Header Wrapping
+- Enums with conditional members/values: wrap as `distinct cint` types and import members as `let` constants with `{.importc, header: hdr.}`. Examples: `i2c_port_t`, `i2c_mode_t`, `ledc_mode_t`, `ledc_intr_type_t`, `ledc_duty_direction_t`, and clock source selections. This avoids baking SoC/IDF‑specific numeric values.
+- Stable, contiguous enums: use Nim `enum` with `{.size: sizeof(cint).}` when definitions don’t vary across SoCs. Examples: `i2c_rw_t`, `i2c_trans_mode_t`, `i2c_ack_type_t`, `i2c_slave_stretch_cause_t`, `ledc_timer_t`, `ledc_channel_t`, `ledc_timer_bit_t`, `ledc_fade_mode_t`.
+- Typedef passthroughs to varying backends: prefer `distinct cint`/`cint` plus imported constants for items like `i2c_clock_source_t`, `ledc_clk_cfg_t`, `ledc_clk_src_t`. Use `{.importc, header: hdr.}` and, if needed to break cycles, alias via an `importc` type (e.g., `= soc_periph_*`), or a plain `cint` placeholder with separately imported constants.
+- Structs: import C structs as `{.importc, bycopy.}` Nim `object`s with matching fields and integer widths (e.g., `i2c_hal_clk_config_t`).
+- Sentinels and macros: `*_MAX` or alias members may be imported as `let` with `distinct cint` types and can be omitted if unstable across targets. Favor names over values; let ESP‑IDF supply the numeric mapping.
+- Header binding: set `const hdr = "<hal/<name>.h>"` and annotate all imports with `header: hdr` to bind directly to ESP‑IDF headers.
+
+Reference patterns:
+- `tests/c_headers/hal/i2c_types.h` → `src/nesper/esp/hal/i2c_types.nim`: ports/modes as `distinct cint` + `let`; stable I2C enums as Nim enums; clock source typedef mapped via `cint` + imported constants.
+- `tests/c_headers/hal/ledc_types.h` → `src/nesper/esp/hal/ledc_types.nim`: modes/interrupts/duty‑dir/clock sources as `distinct cint` + `let`; timers/channels/bit‑width/fade mode as Nim enums.
