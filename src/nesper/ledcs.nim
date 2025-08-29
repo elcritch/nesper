@@ -8,6 +8,7 @@ import ./esp/driver/gpio_driver
 import ./esp/driver_v5/ledc
 import ./esp/hal/ledc_types
 
+export ledc_types
 export ledc
 export consts.bits, consts.bytes
 export gpio_driver.gpio_num_t
