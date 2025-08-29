@@ -4,15 +4,15 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+const hdr = "<hal/i2c_types.h>"
+
 type
 
-  i2c_port_t* {.size: sizeof(cint).} = enum ##
-                                             ##  @brief I2C port number, can be I2C_NUM_0 ~ (I2C_NUM_MAX-1).
-                                             ##
-    I2C_NUM_0 = 0          ## !< I2C port 0
-    I2C_NUM_1              ## !< I2C port 1
-    LP_I2C_NUM_0           ## < LP_I2C port 0
+  i2c_port_t* = distinct cint
 
+  I2C_NUM_0* {.importc: "I2C_NUM_0", header: hdr.}: i2c_port_t
+  I2C_NUM_1* {.importc: "I2C_NUM_1", header: hdr.}: i2c_port_t
+  LP_I2C_NUM_0* {.importc: "LP_I2C_NUM_0", header: hdr.}: i2c_port_t
 
 type
 
@@ -28,8 +28,7 @@ type
 
 type                        ##  #if SOC_I2C_SUPPORT_SLAVE
 
-  i2c_hal_clk_config_t* {.importc: "i2c_hal_clk_config_t",
-                          header: "i2c_types.h", bycopy.} = object ##
+  i2c_hal_clk_config_t* {.importc: "i2c_hal_clk_config_t", header: hdr, bycopy.} = object ##
                               ##
                               ##  @brief Data structure for calculating I2C bus timing.
                               ##
@@ -93,8 +92,8 @@ type
 
 
 type
-  i2c_clock_source_t* {.importc: "i2c_clock_source_t", incompleteStruct, header: "<hal/i2c_types.h>".} = cint
+  i2c_clock_source_t* {.importc: "i2c_clock_source_t", incompleteStruct, header: hdr.} = cint
   
-var I2C_CLK_SRC_XTAL* {.importc: "I2C_CLK_SRC_XTAL", header: "<hal/i2c_types.h>".}: cint
-var I2C_CLK_SRC_RC_FAST* {.importc: "I2C_CLK_SRC_RC_FAST", header: "<hal/i2c_types.h>".}: cint
-var I2C_CLK_SRC_DEFAULT* {.importc: "I2C_CLK_SRC_DEFAULT", header: "<hal/i2c_types.h>".}: cint
+let I2C_CLK_SRC_XTAL* {.importc: "I2C_CLK_SRC_XTAL", header: hdr.}: cint
+let I2C_CLK_SRC_RC_FAST* {.importc: "I2C_CLK_SRC_RC_FAST", header: hdr.}: cint
+let I2C_CLK_SRC_DEFAULT* {.importc: "I2C_CLK_SRC_DEFAULT", header: hdr.}: cint
