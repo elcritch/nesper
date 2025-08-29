@@ -6,11 +6,20 @@
 
 const hdr = "<hal/ledc_types.h>"
 
-let LEDC_AUTO_CLK* {.importc: "LEDC_AUTO_CLK", header: hdr.}: cint                               ##*!< LEDC source clock will be automatically selected based on the giving resolution and duty parameter when init the timer*/
-let LEDC_USE_APB_CLK* {.importc: "LEDC_USE_APB_CLK", header: hdr.}: cint             ##*!< Select APB as the source clock */
-let LEDC_USE_RC_FAST_CLK* {.importc: "LEDC_USE_RC_FAST_CLK", header: hdr.}: cint     ##*!< Select RC_FAST as the source clock */
-let LEDC_USE_REF_TICK* {.importc: "LEDC_USE_REF_TICK", header: hdr.}: cint       ##*!< Select REF_TICK as the source clock */
-let LEDC_USE_RTC8M_CLK* {.importc: "LEDC_USE_RTC8M_CLK", header: hdr.}: cint   ##*!< Alias of 'LEDC_USE_RC_FAST_CLK' */
+type
+
+  ledc_clk_cfg_t* = distinct cint
+
+  ledc_clk_src_t* = distinct cint
+
+proc `$`*(m: ledc_clk_src_t): string {.borrow.}
+proc `$`*(m: ledc_clk_cfg_t): string {.borrow.}
+
+let LEDC_AUTO_CLK* {.importc: "LEDC_AUTO_CLK", header: hdr.}: ledc_clk_src_t                               ##*!< LEDC source clock will be automatically selected based on the giving resolution and duty parameter when init the timer*/
+let LEDC_USE_APB_CLK* {.importc: "LEDC_USE_APB_CLK", header: hdr.}: ledc_clk_src_t             ##*!< Select APB as the source clock */
+let LEDC_USE_RC_FAST_CLK* {.importc: "LEDC_USE_RC_FAST_CLK", header: hdr.}: ledc_clk_src_t     ##*!< Select RC_FAST as the source clock */
+let LEDC_USE_REF_TICK* {.importc: "LEDC_USE_REF_TICK", header: hdr.}: ledc_clk_src_t       ##*!< Select REF_TICK as the source clock */
+let LEDC_USE_RTC8M_CLK* {.importc: "LEDC_USE_RTC8M_CLK", header: hdr.}: ledc_clk_src_t   ##*!< Alias of 'LEDC_USE_RC_FAST_CLK' */
 
 type
   ledc_mode_t* = distinct cint
@@ -34,15 +43,6 @@ let LEDC_INTR_MAX* {.importc: "LEDC_INTR_MAX", header: hdr.}: ledc_intr_type_t
 let LEDC_DUTY_DIR_DECREASE* {.importc: "LEDC_DUTY_DIR_DECREASE", header: hdr.}: ledc_duty_direction_t
 let LEDC_DUTY_DIR_INCREASE* {.importc: "LEDC_DUTY_DIR_INCREASE", header: hdr.}: ledc_duty_direction_t
 let LEDC_DUTY_DIR_MAX* {.importc: "LEDC_DUTY_DIR_MAX", header: hdr.}: ledc_duty_direction_t
-
-type
-
-  ledc_clk_cfg_t* = distinct cint
-
-  ledc_clk_src_t* = distinct cint
-
-proc `$`*(m: ledc_clk_src_t): string {.borrow.}
-proc `$`*(m: ledc_clk_cfg_t): string {.borrow.}
 
 when defined(SOC_LEDC_SUPPORTED):
   ##
