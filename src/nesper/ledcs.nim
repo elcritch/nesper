@@ -47,7 +47,7 @@ proc newLedcTimer*(
     mode: ledc_mode_t,
     timer: ledc_timer_t,
     dutyRes: ledc_timer_bit_t,
-    freqHz: uint32,
+    freqHz: Hertz,
     clkCfg: ledc_clk_cfg_t
   ): LedcTimer =
   result = LedcTimer()
@@ -62,7 +62,7 @@ proc newLedcTimer*(
   if ret != ESP_OK:
     raise newEspError[LedcError]("ledc_timer_config failed (" & $esp_err_to_name(ret) & ")", ret)
 
-proc setFrequency*(t: LedcTimer; freqHz: uint32): esp_err_t {.discardable.} =
+proc setFrequency*(t: LedcTimer; freqHz: Hertz): esp_err_t {.discardable.} =
   # Update timer frequency via driver, and keep cfg in sync.
   let ret = ledc_set_freq(t.cfg.speed_mode, t.cfg.timer_num, freqHz)
   if ret != ESP_OK:
@@ -70,7 +70,7 @@ proc setFrequency*(t: LedcTimer; freqHz: uint32): esp_err_t {.discardable.} =
   t.cfg.freq_hz = freqHz
   ret
 
-proc getFrequency*(t: LedcTimer): uint32 =
+proc getFrequency*(t: LedcTimer): Hertz =
   ledc_get_freq(t.cfg.speed_mode, t.cfg.timer_num)
 
 # Channel helpers

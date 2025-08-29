@@ -9,7 +9,7 @@ block:
     mode = LEDC_LOW_SPEED_MODE,
     timer = LEDC_TIMER_0,
     dutyRes = LEDC_TIMER_13_BIT,
-    freqHz = 4_000'u32,
+    freqHz = 4_000.Hertz,
     clkCfg = LEDC_AUTO_CLK
   )
 

@@ -66,7 +66,7 @@ type
                               ## !< LEDC channel duty resolution
     timer_num* {.importc: "timer_num".}: ledc_timer_t ##
                               ## !< The timer source of channel (0 - LEDC_TIMER_MAX-1)
-    freq_hz* {.importc: "freq_hz".}: uint32 ## !< LEDC timer frequency (Hz)
+    freq_hz* {.importc: "freq_hz".}: Hertz ## !< LEDC timer frequency (Hz)
     clk_cfg* {.importc: "clk_cfg".}: ledc_clk_cfg_t ##
                               ## !< Configure LEDC source clock from ledc_clk_cfg_t.
                               ##                                                 Note that LEDC_USE_RC_FAST_CLK and LEDC_USE_XTAL_CLK are
@@ -230,7 +230,7 @@ proc ledc_stop*(speed_mode: ledc_mode_t; channel: ledc_channel_t;
                       ##
 
 proc ledc_set_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t;
-                    freq_hz: uint32): esp_err_t {.cdecl,
+                    freq_hz: Hertz): esp_err_t {.cdecl,
     importc: "ledc_set_freq", header: hdr.}
   ##
                                                 ##  @brief LEDC set channel frequency (Hz)
@@ -245,7 +245,7 @@ proc ledc_set_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t;
                                                 ##      - ESP_FAIL Can not find a proper pre-divider number base on the given frequency and the current duty_resolution.
                                                 ##
 
-proc ledc_get_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t): uint32 {.
+proc ledc_get_freq*(speed_mode: ledc_mode_t; timer_num: ledc_timer_t): Hertz {.
     cdecl, importc: "ledc_get_freq", header: hdr.}
   ##
                               ##
