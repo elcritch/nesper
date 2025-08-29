@@ -9,6 +9,8 @@ const hdr = "<hal/ledc_types.h>"
 type
   ledc_mode_t* = distinct cint
 
+proc `$`*(m: ledc_mode_t): string {.borrow.}
+
 let LEDC_HIGH_SPEED_MODE* {.importc: "LEDC_HIGH_SPEED_MODE", header: hdr.}: ledc_mode_t
 let LEDC_LOW_SPEED_MODE* {.importc: "LEDC_LOW_SPEED_MODE", header: hdr.}: ledc_mode_t
 let LEDC_SPEED_MODE_MAX* {.importc: "LEDC_SPEED_MODE_MAX", header: hdr.}: ledc_mode_t
@@ -16,6 +18,9 @@ let LEDC_SPEED_MODE_MAX* {.importc: "LEDC_SPEED_MODE_MAX", header: hdr.}: ledc_m
 type
   ledc_intr_type_t* = distinct cint
   ledc_duty_direction_t* = distinct cint
+
+proc `$`*(m: ledc_intr_type_t): string {.borrow.}
+proc `$`*(m: ledc_duty_direction_t): string {.borrow.}
 
 let LEDC_INTR_DISABLE* {.importc: "LEDC_INTR_DISABLE", header: hdr.}: ledc_intr_type_t
 let LEDC_INTR_FADE_END* {.importc: "LEDC_INTR_FADE_END", header: hdr.}: ledc_intr_type_t
@@ -74,6 +79,8 @@ else:
 
     ledc_clk_src_t* = distinct cint
 
+  proc `$`*(m: ledc_clk_src_t): string {.borrow.}
+  proc `$`*(m: ledc_clk_cfg_t): string {.borrow.}
 
 type
 
