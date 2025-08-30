@@ -59,10 +59,10 @@ else:
 
   proc repr*(dev: i2c_device_config_t): string =
     result = "I2cDevice("
-    result &= "deviceAddress: " & $dev.device_address & ", "
-    result &= "sclSpeedHz: " & $dev.scl_speed_hz & ", "
-    result &= "addrLen: " & $dev.dev_addr_length & ", "
-    result &= "sclWaitUs: " & $dev.scl_wait_us & ", "
+    result &= "deviceAddress: " & $(dev.device_address) & ", "
+    result &= "sclSpeedHz: " & $(dev.scl_speed_hz) & ", "
+    result &= "addrLen: " & $(dev.dev_addr_length) & ", "
+    result &= "sclWaitUs: " & $(dev.scl_wait_us) & ", "
     let fl = cast[ptr uint32](addr(dev.flags))
     result &= "flags: " & $toHex(fl[], 8) & ") "
 

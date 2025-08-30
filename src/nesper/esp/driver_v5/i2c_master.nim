@@ -13,16 +13,16 @@ import ./i2c_types
 export i2c_types
 export i2c_hal_types
 
-{.push header: "<driver/i2c_master.h>".}
+const hdr = "<driver/i2c_master.h>"
 
 type
   I2cAddr* = distinct uint16
 
 template `'i2c`*(num: untyped): I2cAddr = I2cAddr((parseInt(num) and 0x0F).uint16)
 
-proc `$`*(a: I2cAddr): string = 
-  result = toHex(a.uint16, 2)
-proc `==`*(a, b: I2cAddr): bool {.borrow.}
+proc `$`*(a: I2cAddr): string = result = toHex(a.uint16, 2)
+
+# proc `==`*(a, b: I2cAddr): bool {.borrow.}
 
 type
 
@@ -38,7 +38,7 @@ type
     ##                                               This can save power, but at the expense of more RAM being consumed
 
 
-  i2c_master_bus_config_t* {.importc: "i2c_master_bus_config_t",
+  i2c_master_bus_config_t* {.importc: "i2c_master_bus_config_t", header: hdr,
                               bycopy.} = object
     i2c_port* {.importc: "i2c_port".}: i2c_port_num_t ##
                               ## !< I2C port number, `-1` for auto selecting, (not include LP I2C instance)
@@ -52,7 +52,7 @@ type
                               ## !< Clock source of I2C master bus
 
     when defined(SOC_LP_I2C_SUPPORTED):
-      lp_source_clk* {.header: "i2c_master.h".}: lp_i2c_clock_source_t
+      lp_source_clk*: lp_i2c_clock_source_t
                               ## !< LP_UART source clock selection
     # anonymous union end
 
@@ -79,7 +79,7 @@ type
     ## !< Disable ACK check. If this is set false, that means ack check is enabled, the transaction will be stopped and API returns error when nack is detected.
 
 
-  i2c_device_config_t* {.importc: "i2c_device_config_t", 
+  i2c_device_config_t* {.importc: "i2c_device_config_t", header: hdr,
                          bycopy.} = object
     dev_addr_length* {.importc: "dev_addr_length".}: i2c_addr_bit_len_t ##
                               ## !< Select the address length of the slave device.
@@ -115,6 +115,7 @@ type
 
 
   i2c_operation_job_t* {.importc: "i2c_operation_job_t", 
+                         header: hdr,
                          bycopy.} = object
     command* {.importc: "command".}: i2c_master_command_t ##
                               ## < I2C command indicating the type of operation (START, WRITE, READ, or STOP)
@@ -134,6 +135,7 @@ type
 
   i2c_master_transmit_multi_buffer_info_t* {.
       importc: "i2c_master_transmit_multi_buffer_info_t",
+      header: hdr,
        bycopy.} = object ##
                                                  ##  @brief I2C master transmit buffer information structure
                                                  ##
@@ -159,7 +161,7 @@ converter toHandle*(s: i2c_master_bus_config_t): i2c_master_bus_config_tt {.inli
 
 proc i2c_new_master_bus*(bus_config: ptr i2c_master_bus_config_t;
                          ret_bus_handle: ptr i2c_master_bus_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_new_master_bus", header: "i2c_master.h".}
+    cdecl, importc: "i2c_new_master_bus", header: hdr.}
   ##
                               ##
                               ##  @brief Allocate an I2C master bus
@@ -176,7 +178,7 @@ proc i2c_new_master_bus*(bus_config: ptr i2c_master_bus_config_t;
 proc i2c_master_bus_add_device*(bus_handle: i2c_master_bus_handle_t;
                                 dev_config: ptr i2c_device_config_t;
                                 ret_handle: ptr i2c_master_dev_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_master_bus_add_device", header: "i2c_master.h".}
+    cdecl, importc: "i2c_master_bus_add_device", header: hdr.}
   ##
                               ##
                               ##  @brief Add I2C master BUS device.
@@ -191,7 +193,7 @@ proc i2c_master_bus_add_device*(bus_handle: i2c_master_bus_handle_t;
                               ##
 
 proc i2c_del_master_bus*(bus_handle: i2c_master_bus_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_del_master_bus", header: "i2c_master.h".}
+    cdecl, importc: "i2c_del_master_bus", header: hdr.}
   ##
                               ##
                               ##  @brief Deinitialize the I2C master bus and delete the handle.
@@ -203,7 +205,7 @@ proc i2c_del_master_bus*(bus_handle: i2c_master_bus_handle_t): esp_err_t {.
                               ##
 
 proc i2c_master_bus_rm_device*(handle: i2c_master_dev_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_master_bus_rm_device", header: "i2c_master.h".}
+    cdecl, importc: "i2c_master_bus_rm_device", header: hdr.}
   ##
                               ##
                               ##  @brief I2C master bus delete device
@@ -216,7 +218,7 @@ proc i2c_master_bus_rm_device*(handle: i2c_master_dev_handle_t): esp_err_t {.
 proc i2c_master_transmit*(i2c_dev: i2c_master_dev_handle_t;
                           write_buffer: ptr uint8; write_size: csize_t;
                           xfer_timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_transmit", header: "i2c_master.h".}
+    importc: "i2c_master_transmit", header: hdr.}
   ##
                               ##
                               ##  @brief Perform a write transaction on the I2C bus.
@@ -240,7 +242,7 @@ proc i2c_master_multi_buffer_transmit*(i2c_dev: i2c_master_dev_handle_t;
     buffer_info_array: ptr i2c_master_transmit_multi_buffer_info_t;
                                        array_size: csize_t;
                                        xfer_timeout_ms: cint): esp_err_t {.
-    cdecl, importc: "i2c_master_multi_buffer_transmit", header: "i2c_master.h".}
+    cdecl, importc: "i2c_master_multi_buffer_transmit", header: hdr.}
   ##
                               ##
                               ##  @brief Transmit multiple buffers of data over an I2C bus.
@@ -263,7 +265,7 @@ proc i2c_master_transmit_receive*(i2c_dev: i2c_master_dev_handle_t;
                                   write_buffer: ptr uint8; write_size: csize_t;
                                   read_buffer: ptr uint8; read_size: csize_t;
                                   xfer_timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_transmit_receive", header: "i2c_master.h".}
+    importc: "i2c_master_transmit_receive", header: hdr.}
   ##
                               ##
                               ##  @brief Perform a write-read transaction on the I2C bus.
@@ -288,7 +290,7 @@ proc i2c_master_transmit_receive*(i2c_dev: i2c_master_dev_handle_t;
 proc i2c_master_receive*(i2c_dev: i2c_master_dev_handle_t;
                          read_buffer: ptr uint8; read_size: csize_t;
                          xfer_timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_receive", header: "i2c_master.h".}
+    importc: "i2c_master_receive", header: hdr.}
   ##
                               ##
                               ##  @brief Perform a read transaction on the I2C bus.
@@ -310,7 +312,7 @@ proc i2c_master_receive*(i2c_dev: i2c_master_dev_handle_t;
 
 proc i2c_master_probe*(bus_handle: i2c_master_bus_handle_t; address: uint16;
                        xfer_timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_probe", header: "i2c_master.h".}
+    importc: "i2c_master_probe", header: hdr.}
   ##
                               ##
                               ##  @brief Probe I2C address, if address is correct and ACK is received, this function will return ESP_OK.
@@ -340,7 +342,7 @@ proc i2c_master_probe*(bus_handle: i2c_master_bus_handle_t; address: uint16;
 proc i2c_master_execute_defined_operations*(i2c_dev: i2c_master_dev_handle_t;
     i2c_operation: ptr i2c_operation_job_t; operation_list_num: csize_t;
     xfer_timeout_ms: cint): esp_err_t {.cdecl, importc: "i2c_master_execute_defined_operations",
-                                        header: "i2c_master.h".}
+                                        header: hdr.}
   ##
                               ##
                               ##  @brief Execute a series of pre-defined I2C operations.
@@ -368,7 +370,7 @@ proc i2c_master_execute_defined_operations*(i2c_dev: i2c_master_dev_handle_t;
 proc i2c_master_register_event_callbacks*(i2c_dev: i2c_master_dev_handle_t;
     cbs: ptr i2c_master_event_callbacks_t; user_data: pointer): esp_err_t {.
     cdecl, importc: "i2c_master_register_event_callbacks",
-    header: "i2c_master.h".}
+    header: hdr.}
   ##
                             ##  @brief Register I2C transaction callbacks for a master device
                             ##
@@ -387,7 +389,7 @@ proc i2c_master_register_event_callbacks*(i2c_dev: i2c_master_dev_handle_t;
                             ##
 
 proc i2c_master_bus_reset*(bus_handle: i2c_master_bus_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_master_bus_reset", header: "i2c_master.h".}
+    cdecl, importc: "i2c_master_bus_reset", header: hdr.}
   ##
                               ##
                               ##  @brief Reset the I2C master bus.
@@ -402,7 +404,7 @@ proc i2c_master_bus_reset*(bus_handle: i2c_master_bus_handle_t): esp_err_t {.
 proc i2c_master_device_change_address*(i2c_dev: i2c_master_dev_handle_t;
                                        new_device_address: uint16;
                                        timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_device_change_address", header: "i2c_master.h".}
+    importc: "i2c_master_device_change_address", header: hdr.}
   ##
                               ##
                               ##  @brief Change the I2C device address at runtime.
@@ -428,7 +430,7 @@ proc i2c_master_device_change_address*(i2c_dev: i2c_master_dev_handle_t;
 
 proc i2c_master_bus_wait_all_done*(bus_handle: i2c_master_bus_handle_t;
                                    timeout_ms: cint): esp_err_t {.cdecl,
-    importc: "i2c_master_bus_wait_all_done", header: "i2c_master.h".}
+    importc: "i2c_master_bus_wait_all_done", header: hdr.}
   ##
                               ##
                               ##  @brief Wait for all pending I2C transactions done
@@ -444,7 +446,7 @@ proc i2c_master_bus_wait_all_done*(bus_handle: i2c_master_bus_handle_t;
 
 proc i2c_master_get_bus_handle*(port_num: i2c_port_num_t;
                                 ret_handle: ptr i2c_master_bus_handle_t): esp_err_t {.
-    cdecl, importc: "i2c_master_get_bus_handle", header: "i2c_master.h".}
+    cdecl, importc: "i2c_master_get_bus_handle", header: hdr.}
   ##
                               ##
                               ##  @brief Retrieves the I2C master bus handle for a specified I2C port number.
