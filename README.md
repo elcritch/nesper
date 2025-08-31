@@ -12,10 +12,9 @@ Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Bra
 
 ## General Usage
 
-1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf)
+1. Install [Nim](https://nim-lang.org/install.html)
+2. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf)
    + TLDR: `git clone -b release/v5.5 --recursive https://github.com/espressif/esp-idf.git && cd esp-idf && ./install.sh`
-   + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1` 
-2. Install [Nim](https://nim-lang.org/install.html)
 4. Create a new Nimble project `nimble init --git esp32_nim_example` 
 
 ### Setup 
@@ -23,10 +22,10 @@ Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Bra
 In the new project directory edit the Nimble file and add the lines:
 
 ```nim
-requires "nesper >= 0.6.1"
+requires "nesper >= 0.8.0"
 ````
 
-**Note:** Make sure _not_ to include a `bin` option like `bin = @["src/esp32_nim_example"]` in your Nimble file as it may break the idf.py build.  
+Next you can do `atlas install` or `nimble install -d`.
 
 Next create a `config.nims` file in your project root:
 
@@ -37,19 +36,21 @@ switch("define", "esp32s3") # or other variants
 include nesper/build_utils/builds
 ```
 
-Then create 
+**Note:** This replaces the older `nesper/build_utils/tasks` setup which has been deprecated. The above is much simpler.
+
+Now you can run:
+
+```sh
+nim espSetup
+```
+
+This will create a `CMakeLists.txt` file, a `main/main.nim` hello world, and a `main/CMakeLists.txt`.
 
 ### Compiling and Building
 
-1. Run `nimble esp_build` to build the esp-idf project
+1. Run `nim espCompile` to compile the Nim code to `main/nimcache/`
+1. Run `nim espBuild` to compile the Nim code *and* build the esp-idf project
 2. Flash and monitor the esp32 board using: `idf.py -p </dev/ttyUSB0> flash monitor`
-
-Notes:
-- Running `nimble esp_build` will both compile the Nim code and then build the esp-idf project
-- During development it's often handy just to run `nimble esp_compile` to check your Nim code works
-- Sometimes the Nim build cache gets out of sync, use `nimble esp_build --clean` to force a full Nim recompile
-- Sometimes the esp-idf build cache gets out of sync, use `nimble esp_build --dist-clean` to force a full Nim recompile
-
 
 ## Example Code 
 
