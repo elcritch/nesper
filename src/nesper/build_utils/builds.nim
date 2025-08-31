@@ -22,7 +22,7 @@ task espCompile, "compile the Nim code":
   espInstallHeadersTask()
 
 task espBuild, "Build esp-idf project":
-  compileTask()
+  espCompileTask()
   echo "\n[Nesper ESP] Building ESP-IDF project:"
 
   if findExe("idf.py") == "":
@@ -36,3 +36,32 @@ task espClean, "clean the Nim code":
   exec("idf.py clean")
   rmDir(cacheDir)
   mkDir(cacheDir)
+
+task espSetup, "setup the esp-idf project":
+  let idfPath = getEnv("IDF_PATH")
+  if idfPath == "":
+    echo "Error: IDF_PATH not set"
+    echo "Run `. $IDF_PATH/export.sh` and try again"
+    quit(1)
+
+  cpFile(idfPath / "examples" / "get-started" / "hello_world" / "CMakeLists.txt", "CMakeLists.txt")
+  mkdir("main")
+
+  writeFile("main" / "CMakeLists.txt", dedent"""
+  idf_component_register(SRC_DIRS "./nimcache"
+                       INCLUDE_DIRS ""
+                      )
+
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-discarded-qualifiers APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-ignored-qualifiers APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=unused-label APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=parentheses APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=implicit-function-declaration APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=maybe-uninitialized APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=nonnull APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=address APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-but-set-variable APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-maybe-uninitialized APPEND)
+  idf_build_set_property(C_COMPILE_OPTIONS -Wno-incompatible-pointer-types APPEND)
+  """)

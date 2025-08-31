@@ -13,19 +13,31 @@ Note: It's recommended to use the ESP-IDF.py v4.0 branch (as of 2020-11-24). Bra
 ## General Usage
 
 1. [Install ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started-get-esp-idf)
-   + TLDR: `git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git`
+   + TLDR: `git clone -b release/v5.5 --recursive https://github.com/espressif/esp-idf.git && cd esp-idf && ./install.sh`
    + esp-idf version can be set using the defines: `-d:ESP_IDF_V4_0` or `-d:ESP_IDF_V4_1` 
-2. Install [Nim 1.4+](https://nim-lang.org/install.html)
-3. Use [Nimble](https://github.com/nim-lang/nimble#nimble-usage) to install Nesper (`nimble install https://github.com/elcritch/nesper` or for the devel branch `nimble install 'https://github.com/elcritch/nesper@#devel' `)
+2. Install [Nim](https://nim-lang.org/install.html)
 4. Create a new Nimble project `nimble init --git esp32_nim_example` 
-5. In the new project directory edit the Nimble file and add the lines:
+
+### Setup 
+
+In the new project directory edit the Nimble file and add the lines:
+
 ```nim
 requires "nesper >= 0.6.1"
-# includes nimble tasks for building Nim esp-idf projects
-include nesper/build_utils/tasks
 ````
-   + Make sure _not_ to include a `bin` option like `bin = @["src/esp32_nim_example"]` in your Nimble file as it may break the idf.py build.  
-6. Run `nimble esp_setup` to setup the correct files for building an esp32/esp-idf project 
+
+**Note:** Make sure _not_ to include a `bin` option like `bin = @["src/esp32_nim_example"]` in your Nimble file as it may break the idf.py build.  
+
+Next create a `config.nims` file in your project root:
+
+```nim
+switch("define", "ESP_IDF_VERSION=5.5")
+switch("define", "esp32s3") # or other variants
+
+include nesper/build_utils/builds
+```
+
+Then create 
 
 ### Compiling and Building
 
