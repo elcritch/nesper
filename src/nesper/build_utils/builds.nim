@@ -88,5 +88,5 @@ task espSetup, "setup the esp-idf project":
   --tls_emulation:off
   """)
 
-  let hwDir = currentSourcePath().parentDir
-  cpFile(hwDir/"src"/"nesper"/"build_utils"/"templates"/"hello_world.nim", "main" / "main.nim")
+  let hwDir = currentSourcePath().parentDir / "templates" / "hello_world.nim"
+  cpFile(hwDir, "main" / "main.nim")
