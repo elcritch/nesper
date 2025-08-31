@@ -50,6 +50,8 @@ task espSetup, "setup the esp-idf project":
   writeFile("CMakeLists.txt", mainCMakeLists)
 
   mkdir("main")
+  mkdir("main/nimcache")
+  writeFile("main/nimcache/.gitkeep", "") # needed to ensure the directory is created for idf.py
 
   writeFile("main" / "CMakeLists.txt", dedent"""
   idf_component_register(SRC_DIRS "./nimcache"
