@@ -1,0 +1,22 @@
+#strict
+#importc
+#cdecl
+#header
+#stdints
+#skipinclude
+
+#reordercomments
+#mergeDuplicates
+#skipFuncDefines
+#importFuncDefines
+
+#mergeblocks
+
+#render nonNep1Imports
+#render extranewlines
+#render reindentlongcomments
+
+#mangle "'va_list'" "varargs[pointer]"
+#anonymousAsFields
+
+#mangle "'__attribute__((packed))'" ""

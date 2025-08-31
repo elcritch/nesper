@@ -1,0 +1,45 @@
+on:
+  pull_request:
+    branches:
+    - "*"
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        nimversion:
+          - '2.x'
+          - '2.0.14'
+        os:
+          - ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Cache packages
+      if: matrix.nimversion != '2.0.14'
+      uses: actions/cache@v3
+      with:
+        path: ~/.nimble
+        key: ${{ runner.os }}-${{ hashFiles('nesper.nimble') }}
+
+    - uses: iffy/install-nim@v4
+      with:
+        version: ${{ matrix.nimversion }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Nimble
+      run: |
+        nimble install nimble@0.18.2
+        nim -v
+        nimble -v
+
+    - name: Install Deps
+      run: |
+        # new atlas workspace
+        nimble install -d --verbose
+
+    - name: Build Tests
+      run: |
+        nim test

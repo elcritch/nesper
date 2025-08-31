@@ -12,7 +12,7 @@
 ##  limitations under the License.
 
 import ../../consts
-import adc
+import adc_legacy
 
 const i2s_header = """#include <freertos/FreeRTOS.h>
                       #include "driver/i2s.h" """

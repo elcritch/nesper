@@ -58,7 +58,7 @@ proc newSpiBus*(
         host: SpiHostDevice;
         miso, mosi, sclk: gpio_num_t;
         quadwp = gpio_num_t(-1), quadhd = gpio_num_t(-1);
-        dma_channel: range[0..2],
+        dma_channel: range[0..3],
         flags: set[SpiBusFlag] = {},
         intr_flags: int = 0,
         max_transfer_sz = 4094

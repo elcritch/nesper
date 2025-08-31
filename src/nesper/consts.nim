@@ -75,7 +75,7 @@ template ESP_INTR_ENABLE*(inum: untyped): untyped =
 template ESP_INTR_DISABLE*(inum: untyped): untyped =
   xt_ints_off((1 shl inum))
 
-template borrowBasicOperations(typ: typedesc) =
+template borrowBasicOperations*(typ: typedesc) =
   proc `+` *(x, y: typ): typ {.borrow.}
   proc `-` *(x, y: typ): typ {.borrow.}
 
@@ -104,6 +104,7 @@ type
 
 borrowBasicOperations(Micros)
 borrowBasicOperations(Millis)
+borrowBasicOperations(Hertz)
 
 proc `or`* (x, y: esp_intr_flags): esp_intr_flags {.borrow.}
 
