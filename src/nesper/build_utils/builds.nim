@@ -72,9 +72,30 @@ task espSetup, "setup the esp-idf project":
   idf_build_set_property(C_COMPILE_OPTIONS -Wno-incompatible-pointer-types APPEND)
   """)
 
+  writeFile("main/config.nims", dedent"""
+  --nomain
+  --compileOnly
+  --define:NimAppMain
+  --nimcache:nimcache
+
+  --gc:arc
+  --os:freertos
+  --cpu:arm
+  --define:useMalloc
+  --define:no_signal_handler
+  --debugger:native
+  # --linetrace:off
+  # --debuginfo:off
+  --threads:on
+  --tls_emulation:off
+  --hint:"conf:off"
+  --hint:"SuccessX:off"
+  """)
+
   writeFile("main/main.nim", dedent"""
   import std/strutils
-  import nesper, nesper/consts, nesper/general
+  import nesper
+  import nesper/[consts, general, timers]
   import nesper/esp/esp_system
 
   const
