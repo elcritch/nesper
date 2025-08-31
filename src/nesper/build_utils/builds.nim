@@ -44,7 +44,11 @@ task espSetup, "setup the esp-idf project":
     echo "Run `. $IDF_PATH/export.sh` and try again"
     quit(1)
 
-  cpFile(idfPath / "examples" / "get-started" / "hello_world" / "CMakeLists.txt", "CMakeLists.txt")
+  let cmakeLists = readFile(idfPath / "examples" / "get-started" / "hello_world" / "CMakeLists.txt")
+  let currentDirName = getCurrentDir().splitFile.name
+  let mainCMakeLists = cmakeLists.replace("hello_world", currentDirName)
+  writeFile("CMakeLists.txt", mainCMakeLists)
+
   mkdir("main")
 
   writeFile("main" / "CMakeLists.txt", dedent"""
