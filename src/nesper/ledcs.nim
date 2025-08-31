@@ -5,7 +5,7 @@ import ./general
 import ./esp/driver/gpio_driver
 
 # Low-level v5 driver bindings and types
-import ./esp/driver_v5/ledc
+import ./esp/driver/ledc
 import ./esp/hal/ledc_types
 
 export ledc_types

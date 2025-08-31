@@ -10,10 +10,10 @@ else:
   import ./esp/driver/gpio_driver
 
   # Low-level v5 driver bindings
-  import ./esp/driver_v5/i2c_master
+  import ./esp/driver/i2c_master
   import ./esp/hal/i2c_types
 
-  export i2c_master
+  export i2c_types, i2c_master
   export consts.bits, consts.bytes, consts.TickType_t, consts.Millis
   export general.toBits
   export gpio_driver.gpio_num_t
@@ -176,11 +176,3 @@ else:
     elif ret == ESP_ERR_NOT_FOUND: false
     else:
       raise newEspError[I2cError]("i2c_master_probe failed (" & $esp_err_to_name(ret) & ")", ret)
-
-
-  when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
-    import legacy/i2cs as i2cs_legacy
-    export i2cs_legacy
-  else:
-
-    import esp/driver_v5/i2c_master
