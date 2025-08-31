@@ -6,10 +6,11 @@
 
 import ../../consts
 import ./timer_types
+import ./esp_etm
 
 type
 
-  gptimer_t* {.importc: "gptimer_t", header: "gptimer_types.h", bycopy.} = object
+  gptimer_t* {.importc: "gptimer_t", header: "gptimer_types.h", incompleteStruct, bycopy.} = object
 
   gptimer_handle_t* = ptr gptimer_t ##
                                     ##  @brief Type of General Purpose Timer handle
