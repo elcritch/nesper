@@ -33,7 +33,7 @@ const
 
 ## * @brief Type of esp_netif_object server
 const hdr = """#include <esp_netif.h>
-               #include "esp_netif_types.h" """
+               #include <esp_netif_types.h> """
 
 type
   esp_netif_t* {.importc: "esp_netif_t", header: hdr, bycopy.} = object
