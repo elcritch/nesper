@@ -24,30 +24,33 @@
 ##
 ##
 
-when not defined(CONFIG_TINYUSB_CDC_ENABLED):
-  const
-    CONFIG_TINYUSB_CDC_ENABLED* = 0
-when not defined(CONFIG_TINYUSB_CDC_COUNT):
-  const
-    CONFIG_TINYUSB_CDC_COUNT* = 0
-when not defined(CONFIG_TINYUSB_MSC_ENABLED):
-  const
-    CONFIG_TINYUSB_MSC_ENABLED* = 0
-when not defined(CONFIG_TINYUSB_HID_COUNT):
-  const
-    CONFIG_TINYUSB_HID_COUNT* = 0
-when not defined(CONFIG_TINYUSB_MIDI_COUNT):
-  const
-    CONFIG_TINYUSB_MIDI_COUNT* = 0
-when not defined(CONFIG_TINYUSB_CUSTOM_CLASS_ENABLED):
-  const
-    CONFIG_TINYUSB_CUSTOM_CLASS_ENABLED* = 0
-when not defined(CONFIG_TINYUSB_DEBUG_LEVEL):
-  const
-    CONFIG_TINYUSB_DEBUG_LEVEL* = 0
-const
-  CFG_TUSB_RHPORT0_MODE* = OPT_MODE_DEVICE or OPT_MODE_FULL_SPEED
-  CFG_TUSB_OS* = OPT_OS_FREERTOS
+import ../../consts
+
+# when not defined(CONFIG_TINYUSB_CDC_ENABLED):
+#   const
+#     CONFIG_TINYUSB_CDC_ENABLED* = 0
+# when not defined(CONFIG_TINYUSB_CDC_COUNT):
+#   const
+#     CONFIG_TINYUSB_CDC_COUNT* = 0
+# when not defined(CONFIG_TINYUSB_MSC_ENABLED):
+#   const
+#     CONFIG_TINYUSB_MSC_ENABLED* = 0
+# when not defined(CONFIG_TINYUSB_HID_COUNT):
+#   const
+#     CONFIG_TINYUSB_HID_COUNT* = 0
+# when not defined(CONFIG_TINYUSB_MIDI_COUNT):
+#   const
+#     CONFIG_TINYUSB_MIDI_COUNT* = 0
+# when not defined(CONFIG_TINYUSB_CUSTOM_CLASS_ENABLED):
+#   const
+#     CONFIG_TINYUSB_CUSTOM_CLASS_ENABLED* = 0
+# when not defined(CONFIG_TINYUSB_DEBUG_LEVEL):
+#   const
+#     CONFIG_TINYUSB_DEBUG_LEVEL* = 0
+
+# const
+#   CFG_TUSB_RHPORT0_MODE* = OPT_MODE_DEVICE or OPT_MODE_FULL_SPEED
+#   CFG_TUSB_OS* = OPT_OS_FREERTOS
 
 ##  USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
 ##  Tinyusb use follows macros to declare transferring memory so that they can be put

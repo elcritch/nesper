@@ -1,3 +1,5 @@
+import ../../consts
+
 const
   VFS_TUSB_MAX_PATH* = 16 ##
                           ##  SPDX-FileCopyrightText: 2020-2022 Espressif Systems (Shanghai) CO LTD

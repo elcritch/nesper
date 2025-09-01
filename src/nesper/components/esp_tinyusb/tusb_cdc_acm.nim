@@ -4,6 +4,9 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+import ../../consts
+import ./tinyusb_types
+
 type
 
   tinyusb_cdcacm_itf_t* {.size: sizeof(cint).} = enum ##

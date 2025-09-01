@@ -4,6 +4,7 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
+import ../../consts
 
 proc tusb_run_task*(): esp_err_t {.cdecl, importc: "tusb_run_task",
                                    header: "tusb_tasks.h".}
