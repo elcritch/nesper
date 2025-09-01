@@ -2,6 +2,7 @@ import nesper
 import nesper/[general]
 import nesper/esp/queue
 import nesper/esp/esp_vfs_fat # for wl_handle_t and WL_INVALID_HANDLE
+import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "usb_composite"

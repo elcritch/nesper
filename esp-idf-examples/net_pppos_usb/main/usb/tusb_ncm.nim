@@ -3,6 +3,7 @@ import nesper/[general, events, wifi]
 import nesper/esp/esp_system
 import nesper/esp/nvs_flash
 import nesper/net_utils
+import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "USB_NCM"

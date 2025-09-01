@@ -1,6 +1,7 @@
 import nesper
 import nesper/[general]
 import nesper/esp/queue
+import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "usb_serial"
