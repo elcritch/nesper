@@ -36,7 +36,10 @@
 
 ##  Declare an endpoint buffer with a type
 
-const hdr_acm = "tusb_cdc_acm.h"
+# const hdr_acm = "tusb_cdc_acm.h"
+# const hdr = "tusb_types.h"
+const hdr_acm = "tusb.h"
+const hdr = "tusb.h"
 
 type
   cdc_line_coding_t* {.importc: "cdc_line_coding_t", header: hdr_acm, bycopy.} = object
@@ -218,7 +221,7 @@ const
 
 type
 
-  tusb_rhport_init_t* {.importc: "tusb_rhport_init_t", header: "tusb_types.h",
+  tusb_rhport_init_t* {.importc: "tusb_rhport_init_t", header: hdr,
                         bycopy.} = object ## --------------------------------------------------------------------+
                                            ##
                                            ## --------------------------------------------------------------------+
@@ -226,7 +229,7 @@ type
     speed* {.importc: "speed".}: tusb_speed_t
 
 
-  tusb_desc_device_t* {.importc: "tusb_desc_device_t", header: "tusb_types.h",
+  tusb_desc_device_t* {.importc: "tusb_desc_device_t", header: hdr,
                         bycopy.} = object ## --------------------------------------------------------------------+
                                            ##  USB Descriptors
                                            ## --------------------------------------------------------------------+
@@ -258,7 +261,7 @@ type
 
 type
 
-  tusb_desc_bos_t* {.importc: "tusb_desc_bos_t", header: "tusb_types.h", bycopy.} = object ##
+  tusb_desc_bos_t* {.importc: "tusb_desc_bos_t", header: hdr, bycopy.} = object ##
                               ##  USB Binary Device Object Store (BOS) Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of this descriptor in bytes
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -272,7 +275,7 @@ type
 type
 
   tusb_desc_configuration_t* {.importc: "tusb_desc_configuration_t",
-                               header: "tusb_types.h", bycopy.} = object ##
+                               header: hdr, bycopy.} = object ##
                               ##  USB Configuration Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of this descriptor in bytes
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -294,7 +297,7 @@ type
 type
 
   tusb_desc_interface_t* {.importc: "tusb_desc_interface_t",
-                           header: "tusb_types.h", bycopy.} = object ##
+                           header: hdr, bycopy.} = object ##
                               ##  USB Interface Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of this descriptor in bytes
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -318,7 +321,7 @@ type
 type
 
   TU_ATTR_PACKED_tusb_types_1* {.importc: "tusb_desc_endpoint_t::no_name",
-                                 header: "tusb_types.h", bycopy.} = object ##
+                                 header: hdr, bycopy.} = object ##
                               ##  USB Endpoint Descriptor
     xfer* {.importc: "xfer", bitsize: 2.}: uint8 ##  Control, ISO, Bulk, Interrupt
     sync* {.importc: "sync", bitsize: 2.}: uint8 ##  None, Asynchronous, Adaptive, Synchronous
@@ -327,7 +330,7 @@ type
 
 
   tusb_desc_endpoint_t* {.importc: "tusb_desc_endpoint_t",
-                          header: "tusb_types.h", bycopy.} = object
+                          header: hdr, bycopy.} = object
     bLength* {.importc: "bLength".}: uint8 ##  Size of this descriptor in bytes
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
                               ##  ENDPOINT Descriptor Type
@@ -343,7 +346,7 @@ type
 type
 
   tusb_desc_other_speed_t* {.importc: "tusb_desc_other_speed_t",
-                             header: "tusb_types.h", bycopy.} = object ##
+                             header: hdr, bycopy.} = object ##
                               ##  USB Other Speed Configuration Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of descriptor
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -363,7 +366,7 @@ type
 
 
   tusb_desc_device_qualifier_t* {.importc: "tusb_desc_device_qualifier_t",
-                                  header: "tusb_types.h", bycopy.} = object ##
+                                  header: hdr, bycopy.} = object ##
                               ##  USB Device Qualifier Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of descriptor
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -387,7 +390,7 @@ type
 type
 
   tusb_desc_interface_assoc_t* {.importc: "tusb_desc_interface_assoc_t",
-                                 header: "tusb_types.h", bycopy.} = object ##
+                                 header: hdr, bycopy.} = object ##
                               ##  USB Interface Association Descriptor (IAD ECN)
     bLength* {.importc: "bLength".}: uint8 ## < Size of descriptor
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -408,7 +411,7 @@ type
 
 type
 
-  tusb_desc_string_t* {.importc: "tusb_desc_string_t", header: "tusb_types.h",
+  tusb_desc_string_t* {.importc: "tusb_desc_string_t", header: hdr,
                         bycopy.} = object ##  USB String Descriptor
     bLength* {.importc: "bLength".}: uint8 ## < Size of this descriptor in bytes
     bDescriptorType* {.importc: "bDescriptorType".}: uint8 ##
@@ -417,7 +420,7 @@ type
 
 
   tusb_desc_bos_platform_t* {.importc: "tusb_desc_bos_platform_t",
-                              header: "tusb_types.h", bycopy.} = object ##
+                              header: hdr, bycopy.} = object ##
                               ##  USB Binary Device Object Store (BOS)
     bLength* {.importc: "bLength".}: uint8
     bDescriptorType* {.importc: "bDescriptorType".}: uint8
@@ -429,7 +432,7 @@ type
 
 
   tusb_desc_webusb_url_t* {.importc: "tusb_desc_webusb_url_t",
-                            header: "tusb_types.h", bycopy.} = object ##
+                            header: hdr, bycopy.} = object ##
                               ##  USB WebUSB URL Descriptor
     bLength* {.importc: "bLength".}: uint8
     bDescriptorType* {.importc: "bDescriptorType".}: uint8
@@ -438,7 +441,7 @@ type
 
 
   TU_ATTR_PACKED_tusb_types_5* {.importc: "tusb_desc_dfu_functional_t::no_name",
-                                 header: "tusb_types.h", bycopy.} = object ##
+                                 header: hdr, bycopy.} = object ##
                               ##  DFU Functional Descriptor
     bitCanDnload* {.importc: "bitCanDnload", bitsize: 1.}: uint8
     bitCanUpload* {.importc: "bitCanUpload", bitsize: 1.}: uint8
@@ -448,7 +451,7 @@ type
 
 
   tusb_desc_dfu_functional_t* {.importc: "tusb_desc_dfu_functional_t",
-                                header: "tusb_types.h", bycopy.} = object
+                                header: hdr, bycopy.} = object
     bLength* {.importc: "bLength".}: uint8
     bDescriptorType* {.importc: "bDescriptorType".}: uint8
     bmAttributes* {.importc: "bmAttributes".}: TU_ATTR_PACKED_tusb_types_5
@@ -459,7 +462,7 @@ type
 
 
   TU_ATTR_PACKED_tusb_types_9* {.importc: "tusb_control_request_t::no_name",
-                                 header: "tusb_types.h", bycopy.} = object ##
+                                 header: hdr, bycopy.} = object ##
                               ## --------------------------------------------------------------------+
                               ##
                               ## --------------------------------------------------------------------+
@@ -472,7 +475,7 @@ type
 
 
   tusb_control_request_t* {.importc: "tusb_control_request_t",
-                            header: "tusb_types.h", bycopy.} = object
+                            header: hdr, bycopy.} = object
     bmRequestType_bit* {.importc: "bmRequestType_bit".}: TU_ATTR_PACKED_tusb_types_9
     bmRequestType* {.importc: "bmRequestType".}: uint8
     bRequest* {.importc: "bRequest".}: uint8
@@ -521,17 +524,17 @@ proc tu_desc_subtype*(desc: pointer): uint8 {.inline, cdecl,
   ##  get descriptor subtype
 
 proc tu_desc_find*(desc: ptr uint8; `end`: ptr uint8; byte1: uint8): ptr uint8 {.
-    cdecl, importc: "tu_desc_find", header: "tusb_types.h".}
+    cdecl, importc: "tu_desc_find", header: hdr.}
   ##
                               ##  find descriptor that match byte1 (type)
 
 proc tu_desc_find2*(desc: ptr uint8; `end`: ptr uint8; byte1: uint8;
                     byte2: uint8): ptr uint8 {.cdecl, importc: "tu_desc_find2",
-    header: "tusb_types.h".}
+    header: hdr.}
   ##  find descriptor that match byte1 (type) and byte2
 
 proc tu_desc_find3*(desc: ptr uint8; `end`: ptr uint8; byte1: uint8;
                     byte2: uint8; byte3: uint8): ptr uint8 {.cdecl,
-    importc: "tu_desc_find3", header: "tusb_types.h".}
+    importc: "tu_desc_find3", header: hdr.}
   ##
                               ##  find descriptor that match byte1 (type) and byte2

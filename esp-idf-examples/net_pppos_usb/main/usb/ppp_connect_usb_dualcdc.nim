@@ -17,8 +17,6 @@ const
 proc esp_tusb_init_console*(itf: tinyusb_cdcacm_itf_t): esp_err_t {.cdecl, importc: "esp_tusb_init_console", header: "tusb_console.h".}
 proc esp_tusb_deinit_console*(itf: tinyusb_cdcacm_itf_t): esp_err_t {.cdecl, importc: "esp_tusb_deinit_console", header: "tusb_console.h".}
 
-# Optional IP_EVENT base import (for filtering). tcpip_adapter.h provides symbol across IDF versions.
-var IP_EVENT* {.importc: "IP_EVENT", header: "tcpip_adapter.h".}: esp_event_base_t
 
 # State
 var

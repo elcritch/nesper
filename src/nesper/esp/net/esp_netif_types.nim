@@ -304,8 +304,6 @@ type
     ## !< LwIP bridge configuration
 
 
-  esp_netif_config_t* = esp_netif_config
-
   esp_netif_iodriver_handle* = pointer ##
                                        ##  @brief  IO driver handle type
                                        ##
@@ -323,7 +321,7 @@ type
     ## !< netif handle
 
 
-  esp_netif_driver_ifconfig* {.importc: "esp_netif_driver_ifconfig",
+  esp_netif_driver_ifconfig_t* {.importc: "esp_netif_driver_ifconfig_t",
                                header: hdr, bycopy.} = object ##
                               ##
                               ##  @brief  Specific IO driver configuration
@@ -342,15 +340,12 @@ type
         cdecl.}
     ## !< set mac filter function pointer
 
-
-  esp_netif_driver_ifconfig_t* = esp_netif_driver_ifconfig
-
   esp_netif_netstack_config_t* = esp_netif_netstack_config ##
                               ##
                               ##  @brief  Specific L3 network stack configuration
                               ##
 
-  esp_netif_config* {.importc: "esp_netif_config", header: hdr,
+  esp_netif_config_t* {.importc: "esp_netif_config_t", header: hdr,
                       bycopy.} = object ##
                                          ##  @brief  Generic esp_netif configuration
                                          ##
