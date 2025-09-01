@@ -3,6 +3,14 @@
 ##
 ##  SPDX-License-Identifier: Apache-2.0
 ##
+import ../../consts
+import ./tusb_types
+import ./tusb_cdc_acm
+import ./tusb_tasks
+
+import ./tinyusb_types
+
+export tusb_types, tusb_cdc_acm, tinyusb_types, tusb_tasks
 
 type
 

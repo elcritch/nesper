@@ -60,12 +60,13 @@ import ../../consts
 ##  - CFG_TUSB_MEM_ALIGN   : __attribute__ ((aligned(4)))
 ##
 
-when not defined(CFG_TUSB_MEM_ALIGN):
-  const
-    CFG_TUSB_MEM_ALIGN* = TU_ATTR_ALIGNED(4)
-when not defined(CFG_TUD_ENDPOINT0_SIZE):
-  const
-    CFG_TUD_ENDPOINT0_SIZE* = 64
+# when not defined(CFG_TUSB_MEM_ALIGN):
+#   const
+#     CFG_TUSB_MEM_ALIGN* = TU_ATTR_ALIGNED(4)
+# when not defined(CFG_TUD_ENDPOINT0_SIZE):
+#   const
+#     CFG_TUD_ENDPOINT0_SIZE* = 64
+
 const
   CFG_TUSB_DEBUG* = CONFIG_TINYUSB_DEBUG_LEVEL ##  Debug Level
   CFG_TUD_CDC_RX_BUFSIZE* = CONFIG_TINYUSB_CDC_RX_BUFSIZE ##
