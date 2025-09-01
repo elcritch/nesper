@@ -50,4 +50,5 @@ app_main:
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
-    delay(2_000.Millis)
+    logi(TAG, "PPPoS connected. Idle loop ...")
+    delay(1_000.Millis)

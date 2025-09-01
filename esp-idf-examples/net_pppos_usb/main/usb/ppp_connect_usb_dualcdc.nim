@@ -1,14 +1,9 @@
 import nesper
 import nesper/[general]
-import nesper/esp/esp_log
-import nesper/esp/esp_event
+import nesper/esp/[esp_log, esp_event, event_groups]
 import nesper/events
-import nesper/esp/event_groups
-import nesper/esp/net/esp_netif
-import nesper/esp/net/esp_netif_ppp
-import nesper/esp/net/esp_netif_types
-import nesper/components/esp_tinyusb/tinyusb
-import nesper/components/esp_tinyusb/tusb_cdc_acm
+import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types]
+import nesper/components/esp_tinyusb/[tinyusb, tusb_cdc_acm]
 
 const
   TAG* = "pppos_dualcdc"
