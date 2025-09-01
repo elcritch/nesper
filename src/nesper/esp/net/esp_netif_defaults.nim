@@ -19,13 +19,29 @@ let
 ##  @brief  Default configuration reference of ethernet interface
 ##
 
-proc ESP_NETIF_INHERENT_DEFAULT_WIFI_STA*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_STA", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_WIFI_STA*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_WIFI_STA();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_INHERENT_DEFAULT_WIFI_AP*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_AP", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_WIFI_AP*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_WIFI_AP();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_INHERENT_DEFAULT_ETH*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_ETH", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_ETH*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_ETH();
+  `result` = cfg;
+  """.}
 
 proc ESP_NETIF_INHERENT_DEFAULT_PPP*(): esp_netif_inherent_config_t =
   {.emit: """
@@ -34,19 +50,47 @@ proc ESP_NETIF_INHERENT_DEFAULT_PPP*(): esp_netif_inherent_config_t =
   """.}
 
 
-proc ESP_NETIF_INHERENT_DEFAULT_BR*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_BR*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_BR();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_DEFAULT_ETH*(): esp_netif_config_t {.importc: "ESP_NETIF_DEFAULT_ETH", header: hdr.}
+proc ESP_NETIF_DEFAULT_ETH*(): esp_netif_config_t =
+  {.emit: """
+  esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_DEFAULT_WIFI_AP*(): esp_netif_config_t {.importc: "ESP_NETIF_DEFAULT_WIFI_AP", header: hdr.}
+proc ESP_NETIF_DEFAULT_WIFI_AP*(): esp_netif_config_t =
+  {.emit: """
+  esp_netif_config_t cfg = ESP_NETIF_DEFAULT_WIFI_AP();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_DEFAULT_WIFI_NAN*(): esp_netif_config_t {.importc: "ESP_NETIF_DEFAULT_WIFI_NAN", header: hdr.}
+proc ESP_NETIF_DEFAULT_WIFI_NAN*(): esp_netif_config_t =
+  {.emit: """
+  esp_netif_config_t cfg = ESP_NETIF_DEFAULT_WIFI_NAN();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_DEFAULT_WIFI_STA*(): esp_netif_config_t {.importc: "ESP_NETIF_DEFAULT_WIFI_STA", header: hdr.}
+proc ESP_NETIF_DEFAULT_WIFI_STA*(): esp_netif_config_t =
+  {.emit: """
+  esp_netif_config_t cfg = ESP_NETIF_DEFAULT_WIFI_STA();
+  `result` = cfg;
+  """.}
 
-proc ESP_NETIF_DEFAULT_PPP*(): esp_netif_config_t {.importc: "ESP_NETIF_DEFAULT_PPP", header: hdr.}
+proc ESP_NETIF_DEFAULT_PPP*(): esp_netif_config_t =
+  {.emit: """
+  esp_netif_config_t cfg = ESP_NETIF_DEFAULT_PPP();
+  `result` = cfg;
+  """.}
 
 
 let
