@@ -8,7 +8,6 @@ const hdr = "esp_netif_defaults.h"
 
 import ./esp_netif_types
 
-
 let
   ESP_NETIF_DEFAULT_ARP_FLAGS* {.importc: "ESP_NETIF_DEFAULT_ARP_FLAGS", header: hdr.}: cint ##
                               ##
