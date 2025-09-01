@@ -2,23 +2,20 @@ import std/strutils
 import nesper
 import nesper/[consts, general, timers]
 import nesper/esp/esp_system
+import nesper/esp/nvs_flash
+import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
+import usb/ppp_connect_usb_dualcdc
 
 const
   TAG*: cstring = "main"
 
-proc setupPPP(): bool =
-  # Network interface configuration
-  var cfg: esp_netif_config_t = ESP_NETIF_DEFAULT_PPP()
-  let esp_netif: ptr esp_netif_t = esp_netif_new(addr cfg)
-
-  # PPP-specific configuration
-  var ppp_config: esp_netif_ppp_config_t
-  ppp_config.ppp_phase_event_enabled = true
-  ppp_config.ppp_error_event_enabled = true
-  check: esp_netif_ppp_set_params(esp_netif, addr ppp_config)
-  return true
+proc setupSystem(): esp_err_t =
+  # Initialize esp-netif and default event loop
+  check: esp_netif_init()
+  check: esp_event_loop_create_default()
+  return ESP_OK
 
 app_main:
   logi(TAG, "esp starting ... ")
@@ -42,6 +39,15 @@ app_main:
   except Defect, CatchableError:
     logi(TAG, "Error getting chip info")
 
+  # Basic system setup: NVS, esp-netif, default event loop
+  discard setupSystem()
+
+  # Start PPPoS over USB with dual CDC (CDC0=PPP, CDC1=console)
+  if examplePppConnectDualCdc() == ESP_OK:
+    logi(TAG, "PPPoS connected. Idle loop ...")
+  else:
+    loge(TAG, "PPPoS connect failed")
+
+  # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
-    logi(TAG, "Hello, World!")
-    delay(1_000.Millis)
+    delay(2_000.Millis)
