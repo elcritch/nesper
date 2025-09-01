@@ -9,33 +9,7 @@
 import ../../consts
 import esp_netif_types
 
-type
-
-  esp_netif_ppp_config_t* {.importc: "esp_netif_ppp_config_t",
-                            header: "esp_netif_ppp.h", bycopy.} = object ##
-                              ##  @brief Configuration structure for PPP network interface
-                              ##
-                              ##
-    ppp_phase_event_enabled* {.importc: "ppp_phase_event_enabled".}: bool ##
-                              ## < Enables events coming from PPP PHASE change
-    ppp_error_event_enabled* {.importc: "ppp_error_event_enabled".}: bool ##
-                              ## < Enables events from main PPP state machine producing errors
-    when defined(CONFIG_LWIP_ENABLE_LCP_ECHO):
-      ppp_lcp_echo_disabled* {.importc: "ppp_lcp_echo_disabled".}: bool ##
-                                ##  #ifdef CONFIG_LWIP_ENABLE_LCP_ECHO
-                                ## 
-    when defined(CONFIG_LWIP_PPP_SERVER_SUPPORT):
-      ppp_our_ip4_addr* {.importc: "ppp_our_ip4_addr".}: esp_ip4_addr_t ##
-                                ##  #endif // CONFIG_LWIP_ENABLE_LCP_ECHO
-                                ##  #ifdef CONFIG_LWIP_PPP_SERVER_SUPPORT
-      ppp_their_ip4_addr* {.importc: "ppp_their_ip4_addr".}: esp_ip4_addr_t ##
-                                ## < Set our preferred address, typically used when we're the PPP server
-      ppp_dns1_addr* {.importc: "ppp_dns1_addr".}: esp_ip4_addr_t ##
-                                ## < DNS to provide if peer asks for it, typically used when we're the PPP server
-      ppp_dns2_addr* {.importc: "ppp_dns2_addr".}: esp_ip4_addr_t ##
-                                ## < DNS to provide if peer asks for it, typically used when we're the PPP server
-      ppp_passive* {.importc: "ppp_passive".}: bool ## < Try once to initiate connection, stay silent if it fails, typically used when we're the PPP server
-    ##  #endif // CONFIG_LWIP_PPP_SERVER_SUPPORT
+const hdr = "esp_netif_ppp.h"
 
 const
   NETIF_PP_PHASE_OFFSET* = (0x100) ##  @brief event id offset for PHASE related events
@@ -101,7 +75,7 @@ type
 proc esp_netif_ppp_set_auth*(netif: ptr esp_netif_t;
                              authtype: esp_netif_auth_type_t; user: cstring;
                              passwd: cstring): esp_err_t {.cdecl,
-    importc: "esp_netif_ppp_set_auth", header: "esp_netif_ppp.h".}
+    importc: "esp_netif_ppp_set_auth", header: hdr.}
   ##
                               ##  @brief Sets the auth parameters for the supplied esp-netif.
                               ##
@@ -116,7 +90,7 @@ proc esp_netif_ppp_set_auth*(netif: ptr esp_netif_t;
 
 proc esp_netif_ppp_set_params*(netif: ptr esp_netif_t;
                                config: ptr esp_netif_ppp_config_t): esp_err_t {.
-    cdecl, importc: "esp_netif_ppp_set_params", header: "esp_netif_ppp.h".}
+    cdecl, importc: "esp_netif_ppp_set_params", header: hdr.}
   ##
                               ##  @brief Sets common parameters for the supplied esp-netif.
                               ##
@@ -129,7 +103,7 @@ proc esp_netif_ppp_set_params*(netif: ptr esp_netif_t;
 
 proc esp_netif_ppp_get_params*(netif: ptr esp_netif_t;
                                config: ptr esp_netif_ppp_config_t): esp_err_t {.
-    cdecl, importc: "esp_netif_ppp_get_params", header: "esp_netif_ppp.h".}
+    cdecl, importc: "esp_netif_ppp_get_params", header: hdr.}
   ##
                               ##  @brief Gets parameters configured in the supplied esp-netif.
                               ##

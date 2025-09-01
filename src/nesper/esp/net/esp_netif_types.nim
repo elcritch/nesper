@@ -199,8 +199,68 @@ type
   esp_netif_ip_event_type_t* {.size: sizeof(cint).} = enum
     ESP_NETIF_IP_EVENT_GOT_IP = 1, ESP_NETIF_IP_EVENT_LOST_IP = 2
 
+when defined(CONFIG_ESP_NETIF_RECEIVE_REPORT_ERRORS):
+  type
+    esp_netif_recv_ret_t* = esp_err_t
+else:
+  type
+    esp_netif_recv_ret_t* = void
+
 
 type
+
+  err_t* = distinct int8
+  net_if* {.importc: "netif", header: hdr, bycopy.} = object
+
+  init_fn_t* = proc (a1: ptr netif): err_t {.cdecl.}
+
+  input_fn_t* = proc (netif: pointer; buffer: pointer; len: csize_t; eb: pointer): esp_netif_recv_ret_t {.
+      cdecl.}
+
+  esp_netif_netstack_lwip_vanilla_config* {.
+      importc: "esp_netif_netstack_lwip_vanilla_config",
+      header: "esp_netif_net_stack.h", bycopy.} = object
+    init_fn* {.importc: "init_fn".}: init_fn_t
+    input_fn* {.importc: "input_fn".}: input_fn_t
+
+
+  esp_netif_netstack_lwip_ppp_config* {.importc: "esp_netif_netstack_lwip_ppp_config",
+                                        header: "esp_netif_net_stack.h", bycopy.} = object
+    input_fn* {.importc: "input_fn".}: input_fn_t
+    ppp_events* {.importc: "ppp_events".}: esp_netif_ppp_config_t
+
+
+  esp_netif_netstack_config* {.importc: "esp_netif_netstack_config",
+                               header: "esp_netif_net_stack.h", bycopy.} = object ##
+                              ##  LWIP netif specific network stack configuration
+    lwip* {.importc: "lwip".}: esp_netif_netstack_lwip_vanilla_config
+    lwip_ppp* {.importc: "lwip_ppp".}: esp_netif_netstack_lwip_ppp_config
+
+  esp_netif_ppp_config_t* {.importc: "esp_netif_ppp_config_t",
+                            header: "esp_netif_ppp.h", bycopy.} = object ##
+                              ##  @brief Configuration structure for PPP network interface
+                              ##
+                              ##
+    ppp_phase_event_enabled* {.importc: "ppp_phase_event_enabled".}: bool ##
+                              ## < Enables events coming from PPP PHASE change
+    ppp_error_event_enabled* {.importc: "ppp_error_event_enabled".}: bool ##
+                              ## < Enables events from main PPP state machine producing errors
+    when defined(CONFIG_LWIP_ENABLE_LCP_ECHO):
+      ppp_lcp_echo_disabled* {.importc: "ppp_lcp_echo_disabled".}: bool ##
+                                ##  #ifdef CONFIG_LWIP_ENABLE_LCP_ECHO
+                                ## 
+    when defined(CONFIG_LWIP_PPP_SERVER_SUPPORT):
+      ppp_our_ip4_addr* {.importc: "ppp_our_ip4_addr".}: esp_ip4_addr_t ##
+                                ##  #endif // CONFIG_LWIP_ENABLE_LCP_ECHO
+                                ##  #ifdef CONFIG_LWIP_PPP_SERVER_SUPPORT
+      ppp_their_ip4_addr* {.importc: "ppp_their_ip4_addr".}: esp_ip4_addr_t ##
+                                ## < Set our preferred address, typically used when we're the PPP server
+      ppp_dns1_addr* {.importc: "ppp_dns1_addr".}: esp_ip4_addr_t ##
+                                ## < DNS to provide if peer asks for it, typically used when we're the PPP server
+      ppp_dns2_addr* {.importc: "ppp_dns2_addr".}: esp_ip4_addr_t ##
+                                ## < DNS to provide if peer asks for it, typically used when we're the PPP server
+      ppp_passive* {.importc: "ppp_passive".}: bool ## < Try once to initiate connection, stay silent if it fails, typically used when we're the PPP server
+    ##  #endif // CONFIG_LWIP_PPP_SERVER_SUPPORT
 
   bridgeif_config_t* {.importc: "bridgeif_config_t",
                        header: hdr, bycopy.} = object ##
