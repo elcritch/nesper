@@ -6,6 +6,7 @@
 
 import ../../consts
 import ./tinyusb_types
+import ./tusb_types
 
 type
 
