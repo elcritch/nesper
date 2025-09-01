@@ -27,7 +27,12 @@ proc ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN*(): esp_netif_inherent_config_t {.impor
 
 proc ESP_NETIF_INHERENT_DEFAULT_ETH*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_ETH", header: hdr.}
 
-proc ESP_NETIF_INHERENT_DEFAULT_PPP*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_PPP", header: hdr.}
+proc ESP_NETIF_INHERENT_DEFAULT_PPP*(): esp_netif_inherent_config_t =
+  {.emit: """
+  esp_netif_inherent_config_t cfg = ESP_NETIF_INHERENT_DEFAULT_PPP();
+  `result` = cfg;
+  """.}
+
 
 proc ESP_NETIF_INHERENT_DEFAULT_BR*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR", header: hdr.}
 

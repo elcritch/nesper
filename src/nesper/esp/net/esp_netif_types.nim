@@ -210,9 +210,9 @@ else:
 type
 
   err_t* = distinct int8
-  net_if* {.importc: "netif", header: hdr, bycopy.} = object
+  netif* {.importc: "netif", header: hdr, bycopy.} = object
 
-  init_fn_t* = proc (a1: ptr netif): err_t {.cdecl.}
+  init_fn_t* = proc (a1: pointer): err_t {.cdecl.}
 
   input_fn_t* = proc (netif: pointer; buffer: pointer; len: csize_t; eb: pointer): esp_netif_recv_ret_t {.
       cdecl.}
