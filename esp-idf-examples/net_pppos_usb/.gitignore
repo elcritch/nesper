@@ -13,3 +13,4 @@ sdkconfig
 build/
 sdkconfig.old
 .cache/
+managed_components/
