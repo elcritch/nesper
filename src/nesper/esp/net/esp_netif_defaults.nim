@@ -22,23 +22,17 @@ let
 
 proc ESP_NETIF_INHERENT_DEFAULT_WIFI_STA*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_STA", header: hdr.}
 
-let
-  ESP_NETIF_INHERENT_DEFAULT_WIFI_AP* {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_AP", header: hdr.}: esp_netif_inherent_config_t ##
+proc ESP_NETIF_INHERENT_DEFAULT_WIFI_AP*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_AP", header: hdr.}
 
+proc ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN", header: hdr.}
 
-  ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN* {.importc: "ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN", header: hdr.}: esp_netif_inherent_config_t ##
+proc ESP_NETIF_INHERENT_DEFAULT_ETH*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_ETH", header: hdr.}
 
+proc ESP_NETIF_INHERENT_DEFAULT_PPP*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_PPP", header: hdr.}
 
-  ESP_NETIF_INHERENT_DEFAULT_ETH* {.importc: "ESP_NETIF_INHERENT_DEFAULT_ETH", header: hdr.}: esp_netif_inherent_config_t ##
+proc ESP_NETIF_INHERENT_DEFAULT_BR*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR", header: hdr.}
 
-
-  ESP_NETIF_INHERENT_DEFAULT_PPP* {.importc: "ESP_NETIF_INHERENT_DEFAULT_PPP", header: hdr.}: esp_netif_inherent_config_t ##
-
-
-  ESP_NETIF_INHERENT_DEFAULT_BR* {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR", header: hdr.}: esp_netif_inherent_config_t ##
-
-
-  ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS* {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS", header: hdr.}: esp_netif_inherent_config_t ##
+proc ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS*(): esp_netif_inherent_config_t {.importc: "ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS", header: hdr.}
 
 
 let
