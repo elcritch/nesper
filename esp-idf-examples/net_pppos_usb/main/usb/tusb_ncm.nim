@@ -4,78 +4,30 @@ import nesper/esp/esp_system
 import nesper/esp/nvs_flash
 import nesper/net_utils
 import nesper/components/esp_tinyusb/tinyusb
+import nesper/consts
+import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "USB_NCM"
   WIFI_SSID {.strdefine.}: string = "NOSSID"
   WIFI_PASS {.strdefine.}: string = ""
 
-# C includes and helper wrappers for TinyUSB NET and internal WiFi APIs
-{.emit: """
-#include <string.h>
-#include "tinyusb.h"
-#include "tinyusb_net.h"
-#include "esp_private/wifi.h"
+# TinyUSB NET type/procs (no emit)
+type
+  tinyusb_net_config_t* {.importc: "tinyusb_net_config_t", header: "tinyusb_net.h", bycopy.} = object
+    on_recv_callback* {.importc: "on_recv_callback".}: proc (buffer: pointer; len: uint16; ctx: pointer): esp_err_t {.cdecl.}
+    free_tx_buffer* {.importc: "free_tx_buffer".}: proc (eb: pointer; ctx: pointer) {.cdecl.}
+    user_context* {.importc: "user_context".}: pointer
+    mac_addr* {.importc: "mac_addr".}: array[6, uint8]
 
-typedef esp_err_t (*nesper_ncm_recv_cb_t)(void *buffer, uint16_t len, void *ctx);
-typedef void (*nesper_ncm_free_cb_t)(void *eb, void *ctx);
+proc tinyusb_net_init*(dev: tinyusb_usbdev_t; cfg: ptr tinyusb_net_config_t): esp_err_t {.cdecl, importc: "tinyusb_net_init", header: "tinyusb_net.h".}
+proc tinyusb_net_send_sync*(buffer: pointer; len: uint16; eb: pointer; timeout_ticks: uint32): esp_err_t {.cdecl, importc: "tinyusb_net_send_sync", header: "tinyusb_net.h".}
 
-// Install TinyUSB with default descriptors from Kconfig
-esp_err_t nesper_tinyusb_install_default(void) {
-  const tinyusb_config_t tusb_cfg = {
-    .device_descriptor = NULL,
-    .string_descriptor = NULL,
-    .string_descriptor_count = 0,
-    .external_phy = false,
-#if (TUD_OPT_HIGH_SPEED)
-    .fs_configuration_descriptor = NULL,
-    .hs_configuration_descriptor = NULL,
-    .qualifier_descriptor = NULL,
-#else
-    .configuration_descriptor = NULL,
-#endif
-  };
-  return tinyusb_driver_install(&tusb_cfg);
-}
-
-// Initialize NCM with provided callbacks and MAC address
-esp_err_t nesper_tinyusb_net_init_bridge(tinyusb_usbdev_t dev,
-                                         uint8_t mac_addr[6],
-                                         nesper_ncm_recv_cb_t on_recv,
-                                         nesper_ncm_free_cb_t free_tx_buf,
-                                         void *user_ctx) {
-  tinyusb_net_config_t cfg = {
-    .on_recv_callback = on_recv,
-    .free_tx_buffer = free_tx_buf,
-    .user_context = user_ctx,
-  };
-  memcpy(cfg.mac_addr, mac_addr, 6);
-  return tinyusb_net_init(dev, &cfg);
-}
-
-// Thin wrapper to expose send_sync
-static inline esp_err_t nesper_tinyusb_net_send_sync(void *buffer, uint16_t len, void *eb, uint32_t timeout_ticks) {
-  return tinyusb_net_send_sync(buffer, len, eb, timeout_ticks);
-}
-
-// WiFi internal helpers (signatures only, implemented by IDF)
-esp_err_t esp_wifi_internal_tx(wifi_interface_t ifx, void *buffer, uint16_t len);
-esp_err_t esp_wifi_internal_reg_rxcb(wifi_interface_t ifx, esp_wifi_rxcb_t rx_cb);
-void esp_wifi_internal_free_rx_buffer(void *eb);
-""".}
-
-proc nesper_tinyusb_install_default(): esp_err_t {.cdecl, importc.}
-proc nesper_tinyusb_net_init_bridge(dev: cint;
-                                    mac: ptr uint8;
-                                    on_recv: proc (buffer: pointer; len: uint16; ctx: pointer): esp_err_t {.cdecl.};
-                                    free_tx: proc (eb: pointer; ctx: pointer) {.cdecl.};
-                                    user_ctx: pointer): esp_err_t {.cdecl, importc.}
-proc nesper_tinyusb_net_send_sync(buffer: pointer; len: uint16; eb: pointer; timeoutTicks: uint32): esp_err_t {.cdecl, importc.}
-
-proc esp_wifi_internal_tx(ifx: wifi_interface_t; buffer: pointer; len: uint16): esp_err_t {.cdecl, importc.}
+# WiFi internal helpers (signatures only)
+proc esp_wifi_internal_tx(ifx: wifi_interface_t; buffer: pointer; len: uint16): esp_err_t {.cdecl, importc: "esp_wifi_internal_tx", header: "esp_private/wifi.h".}
 proc esp_wifi_internal_reg_rxcb(ifx: wifi_interface_t;
-                                rx_cb: proc (buffer: pointer; len: uint16; eb: pointer): esp_err_t {.cdecl.}): esp_err_t {.cdecl, importc.}
-proc esp_wifi_internal_free_rx_buffer(eb: pointer) {.cdecl, importc.}
+                                rx_cb: proc (buffer: pointer; len: uint16; eb: pointer): esp_err_t {.cdecl.}): esp_err_t {.cdecl, importc: "esp_wifi_internal_reg_rxcb", header: "esp_private/wifi.h".}
+proc esp_wifi_internal_free_rx_buffer(eb: pointer) {.cdecl, importc: "esp_wifi_internal_free_rx_buffer", header: "esp_private/wifi.h".}
 
 var sIsWifiConnected {.volatile.}: bool = false
 
@@ -92,7 +44,7 @@ proc wifiPktFree(eb: pointer; ctx: pointer) {.cdecl.} =
 
 # WiFi -> USB path: send WiFi RX packet out over USB NCM
 proc pktWifi2Usb(buffer: pointer; len: uint16; eb: pointer): esp_err_t {.cdecl.} =
-  if nesper_tinyusb_net_send_sync(buffer, len, eb, portMAX_DELAY.uint32) != ESP_OK:
+  if tinyusb_net_send_sync(buffer, len, eb, portMAX_DELAY.uint32) != ESP_OK:
     esp_wifi_internal_free_rx_buffer(eb)
   return ESP_OK
 
@@ -134,7 +86,9 @@ proc runUsbNcmBridge*() =
   check: ret
 
   logi(TAG, "USB NCM device initialization")
-  check: nesper_tinyusb_install_default()
+  var tusbCfg: tinyusb_config_t
+  tusbCfg.external_phy = false
+  check: tinyusb_driver_install(addr tusbCfg)
 
   var mac: array[6, uint8]
   check: esp_read_mac(addr mac[0], ESP_MAC_WIFI_STA)
@@ -142,10 +96,14 @@ proc runUsbNcmBridge*() =
        mac[0].int, mac[1].int, mac[2].int, mac[3].int, mac[4].int, mac[5].int)
 
   # Initialize TinyUSB NET class with callbacks and MAC
-  check: nesper_tinyusb_net_init_bridge(0, addr mac[0], usbRecvCallback, wifiPktFree, addr sIsWifiConnected)
+  var ncfg: tinyusb_net_config_t
+  ncfg.on_recv_callback = usbRecvCallback
+  ncfg.free_tx_buffer = wifiPktFree
+  ncfg.user_context = addr sIsWifiConnected
+  for i in 0..5: ncfg.mac_addr[i] = mac[i]
+  check: tinyusb_net_init(TINYUSB_USBDEV_0, addr ncfg)
 
   logi(TAG, "WiFi initialization")
   check: startWifi(addr sIsWifiConnected)
 
   logi(TAG, "USB NCM and WiFi initialized and started")
-

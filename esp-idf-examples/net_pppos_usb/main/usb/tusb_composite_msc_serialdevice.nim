@@ -3,80 +3,30 @@ import nesper/[general]
 import nesper/esp/queue
 import nesper/esp/esp_vfs_fat # for wl_handle_t and WL_INVALID_HANDLE
 import nesper/components/esp_tinyusb/tinyusb
+import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "usb_composite"
   RXBufSz = 64
   BasePath = "/usb"
 
-{.emit: """
-#include <errno.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <stdio.h>
-#include "esp_partition.h"
-#include "wear_levelling/wear_levelling.h"
-#include "tinyusb.h"
-#include "tusb_cdc_acm.h"
-#include "tusb_msc_storage.h"
-
-// Install TinyUSB with default descriptors from Kconfig
-esp_err_t nesper_tinyusb_install_default(void) {
-  const tinyusb_config_t tusb_cfg = {
-    .device_descriptor = NULL,
-    .string_descriptor = NULL,
-    .string_descriptor_count = 0,
-    .external_phy = false,
-#if (TUD_OPT_HIGH_SPEED)
-    .fs_configuration_descriptor = NULL,
-    .hs_configuration_descriptor = NULL,
-    .qualifier_descriptor = NULL,
-#else
-    .configuration_descriptor = NULL,
-#endif
-  };
-  return tinyusb_driver_install(&tusb_cfg);
-}
-
-// Init CDC-ACM with provided callbacks
-esp_err_t nesper_tinyusb_cdc_acm_init_default(tinyusb_usbdev_t usb_dev,
-                                              tinyusb_cdcacm_itf_t cdc_port,
-                                              size_t rx_unread_buf_sz,
-                                              cdcacm_event_callback_t cb_rx,
-                                              cdcacm_event_callback_t cb_line_state) {
-  tinyusb_config_cdcacm_t acm_cfg = {
-    .usb_dev = usb_dev,
-    .cdc_port = cdc_port,
-    .rx_unread_buf_sz = rx_unread_buf_sz,
-    .callback_rx = cb_rx,
-    .callback_rx_wanted_char = NULL,
-    .callback_line_state_changed = cb_line_state,
-    .callback_line_coding_changed = NULL,
-  };
-  return tusb_cdc_acm_init(&acm_cfg);
-}
-
-// Init MSC storage on SPI flash and mount to base path
-esp_err_t nesper_msc_init_and_mount_spiflash(wl_handle_t wl_handle, const char *base_path) {
-  const tinyusb_msc_spiflash_config_t config_spi = { .wl_handle = wl_handle };
-  esp_err_t err = tinyusb_msc_storage_init_spiflash(&config_spi);
-  if (err != ESP_OK) return err;
-  return tinyusb_msc_storage_mount(base_path);
-}
-""".}
-
-proc nesper_tinyusb_install_default(): esp_err_t {.cdecl, importc.}
-proc nesper_tinyusb_cdc_acm_init_default(usb_dev: cint; cdc_port: cint; rx_unread_buf_sz: csize_t;
-                                         cb_rx, cb_line_state: proc (itf: cint; event: pointer) {.cdecl.}): esp_err_t {.cdecl, importc.}
-proc nesper_msc_init_and_mount_spiflash(wl: wl_handle_t; basePath: cstring): esp_err_t {.cdecl, importc.}
+## C stdlib and ESP-IDF imports needed by the example
 
 proc esp_partition_find_first(ptype: uint8; psubtype: uint8; label: cstring): pointer {.cdecl, importc: "esp_partition_find_first", header: "esp_partition.h".}
 proc wl_mount(partition: pointer; outHandle: ptr wl_handle_t): esp_err_t {.cdecl, importc: "wl_mount", header: "wear_levelling/wear_levelling.h".}
 
-proc tinyusb_cdcacm_read(itf: cint; buf: ptr uint8; bufsize: csize_t; rx_size: ptr csize_t): esp_err_t {.cdecl, importc: "tinyusb_cdcacm_read", header: "tusb_cdc_acm.h".}
-proc tinyusb_cdcacm_write_queue(itf: cint; buf: ptr uint8; size: csize_t): esp_err_t {.cdecl, importc: "tinyusb_cdcacm_write_queue", header: "tusb_cdc_acm.h".}
-proc tinyusb_cdcacm_write_flush(itf: cint; timeout_ms: cint): esp_err_t {.cdecl, importc: "tinyusb_cdcacm_write_flush", header: "tusb_cdc_acm.h".}
+## TinyUSB CDC ACM from wrappers
+proc tinyusb_cdcacm_read(itf: tinyusb_cdcacm_itf_t; buf: ptr uint8; bufsize: csize_t; rx_size: ptr csize_t): esp_err_t {.cdecl, importc: "tinyusb_cdcacm_read", header: "tusb_cdc_acm.h".}
+proc tinyusb_cdcacm_write_queue(itf: tinyusb_cdcacm_itf_t; buf: ptr uint8; size: csize_t): csize_t {.cdecl, importc: "tinyusb_cdcacm_write_queue", header: "tusb_cdc_acm.h".}
+proc tinyusb_cdcacm_write_flush(itf: tinyusb_cdcacm_itf_t; timeout_ticks: uint32): esp_err_t {.cdecl, importc: "tinyusb_cdcacm_write_flush", header: "tusb_cdc_acm.h".}
+
+## TinyUSB MSC storage minimal imports (no emit)
+type
+  tinyusb_msc_spiflash_config_t* {.importc: "tinyusb_msc_spiflash_config_t", header: "tusb_msc_storage.h", bycopy.} = object
+    wl_handle* {.importc: "wl_handle".}: wl_handle_t
+
+proc tinyusb_msc_storage_init_spiflash*(cfg: ptr tinyusb_msc_spiflash_config_t): esp_err_t {.cdecl, importc: "tinyusb_msc_storage_init_spiflash", header: "tusb_msc_storage.h".}
+proc tinyusb_msc_storage_mount*(base_path: cstring): esp_err_t {.cdecl, importc: "tinyusb_msc_storage_mount", header: "tusb_msc_storage.h".}
 
 # C stdlib helpers used by the example file operations
 type Stat* {.importc: "struct stat", header: "sys/stat.h", bycopy.} = object
@@ -104,9 +54,9 @@ var
   appQueue: QueueHandle_t
   rxBuf {.volatile.}: array[RXBufSz + 1, uint8]
 
-proc onCdcRx(itf: cint; event: pointer) {.cdecl.} =
+proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   var rxSize: csize_t = 0
-  let ret = tinyusb_cdcacm_read(itf, addr rxBuf[0], RXBufSz.csize_t, addr rxSize)
+  let ret = tinyusb_cdcacm_read(tinyusb_cdcacm_itf_t(itf), addr rxBuf[0], RXBufSz.csize_t, addr rxSize)
   if ret == ESP_OK:
     var msg: AppMessage
     msg.bufLen = rxSize
@@ -117,7 +67,7 @@ proc onCdcRx(itf: cint; event: pointer) {.cdecl.} =
   else:
     loge(TAG, "Read Error")
 
-proc onCdcLineState(itf: cint; event: pointer) {.cdecl.} =
+proc onCdcLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   logi(TAG, "Line state changed on channel %d", itf)
 
 proc fileExists(path: cstring): bool =
@@ -171,12 +121,26 @@ proc runUsbCompositeMscSerial*() =
   logi(TAG, "Initializing storage...")
   var wl: wl_handle_t = WL_INVALID_HANDLE
   check: storageInitSpiFlash(wl)
-  check: nesper_msc_init_and_mount_spiflash(wl, BasePath)
+  var mscCfg: tinyusb_msc_spiflash_config_t
+  mscCfg.wl_handle = wl
+  check: tinyusb_msc_storage_init_spiflash(addr mscCfg)
+  check: tinyusb_msc_storage_mount(BasePath)
   fileOperations()
 
   logi(TAG, "USB Composite initialization")
-  check: nesper_tinyusb_install_default()
-  check: nesper_tinyusb_cdc_acm_init_default(0, 0, RXBufSz, onCdcRx, onCdcLineState)
+  var tusbCfg: tinyusb_config_t
+  tusbCfg.external_phy = false
+  check: tinyusb_driver_install(addr tusbCfg)
+
+  var acmCfg: tinyusb_config_cdcacm_t
+  acmCfg.usb_dev = TINYUSB_USBDEV_0
+  acmCfg.cdc_port = TINYUSB_CDC_ACM_0
+  acmCfg.rx_unread_buf_sz = RXBufSz
+  acmCfg.callback_rx = onCdcRx
+  acmCfg.callback_rx_wanted_char = nil
+  acmCfg.callback_line_state_changed = onCdcLineState
+  acmCfg.callback_line_coding_changed = nil
+  check: tusb_cdc_acm_init(addr acmCfg)
   logi(TAG, "USB Composite initialization DONE")
 
   var msg: AppMessage
@@ -184,7 +148,7 @@ proc runUsbCompositeMscSerial*() =
     if xQueueReceive(appQueue, addr msg, portMAX_DELAY) == 1:
       if msg.bufLen > 0:
         logi(TAG, "Data from channel %d", msg.itf.int)
-        discard tinyusb_cdcacm_write_queue(msg.itf.int, addr msg.buf[0], msg.bufLen)
-        let err = tinyusb_cdcacm_write_flush(msg.itf.int, 0)
+        discard tinyusb_cdcacm_write_queue(tinyusb_cdcacm_itf_t(msg.itf.int), addr msg.buf[0], msg.bufLen)
+        let err = tinyusb_cdcacm_write_flush(tinyusb_cdcacm_itf_t(msg.itf.int), 0)
         if err != ESP_OK:
           loge(TAG, "CDC ACM write flush error: %s", esp_err_to_name(err))
