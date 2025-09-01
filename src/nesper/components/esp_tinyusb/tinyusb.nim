@@ -7,10 +7,11 @@ import ../../consts
 import ./tusb_types
 import ./tusb_cdc_acm
 import ./tusb_tasks
+import ./tusb_config
 
 import ./tinyusb_types
 
-export tusb_types, tusb_cdc_acm, tinyusb_types, tusb_tasks
+export tusb_types, tusb_cdc_acm, tinyusb_types, tusb_tasks, tusb_config
 
 type
 
