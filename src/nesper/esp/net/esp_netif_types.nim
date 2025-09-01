@@ -105,7 +105,7 @@ type
 
 ##  @brief IP event base declaration
 
-# ESP_EVENT_DECLARE_BASE(IP_EVENT)
+let IP_EVENT* {.importc: "IP_EVENT", header: "esp_netif_types.h".}: esp_event_base_t 
 
 type
 
