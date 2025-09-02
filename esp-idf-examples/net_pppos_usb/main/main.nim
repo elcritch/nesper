@@ -7,9 +7,9 @@ import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
 when defined(RUN_NCM):
-  import usb/tusb_ncm_eth_dualcdc as ncm_eth
+  import usb/usb_ncm_eth_dualcdc as ncm_eth
 else:
-  import usb/ppp_connect_usb_dualcdc
+  import usb/usb_ppp_connect_dualcdc
 
 const
   TAG*: cstring = "main"
