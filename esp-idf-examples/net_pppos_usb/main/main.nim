@@ -6,7 +6,10 @@ import nesper/esp/nvs_flash
 import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
-import usb/ppp_connect_usb_dualcdc
+when defined(RUN_NCM):
+  import usb/tusb_ncm_eth_dualcdc as ncm_eth
+else:
+  import usb/ppp_connect_usb_dualcdc
 
 const
   TAG*: cstring = "main"
@@ -39,14 +42,17 @@ app_main:
   except Defect, CatchableError:
     logi(TAG, "Error getting chip info")
 
-  # Basic system setup: NVS, esp-netif, default event loop
-  discard setupSystem()
-
-  # Start PPPoS over USB with dual CDC (CDC0=PPP, CDC1=console)
-  if examplePppConnectDualCdc() == ESP_OK:
-    logi(TAG, "PPPoS connected. Idle loop ...")
+  when defined(RUN_NCM):
+    # Start USB NCM-as-Ethernet with separate CDC console
+    ncm_eth.runUsbNcmEthWithConsole()
   else:
-    loge(TAG, "PPPoS connect failed")
+    # Basic system setup: NVS, esp-netif, default event loop
+    discard setupSystem()
+    # Start PPPoS over USB with dual CDC (CDC0=PPP, CDC1=console)
+    if examplePppConnectDualCdc() == ESP_OK:
+      logi(TAG, "PPPoS connected. Idle loop ...")
+    else:
+      loge(TAG, "PPPoS connect failed")
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
