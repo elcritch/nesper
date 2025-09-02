@@ -45,7 +45,14 @@ proc runMummy() =
   var router: Router
   router.get("/", indexHandler)
 
-  let server = newServer(router, workerThreads=1)
+  let server = newServer(router,
+                          websocketHandler=nil,
+                          logHandler=nil,
+                          workerThreads=1,
+                          maxHeadersLen=8*1024,
+                          maxBodyLen=128*1024,
+                          maxMessageLen=16*1024
+                          )
   echo "Serving on http://localhost:8080"
   server.serve(Port(8080), address="::")
 
