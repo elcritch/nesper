@@ -1,6 +1,7 @@
 import nesper
 import nesper/[general, gpios, timers]
 import nesper/esp/[esp_log, esp_event, event_groups]
+import nesper/esp/esp_system
 import nesper/events
 import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types]
 import nesper/components/esp_tinyusb/[tinyusb, tusb_cdc_acm]
@@ -53,7 +54,7 @@ proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
     if ls.rts and not ls.dtr:
       logi(TAG, "DTR/RTS trigger: restarting...")
       delay(10.Millis)
-      esp_restart()
+      espReboot()
 
 # IP events handler: filter for our PPP netif and set bits
 proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; event_data: pointer) {.cdecl.} =
