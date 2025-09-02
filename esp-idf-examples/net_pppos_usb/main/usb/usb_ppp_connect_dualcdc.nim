@@ -1,5 +1,5 @@
 import nesper
-import nesper/[general]
+import nesper/[general, gpios, timers]
 import nesper/esp/[esp_log, esp_event, event_groups]
 import nesper/events
 import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types]
@@ -47,11 +47,12 @@ proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   logi(TAG, "Line state changed on itf %d", itf)
   # Allow host tools (esptool) to reset via DTR/RTS on the console CDC
   if tinyusb_cdcacm_itf_t(itf) == sLogItf:
-    logi(TAG, "DTR/RTS triggered on console: restarting for flashing")
     let ls = event.line_state_changed_data
+    logi(TAG, "DTR/RTS triggered on console rts: %s, dtr: %s", $ls.rts, $ls.dtr)
     # Common esptool pattern: RTS asserted and DTR deasserted -> reset to enter flashing
     if ls.rts and not ls.dtr:
-      logi(TAG, "DTR/RTS trigger: restarting for flashing")
+      logi(TAG, "DTR/RTS trigger: restarting...")
+      delay(10.Millis)
       esp_restart()
 
 # IP events handler: filter for our PPP netif and set bits
