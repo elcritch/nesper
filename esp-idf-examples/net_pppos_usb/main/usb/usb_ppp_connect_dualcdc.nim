@@ -47,6 +47,7 @@ proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   logi(TAG, "Line state changed on itf %d", itf)
   # Allow host tools (esptool) to reset via DTR/RTS on the console CDC
   if tinyusb_cdcacm_itf_t(itf) == sLogItf:
+    logi(TAG, "DTR/RTS triggered on console: restarting for flashing")
     let ls = event.line_state_changed_data
     # Common esptool pattern: RTS asserted and DTR deasserted -> reset to enter flashing
     if ls.rts and not ls.dtr:
