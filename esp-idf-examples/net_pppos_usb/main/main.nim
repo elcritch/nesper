@@ -6,6 +6,9 @@ import nesper/esp/nvs_flash
 import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
+
+import nesper/servers/rpc/rpcsocket_json
+
 when defined(RUN_NCM):
   import usb/usb_ncm_eth_dualcdc as ncm_eth
 else:
@@ -13,6 +16,15 @@ else:
 
 const
   TAG*: cstring = "main"
+
+proc setupRpc(rt: var RpcRouter) =
+  rt.rpc("hello") do(input: string) -> string:
+    # example: ./rpc_cli --ip:$IP -c:1 '{"method": "hello", "params": ["world"]}'
+    result = "Hello " & input
+
+  rt.rpc("add") do(a: int, b: int) -> int:
+    # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
+    result = a + b
 
 proc setupSystem(): esp_err_t =
   # Initialize esp-netif and default event loop
@@ -53,6 +65,11 @@ app_main:
       logi(TAG, "PPPoS connected. Idle loop ...")
     else:
       loge(TAG, "PPPoS connect failed")
+
+  var rt: RpcRouter = createRpcRouter(4096)
+  rt.setupRpc()
+
+  startRpcSocketServer(port=Port(5555), address="::", router=rt)
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
