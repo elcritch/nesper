@@ -47,13 +47,6 @@ proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; even
       logi(TAG, "Got IPv4: %s", $ev.ip_info.ip)
 
 proc runUsbNcmAsEth*() =
-  # NVS init (common)
-  var ret = nvs_flash_init()
-  if ret == ESP_ERR_NVS_NO_FREE_PAGES or ret == ESP_ERR_NVS_NEW_VERSION_FOUND:
-    check: nvs_flash_erase()
-    ret = nvs_flash_init()
-  check: ret
-
   # Netif + event loop
   check: esp_netif_init()
   check: esp_event_loop_create_default()
