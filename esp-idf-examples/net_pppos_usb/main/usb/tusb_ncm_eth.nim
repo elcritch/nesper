@@ -51,15 +51,15 @@ proc runUsbNcmAsEth*() =
   check: esp_netif_init()
   check: esp_event_loop_create_default()
 
-  # TinyUSB init
-  var tusbCfg: tinyusb_config_t
-  tusbCfg.external_phy = false
-  check: tinyusb_driver_install(addr tusbCfg)
-
   # MAC address
   var mac: array[6, uint8]
   check: esp_read_mac(addr mac[0], ESP_MAC_WIFI_STA)
   logi(TAG, "Using MAC: %02x:%02x:%02x:%02x:%02x:%02x", mac[0].int, mac[1].int, mac[2].int, mac[3].int, mac[4].int, mac[5].int)
+
+  # TinyUSB init
+  var tusbCfg: tinyusb_config_t
+  tusbCfg.external_phy = false
+  check: tinyusb_driver_install(addr tusbCfg)
 
   # TinyUSB NET config
   var ncfg: tinyusb_net_config_t
@@ -93,4 +93,3 @@ proc runUsbNcmAsEth*() =
   esp_netif_action_connected(sNetif, nil, 0, nil)
 
   logi(TAG, "USB NCM Ethernet-like interface started")
-

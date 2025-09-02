@@ -85,15 +85,16 @@ proc runUsbNcmBridge*() =
     ret = nvs_flash_init()
   check: ret
 
-  logi(TAG, "USB NCM device initialization")
-  var tusbCfg: tinyusb_config_t
-  tusbCfg.external_phy = false
-  check: tinyusb_driver_install(addr tusbCfg)
-
+  # Read MAC before enabling USB, to set MAC string immediately after install
   var mac: array[6, uint8]
   check: esp_read_mac(addr mac[0], ESP_MAC_WIFI_STA)
   logi(TAG, "Network interface HW address: %02x:%02x:%02x:%02x:%02x:%02x",
        mac[0].int, mac[1].int, mac[2].int, mac[3].int, mac[4].int, mac[5].int)
+
+  logi(TAG, "USB NCM device initialization")
+  var tusbCfg: tinyusb_config_t
+  tusbCfg.external_phy = false
+  check: tinyusb_driver_install(addr tusbCfg)
 
   # Initialize TinyUSB NET class with callbacks and MAC
   var ncfg: tinyusb_net_config_t

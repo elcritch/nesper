@@ -56,24 +56,17 @@ proc runUsbNcmEthWithConsole*() =
   check: esp_netif_init()
   check: esp_event_loop_create_default()
 
+  # Read MAC before enabling USB so we can set it immediately
+  var mac: array[6, uint8]
+  check: esp_read_mac(addr mac[0], ESP_MAC_WIFI_STA)
+  logi(TAG, "Using MAC: %02x:%02x:%02x:%02x:%02x:%02x", mac[0].int, mac[1].int, mac[2].int, mac[3].int, mac[4].int, mac[5].int)
+
   # TinyUSB device stack
   var tusbCfg: tinyusb_config_t
   tusbCfg.external_phy = false
   check: tinyusb_driver_install(addr tusbCfg)
 
-  # CDC ACM for console on CDC1 (leave CDC0 free if desired)
-  var acmLog: tinyusb_config_cdcacm_t
-  acmLog.usb_dev = TINYUSB_USBDEV_0
-  acmLog.cdc_port = TINYUSB_CDC_ACM_1
-  check: tusb_cdc_acm_init(addr acmLog)
-  check: esp_tusb_init_console(TINYUSB_CDC_ACM_1)
-
-  # MAC address
-  var mac: array[6, uint8]
-  check: esp_read_mac(addr mac[0], ESP_MAC_WIFI_STA)
-  logi(TAG, "Using MAC: %02x:%02x:%02x:%02x:%02x:%02x", mac[0].int, mac[1].int, mac[2].int, mac[3].int, mac[4].int, mac[5].int)
-
-  # Initialize TinyUSB NET (NCM)
+  # Initialize TinyUSB NET (NCM) as early as possible so host can read MAC string
   var ncfg: tinyusb_net_config_t
   for i in 0..5: ncfg.mac_addr[i] = mac[i]
   ncfg.on_recv_callback = ncmRecvToNetif
@@ -81,6 +74,13 @@ proc runUsbNcmEthWithConsole*() =
   ncfg.on_init_callback = nil
   ncfg.user_context = nil
   check: tinyusb_net_init(TINYUSB_USBDEV_0, addr ncfg)
+
+  # CDC ACM for console on CDC1 (leave CDC0 free if desired)
+  var acmLog: tinyusb_config_cdcacm_t
+  acmLog.usb_dev = TINYUSB_USBDEV_0
+  acmLog.cdc_port = TINYUSB_CDC_ACM_1
+  check: tusb_cdc_acm_init(addr acmLog)
+  check: esp_tusb_init_console(TINYUSB_CDC_ACM_1)
 
   # Create Ethernet-like netif backed by NCM
   var baseCfg = ESP_NETIF_INHERENT_DEFAULT_ETH()
@@ -113,4 +113,3 @@ proc stopUsbNcmEthWithConsole*() =
     esp_netif_destroy(sNetif)
     sNetif = nil
   discard esp_tusb_deinit_console(TINYUSB_CDC_ACM_1)
-
