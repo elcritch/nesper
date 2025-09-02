@@ -5,7 +5,6 @@ import nesper/esp/nvs_flash
 import nesper/net_utils
 import nesper/components/esp_tinyusb/tinyusb
 import nesper/consts
-import nesper/components/esp_tinyusb/tinyusb
 
 const
   TAG* = "USB_NCM"
@@ -15,10 +14,11 @@ const
 # TinyUSB NET type/procs (no emit)
 type
   tinyusb_net_config_t* {.importc: "tinyusb_net_config_t", header: "tinyusb_net.h", bycopy.} = object
+    mac_addr* {.importc: "mac_addr".}: array[6, uint8]
     on_recv_callback* {.importc: "on_recv_callback".}: proc (buffer: pointer; len: uint16; ctx: pointer): esp_err_t {.cdecl.}
     free_tx_buffer* {.importc: "free_tx_buffer".}: proc (eb: pointer; ctx: pointer) {.cdecl.}
+    on_init_callback* {.importc: "on_init_callback".}: proc (ctx: pointer) {.cdecl.}
     user_context* {.importc: "user_context".}: pointer
-    mac_addr* {.importc: "mac_addr".}: array[6, uint8]
 
 proc tinyusb_net_init*(dev: tinyusb_usbdev_t; cfg: ptr tinyusb_net_config_t): esp_err_t {.cdecl, importc: "tinyusb_net_init", header: "tinyusb_net.h".}
 proc tinyusb_net_send_sync*(buffer: pointer; len: uint16; eb: pointer; timeout_ticks: uint32): esp_err_t {.cdecl, importc: "tinyusb_net_send_sync", header: "tinyusb_net.h".}
