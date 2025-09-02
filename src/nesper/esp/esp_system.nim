@@ -91,8 +91,8 @@ proc esp_unregister_shutdown_handler*(handle: shutdown_handler_t): esp_err_t {.
 ##  This function does not return.
 ##
 
-# defined in general.nim
-# proc esp_restart*() {.importc: "esp_restart", header: "esp_system.h".}
+## defined in general.nim
+## proc esp_restart*() {.importc: "esp_restart", header: "esp_system.h".}
 
 
 ## *
