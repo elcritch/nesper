@@ -6,6 +6,74 @@ import nesper/events
 import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types]
 import nesper/components/esp_tinyusb/[tinyusb, tinyusb_net, tusb_cdc_acm]
 
+## Code that is specific to the USB PPP over Dual CDC (CDC0=PPP, CDC1=console)
+## Requires TinyUSB and incompatible with USB JTAG or OTG Modes
+## CDC0 is used for PPP data, CDC1 is used for console
+## 
+## Example /etc/ppp/ipv6-up script:
+## ```sh
+## #!/bin/sh
+## 
+## INTERFACE=$1
+## DEVICE=$2
+## SPEED=$3
+## LOCAL_IP=$4
+## REMOTE_IP=$5
+## IPPARAM=$6
+## 
+## echo 0 > /proc/sys/net/ipv6/conf/$1/use_tempaddr
+## echo 2 > /proc/sys/net/ipv6/conf/$1/accept_ra
+## echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+## 
+## ULA_PREFIX="fd12:1234:0E74" # Choose your own prefix!!!
+## HOST_ULA="${ULA_PREFIX}::1/64"
+## DEVICE_ULA="${ULA_PREFIX}::2/64"
+## 
+## # Add the ULA address to the PPP interface
+## ip -6 addr add $HOST_ULA dev $INTERFACE
+## 
+## # Add a route to the device's ULA address
+## ip -6 route add $DEVICE_ULA dev $INTERFACE
+## 
+## # Optional: Add the ULA subnet to the routing table
+## ip -6 route add ${ULA_PREFIX}::/64 dev $INTERFACE
+## 
+## # Log the configuration
+## logger "IPv6-up: Added ULA addresses - Host: $HOST_ULA, Device: $DEVICE_ULA on $INTERFACE"
+## ```
+## 
+## Example of /etc/ppp/peers/esp32 config:
+## 
+## ```sh
+## # Serial device
+## /dev/ttyACM0
+## # Baud rate (match your ESP32-S3 configuration)
+## 115200
+## # Hardware flow control
+## crtscts
+## # Don't use modem control lines
+## local
+## # Don't require authentication from peer
+## noauth
+## # Set this side as client
+## noipdefault
+## defaultroute
+## # Use peer's DNS
+## usepeerdns
+## # Enable debug (remove after testing)
+## debug
+## dump
+## # Keep connection alive
+## persist
+## maxfail 0
+## 
+## # Optional: specific IP addresses if your ESP32-S3 assigns them
+## # 192.168.1.100:192.168.1.101
+## +ipv6
+## ```
+## 
+## Then you can simply run `sudo pppd call esp32`
+
 const
   TAG* = "pppos_dualcdc"
 
