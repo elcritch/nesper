@@ -146,3 +146,7 @@ proc shutdownPppConnectDualCdc*() =
     vEventGroupDelete(sEventGroup)
     sEventGroup = nil
   discard esp_tusb_deinit_console(TINYUSB_CDC_ACM_1)
+
+proc pppInterface*(): ptr esp_netif_t =
+  ## Returns the PPP esp-netif created by initPppConnectDualCdc
+  sNetif

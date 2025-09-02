@@ -647,6 +647,16 @@ proc esp_netif_get_ip6_linklocal*(esp_netif: ptr esp_netif_t;
 proc esp_netif_get_ip6_global*(esp_netif: ptr esp_netif_t;
                               if_ip6: ptr esp_ip6_addr_t): esp_err_t {.
     importc: "esp_netif_get_ip6_global", header: "esp_netif.h".}
+
+proc esp_netif_add_ip6_address*(esp_netif: ptr esp_netif_t;
+                                ip6addr: esp_ip6_addr_t,
+                                preferred: bool): esp_err_t {.
+    importc: "esp_netif_add_ip6_address", header: "esp_netif.h".} ##\
+    ##  @brief  Add a static IPv6 address to the specified interface
+    ##
+    ##  Adds the given IPv6 address to the interface and triggers related events.
+    ##
+
 ## *
 ##  @brief Sets IPv4 address to the specified octets
 ##

@@ -6,6 +6,8 @@ import nesper/esp/nvs_flash
 import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
+import nesper/esp/net/esp_netif_impl
+import nesper/net_utils
 
 import nesper/servers/rpc/rpcsocket_json
 
@@ -16,6 +18,11 @@ else:
 
 const
   TAG*: cstring = "main"
+
+proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
+  ## Convert Nim IpAddress to esp_ip6_addr_t and add it to the interface
+  let espIp6 = toEspIp6Addr(ip)
+  result = esp_netif_add_ip6_address(netif, espIp6, preferred=true)
 
 proc setupRpc(rt: var RpcRouter) =
   rt.rpc("hello") do(input: string) -> string:
@@ -57,6 +64,15 @@ app_main:
     # Start PPPoS over USB with dual CDC (CDC0=PPP, CDC1=console)
     if initPppConnectDualCdc() == ESP_OK:
       logi(TAG, "PPPoS connected. Idle loop ...")
+
+      # Demo: add a static IPv6 address to the PPP netif
+      let netif = pppInterface()
+      let demoIp = parseIpAddress("fd12:4FE6:B3B5:0E74::2")
+      let rc = addIpv6ToNetif(netif, demoIp)
+      if rc == ESP_OK:
+        logi(TAG, "Added IPv6 %s to PPP interface", $demoIp)
+      else:
+        logw(TAG, "Failed to add IPv6 (%d)", rc)
     else:
       loge(TAG, "PPPoS connect failed")
 

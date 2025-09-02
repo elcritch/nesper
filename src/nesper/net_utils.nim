@@ -87,6 +87,16 @@ when not defined(ESP_IDF_V4_0):
   proc toIpAddress*(ip: esp_ip6_addr_t): IpAddress =
     toIpAddress(ip.address)
 
+when not defined(ESP_IDF_V4_0):
+  ## Convert a Nim IPv6 IpAddress to ESP-IDF esp_ip6_addr_t
+  proc toEspIp6Addr*(ip: IpAddress): esp_ip6_addr_t =
+    ## Ensures the input is IPv6 and maps bytes directly
+    doAssert ip.family == IpAddressFamily.IPv6
+    var res: esp_ip6_addr_t
+    res.zone = 0'u8
+    copyMem(res.address[0].unsafeAddr, ip.address_v6[0].unsafeAddr, 16)
+    return res
+
 ## * Generate host name based on sdkconfig, optionally adding a portion of MAC address to it.
 proc generate_hostname*(hostname: string): string =
   var mac: array[6, uint8]
@@ -109,4 +119,3 @@ proc generate_sensor_id*(): string =
     sensor_id.add(mac[i].toHex(2))
 
   return sensor_id.join(":")
-
