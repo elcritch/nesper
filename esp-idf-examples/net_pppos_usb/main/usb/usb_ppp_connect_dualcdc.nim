@@ -45,6 +45,13 @@ proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
 
 proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   logi(TAG, "Line state changed on itf %d", itf)
+  # Allow host tools (esptool) to reset via DTR/RTS on the console CDC
+  if tinyusb_cdcacm_itf_t(itf) == sLogItf:
+    let ls = event.line_state_changed_data
+    # Common esptool pattern: RTS asserted and DTR deasserted -> reset to enter flashing
+    if ls.rts and not ls.dtr:
+      logi(TAG, "DTR/RTS trigger: restarting for flashing")
+      esp_restart()
 
 # IP events handler: filter for our PPP netif and set bits
 proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; event_data: pointer) {.cdecl.} =
@@ -86,6 +93,7 @@ proc examplePppConnectDualCdc*(): esp_err_t =
   var acmLog: tinyusb_config_cdcacm_t
   acmLog.usb_dev = TINYUSB_USBDEV_0
   acmLog.cdc_port = TINYUSB_CDC_ACM_1
+  acmLog.callback_line_state_changed = onLineState
   check: tusb_cdc_acm_init(addr acmLog)
   check: esp_tusb_init_console(TINYUSB_CDC_ACM_1)
 
@@ -130,4 +138,3 @@ proc examplePppShutdownDualCdc*() =
     vEventGroupDelete(sEventGroup)
     sEventGroup = nil
   discard esp_tusb_deinit_console(TINYUSB_CDC_ACM_1)
-
