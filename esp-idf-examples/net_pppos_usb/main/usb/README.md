@@ -29,6 +29,11 @@ Kconfig Requirements
   - TinyUSB → Enable NET (NCM) device class.
   - DHCP client runs on the device (default ETH netif config). Ensure host provides DHCP or set static IP as needed.
 
+Endpoint-safe defaults
+- PPP mode (default): `sdkconfig.defaults` (or `sdkconfig.defaults.ppp`) sets CDC count = 2 and disables NCM.
+- NCM mode: use `sdkconfig.defaults.ncm` to enable NCM and set CDC count = 1 (console only).
+  - Having both NCM and two CDCs may exceed endpoint limits on some targets.
+
 Host Expectations
 - PPPoS:
   - Host sees two serial ports. Attach PPP dialer to CDC0; logs on CDC1.
@@ -43,3 +48,6 @@ Entrypoints
 - PPP: `examplePppConnectDualCdc()` / `examplePppShutdownDualCdc()`.
 - NCM ETH: `runUsbNcmEthWithConsole()` / `stopUsbNcmEthWithConsole()`.
 
+Switching modes
+- PPP (default): build normally.
+- NCM: either pass `-d:RUN_NCM` at build time or temporarily copy `sdkconfig.defaults.ncm` to `sdkconfig.defaults` and reconfigure.
