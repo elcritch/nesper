@@ -130,7 +130,7 @@ proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient
       client.sendWrap(data & message & "\r\L")
 
 proc startSocketServer*[T](port: Port, address: string = "", readHandler: TcpServerHandler[T], writeHandler: TcpServerHandler[T], data: var T) =
-  var server: Socket = newSocket()
+  var server: Socket = newSocket(domain=AF_INET6)
   var select: Selector[T] = newSelector[T]()
 
   server.setSockOpt(OptReuseAddr, true)

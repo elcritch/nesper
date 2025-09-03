@@ -8,7 +8,7 @@ when defined(freertos):
   export esp_timer
 else:
   import std/monotimes
-  proc esp_timer_get_time*(): uint64 = return uint64(getMonoTime().ticks * 1_000_000)
+  proc esp_timer_get_time*(): uint64 = return uint64(getMonoTime().ticks div 1_000)
   type
     esp_timer_cb_t* = proc (arg: pointer) {.cdecl.}
     esp_timer_dispatch_t* = enum
