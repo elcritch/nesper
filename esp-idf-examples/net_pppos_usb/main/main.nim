@@ -52,7 +52,8 @@ when defined(TcpEchoServer):
 
     while true:
       # Accept a client connection
-      let client = server.accept()
+      var client: Socket = new(Socket)
+      server.accept(client)
       echo "Client connected"
       
       # Echo loop for this client
@@ -121,6 +122,7 @@ app_main:
     delay(4_000.Millis)
     startRpcSocketServer(port=Port(5555), address = "::", router = rt)
   when defined(TcpEchoServer):
+    delay(4_000.Millis)
     runTcpEcho()
 
   # Keep app alive; clean shutdown not triggered in this minimal example
