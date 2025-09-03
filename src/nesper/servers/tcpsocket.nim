@@ -36,11 +36,11 @@ template sendWrap*(socket: Socket, data: untyped) =
 
 proc sendChunks*(sourceClient: Socket, rmsg: string) =
   let rN = rmsg.len()
-  # logd(TAG,"rpc handler send client: %d bytes", rN)
+  logi(TAG,"rpc handler send client: %d bytes", rN)
   var i = 0
   while i < rN:
     var j = min(i + MsgChunk, rN) 
-    # logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
+    logi(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
     var sl = rmsg[i..<j]
     sourceClient.sendWrap(move sl)
     i = j
@@ -88,7 +88,7 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
     srv.clients[client.getFd()] = client
 
     let id: int = client.getFd().int
-    logd(TAG, "client connected: %d", id)
+    logi(TAG, "client connected: %d", id)
 
   elif srv.clients.hasKey(SocketHandle(selected.fd)):
     let sourceClient: Socket = newSocket(SocketHandle(selected.fd))
@@ -104,14 +104,14 @@ proc processReads[T](selected: ReadyKey, srv: TcpServerInfo[T], data: T) =
       discard srv.clients.pop(sourceFd.SocketHandle, client)
       srv.select.unregister(sourceFd)
       discard posix.close(sourceFd.cint)
-      logd(TAG, "client disconnected: fd: %s", $sourceFd)
+      logi(TAG, "client disconnected: fd: %s", $sourceFd)
 
     except TcpClientError as err:
       srv.clients.del(sourceFd.SocketHandle)
       srv.select.unregister(sourceFd)
 
       discard posix.close(sourceFd.cint)
-      logd(TAG, "client read error: %s", $(sourceFd))
+      logi(TAG, "client read error: %s", $(sourceFd))
 
   else:
     raise newException(OSError, "unknown socket id: " & $selected.fd.int)
@@ -124,7 +124,7 @@ proc echoReadHandler*(srv: TcpServerInfo[string], result: ReadyKey, sourceClient
     raise newException(TcpClientDisconnected, "")
 
   else:
-    logd(TAG, "received from client: %s", message)
+    logi(TAG, "received from client: %s", message)
 
     for cfd, client in srv.clients:
       client.sendWrap(data & message & "\r\L")

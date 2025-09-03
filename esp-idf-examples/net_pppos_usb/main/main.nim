@@ -27,9 +27,12 @@ proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
 proc setupRpc(rt: var RpcRouter) =
   rt.rpc("hello") do(input: string) -> string:
     # example: ./rpc_cli --ip:$IP -c:1 '{"method": "hello", "params": ["world"]}'
+    logi(TAG, "rcp hello: %s", input)
     result = "Hello " & input
 
   rt.rpc("add") do(a: int, b: int) -> int:
+    echo "ADDING!"
+    logi(TAG, "rcp add: %s, %s", $a, $b)
     # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
     result = a + b
 
@@ -80,7 +83,8 @@ app_main:
   var rt: RpcRouter = createRpcRouter(4096)
   rt.setupRpc()
 
-  startRpcSocketServer(port=Port(5555), address = $ipAddr, router = rt)
+  delay(4_000.Millis)
+  startRpcSocketServer(port=Port(5555), address = "::", router = rt)
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
