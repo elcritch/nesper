@@ -36,6 +36,35 @@ proc setupRpc(rt: var RpcRouter) =
     # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
     result = a + b
 
+proc runTcpEcho*() =
+  # Create the server socket
+  let server = newSocket()
+  server.setSockOpt(OptReuseAddr, true)
+  server.bindAddr(Port(8080))
+  server.listen()
+
+  echo "Echo server listening on port 8080"
+
+  while true:
+    # Accept a client connection
+    let client = server.accept()
+    echo "Client connected"
+    
+    # Echo loop for this client
+    while true:
+      try:
+        echo "Client waiting for data"
+        let data = client.recv(1024)
+        echo "Client waiting received data: ", data.repr()
+        if data.len == 0:
+          break  # Client disconnected
+        client.send(data)  # Echo back the data
+      except:
+        break  # Error occurred
+    
+    echo "Client disconnected"
+    client.close()
+
 app_main:
   logi(TAG, "esp starting ... ")
 
@@ -80,11 +109,14 @@ app_main:
     else:
       loge(TAG, "PPPoS connect failed")
 
-  var rt: RpcRouter = createRpcRouter(4096)
-  rt.setupRpc()
+  when defined(RpcServer):
+    var rt: RpcRouter = createRpcRouter(4096)
+    rt.setupRpc()
 
-  delay(4_000.Millis)
-  startRpcSocketServer(port=Port(5555), address = "::", router = rt)
+    delay(4_000.Millis)
+    startRpcSocketServer(port=Port(5555), address = "::", router = rt)
+  when defined(TcpEchoServer):
+    runTcpEcho()
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
