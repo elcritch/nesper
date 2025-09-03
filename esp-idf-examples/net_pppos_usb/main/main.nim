@@ -46,7 +46,7 @@ when defined(TcpEchoServer):
   proc runTcpEcho*() =
     # Create the server socket
     let server = newSocket(domain=AF_INET6)
-    server.setSockOpt(OptReuseAddr, true)
+    # server.setSockOpt(OptReuseAddr, true)
     server.bindAddr(Port(8080), address="::")
     server.listen()
 
@@ -54,9 +54,13 @@ when defined(TcpEchoServer):
 
     while true:
       # Accept a client connection
+      echo "Waiting for client connection"
       var client: Socket = new(Socket)
       server.accept(client)
       echo "Client connected"
+      if client == nil:
+        loge(TAG, "Error accepting client connection")
+        continue
       
       # Echo loop for this client
       while true:
@@ -67,8 +71,8 @@ when defined(TcpEchoServer):
           if data.len == 0:
             break  # Client disconnected
           client.send(data)  # Echo back the data
-        except:
-          break  # Error occurred
+        except Defect, CatchableError:
+          loge(TAG, "Error receiving from TCP socket: %s", getCurrentExceptionMsg())
       
       echo "Client disconnected"
       client.close()
