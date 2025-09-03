@@ -93,7 +93,7 @@ const
 
 # PPP transmit: push bytes to CDC PPP interface
 proc pppTransmit(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.} =
-  logi(TAG, "CDC TX: %d", len)
+  # logi(TAG, "CDC TX: %d", len)
   discard tinyusb_cdcacm_write_queue(sPppItf, cast[ptr uint8](buffer), len)
   result = tinyusb_cdcacm_write_flush(sPppItf, 0'u32)
 
@@ -101,25 +101,25 @@ var driverCfg: esp_netif_driver_ifconfig_t
 
 # CDC RX: feed data to esp_netif
 proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
-  logi(TAG, "CDC RX: interface %d", itf)
+  # logi(TAG, "CDC RX: interface %d", itf)
   if tinyusb_cdcacm_itf_t(itf) != sPppItf:
-    logi(TAG, "CDC RX: interface %d not sPppItf", itf)
+    # logi(TAG, "CDC RX: interface %d not sPppItf", itf)
     return
   var rxSize: csize_t = 0
   let ret = tinyusb_cdcacm_read(tinyusb_cdcacm_itf_t(itf), addr rxBuf[0], CONFIG_TINYUSB_CDC_RX_BUFSIZE.csize_t, addr rxSize)
-  logi(TAG, "CDC RX: interface %d returned %d rxBuf: %d", itf, ret, rxBuf.len())
+  # logi(TAG, "CDC RX: interface %d returned %d rxBuf: %d", itf, ret, rxBuf.len())
   if ret == ESP_OK and rxSize > 0:
     discard esp_netif_receive(sNetif, addr rxBuf[0], rxSize, nil)
 
 proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
-  logi(TAG, "Line state changed on itf %d", itf)
+  # logi(TAG, "Line state changed on itf %d", itf)
   # Allow host tools (esptool) to reset via DTR/RTS on the console CDC
   if tinyusb_cdcacm_itf_t(itf) == sLogItf:
     let ls = event.line_state_changed_data
-    logi(TAG, "DTR/RTS triggered on console rts: %s, dtr: %s", $ls.rts, $ls.dtr)
+    # logi(TAG, "DTR/RTS triggered on console rts: %s, dtr: %s", $ls.rts, $ls.dtr)
     # Common esptool pattern: RTS asserted and DTR deasserted -> reset to enter flashing
     if ls.rts and not ls.dtr:
-      logi(TAG, "DTR/RTS trigger: restarting...")
+      # logi(TAG, "DTR/RTS trigger: restarting...")
       delay(10.Millis)
       esp_restart()
 
