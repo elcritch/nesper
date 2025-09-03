@@ -196,7 +196,7 @@ proc runRpc*(args: var RpcCli) =
     for (f,v) in m.pairs():
       call[f] = v
 
-  let client: Socket = newSocket(buffered=false)
+  let client: Socket = newSocket(buffered=false, domain = AF_UNSPEC)
   client.connect(args.ipAddr, args.port)
   echo(yellow, "[connected to server ip addr: ", args.ipAddr,"]")
   echo(blue, "[call: ", $call, "]")
