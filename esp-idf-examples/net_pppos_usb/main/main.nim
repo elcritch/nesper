@@ -51,7 +51,7 @@ when defined(TcpEchoServer):
     server.bindAddr(Port(5555), address="::")
     server.listen()
 
-    echo "Echo server listening on port 8080"
+    echo "Echo server listening on port 5555"
 
     while true:
       try:
@@ -88,7 +88,7 @@ when defined(UdpEchoServer):
     let server = newSocket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)
     server.bindAddr(Port(9090), address="::")
 
-    echo "UDP echo server listening on port 8080"
+    echo "UDP echo server listening on port 9090"
 
     while true:
       try:
