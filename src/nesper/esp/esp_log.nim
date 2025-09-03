@@ -29,11 +29,12 @@ when defined(freertos):
 
   proc log_timestamp*(): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
 else:
-  proc loge*(tag: cstring, formatstr: cstring) {.importc: "printf", varargs, header: "stdio.h".}
-  proc logw*(tag: cstring, formatstr: cstring) {.importc: "printf", varargs, header: "stdio.h".}
-  proc logi*(tag: cstring, formatstr: cstring) {.importc: "printf", varargs, header: "stdio.h".}
-  proc logd*(tag: cstring, formatstr: cstring) {.importc: "printf", varargs, header: "stdio.h".}
-  proc logv*(tag: cstring, formatstr: cstring) {.importc: "printf", varargs, header: "stdio.h".}
+  proc c_printf*(formatstr: cstring) {.importc: "printf", header: "stdio.h", varargs.}
+  template loge*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "ERROR: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logw*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "WARN: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logi*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "INFO: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logd*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "DEBUG: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logv*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "VERBOSE: ", tag, ": "; c_printf(formatstr, args); echo ""
 
 type 
   MallocCapacity* = enum
