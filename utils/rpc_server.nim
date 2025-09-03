@@ -11,4 +11,5 @@ proc setupRpc(rt: var RpcRouter) =
     result = a + b
 
 var rt: RpcRouter = createRpcRouter(4096)
+rt.setupRpc()
 startRpcSocketServer(port=Port(5555), address="::", router=rt)
