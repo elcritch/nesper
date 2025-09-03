@@ -53,29 +53,32 @@ when defined(TcpEchoServer):
     echo "Echo server listening on port 8080"
 
     while true:
-      # Accept a client connection
-      echo "Waiting for client connection"
-      var client: Socket = new(Socket)
-      server.accept(client)
-      echo "Client connected"
-      if client == nil:
-        loge(TAG, "Error accepting client connection")
-        continue
-      
-      # Echo loop for this client
-      while true:
-        try:
-          echo "Client waiting for data"
-          let data = client.recv(1024)
-          echo "Client waiting received data: ", data.repr()
-          if data.len == 0:
-            break  # Client disconnected
-          client.send(data)  # Echo back the data
-        except Defect, CatchableError:
-          loge(TAG, "Error receiving from TCP socket: %s", getCurrentExceptionMsg())
-      
-      echo "Client disconnected"
-      client.close()
+      try:
+        # Accept a client connection
+        echo "Waiting for client connection"
+        var client: Socket = new(Socket)
+        server.accept(client)
+        echo "Client connected"
+        if client == nil:
+          loge(TAG, "Error accepting client connection")
+          continue
+        
+        # Echo loop for this client
+        while true:
+          try:
+            echo "Client waiting for data"
+            let data = client.recv(1024)
+            echo "Client waiting received data: ", data.repr()
+            if data.len == 0:
+              break  # Client disconnected
+            client.send(data)  # Echo back the data
+          except Defect, CatchableError:
+            loge(TAG, "Error receiving from client: %s", getCurrentExceptionMsg())
+        
+        echo "Client disconnected"
+        client.close()
+      except Defect, CatchableError:
+        loge(TAG, "Error receiving from TCP socket: %s", getCurrentExceptionMsg())
 
 when defined(UdpEchoServer):
   proc runUdpEcho*() =
