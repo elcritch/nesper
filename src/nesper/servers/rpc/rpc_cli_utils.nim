@@ -192,10 +192,9 @@ proc runRpc*(args: var RpcCli) =
   else:
     call = %* { "jsonrpc": "2.0", "id": 1 }
 
-  let m = parseJson(args.jsonArg)
-
-  for (f,v) in m.pairs():
-    call[f] = v
+    let m = parseJson(args.jsonArg)
+    for (f,v) in m.pairs():
+      call[f] = v
 
   let client: Socket = newSocket(buffered=false)
   client.connect(args.ipAddr, args.port)
