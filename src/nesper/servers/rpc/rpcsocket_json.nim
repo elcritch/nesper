@@ -4,8 +4,10 @@ import selectors
 import tables
 import posix
 
-import ../../consts
-import ../../general
+when defined(freertos):
+  import ../../consts
+  import ../../general
+
 import ../tcpsocket
 import router
 import json
@@ -40,7 +42,7 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 
 
 proc startRpcSocketServer*(port: Port; address="", router: var RpcRouter) =
-  logi(TAG, "starting json rpc server: buffer: %s", $router.buffer)
+  logi(TAG, "starting json rpc server: buffer: %s, port: %s", $router.buffer, $port)
 
   startSocketServer[RpcRouter](
     port,

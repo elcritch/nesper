@@ -6,12 +6,11 @@ import posix
 
 import ../consts
 import ../general
-import ../tasks
 import ../timers
+export consts, general, timers
 
 export net, selectors, tables, posix
 
-export consts, general, timers
 
 const
   TAG = "socketrpc"
@@ -157,7 +156,7 @@ proc startSocketServer*[T](port: Port, address: string = "", readHandler: TcpSer
           result.processWrites(srv, data)
       # taskYIELD()
     # delayMillis(1)
-    vTaskDelay(1.TickType_t)
+      delay(1.Micros)
 
   
   select.close()

@@ -2,10 +2,39 @@
 import consts
 import general
 
-import esp/esp_timer
+export consts
+when defined(freertos):
+  import esp/esp_timer
+  export esp_timer
+else:
+  import std/monotimes
+  proc esp_timer_get_time*(): uint64 = return uint64(getMonoTime().ticks * 1_000_000)
+  type
+    esp_timer_cb_t* = proc (arg: pointer) {.cdecl.}
+    esp_timer_dispatch_t* = enum
+      ESP_TIMER_DISPATCH_NOW = 0,
+      ESP_TIMER_DISPATCH_NEXT = 1,
+      ESP_TIMER_DISPATCH_LATE = 2,
+      ESP_TIMER_DISPATCH_UNIQUE = 3
+    esp_timer_handle_t* = ptr esp_timer_t
+    esp_timer_t* = object
+      callback: esp_timer_cb_t
+      arg: pointer
+      dispatch_method: esp_timer_dispatch_t
+      name: cstring
+    esp_timer_create_args_t* = object
+      callback: esp_timer_cb_t
+      arg: pointer
+      dispatch_method: esp_timer_dispatch_t
+      name: cstring
+  proc esp_timer_create*(create_args: ptr esp_timer_create_args_t; out_handle: ptr esp_timer_handle_t): esp_err_t {.cdecl.} = return ESP_OK
+  proc esp_timer_start_once*(timer: esp_timer_handle_t; timeout_us: uint64): esp_err_t {.cdecl.} = return ESP_OK
+  proc esp_timer_start_periodic*(timer: esp_timer_handle_t; period: uint64): esp_err_t {.cdecl.} = return ESP_OK
+  proc esp_timer_stop*(timer: esp_timer_handle_t): esp_err_t {.cdecl.} = return ESP_OK
+  proc esp_timer_delete*(timer: esp_timer_handle_t): esp_err_t {.cdecl.} = return ESP_OK
+
 # import esp/driver/timer
 
-export consts, esp_timer
 
 type
   TimerError* = object of OSError
