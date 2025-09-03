@@ -16,10 +16,10 @@ export tcpsocket, router
 
 const TAG = "socketrpc"
 
-proc rpcMsgPackWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
+proc rpcJsonWriteHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
   raise newException(OSError, "the request to the OS failed")
 
-proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
+proc rpcJsonReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sourceClient: Socket, rt: RpcRouter) =
 
   try:
     logd(TAG, "rpc server handler: router: %x", rt.buffer)
@@ -44,11 +44,11 @@ proc rpcMsgPackReadHandler*(srv: TcpServerInfo[RpcRouter], result: ReadyKey, sou
 proc startRpcSocketServer*(port: Port; address="", router: var RpcRouter) =
   logi(TAG, "starting json rpc server: buffer: %s, port: %s", $router.buffer, $port)
 
-  startSocketServer[RpcRouter](
+  startUdpSocketServer[RpcRouter](
     port,
     address=address,
-    readHandler=rpcMsgPackReadHandler,
-    writeHandler=rpcMsgPackWriteHandler,
+    readHandler=rpcJsonReadHandler,
+    writeHandler=rpcJsonWriteHandler,
     data=router)
 
 
