@@ -211,6 +211,7 @@ type
 
   err_t* = distinct int8
   netif* {.importc: "netif", header: hdr, bycopy.} = object
+    mtu* {.importc: "mtu".}: uint16
 
   init_fn_t* = proc (a1: pointer): err_t {.cdecl.}
 

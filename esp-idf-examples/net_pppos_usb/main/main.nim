@@ -13,6 +13,7 @@ when defined(RpcServer):
   import nesper/servers/rpc/rpcsocket_json
 when defined(TcpEchoServer):
   import std/net
+  import std/nativesockets
 when defined(UdpEchoServer):
   import std/net
 
@@ -45,9 +46,9 @@ when defined(RpcServer):
 when defined(TcpEchoServer):
   proc runTcpEcho*() =
     # Create the server socket
-    let server = newSocket(domain=AF_INET6)
-    # server.setSockOpt(OptReuseAddr, true)
-    server.bindAddr(Port(8080), address="::")
+    let server = newSocket(domain=AF_INET6, protocol=IPPROTO_IPV6)
+    server.setSockOpt(OptReuseAddr, true)
+    server.bindAddr(Port(5555), address="::")
     server.listen()
 
     echo "Echo server listening on port 8080"
@@ -67,7 +68,7 @@ when defined(TcpEchoServer):
         while true:
           try:
             echo "Client waiting for data"
-            let data = client.recv(1024)
+            let data = client.recv(128)
             echo "Client waiting received data: ", data.repr()
             if data.len == 0:
               break  # Client disconnected
