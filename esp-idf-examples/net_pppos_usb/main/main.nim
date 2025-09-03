@@ -9,7 +9,10 @@ import nesper/esp/net/esp_netif_ppp
 import nesper/esp/net/esp_netif_impl
 import nesper/net_utils
 
-import nesper/servers/rpc/rpcsocket_json
+when defined(RpcServer):
+  import nesper/servers/rpc/rpcsocket_json
+when defined(TcpEchoServer):
+  import std/net
 
 when defined(RUN_NCM):
   import usb/usb_ncm_eth_dualcdc as ncm_eth
@@ -24,46 +27,48 @@ proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
   let espIp6 = toEspIp6Addr(ip)
   result = esp_netif_add_ip6_address(netif, espIp6, preferred=true)
 
-proc setupRpc(rt: var RpcRouter) =
-  rt.rpc("hello") do(input: string) -> string:
-    # example: ./rpc_cli --ip:$IP -c:1 '{"method": "hello", "params": ["world"]}'
-    logi(TAG, "rcp hello: %s", input)
-    result = "Hello " & input
+when defined(RpcServer):
+  proc setupRpc(rt: var RpcRouter) =
+    rt.rpc("hello") do(input: string) -> string:
+      # example: ./rpc_cli --ip:$IP -c:1 '{"method": "hello", "params": ["world"]}'
+      logi(TAG, "rcp hello: %s", input)
+      result = "Hello " & input
 
-  rt.rpc("add") do(a: int, b: int) -> int:
-    echo "ADDING!"
-    logi(TAG, "rcp add: %s, %s", $a, $b)
-    # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
-    result = a + b
+    rt.rpc("add") do(a: int, b: int) -> int:
+      echo "ADDING!"
+      logi(TAG, "rcp add: %s, %s", $a, $b)
+      # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
+      result = a + b
 
-proc runTcpEcho*() =
-  # Create the server socket
-  let server = newSocket()
-  server.setSockOpt(OptReuseAddr, true)
-  server.bindAddr(Port(8080))
-  server.listen()
+when defined(TcpEchoServer):
+  proc runTcpEcho*() =
+    # Create the server socket
+    let server = newSocket()
+    server.setSockOpt(OptReuseAddr, true)
+    server.bindAddr(Port(8080))
+    server.listen()
 
-  echo "Echo server listening on port 8080"
+    echo "Echo server listening on port 8080"
 
-  while true:
-    # Accept a client connection
-    let client = server.accept()
-    echo "Client connected"
-    
-    # Echo loop for this client
     while true:
-      try:
-        echo "Client waiting for data"
-        let data = client.recv(1024)
-        echo "Client waiting received data: ", data.repr()
-        if data.len == 0:
-          break  # Client disconnected
-        client.send(data)  # Echo back the data
-      except:
-        break  # Error occurred
-    
-    echo "Client disconnected"
-    client.close()
+      # Accept a client connection
+      let client = server.accept()
+      echo "Client connected"
+      
+      # Echo loop for this client
+      while true:
+        try:
+          echo "Client waiting for data"
+          let data = client.recv(1024)
+          echo "Client waiting received data: ", data.repr()
+          if data.len == 0:
+            break  # Client disconnected
+          client.send(data)  # Echo back the data
+        except:
+          break  # Error occurred
+      
+      echo "Client disconnected"
+      client.close()
 
 app_main:
   logi(TAG, "esp starting ... ")
