@@ -13,6 +13,8 @@ when defined(RpcServer):
   import nesper/servers/rpc/rpcsocket_json
 when defined(TcpEchoServer):
   import std/net
+when defined(UdpEchoServer):
+  import std/net
 
 when defined(RUN_NCM):
   import usb/usb_ncm_eth_dualcdc as ncm_eth
@@ -71,6 +73,33 @@ when defined(TcpEchoServer):
       echo "Client disconnected"
       client.close()
 
+when defined(UdpEchoServer):
+  proc runUdpEcho*() =
+
+    # Create UDP socket
+    let server = newSocket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)
+    server.bindAddr(Port(9090), address="::")
+
+    echo "UDP echo server listening on port 8080"
+
+    while true:
+      try:
+        var
+          data: string
+          address: string
+          port: Port
+        
+        echo "UDP echo server waiting for data"
+        # Receive data from any client
+        let res = server.recvFrom(data, 1024, address, port)
+        
+        echo "Received from ", address, ":", port, " -> ", data.repr()
+        
+        # Echo back to the sender
+        server.sendTo(address, port, data)
+      except Defect, CatchableError:
+        loge(TAG, "Error receiving from UDP socket: %s", getCurrentExceptionMsg())
+
 app_main:
   logi(TAG, "esp starting ... ")
 
@@ -124,6 +153,9 @@ app_main:
   when defined(TcpEchoServer):
     delay(10_000.Millis)
     runTcpEcho()
+  when defined(UdpEchoServer):
+    delay(10_000.Millis)
+    runUdpEcho()
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:

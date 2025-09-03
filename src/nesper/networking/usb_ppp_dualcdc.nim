@@ -93,6 +93,7 @@ const
 
 # PPP transmit: push bytes to CDC PPP interface
 proc pppTransmit(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.} =
+  logi(TAG, "CDC TX: %d", len)
   discard tinyusb_cdcacm_write_queue(sPppItf, cast[ptr uint8](buffer), len)
   result = tinyusb_cdcacm_write_flush(sPppItf, 0'u32)
 
@@ -100,10 +101,13 @@ var driverCfg: esp_netif_driver_ifconfig_t
 
 # CDC RX: feed data to esp_netif
 proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
+  logi(TAG, "CDC RX: interface %d", itf)
   if tinyusb_cdcacm_itf_t(itf) != sPppItf:
+    logi(TAG, "CDC RX: interface %d not sPppItf", itf)
     return
   var rxSize: csize_t = 0
   let ret = tinyusb_cdcacm_read(tinyusb_cdcacm_itf_t(itf), addr rxBuf[0], CONFIG_TINYUSB_CDC_RX_BUFSIZE.csize_t, addr rxSize)
+  logi(TAG, "CDC RX: interface %d returned %d rxBuf: %d", itf, ret, rxBuf.len())
   if ret == ESP_OK and rxSize > 0:
     discard esp_netif_receive(sNetif, addr rxBuf[0], rxSize, nil)
 
@@ -134,6 +138,7 @@ proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; even
       logi(TAG, "PPP IPv6 acquired")
       discard xEventGroupSetBits(sEventGroup, EventBits_t(GOT_IPV6))
   of IP_EVENT_PPP_LOST_IP:
+    logi(TAG, "PPP IPv6 lost")
     discard xEventGroupSetBits(sEventGroup, EventBits_t(CONN_FAILED))
   else:
     discard
