@@ -145,7 +145,7 @@ proc startSocketServer*[T](port: Port, address: string = "", readHandler: TcpSer
   server.bindAddr(port, address=address)
   server.listen()
 
-  logi TAG, "Server: started. Listening to new connections on port: %s", $port
+  logi TAG, "Server: started. Listening to new connections on address: %s, port: %s, domain: %s", $address, $port, $server.getFd().getSockDomain()
 
   var srv = createServerInfo[T](server, select)
   srv.readHandler = readHandler
