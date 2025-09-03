@@ -43,9 +43,9 @@ when defined(RpcServer):
 when defined(TcpEchoServer):
   proc runTcpEcho*() =
     # Create the server socket
-    let server = newSocket()
+    let server = newSocket(domain=AF_INET6)
     server.setSockOpt(OptReuseAddr, true)
-    server.bindAddr(Port(8080))
+    server.bindAddr(Port(8080), address="::")
     server.listen()
 
     echo "Echo server listening on port 8080"
@@ -122,7 +122,7 @@ app_main:
     delay(4_000.Millis)
     startRpcSocketServer(port=Port(5555), address = "::", router = rt)
   when defined(TcpEchoServer):
-    delay(4_000.Millis)
+    delay(10_000.Millis)
     runTcpEcho()
 
   # Keep app alive; clean shutdown not triggered in this minimal example
