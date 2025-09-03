@@ -55,6 +55,8 @@ app_main:
   except Defect, CatchableError:
     logi(TAG, "Error getting chip info")
 
+  let ipAddr = parseIpAddress("fd12:4FE6:B3B5:0E74::2")
+
   when defined(RUN_NCM):
     # Start USB NCM-as-Ethernet with separate CDC console
     ncm_eth.runUsbNcmEthWithConsole()
@@ -67,10 +69,9 @@ app_main:
 
       # Demo: add a static IPv6 address to the PPP netif
       let netif = pppInterface()
-      let demoIp = parseIpAddress("fd12:4FE6:B3B5:0E74::2")
-      let rc = addIpv6ToNetif(netif, demoIp)
+      let rc = addIpv6ToNetif(netif, ipAddr)
       if rc == ESP_OK:
-        logi(TAG, "Added IPv6 %s to PPP interface", $demoIp)
+        logi(TAG, "Added IPv6 %s to PPP interface", $ipAddr)
       else:
         logw(TAG, "Failed to add IPv6 (%d)", rc)
     else:
@@ -79,7 +80,7 @@ app_main:
   var rt: RpcRouter = createRpcRouter(4096)
   rt.setupRpc()
 
-  startRpcSocketServer(port=Port(5555), address="::", router=rt)
+  startRpcSocketServer(port=Port(5555), address = $ipAddr, router = rt)
 
   # Keep app alive; clean shutdown not triggered in this minimal example
   while true:
