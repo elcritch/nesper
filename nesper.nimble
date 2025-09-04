@@ -14,5 +14,4 @@ requires "stew >= 0.1.0"
 requires "bytesequtils"
 
 feature "examples":
-  requires "mummy"
-  requires "fastrpc@#head"
+  requires "fastrpc > 0.5.1"
