@@ -45,6 +45,7 @@ when defined(FastRpcServer):
   DefineRpcs(name=exampleRpcs):
 
     proc add(a: int, b: int): int {.rpc.} =
+      echo "adding: ", a, " + ", b
       result = 1 + a + b
 
 
