@@ -15,3 +15,4 @@ requires "bytesequtils"
 
 feature "examples":
   requires "mummy"
+  requires "fastrpc@#head"
