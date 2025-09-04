@@ -165,13 +165,18 @@ app_main:
     var rt: RpcRouter = createRpcRouter(4096)
     rt.setupRpc()
   when defined(FastRpcServer):
-    let inetAddrs = [
-      newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
-    ]
-    var rt: FastRpcRouter = newFastRpcRouter()
-    rt.registerRpcs(exampleRpcs)
-    var frpcServer = newFastRpcServer(rt, prefixMsgSize=true, threaded=false)
-    startSocketServer(inetAddrs, frpcServer)
+    try:
+      let inetAddrs = [
+        newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
+      ]
+      var rt: FastRpcRouter = newFastRpcRouter()
+      rt.registerRpcs(exampleRpcs)
+      var frpcServer = newFastRpcServer(rt, prefixMsgSize=true, threaded=false)
+      startSocketServer(inetAddrs, frpcServer)
+    except Defect, CatchableError:
+      loge(TAG, "Error starting FastRpcServer: %s", getCurrentExceptionMsg())
+      for st in getCurrentException().getStackTrace():
+        loge(TAG, "Error: %s", $st)
 
   when defined(TcpEchoServer):
     delay(10_000.Millis)
