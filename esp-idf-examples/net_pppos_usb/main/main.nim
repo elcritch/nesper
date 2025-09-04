@@ -168,9 +168,9 @@ app_main:
     let inetAddrs = [
       newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
     ]
-    var rt: FastRpcRouter = createFastRpcRouter(4096)
+    var rt: FastRpcRouter = newFastRpcRouter()
     rt.registerRpcs(exampleRpcs)
-    var frpcServer = newFastRpcServer(router, prefixMsgSize=true, threaded=false)
+    var frpcServer = newFastRpcServer(rt, prefixMsgSize=true, threaded=false)
     startSocketServer(inetAddrs, frpcServer)
 
   when defined(TcpEchoServer):
