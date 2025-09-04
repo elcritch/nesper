@@ -166,17 +166,22 @@ app_main:
     rt.setupRpc()
   when defined(FastRpcServer):
     try:
+      logi(TAG, "setting up fast rpc router")
       let inetAddrs = [
         newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
       ]
       var rt: FastRpcRouter = newFastRpcRouter()
+      logi(TAG, "registering rpcs")
       rt.registerRpcs(exampleRpcs)
+      logi(TAG, "newing fast rpc server")
       var frpcServer = newFastRpcServer(rt, prefixMsgSize=true, threaded=false)
+      logi(TAG, "starting fast rpc server")
       startSocketServer(inetAddrs, frpcServer)
+      logi(TAG, "fast rpc server done")
     except Defect, CatchableError:
       loge(TAG, "Error starting FastRpcServer: %s", getCurrentExceptionMsg())
-      for st in getCurrentException().getStackTrace():
-        loge(TAG, "Error: %s", $st)
+      for ste in getCurrentException().getStackTraceEntries():
+        loge(TAG, "Error: %s", $ste)
 
   when defined(TcpEchoServer):
     delay(10_000.Millis)

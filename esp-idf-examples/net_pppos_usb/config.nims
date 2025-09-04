@@ -6,6 +6,7 @@ switch("define", "nimIoselectorEventfd")
 # switch("define", "UdpEchoServer")
 switch("define", "FastRpcServer")
 
+switch("define", "McuUtilsLoggingLevel:lvlTrace")
 # switch("define", "RUN_NCM")
 
 patchFile("stdlib", "cpuinfo", "main/cpuinfo.nim")

@@ -1,5 +1,6 @@
 --nomain
 --compileOnly
+--define:debug
 --define:NimAppMain
 --nimcache:nimcache
 
@@ -8,6 +9,6 @@
 --cpu:arm
 --define:useMalloc
 --define:noSignalHandler
---debugger:native
+# --debugger:native
 --threads:on
 --tls_emulation:off
