@@ -176,9 +176,12 @@ elif defined(nimIoselectorEventfd):
 
   proc newSelectEvent*(): SelectEvent =
     when compiles(O_CLOEXEC):
+      echo "eventfd O_CLOEXEC or O_NONBLOCK"
       let fdci = eventfd(0, O_CLOEXEC or O_NONBLOCK)
     else:
-      let fdci = eventfd(0, O_NONBLOCK)
+      echo "eventfd O_NONBLOCK"
+      let fdci = eventfd(0, 0)
+      echo "eventfd O_NONBLOCK result: ", $fdci
     if fdci == -1:
       raiseIOSelectorsError(osLastError())
     result = cast[SelectEvent](allocShared0(sizeof(SelectEventImpl)))

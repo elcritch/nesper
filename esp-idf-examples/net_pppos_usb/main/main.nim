@@ -166,10 +166,15 @@ app_main:
     rt.setupRpc()
   when defined(FastRpcServer):
     try:
+      logi(TAG, "setting up select event")
+      let ev = newSelectEvent()
+      logi(TAG, "ev: %s", repr(ev))
+
       logi(TAG, "setting up fast rpc router")
       let inetAddrs = [
         newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
       ]
+      logi(TAG, "newing fast rpc router")
       var rt: FastRpcRouter = newFastRpcRouter()
       logi(TAG, "registering rpcs")
       rt.registerRpcs(exampleRpcs)
@@ -178,8 +183,8 @@ app_main:
       logi(TAG, "starting fast rpc server")
       startSocketServer(inetAddrs, frpcServer)
       logi(TAG, "fast rpc server done")
-    except Defect, CatchableError:
-      loge(TAG, "Error starting FastRpcServer: %s", getCurrentExceptionMsg())
+    except CatchableError as e:
+      loge(TAG, "Error starting FastRpcServer: %s, %s", $e.name, $e.msg)
       for ste in getCurrentException().getStackTraceEntries():
         loge(TAG, "Error: %s", $ste)
 
