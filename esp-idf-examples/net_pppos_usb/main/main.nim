@@ -9,14 +9,6 @@ import nesper/esp/net/esp_netif_ppp
 import nesper/esp/net/esp_netif_impl
 import nesper/net_utils
 
-when defined(RpcServer):
-  import nesper/servers/rpc/rpcsocket_json
-when defined(TcpEchoServer):
-  import std/net
-  import std/nativesockets
-when defined(UdpEchoServer):
-  import std/net
-
 when defined(RUN_NCM):
   import usb/usb_ncm_eth_dualcdc as ncm_eth
 else:
@@ -31,6 +23,7 @@ proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
   result = esp_netif_add_ip6_address(netif, espIp6, preferred=true)
 
 when defined(RpcServer):
+  import nesper/servers/rpc/rpcsocket_json
   proc setupRpc(rt: var RpcRouter) =
     rt.rpc("hello") do(input: string) -> string:
       # example: ./rpc_cli --ip:$IP -c:1 '{"method": "hello", "params": ["world"]}'
@@ -43,7 +36,21 @@ when defined(RpcServer):
       # example: ./rpc_cli --ip:$IP -c:1 '{"method": "add", "params": [1, 2]}'
       result = a + b
 
+when defined(FastRpcServer):
+  import fastrpc/server/fastrpcserver
+  import fastrpc/server/rpcmethods
+
+  # Define RPC Server #
+  DefineRpcs(name=exampleRpcs):
+
+    proc add(a: int, b: int): int {.rpc.} =
+      result = 1 + a + b
+
+
 when defined(TcpEchoServer):
+  import std/net
+  import std/nativesockets
+
   proc runTcpEcho*() =
     # Create the server socket
     let server = newSocket(domain=AF_INET6, protocol=IPPROTO_IPV6)
@@ -82,6 +89,8 @@ when defined(TcpEchoServer):
         loge(TAG, "Error receiving from TCP socket: %s", getCurrentExceptionMsg())
 
 when defined(UdpEchoServer):
+  import std/net
+
   proc runUdpEcho*() =
 
     # Create UDP socket
@@ -155,9 +164,15 @@ app_main:
   when defined(RpcServer):
     var rt: RpcRouter = createRpcRouter(4096)
     rt.setupRpc()
+  when defined(FastRpcServer):
+    let inetAddrs = [
+      newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
+    ]
+    var rt: FastRpcRouter = createFastRpcRouter(4096)
+    rt.registerRpcs(exampleRpcs)
+    var frpcServer = newFastRpcServer(router, prefixMsgSize=true, threaded=false)
+    startSocketServer(inetAddrs, frpcServer)
 
-    delay(4_000.Millis)
-    startRpcSocketServer(port=Port(5555), address = "::", router = rt)
   when defined(TcpEchoServer):
     delay(10_000.Millis)
     runTcpEcho()
