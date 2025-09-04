@@ -14,4 +14,4 @@ requires "stew >= 0.1.0"
 requires "bytesequtils"
 
 feature "examples":
-  requires "fastrpc >= 0.5.1"
+  requires "https://github.com/elcritch/fastrpc >= 0.5.1"
