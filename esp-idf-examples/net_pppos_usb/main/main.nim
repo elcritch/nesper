@@ -7,6 +7,7 @@ import nesper/esp/esp_event
 import nesper/esp/net/esp_netif
 import nesper/esp/net/esp_netif_ppp
 import nesper/esp/net/esp_netif_impl
+import nesper/esp/esp_vfs_eventfd
 import nesper/net_utils
 
 when defined(RUN_NCM):
@@ -166,9 +167,9 @@ app_main:
     rt.setupRpc()
   when defined(FastRpcServer):
     try:
-      logi(TAG, "setting up select event")
-      let ev = newSelectEvent()
-      logi(TAG, "ev: %s", repr(ev))
+      let cfg = ESP_VFS_EVENTD_CONFIG_DEFAULT()
+      logi(TAG, "cfg: %s", repr(cfg))
+      check esp_vfs_eventfd_register(addr cfg)
 
       logi(TAG, "setting up fast rpc router")
       let inetAddrs = [
