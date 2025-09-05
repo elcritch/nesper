@@ -73,7 +73,7 @@ proc wifiInitSta() =
   wifi_config.sta.sae_h2e_identifier.setFromString("")
 
   check: esp_wifi_set_mode(WIFI_MODE_STA)
-  check: esp_wifi_set_config(ESP_IF_WIFI_STA, addr wifi_config)
+  check: esp_wifi_set_config(WIFI_IF_STA, addr wifi_config)
   check: esp_wifi_start()
 
   logw(TAG, "Wifi Init Sta finished.")

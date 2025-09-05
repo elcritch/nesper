@@ -727,7 +727,7 @@ proc esp_wifi_get_promiscuous_ctrl_filter*(filter: ptr wifi_promiscuous_filter_t
 ##     - others: refer to the erro code in esp_err.h
 ##
 
-proc esp_wifi_set_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
+proc esp_wifi_set_config*(intf: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
     importc: "esp_wifi_set_config", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get configuration of specified interface
@@ -742,7 +742,7 @@ proc esp_wifi_set_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t
 ##     - ESP_ERR_WIFI_IF: invalid interface
 ##
 
-proc esp_wifi_get_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
+proc esp_wifi_get_config*(intf: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
     importc: "esp_wifi_get_config", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get STAs associated with soft-AP
