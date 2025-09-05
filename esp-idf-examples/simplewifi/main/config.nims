@@ -1,6 +1,5 @@
 --nomain
 --compileOnly
---define:debug
 --define:NimAppMain
 --nimcache:nimcache
 

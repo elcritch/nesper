@@ -5,7 +5,7 @@ switch("define", "nimIoselectorEventfd")
 
 switch("define", "FastRpcServer")
 
-switch("define", "McuUtilsLoggingLevel:lvlTrace")
+switch("define", "McuUtilsLoggingLevel:lvlInfo")
 
 patchFile("stdlib", "ioselectors_select", "../../src/nesper/networking/ioselectors_select_patch.nim")
 
