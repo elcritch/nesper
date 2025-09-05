@@ -46,9 +46,8 @@ proc wifiStart*() =
 
   discard esp_wifi_init(unsafeAddr(wcfg))
 
-  let evDis: EventHandlerCb[pointer] = onWifiDisconnect
-  eventRegister(WIFI_EVENT_STA_DISCONNECTED, evDis)
-  eventRegister(IP_EVENT_STA_GOT_IP, ipReceivedHandler)
+  eventRegister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, onWifiDisconnect, nil)
+  eventRegister(IP_EVENT, IP_EVENT_STA_GOT_IP, ipReceivedHandler)
 
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
 

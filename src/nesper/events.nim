@@ -27,24 +27,16 @@ type
                              event_base: esp_event_base_t;
                              event_id: int32;
                              event_data: pointer) {.cdecl.}
+  EventHandlerInstance* = ptr esp_event_handler_instance_t
 
-template eventRegister*[EVT; T: pointer](
-            evt_id: EVT;
-            evt_handler: EventHandlerCb[T];
+proc eventRegister*[E; T](
+            evt_base: esp_event_base_t,
+            evt_id: E,
+            evt_handler: EventHandlerCb[T],
             evt_handler_arg: T = nil,
-            handler_instance: ptr esp_event_handler_instance_t = nil
+            instance: EventHandlerInstance = nil
         ) =
     ## Register event with the default event loop. Understand WIFI & IP Events
-
-    let evt_base = 
-        when typeof(EVT) is wifi_event_t:
-            WIFI_EVENT
-        elif typeof(EVT) is ip_event_t:
-            IP_EVENT
-        elif typeof(EVT) is eth_event_t:
-            ETH_EVENT
-        else:
-            {.fatal: "Uknown event type, don't know how to unregister automatically".}
 
     let handler: esp_event_handler_t = cast[esp_event_handler_t](evt_handler)
     let ret = 
@@ -52,35 +44,34 @@ template eventRegister*[EVT; T: pointer](
                 event_base = evt_base,
                 event_id = int32(evt_id),
                 event_handler = handler,
-                event_handler_arg = evt_handler_arg,
-                handler_instance = handler_instance)
+                event_handler_arg = cast[pointer](evt_handler_arg),
+                instance = instance)
 
     if ret != ESP_OK:
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
-template eventRegister*[EVT; T: pointer](
-            event_base: esp_event_base_t;
-            event_id: EVT;
-            event_handler: EventHandlerCb[T];
-            event_handler_arg: T = nil,
-            handler_instance: ptr esp_event_handler_instance_t = nil
-        ) =
-    ## Register event for an event base on the default loop.
-    let handler: esp_event_handler_t = cast[esp_event_handler_t](event_handler)
-    let ret = esp_event_handler_instance_register(
-        event_base,
-        event_id.cint,
-        handler,
-        event_handler_arg,
-        handler_instance)
+# template eventRegister*[E; T: pointer](
+#             event_base: esp_event_base_t;
+#             event_id: E;
+#             event_handler: EventHandlerCb[T];
+#             event_handler_arg: T = nil,
+#             instance: ptr esp_event_handler_instance_t = nil
+#         ) =
+#     ## Register event for an event base on the default loop.
+#     let handler: esp_event_handler_t = cast[esp_event_handler_t](event_handler)
+#     let ret = esp_event_handler_instance_register(
+#         event_base,
+#         event_id.cint,
+#         handler,
+#         event_handler_arg,
+#         instance = instance)
+#     if ret != ESP_OK:
+#       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
-    if ret != ESP_OK:
-      raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
-
-template eventRegisterWith*[EVT, TP](
+template eventRegisterWith*[E; TP](
             event_loop: esp_event_loop_handle_t;
             event_base: esp_event_base_t;
-            event_id: EVT;
+            event_id: E;
             event_handler: TP;
             event_handler_arg: pointer = nil
         ) =

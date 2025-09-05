@@ -247,9 +247,12 @@ proc esp_event_handler_instance_register_with*(
                            ##   - Others: Fail
                            ##
 
-proc esp_event_handler_instance_register*(event_base: esp_event_base_t;
-    event_id: int32; event_handler: esp_event_handler_t;
-    event_handler_arg: pointer; instance: ptr esp_event_handler_instance_t): esp_err_t {.
+proc esp_event_handler_instance_register*(
+      event_base: esp_event_base_t;
+      event_id: int32;
+      event_handler: esp_event_handler_t;
+      event_handler_arg: pointer;
+      instance: ptr esp_event_handler_instance_t): esp_err_t {.
     cdecl, importc: "esp_event_handler_instance_register", header: "esp_event.h".}
   ##
                               ##
