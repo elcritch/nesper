@@ -351,10 +351,8 @@ proc selectInto*[T](s: Selector[T], timeout: int,
     wset = s.wSet
     eset = s.eSet
 
-  echo "selectInto s.maxFD: ", $s.maxFD, " rset: ", $rset, " wset: ", $wset, " eset: ", $eset
   var count = ioselect(cint(s.maxFD) + 1, addr(rset), addr(wset),
                        addr(eset), ptv)
-  echo "selectInto count: ", $count
   if count < 0:
     result = 0
     when defined(windows):
