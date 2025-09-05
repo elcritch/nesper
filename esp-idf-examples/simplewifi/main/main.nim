@@ -108,6 +108,7 @@ when defined(FastRpcServer):
 
       logi(TAG, "setting up fast rpc router")
       let inetAddrs = [
+        newInetAddr("0.0.0.0", 5556, Protocol.IPPROTO_UDP),
         newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
       ]
       logi(TAG, "newing fast rpc router")
