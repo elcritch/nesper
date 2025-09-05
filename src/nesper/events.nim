@@ -38,7 +38,7 @@ proc eventRegister*[E; T](
         ) =
     ## Register event with the default event loop. Understand WIFI & IP Events
 
-    let handler: esp_event_handler_t = cast[esp_event_handler_t](evt_handler)
+    var handler: esp_event_handler_t = cast[esp_event_handler_t](evt_handler)
     let ret = 
             esp_event_handler_instance_register(
                 event_base = evt_base,

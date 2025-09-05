@@ -13,7 +13,7 @@ when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
   export esp_event_legacy
 
 type
-  esp_event_base_t* = cstring
+  esp_event_base_t* {.importc: "esp_event_base_t", header: "esp_event.h".} = pointer
 
 type
   ## *< unique pointer to a subsystem that exposes events
