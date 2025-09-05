@@ -106,4 +106,4 @@ app_main():
   
   while true:
     echo "looping..."
-    delayMillis(1000)
+    delayMillis(10_000)
