@@ -1,133 +1,96 @@
 import nesper
-import nesper/net_utils
-import nesper/nvs_utils
+import nesper/general
+import nesper/timers
 import nesper/events
 import nesper/wifi
-import nesper/tasks
-import nesper/timers
+import nesper/net_utils
+import nesper/esp/nvs
+import nesper/esp/nvs_flash
+import nesper/nvs_utils
 
-import server
+# Config (match the C example names)
+const EXAMPLE_ESP_WIFI_SSID* {.strdefine.}: string = ""
+const EXAMPLE_ESP_WIFI_PASS* {.strdefine.}: string = ""
+const EXAMPLE_ESP_MAXIMUM_RETRY* {.intdefine.}: int = 5
 
-# Get Password
-const WIFI_SSID {.strdefine.}: string = ""
-const WIFI_PASSWORD  {.strdefine.}: string = "" 
+const TAG: cstring = "wifi station"
 
-# const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
-# const CONFIG_EXAMPLE_WIFI_PASSWORD = getEnv("WIFI_PASSWORD")
+const WIFI_CONNECTED = 1 shl 0
+const WIFI_FAIL      = 1 shl 1
 
-const
-  GOT_IPV4_BIT* = EventBits_t(BIT(1))
-  CONNECTED_BITS* = (GOT_IPV4_BIT)
+var sWifiEventGroup: EventGroupHandle_t
+var sRetryNum = 0
 
-const TAG*: cstring = "simplewifi"
-var sConnectEventGroup*: EventGroupHandle_t
-var sIpAddr*: IpAddress
-var sConnectionName*: cstring
+proc eventHandler(arg: pointer; event_base: esp_event_base_t; event_id: int32; event_data: pointer) {.cdecl.} =
+  if event_base == WIFI_EVENT and wifi_event_t(event_id) == WIFI_EVENT_STA_START:
+    discard esp_wifi_connect()
+  elif event_base == WIFI_EVENT and wifi_event_t(event_id) == WIFI_EVENT_STA_DISCONNECTED:
+    if sRetryNum < EXAMPLE_ESP_MAXIMUM_RETRY:
+      discard esp_wifi_connect()
+      inc sRetryNum
+      logi(TAG, "retry to connect to the AP")
+    else:
+      discard xEventGroupSetBits(sWifiEventGroup, EventBits_t(WIFI_FAIL))
+    logi(TAG, "connect to the AP fail")
+  elif event_base == IP_EVENT and ip_event_t(event_id) == IP_EVENT_STA_GOT_IP:
+    let ev = cast[ptr ip_event_got_ip_t](event_data)
+    logi(TAG, "got ip: %s", $ev.ip_info.ip)
+    sRetryNum = 0
+    discard xEventGroupSetBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED))
 
-proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
-                        event_data: pointer) {.cdecl.} =
-  var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
-  logi TAG, "event.ip_info.ip: %s", $(event.ip_info.ip)
+proc wifiInitSta() =
+  sWifiEventGroup = xEventGroupCreate()
 
-  sIpAddr = toIpAddress(event.ip_info.ip)
-  # memcpy(addr(sIpAddr), addr(event.ip_info.ip), sizeof((sIpAddr)))
-  logw TAG, "got event ip: %s", $sIpAddr
-  discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)
-
-proc onWifiDisconnect*(arg: pointer;
-                          event_base: esp_event_base_t;
-                          event_id: int32;
-                          event_data: pointer) {.cdecl.} =
-  logi(TAG, "Wi-Fi disconnected, trying to reconnect...")
-  check: esp_wifi_connect()
-
-proc wifiStart*() =
-  ##  set up connection, Wi-Fi or Ethernet
-  let wcfg: wifi_init_config_t = wifi_init_config_default()
-
-  discard esp_wifi_init(unsafeAddr(wcfg))
-
-  eventRegister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, onWifiDisconnect, nil)
-  eventRegister(IP_EVENT, IP_EVENT_STA_GOT_IP, ipReceivedHandler)
-
-  check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
-
-  when WIFI_SSID == "":
-    {.error: "WIFI_SSID is not set".}
-  when WIFI_PASSWORD == "":
-    {.error: "WIFI_PASSWORD is not set".}
-
-  var wifi_config: wifi_config_t
-  wifi_config.sta.ssid.setFromString(WIFI_SSID)
-  wifi_config.sta.password.setFromString(WIFI_PASSWORD)
-
-  logi(TAG, "Connecting to %s...", wifi_config.sta.ssid)
-  check: esp_wifi_set_mode(WIFI_MODE_STA)
-  check: esp_wifi_set_config(ESP_IF_WIFI_STA, addr(wifi_config))
-  check: esp_wifi_start()
-  check: esp_wifi_connect()
-
-  sConnectionName = WIFI_SSID 
-
-proc wifiStop*() =
-  ##  tear down connection, release resources
-  WIFI_EVENT_STA_DISCONNECTED.eventUnregister(onWifiDisconnect) 
-  IP_EVENT_STA_GOT_IP.eventUnregister(ipReceivedHandler)
-
-  check: esp_wifiStop()
-  check: esp_wifi_deinit()
-
-proc exampleConnect*(): esp_err_t =
-  if sConnectEventGroup != nil:
-    return ESP_ERR_INVALID_STATE
-
-  sConnectEventGroup = xEventGroupCreate()
-
-  wifiStart()
-  discard xEventGroupWaitBits(sConnectEventGroup, CONNECTED_BITS, 1, 1, portMAX_DELAY)
-
-  logi(TAG, "Connected to %s", sConnectionName)
-  logi(TAG, "IPv4 address: %s", $sIpAddr)
-
-  echo("run_http_server\n")
-  run_http_server()
-
-  return ESP_OK
-
-proc exampleDisconnect*(): esp_err_t =
-  if sConnectEventGroup == nil:
-    return ESP_ERR_INVALID_STATE
-
-  vEventGroupDelete(sConnectEventGroup)
-  sConnectEventGroup = nil
-  wifiStop()
-  logi(TAG, "Disconnected from %s", sConnectionName)
-  sConnectionName = nil
-
-  return ESP_OK
-
-app_main():
-  initNvs()
   when defined(ESP_IDF_V4_0):
     tcpip_adapter_init()
   else:
-    # Initialize TCP/IP network interface (should be called only once in application)
     check: esp_netif_init()
 
-
-  # Create default event loop that running in background
   check: esp_event_loop_create_default()
 
-  logi(TAG, "wifi setup!\n")
-  check: exampleConnect()
+  let cfg = wifi_init_config_default()
+  check: esp_wifi_init(unsafeAddr cfg)
 
-  ##  Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
-  ##  and re-start it upon connection.
-  ##
-  # IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
+  # Register for all WIFI_EVENT IDs and for IP_EVENT_STA_GOT_IP
+  check: esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID.cint, cast[esp_event_handler_t](eventHandler), nil, nil)
+  check: esp_event_handler_instance_register(IP_EVENT, int32(IP_EVENT_STA_GOT_IP), cast[esp_event_handler_t](eventHandler), nil, nil)
 
-  echo("Wait done\n")
-  # vTaskDelay(10000 div portTICK_PERIOD_MS)
+  var wifi_config: wifi_config_t
+  wifi_config.sta.ssid.setFromString(EXAMPLE_ESP_WIFI_SSID)
+  wifi_config.sta.password.setFromString(EXAMPLE_ESP_WIFI_PASS)
+
+  check: esp_wifi_set_mode(WIFI_MODE_STA)
+  check: esp_wifi_set_config(ESP_IF_WIFI_STA, addr wifi_config)
+  check: esp_wifi_start()
+
+  logi(TAG, "wifi_init_sta finished.")
+
+  let bits = xEventGroupWaitBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED or WIFI_FAIL), pdFALSE, pdFALSE, portMAX_DELAY)
+
+  if (bits and EventBits_t(WIFI_CONNECTED)) != 0:
+    logi(TAG, "connected to ap SSID:%s password:%s", EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS)
+  elif (bits and EventBits_t(WIFI_FAIL)) != 0:
+    logi(TAG, "Failed to connect to SSID:%s, password:%s", EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS)
+  else:
+    loge(TAG, "UNEXPECTED EVENT")
+
+app_main():
+  logi(TAG, "Running main app...")
+
+  logi(TAG, "Initializing NVS...")
+  initNVS()
+  # var ret = nvs_flash_init()
+  # if ret == ESP_ERR_NVS_NO_FREE_PAGES or ret == ESP_ERR_NVS_NEW_VERSION_FOUND:
+  #   check: nvs_flash_erase()
+  #   ret = nvs_flash_init()
+  # check: ret
+
+  logi(TAG, "ESP_WIFI_MODE_STA")
+  when EXAMPLE_ESP_WIFI_SSID == "" or EXAMPLE_ESP_WIFI_PASS == "":
+    {.error: "EXAMPLE_ESP_WIFI_SSID and EXAMPLE_ESP_WIFI_PASS are not set".}
+  else:
+    wifiInitSta()
+  
   while true:
     echo "looping..."
     delayMillis(1000)
