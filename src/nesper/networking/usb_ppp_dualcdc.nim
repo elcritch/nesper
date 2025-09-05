@@ -3,8 +3,13 @@ import nesper/[general, gpios, timers]
 import nesper/esp/[esp_log, esp_event, event_groups]
 import nesper/esp/esp_system
 import nesper/events
-import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types]
+import nesper/esp/net/[esp_netif, esp_netif_ppp, esp_netif_types, esp_netif_impl]
 import nesper/components/esp_tinyusb/[tinyusb, tinyusb_net, tusb_cdc_acm]
+
+export esp_netif
+export esp_netif_ppp
+export esp_netif_types
+export esp_netif_impl
 
 ## Code that is specific to the USB PPP over Dual CDC (CDC0=PPP, CDC1=console)
 ## Requires TinyUSB and incompatible with USB JTAG or OTG Modes
