@@ -23,8 +23,8 @@ var sConnectEventGroup*: EventGroupHandle_t
 var sIpAddr*: IpAddress
 var sConnectionName*: cstring
 
-proc ipReceivedHandler*(arg: esp_event_base_t; event_base: esp_event_base_t; event_id: int32;
-              event_data: pointer) {.cdecl.} =
+proc ipReceivedHandler*(arg: pointer; event_base: esp_event_base_t; event_id: int32;
+                        event_data: pointer) {.cdecl.} =
   var event: ptr ip_event_got_ip_t = cast[ptr ip_event_got_ip_t](event_data)
   logi TAG, "event.ip_info.ip: %s", $(event.ip_info.ip)
 
@@ -33,7 +33,7 @@ proc ipReceivedHandler*(arg: esp_event_base_t; event_base: esp_event_base_t; eve
   logw TAG, "got event ip: %s", $sIpAddr
   discard xEventGroupSetBits(sConnectEventGroup, GOT_IPV4_BIT)
 
-proc onWifiDisconnect*(arg: esp_event_base_t;
+proc onWifiDisconnect*(arg: pointer;
                           event_base: esp_event_base_t;
                           event_id: int32;
                           event_data: pointer) {.cdecl.} =
@@ -46,9 +46,9 @@ proc wifiStart*() =
 
   discard esp_wifi_init(unsafeAddr(wcfg))
 
-  let disEv: esp_event_handler_t = onWifiDisconnect
-  WIFI_EVENT_STA_DISCONNECTED.eventRegister(disEv, nil)
-  IP_EVENT_STA_GOT_IP.eventRegister(ipReceivedHandler, nil)
+  let evDis: EventHandlerCb[pointer] = onWifiDisconnect
+  eventRegister(WIFI_EVENT_STA_DISCONNECTED, evDis)
+  eventRegister(IP_EVENT_STA_GOT_IP, ipReceivedHandler)
 
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
 

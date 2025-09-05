@@ -24,11 +24,11 @@ type
 type
   ## *< a number that identifies an event with respect to a base
   EventHandlerCb*[T] = proc (event_handler_arg: T;
-                               event_base: esp_event_base_t;
-                               event_id: int32;
-                               event_data: pointer) {.cdecl.}
+                             event_base: esp_event_base_t;
+                             event_id: int32;
+                             event_data: pointer) {.cdecl.}
 
-template eventRegister*[EVT; T: ptr](
+template eventRegister*[EVT; T: pointer](
             evt_id: EVT;
             evt_handler: EventHandlerCb[T];
             evt_handler_arg: T = nil,
@@ -46,18 +46,19 @@ template eventRegister*[EVT; T: ptr](
         else:
             {.fatal: "Uknown event type, don't know how to unregister automatically".}
 
+    let handler: esp_event_handler_t = cast[esp_event_handler_t](evt_handler)
     let ret = 
             esp_event_handler_instance_register(
                 event_base = evt_base,
                 event_id = int32(evt_id),
-                event_handler = evt_handler,
+                event_handler = handler,
                 event_handler_arg = evt_handler_arg,
                 handler_instance = handler_instance)
 
     if ret != ESP_OK:
       raise newEspError[EventError]("register: " & $esp_err_to_name(ret), ret)
 
-template eventRegister*[EVT; T: ptr](
+template eventRegister*[EVT; T: pointer](
             event_base: esp_event_base_t;
             event_id: EVT;
             event_handler: EventHandlerCb[T];
@@ -65,10 +66,11 @@ template eventRegister*[EVT; T: ptr](
             handler_instance: ptr esp_event_handler_instance_t = nil
         ) =
     ## Register event for an event base on the default loop.
+    let handler: esp_event_handler_t = cast[esp_event_handler_t](event_handler)
     let ret = esp_event_handler_instance_register(
         event_base,
         event_id.cint,
-        event_handler,
+        handler,
         event_handler_arg,
         handler_instance)
 
