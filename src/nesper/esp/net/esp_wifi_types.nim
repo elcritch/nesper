@@ -892,6 +892,22 @@ const
 ##
 
 type
+  wifi_csi_config_t* {.importc: "wifi_csi_config_t", header: "esp_wifi_types.h",
+                      bycopy.} = object
+    lltf_en* {.importc: "lltf_en".}: bool ## *< enable to receive legacy long training field(lltf) data. Default enabled
+    htltf_en* {.importc: "htltf_en".}: bool ## *< enable to receive HT long training field(htltf) data. Default enabled
+    stbc_htltf2_en* {.importc: "stbc_htltf2_en".}: bool ## *< enable to receive space time block code HT long training field(stbc-htltf2) data. Default enabled
+    ltf_merge_en* {.importc: "ltf_merge_en".}: bool ## *< enable to generate htlft data by averaging lltf and ht_ltf data when receiving HT packet. Otherwise, use ht_ltf data directly. Default enabled
+    channel_filter_en* {.importc: "channel_filter_en".}: bool ## *< enable to turn on channel filter to smooth adjacent sub-carrier. Disable it to keep independence of adjacent sub-carrier. Default enabled
+    manu_scale* {.importc: "manu_scale".}: bool ## *< manually scale the CSI data by left shifting or automatically scale the CSI data. If set true, please set the shift bits. false: automatically. true: manually. Default false
+    shift* {.importc: "shift".}: uint8 ## *< manually left shift bits of the scale of the CSI data. The range of the left shift bits is 0~15
+
+  wifi_pkt_rx_ctrl_t* {.importc: "wifi_pkt_rx_ctrl_t", header: "esp_wifi_types.h",
+                       bycopy.} = object
+    rssi* {.importc: "rssi", bitsize: 8.}: cint ## *< Received Signal Strength Indicator(RSSI) of packet. unit: dBm
+    rate* {.importc: "rate", bitsize: 5.}: cuint ## *< PHY rate encoding of the packet. Only valid for non HT(11bg) packet
+
+
   wifi_csi_info_t* {.importc: "wifi_csi_info_t", header: "esp_wifi_types.h", bycopy.} = object
     rx_ctrl* {.importc: "rx_ctrl".}: wifi_pkt_rx_ctrl_t ## *< received packet radio metadata header of the CSI data
     mac* {.importc: "mac".}: array[6, uint8] ## *< source MAC address of the CSI data
