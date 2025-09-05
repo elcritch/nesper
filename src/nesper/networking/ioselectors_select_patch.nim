@@ -75,7 +75,8 @@ else:
 type
   SelectEventImpl = object
     rsock: SocketHandle
-    wsock: SocketHandle
+    when not defined(nimIoselectorEventfd):
+      wsock: SocketHandle
   SelectEvent* = ptr SelectEventImpl
 
 when hasThreadSupport:
@@ -176,17 +177,13 @@ elif defined(nimIoselectorEventfd):
 
   proc newSelectEvent*(): SelectEvent =
     when compiles(O_CLOEXEC):
-      echo "eventfd O_CLOEXEC or O_NONBLOCK"
       let fdci = eventfd(0, O_CLOEXEC or O_NONBLOCK)
     else:
-      echo "eventfd O_NONBLOCK"
       let fdci = eventfd(0, 0)
-      echo "eventfd O_NONBLOCK result: ", $fdci
     if fdci == -1:
       raiseIOSelectorsError(osLastError())
     result = cast[SelectEvent](allocShared0(sizeof(SelectEventImpl)))
     result.rsock = SocketHandle(fdci)
-    result.wsock = SocketHandle(-1)
 
   proc trigger*(ev: SelectEvent) =
     var data: uint64 = 1
@@ -354,8 +351,10 @@ proc selectInto*[T](s: Selector[T], timeout: int,
     wset = s.wSet
     eset = s.eSet
 
+  echo "selectInto s.maxFD: ", $s.maxFD, " rset: ", $rset, " wset: ", $wset, " eset: ", $eset
   var count = ioselect(cint(s.maxFD) + 1, addr(rset), addr(wset),
                        addr(eset), ptv)
+  echo "selectInto count: ", $count
   if count < 0:
     result = 0
     when defined(windows):
@@ -380,8 +379,13 @@ proc selectInto*[T](s: Selector[T], timeout: int,
         if IOFD_ISSET(fd, addr rset) != 0:
           if Event.User in pkey.events:
             var data: uint64 = 0
-            if recv(fd, cast[pointer](addr(data)),
-                    sizeof(uint64).cint, 0) != sizeof(uint64):
+            when defined(nimIoselectorEventfd):
+              let res = read(fd.cint, cast[pointer](addr(data)),
+                    sizeof(uint64).cint)
+            else:
+              let res = recv(fd.cint, cast[pointer](addr(data)),
+                    sizeof(uint64).cint, 0)
+            if res != sizeof(uint64):
               let err = osLastError()
               if cint(err) != EAGAIN:
                 raiseIOSelectorsError(err)
