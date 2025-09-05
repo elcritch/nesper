@@ -4,9 +4,6 @@ import nesper/[consts, general, timers]
 import nesper/esp/esp_system
 import nesper/esp/nvs_flash
 import nesper/esp/esp_event
-import nesper/esp/net/esp_netif
-import nesper/esp/net/esp_netif_ppp
-import nesper/esp/net/esp_netif_impl
 import nesper/esp/esp_vfs_eventfd
 import nesper/net_utils
 
