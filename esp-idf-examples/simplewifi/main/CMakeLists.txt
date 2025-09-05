@@ -1,7 +1,6 @@
 
 idf_component_register(SRC_DIRS "./nimcache"
                     INCLUDE_DIRS ""
-                    PRIV_REQUIRES esp_wifi nvs_flash esp_timer
                     )
 
 # set(C_COMPILE_OPTIONS "${C_COMPILE_OPTIONS} -Wno-error=unused-label")

@@ -3,6 +3,8 @@ switch("define", "esp32s3") # or other variants
 switch("define", "nimNetSocketExtras")
 switch("define", "nimIoselectorEventfd")
 
+switch("define", "FastRpcServer")
+
 switch("define", "McuUtilsLoggingLevel:lvlTrace")
 
 patchFile("stdlib", "ioselectors_select", "main/ioselectors_select.nim")
