@@ -20,8 +20,6 @@ discard delayMicros(100)
 delay(Micros(100))
 esp_restart()
 
-# vTaskDelete*( handle: any )
-
 echo "ESP_ERR_FLASH_BASE: " & $esp_err_to_name(ESP_ERR_FLASH_BASE)
 
 ESP_ERROR_CHECK(ESP_OK)

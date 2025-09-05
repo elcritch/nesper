@@ -7,11 +7,6 @@
 import ../consts
 export consts
 
-when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
-  import esp_event_legacy
-
-  export esp_event_legacy
-
 type
   esp_event_base_t* {.importc: "esp_event_base_t", header: "esp_event.h".} = pointer
 

@@ -11,41 +11,6 @@ when not defined(ESP_IDF_V4_0):
   export esp_netif 
 
 
-## * This is the aligned version of ip4_addr_t,
-##    used as local variable, on the stack, etc.
-type
-  ip4_addr_t* {.importc: "ip4_addr_t", header: "lwip/ip4_addr.h", bycopy.} = object
-    address* {.importc: "addr".}: uint32
-
-  ip6_addr_t* {.importc: "ip6_addr_t", header: "lwip/ip6_addr.h", bycopy.} = object
-    address* {.importc: "addr".}: array[4, uint32]
-
-type
-  lwip_ip_addr_type* {.size: sizeof(cint).} = enum ## * IPv4
-    IPADDR_TYPE_V4 = 0,         ## * IPv6
-    IPADDR_TYPE_V6 = 6,         ## * IPv4+IPv6 ("dual-stack")
-    IPADDR_TYPE_ANY = 46
-
-
-##  #if LWIP_IPV4 && LWIP_IPV6
-## *
-##  @ingroup ipaddr
-##  A union struct for both IP version's addresses.
-##  ATTENTION: watch out for its size when adding IPv6 address scope!
-##
-
-type
-  INNER_C_UNION_ip_addr_71* {.importc: "no_name", header: "lwip/ip_addr.h", bycopy, union.} = object
-    ip6* {.importc: "ip6".}: ip6_addr_t
-    ip4* {.importc: "ip4".}: ip4_addr_t
-
-  ip_addr_t* {.importc: "ip_addr_t", header: "lwip/ip_addr.h", bycopy.} = object
-    u_addr* {.importc: "u_addr".}: INNER_C_UNION_ip_addr_71 ## * @ref lwip_ip_addr_type
-    `type`* {.importc: "type".}: uint8
-
-
-var ip_addr_any_type* {.importc: "ip_addr_any_type", header: "lwip/ip_addr.h".}: ip_addr_t
-
 type
   esp_interface_t* {.size: sizeof(cint).} = enum
     ESP_IF_WIFI_STA = 0,        ## *< ESP32 station interface

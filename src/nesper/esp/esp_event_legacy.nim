@@ -16,7 +16,6 @@
 ## * System event types enumeration
 import ../consts
 import net/esp_wifi_types
-import net/tcpip_adapter
 
 type
   system_event_id_t* {.size: sizeof(cint).} = enum

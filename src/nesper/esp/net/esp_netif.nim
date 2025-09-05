@@ -20,6 +20,7 @@ import ../../consts
 ##
 
 when defined(ESP_IDF_V4_0):
+  import esp_netif_ip_addr
   include tcpip_adapter
 
 else:
