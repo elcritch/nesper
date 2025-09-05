@@ -52,13 +52,6 @@ type
     ESP_IF_WIFI_AP,           ## *< ESP32 soft-AP interface
     ESP_IF_ETH,               ## *< ESP32 ethernet interface
     ESP_IF_MAX
-  wifi_mode_t* {.size: sizeof(cint).} = enum
-    WIFI_MODE_NULL = 0,         ## *< null mode
-    WIFI_MODE_STA,            ## *< WiFi station mode
-    WIFI_MODE_AP,             ## *< WiFi soft-AP mode
-    WIFI_MODE_APSTA,          ## *< WiFi station + soft-AP mode
-    WIFI_MODE_MAX
-  wifi_interface_t* = esp_interface_t
 
 const
   WIFI_IF_STA* = ESP_IF_WIFI_STA
