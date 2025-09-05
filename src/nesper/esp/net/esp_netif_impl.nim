@@ -12,7 +12,7 @@
 ##  limitations under the License.
 
 
-import ../../consts
+import ../esp_event
 import esp_netif_ip_addr
 import esp_netif_types
 

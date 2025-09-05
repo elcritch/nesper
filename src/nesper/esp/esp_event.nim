@@ -13,12 +13,26 @@
 ##  limitations under the License.
 
 import ../consts
+export consts
 
 when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
   import esp_event_legacy
 
   export esp_event_legacy
 
+type
+  esp_event_base_t* = cstring
+
+type
+  ## *< unique pointer to a subsystem that exposes events
+  esp_event_loop_handle_t* = pointer
+
+type
+  ## *< a number that identifies an event with respect to a base
+  esp_event_handler_t* = proc (event_handler_arg: pointer;
+                               event_base: esp_event_base_t;
+                               event_id: int32;
+                               event_data: pointer) {.cdecl.}
 
 ## / Configuration for creating event loops
 

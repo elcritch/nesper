@@ -4,9 +4,8 @@
 ##  SPDX-License-Identifier: Apache-2.0
 ##
 
-import ../../consts
-
-import esp_netif_ip_addr
+import ../esp_event
+import ./esp_netif_ip_addr
 
 const hdr = "esp_netif_types.h"
 

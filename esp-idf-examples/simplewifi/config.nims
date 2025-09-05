@@ -1,26 +1,19 @@
-import os, strutils
+switch("define", "ESP_IDF_VERSION=5.5")
+switch("define", "esp32s3") # or other variants
+switch("define", "nimNetSocketExtras")
+switch("define", "nimIoselectorEventfd")
+# switch("define", "TcpEchoServer")
+# switch("define", "UdpEchoServer")
+switch("define", "FastRpcServer")
 
-task prepare, "Compile to C code":
-  mkDir("./main/nimcache")
-  let nimbasepath = selfExe().splitFile.dir.parentDir / "lib" / "nimbase.h"
-  let nimcachepath = "main" / "nimcache"
-  cpFile(nimbasepath, nimcachepath / "nimbase.h")
-  let params = commandLineParams()
-  let file = params[1]
-  let rest = params[2..high(params)].join(" ")
-  
-  let wifi_ssid = getEnv("WIFI_SSID")
-  let wifi_pass = getEnv("WIFI_PASSWORD")
+switch("define", "McuUtilsLoggingLevel:lvlTrace")
+# switch("define", "RUN_NCM")
 
-  let wifidefs =
-    if wifi_ssid != "" and wifi_pass != "":
-      "-d:WIFI_SSID=$1 -d:WIFI_PASSWORD=$2 " % [wifi_ssid, wifi_pass]
-    else:
-      ""
+patchFile("stdlib", "cpuinfo", "main/cpuinfo.nim")
+patchFile("stdlib", "ioselectors_select", "main/ioselectors_select.nim")
 
-  let
-    cmd = "nim c --os:freertos --cpu:esp --nomain --nimcache:$1 --compileOnly -d:NimAppMain $4 $3 $2 " %
-              [nimcachepath, file, rest, wifidefs]
+switch("define", "WIFI_SSID", getEnv("WIFI_SSID"))
+switch("define", "WIFI_PASSWORD", getEnv("WIFI_PASSWORD"))
 
-  echo("cmd: " & cmd)
-  exec(cmd)
+
+include nesper/build_utils/builds
