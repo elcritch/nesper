@@ -15,6 +15,9 @@ when ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0):
 type
   esp_event_base_t* {.importc: "esp_event_base_t", header: "esp_event.h".} = pointer
 
+proc `$`*(base: esp_event_base_t): string =
+  $(cast[cstring](base))
+
 type
   ## *< unique pointer to a subsystem that exposes events
   esp_event_loop_handle_t* = pointer
