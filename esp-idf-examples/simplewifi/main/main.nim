@@ -4,11 +4,12 @@ import nesper/nvs_utils
 import nesper/events
 import nesper/wifi
 import nesper/tasks
+import nesper/timers
 
 import server
 
 # Get Password
-const WIFI_SSID {.strdefine.}: string = "NOSSID"
+const WIFI_SSID {.strdefine.}: string = ""
 const WIFI_PASSWORD  {.strdefine.}: string = "" 
 
 # const CONFIG_EXAMPLE_WIFI_SSID = getEnv("WIFI_SSID")
@@ -50,6 +51,11 @@ proc wifiStart*() =
   eventRegister(IP_EVENT, IP_EVENT_STA_GOT_IP, ipReceivedHandler)
 
   check: esp_wifi_set_storage(WIFI_STORAGE_RAM)
+
+  when WIFI_SSID == "":
+    {.error: "WIFI_SSID is not set".}
+  when WIFI_PASSWORD == "":
+    {.error: "WIFI_PASSWORD is not set".}
 
   var wifi_config: wifi_config_t
   wifi_config.sta.ssid.setFromString(WIFI_SSID)
@@ -122,3 +128,6 @@ app_main():
 
   echo("Wait done\n")
   # vTaskDelay(10000 div portTICK_PERIOD_MS)
+  while true:
+    echo "looping..."
+    delayMillis(1000)
