@@ -77,3 +77,8 @@ proc generate_sensor_id*(): string =
     sensor_id.add(mac[i].toHex(2))
 
   return sensor_id.join(":")
+
+proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
+  ## Convert Nim IpAddress to esp_ip6_addr_t and add it to the interface
+  let espIp6 = toEspIp6Addr(ip)
+  result = esp_netif_add_ip6_address(netif, espIp6, preferred=true)

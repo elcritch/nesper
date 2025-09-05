@@ -15,11 +15,6 @@ else:
 const
   TAG*: cstring = "main"
 
-proc addIpv6ToNetif*(netif: ptr esp_netif_t; ip: IpAddress): esp_err_t =
-  ## Convert Nim IpAddress to esp_ip6_addr_t and add it to the interface
-  let espIp6 = toEspIp6Addr(ip)
-  result = esp_netif_add_ip6_address(netif, espIp6, preferred=true)
-
 when defined(RpcServer):
   import nesper/servers/rpc/rpcsocket_json
   proc setupRpc(rt: var RpcRouter) =
