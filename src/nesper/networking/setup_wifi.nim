@@ -44,7 +44,7 @@ proc wifiInitSta*(
   pass: string,
   maxRetry: int = 5,
   authMode: wifi_auth_mode_t = WIFI_AUTH_WPA3_PSK,
-  saeMode: wifi_sae_mode_t = WPA3_SAE_PWE_HUNT_AND_PECK,
+  saeMode: wifi_sae_pwe_method_t = WPA3_SAE_PWE_HUNT_AND_PECK,
   saeIdentifier: string = "",
 ) =
   logw(TAG, "Wifi Init Sta starting...")
