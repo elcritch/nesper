@@ -39,7 +39,7 @@ proc eventHandler(arg: pointer; event_base: esp_event_base_t; event_id: int32; e
     sRetryNum = 0
     discard xEventGroupSetBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED))
 
-proc wifiInitSta(
+proc wifiInitSta*(
   ssid: string,
   pass: string,
   maxRetry: int = 5,
@@ -84,6 +84,7 @@ proc wifiInitSta(
 
   logw(TAG, "Wifi Init Sta finished.")
 
+proc waitForWifiConnected*() =
   logw(TAG, "Wifi Init Sta waiting for events...")
   let bits = xEventGroupWaitBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED or WIFI_FAIL), pdFALSE, pdFALSE, portMAX_DELAY)
 
