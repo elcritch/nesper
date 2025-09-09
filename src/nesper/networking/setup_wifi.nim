@@ -12,7 +12,7 @@ const EXAMPLE_ESP_WIFI_SSID* {.strdefine.}: string = ""
 const EXAMPLE_ESP_WIFI_PASS* {.strdefine.}: string = ""
 const EXAMPLE_ESP_MAXIMUM_RETRY* {.intdefine.}: int = 5
 
-const TAG: cstring = "Wifi Example"
+const TAG: cstring = "WiFi Setup"
 
 const WIFI_CONNECTED = 1 shl 0
 const WIFI_FAIL      = 1 shl 1
@@ -35,7 +35,7 @@ proc eventHandler(arg: pointer; event_base: esp_event_base_t; event_id: int32; e
     loge(TAG, "Connect to the AP failed")
   elif event_base == IP_EVENT and ip_event_t(event_id) == IP_EVENT_STA_GOT_IP:
     let ev = cast[ptr ip_event_got_ip_t](event_data)
-    logi(TAG, "Wifi Got IP: %s", $ev.ip_info.ip)
+    logi(TAG, "Got IP: %s", $ev.ip_info.ip)
     sRetryNum = 0
     discard xEventGroupSetBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED))
 
@@ -47,7 +47,7 @@ proc wifiInitSta*(
   saeMode: wifi_sae_pwe_method_t = WPA3_SAE_PWE_HUNT_AND_PECK,
   saeIdentifier: string = "",
 ) =
-  logw(TAG, "Wifi Init Sta starting...")
+  logw(TAG, "Init Sta starting...")
   sWifiEventGroup = xEventGroupCreate()
 
   check: esp_netif_init()
@@ -82,15 +82,15 @@ proc wifiInitSta*(
   check: esp_wifi_set_config(WIFI_IF_STA, addr wifi_config)
   check: esp_wifi_start()
 
-  logw(TAG, "Wifi Init Sta finished.")
+  logi(TAG, "WiFi STA connecting to ap SSID:%s password:%s", ssid, pass)
 
 proc waitForWifiConnected*() =
-  logw(TAG, "Wifi Init Sta waiting for events...")
+  logw(TAG, "WiFi Init Sta waiting for events...")
   let bits = xEventGroupWaitBits(sWifiEventGroup, EventBits_t(WIFI_CONNECTED or WIFI_FAIL), pdFALSE, pdFALSE, portMAX_DELAY)
 
   if (bits and EventBits_t(WIFI_CONNECTED)) != 0:
-    logi(TAG, "connected to ap SSID:%s password:%s", ssid, pass)
+    logi(TAG, "WiFi Connected")
   elif (bits and EventBits_t(WIFI_FAIL)) != 0:
-    logi(TAG, "Failed to connect to SSID:%s, password:%s", ssid, pass)
+    logi(TAG, "WiFi Failed to connect")
   else:
     loge(TAG, "unexpected WIFI event: %s", $bits)
