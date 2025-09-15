@@ -42,6 +42,13 @@ proc repr*(c: ledc_channel_config_t): string =
   result &= "duty: " & $c.duty & ", "
   result &= "hpoint: " & $c.hpoint & ")"
 
+var ledcInitialized*: bool = false
+
+proc initLedc*() =
+  if not ledcInitialized:
+    ledcInitialized = true
+    check: ledc_fade_func_install(0)
+
 # Timer helpers
 proc newLedcTimer*(
     mode: ledc_mode_t,
@@ -57,6 +64,8 @@ proc newLedcTimer*(
   result.cfg.freq_hz = freqHz
   result.cfg.clk_cfg = clkCfg
   result.cfg.deconfigure = false
+
+  initLedc()
 
   let ret = ledc_timer_config(addr result.cfg)
   if ret != ESP_OK:
