@@ -103,7 +103,7 @@ proc begin*(ota: OtaUpdateHandle) =
     TAG.loge("esp_ota_begin failed (%s)", repr(ota.update))
     raise newEspError[OtaError]("Error ota begin: " & $esp_err_to_name(err), err)
 
-proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = true):
+proc checkImageHeader*(ota: OtaUpdateHandle, data: string; version_check = true):
       tuple[status: OtaUpdateStatus, info: esp_app_desc_t] =
 
     var new_app_info: esp_app_desc_t
