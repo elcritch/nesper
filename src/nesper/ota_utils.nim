@@ -5,6 +5,9 @@ import options
 import consts
 import general
 import esp/storage/esp_ota_ops
+import esp_app_format
+
+export esp_app_format
 
 const TAG = "OTAUTL"
 
