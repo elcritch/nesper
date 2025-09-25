@@ -145,7 +145,7 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: string; version_check = true)
 
     return (status: VersionNewer, info: new_app_info)
 
-proc write*(ota: var OtaUpdateHandle, write_data: var string) =
+proc write*(ota: var OtaUpdateHandle, write_data: string) =
   let err = esp_ota_write(ota.handle, addr write_data[0], write_data.len().csize_t)
   if err != ESP_OK:
     raise newEspError[OtaError]("Error ota write: " & $esp_err_to_name(err), err)
