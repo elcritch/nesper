@@ -65,7 +65,7 @@ proc newLedcTimer*(
   result.cfg.clk_cfg = clkCfg
   result.cfg.deconfigure = false
 
-  initLedc()
+  # initLedc()
 
   let ret = ledc_timer_config(addr result.cfg)
   if ret != ESP_OK:
