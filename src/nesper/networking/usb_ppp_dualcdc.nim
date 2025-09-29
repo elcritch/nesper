@@ -166,7 +166,7 @@ proc cdcSetupConsole*(
   check: esp_tusb_init_console(cdc_port)
 
 proc cdcSetupPpp*(
-    usb_dev: tinyusb_usbdev_t = TINYUSB_USBDEV_1,
+    usb_dev: tinyusb_usbdev_t = TINYUSB_USBDEV_0,
     cdc_port: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_1
 ) =
   # CDC1 for PPP
