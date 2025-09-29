@@ -190,7 +190,7 @@ proc initPppConnectDualCdc*(): esp_err_t =
   # Create PPP netif using inherent defaults and custom driver
   logi(TAG, "Creating PPP netif...")
   var baseCfg = ESP_NETIF_INHERENT_DEFAULT_PPP()
-  baseCfg.if_desc = "example_netif_ppp"
+  baseCfg.if_desc = "ppp_dualcdc"
 
   driverCfg.handle = cast[pointer](1)
   driverCfg.transmit = pppTransmit
