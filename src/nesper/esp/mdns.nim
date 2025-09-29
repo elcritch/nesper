@@ -403,7 +403,7 @@ proc mdns_query_txt*(instance_name: cstring; service_type: cstring; proto: cstri
 ##      - ESP_ERR_INVALID_ARG    parameter error
 ##
 
-proc mdns_query_a*(host_name: cstring; timeout: uint32; `addr`: ptr ip4_addr_t): esp_err_t {.
+proc mdns_query_a*(host_name: cstring; timeout: uint32; `addr`: ptr esp_ip4_addr_t): esp_err_t {.
     importc: "mdns_query_a", header: hdr.}
 ## *
 ##  @brief  Query mDNS for A record
@@ -419,7 +419,7 @@ proc mdns_query_a*(host_name: cstring; timeout: uint32; `addr`: ptr ip4_addr_t):
 ##      - ESP_ERR_INVALID_ARG    parameter error
 ##
 
-proc mdns_query_aaaa*(host_name: cstring; timeout: uint32; `addr`: ptr ip6_addr_t): esp_err_t {.
+proc mdns_query_aaaa*(host_name: cstring; timeout: uint32; `addr`: ptr esp_ip6_addr_t): esp_err_t {.
     importc: "mdns_query_aaaa", header: hdr.}
 ## *
 ##  @brief   System event handler
@@ -430,5 +430,5 @@ proc mdns_query_aaaa*(host_name: cstring; timeout: uint32; `addr`: ptr ip6_addr_
 ##  @param  event        The system event
 ##
 
-proc mdns_handle_system_event*(ctx: pointer; event: ptr system_event_t): esp_err_t {.
-    importc: "mdns_handle_system_event", header: hdr.}
+# proc mdns_handle_system_event*(ctx: pointer; event: ptr system_event_t): esp_err_t {.
+#     importc: "mdns_handle_system_event", header: hdr.}

@@ -30,9 +30,6 @@ type
 
 proc esp_restart*() {.cdecl, importc: "esp_restart".}
 
-proc vTaskDelete*( handle: any )
-  {.cdecl, importc: "vTaskDelete", header: "<freertos/FreeRTOS.h>".}
-
 proc esp_err_to_name*(code: esp_err_t): cstring {.cdecl, importc: "esp_err_to_name",
     header: "freertos/FreeRTOS.h".}
 proc esp_err_to_name_r*(code: esp_err_t; buf: cstring; buflen: csize_t): cstring {.cdecl,

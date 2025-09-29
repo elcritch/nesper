@@ -1,0 +1,16 @@
+nim.cfg
+main/nimcache
+*.out
+.DS_Store
+
+.tool-versions
+*.dSYM/
+/*.png
+nimble.develop
+nimble.paths
+deps
+sdkconfig
+build/
+sdkconfig.old
+.cache/
+managed_components/

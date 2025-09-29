@@ -16,7 +16,7 @@
 ## * System event types enumeration
 import ../consts
 import net/esp_wifi_types
-import net/tcpip_adapter
+import net/esp_netif_types
 
 type
   system_event_id_t* {.size: sizeof(cint).} = enum
@@ -101,8 +101,8 @@ type
 
 ## * Argument structure of  event
 
-type
-  system_event_ap_staipassigned_t* = ip_event_ap_staipassigned_t
+# type
+#   system_event_ap_staipassigned_t* = ip_event_ap_staipassigned_t
 
 ## * Argument structure of  event
 
@@ -129,7 +129,7 @@ type
     sta_connected* {.importc: "sta_connected".}: system_event_ap_staconnected_t ## !< a station connected to ESP32 soft-AP
     sta_disconnected* {.importc: "sta_disconnected".}: system_event_ap_stadisconnected_t ## !< a station disconnected to ESP32 soft-AP
     ap_probereqrecved* {.importc: "ap_probereqrecved".}: system_event_ap_probe_req_rx_t ## !< ESP32 soft-AP receive probe request packet
-    ap_staipassigned* {.importc: "ap_staipassigned".}: system_event_ap_staipassigned_t ## *< ESP32 soft-AP assign an IP to the station
+    # ap_staipassigned* {.importc: "ap_staipassigned".}: system_event_ap_staipassigned_t ## *< ESP32 soft-AP assign an IP to the station
     got_ip6* {.importc: "got_ip6".}: system_event_got_ip6_t ## !< ESP32 station　or ap or ethernet ipv6 addr state change to preferred
 
 

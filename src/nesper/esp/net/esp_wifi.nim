@@ -57,12 +57,11 @@ import ../esp_event
 import ../../net_utils
 import esp_wifi_types
 
+export esp_wifi_types
+
 type 
   wifi_osi_funcs_t* {.importc: "wifi_osi_funcs_t", header: "esp_wifi.h", bycopy.} = object
   wpa_crypto_funcs_t* {.importc: "wpa_crypto_funcs_t", header: "esp_wifi.h", bycopy.} = object
-
-# import
-  # esp_err, esp_wifi_types, esp_event, esp_private/esp_wifi_private
 
 const
   ESP_ERR_WIFI_NOT_INIT* = (ESP_ERR_WIFI_BASE + 1) ## !< WiFi driver was not installed by esp_wifi_init
@@ -132,61 +131,25 @@ type
     magic* {.importc: "magic".}: cint ## *< WiFi init magic number, it should be the last field
 
 
-# {.emit: """
-# wifi_init_config_t _wifi_init_config_default() {
-#   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-#   return cfg;
-# }
-# """.}
+proc WIFI_INIT_CONFIG_DEFAULT*(): wifi_init_config_t =
+  {.emit: """
+  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT(); 
+  `result` = cfg;
+  """.}
 
-# proc wifi_init_config_default*(): wifi_init_config_t {.importc:"_wifi_init_config_default", header: "esp_wifi.h".}
 
-proc wifi_init_config_default*(): wifi_init_config_t =
-  {.emit: ["wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT(); "].}
-  {.emit: ["result = cfg; "].}
+# let ESP_WIFI_MAX_CONN_NUM* {.importc: "ESP_WIFI_MAX_CONN_NUM", header: hdr.}: cint ## *< station list
 
-# when defined(CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM):
-#   const
-#     WIFI_STATIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_STATIC_TX_BUFFER_NUM
-# else:
-#   const
-#     WIFI_STATIC_TX_BUFFER_NUM* = 0
-# when defined(CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM):
-#   const
-#     WIFI_DYNAMIC_TX_BUFFER_NUM* = CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM
-# else:
-#   const
-#     WIFI_DYNAMIC_TX_BUFFER_NUM* = 0
-# when CONFIG_ESP32_WIFI_CSI_ENABLED:
-#   const
-#     WIFI_CSI_ENABLED* = 1
-# else:
-#   const
-#     WIFI_CSI_ENABLED* = 0
-# when CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED:
-#   const
-#     WIFI_AMPDU_RX_ENABLED* = 1
-# else:
-#   const
-#     WIFI_AMPDU_RX_ENABLED* = 0
-# when CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED:
-#   const
-#     WIFI_AMPDU_TX_ENABLED* = 1
-# else:
-#   const
-#     WIFI_AMPDU_TX_ENABLED* = 0
-# when CONFIG_ESP32_WIFI_NVS_ENABLED:
-#   const
-#     WIFI_NVS_ENABLED* = 1
-# else:
-#   const
-#     WIFI_NVS_ENABLED* = 0
-# when CONFIG_NEWLIB_NANO_FORMAT:
-#   const
-#     WIFI_NANO_FORMAT_ENABLED* = 1
-# else:
-#   const
-#     WIFI_NANO_FORMAT_ENABLED* = 0
+type
+  wifi_sta_list_t* {.importc: "wifi_sta_list_t", header: "esp_wifi_types.h", bycopy.} = object
+    sta* {.importc: "sta".}: UncheckedArray[wifi_sta_info_t] ## *< station list
+    num* {.importc: "num".}: cint ## *< number of stations in the list (other entries are invalid)
+
+  wifi_storage_t* {.size: sizeof(cint).} = enum
+    WIFI_STORAGE_FLASH,       ## *< all configuration will store in both memory and flash
+    WIFI_STORAGE_RAM          ## *< all configuration will only store in the memory
+
+
 var g_wifi_default_wpa_crypto_funcs* {.importc: "g_wifi_default_wpa_crypto_funcs",
                                      header: "esp_wifi.h".}: wpa_crypto_funcs_t
 
@@ -195,80 +158,6 @@ var g_wifi_feature_caps* {.importc: "g_wifi_feature_caps", header: "esp_wifi.h".
 const
   WIFI_INIT_CONFIG_MAGIC* = 0x1F2F3F4F
 
-# when defined(CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED):
-#   const
-#     WIFI_DEFAULT_TX_BA_WIN* = CONFIG_ESP32_WIFI_TX_BA_WIN
-# else:
-#   const
-#     WIFI_DEFAULT_TX_BA_WIN* = 0
-# when defined(CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED):
-#   const
-#     WIFI_DEFAULT_RX_BA_WIN* = CONFIG_ESP32_WIFI_RX_BA_WIN
-# else:
-#   const
-#     WIFI_DEFAULT_RX_BA_WIN* = 0
-# when CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1:
-#   const
-#     WIFI_TASK_CORE_ID* = 1
-# else:
-#   const
-#     WIFI_TASK_CORE_ID* = 0
-# when defined(CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN):
-#   const
-#     WIFI_SOFTAP_BEACON_MAX_LEN* = CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN
-# else:
-#   const
-#     WIFI_SOFTAP_BEACON_MAX_LEN* = 752
-# when defined(CONFIG_ESP32_WIFI_MGMT_SBUF_NUM):
-#   const
-#     WIFI_MGMT_SBUF_NUM* = CONFIG_ESP32_WIFI_MGMT_SBUF_NUM
-# else:
-#   const
-#     WIFI_MGMT_SBUF_NUM* = 32
-# const
-#   CONFIG_FEATURE_WPA3_SAE_BIT* = (1 shl 0)
-
-##  #define WIFI_INIT_CONFIG_DEFAULT() { \
-##      .event_handler = &esp_event_send, \
-##      .osi_funcs = &g_wifi_osi_funcs, \
-##      .wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs, \
-##      .static_rx_buf_num = CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM,\
-##      .dynamic_rx_buf_num = CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM,\
-##      .tx_buf_type = CONFIG_ESP32_WIFI_TX_BUFFER_TYPE,\
-##      .static_tx_buf_num = WIFI_STATIC_TX_BUFFER_NUM,\
-##      .dynamic_tx_buf_num = WIFI_DYNAMIC_TX_BUFFER_NUM,\
-##      .csi_enable = WIFI_CSI_ENABLED,\
-##      .ampdu_rx_enable = WIFI_AMPDU_RX_ENABLED,\
-##      .ampdu_tx_enable = WIFI_AMPDU_TX_ENABLED,\
-##      .nvs_enable = WIFI_NVS_ENABLED,\
-##      .nano_enable = WIFI_NANO_FORMAT_ENABLED,\
-##      .tx_ba_win = WIFI_DEFAULT_TX_BA_WIN,\
-##      .rx_ba_win = WIFI_DEFAULT_RX_BA_WIN,\
-##      .wifi_task_core_id = WIFI_TASK_CORE_ID,\
-##      .beacon_max_len = WIFI_SOFTAP_BEACON_MAX_LEN, \
-##      .mgmt_sbuf_num = WIFI_MGMT_SBUF_NUM, \
-##      .feature_caps = g_wifi_feature_caps, \
-##      .magic = WIFI_INIT_CONFIG_MAGIC\
-##  };
-## *
-##  @brief  Init WiFi
-##          Alloc resource for WiFi driver, such as WiFi control structure, RX/TX buffer,
-##          WiFi NVS structure etc, this WiFi also start WiFi task
-##
-##  @attention 1. This API must be called before all other WiFi API can be called
-##  @attention 2. Always use WIFI_INIT_CONFIG_DEFAULT macro to init the config to default values, this can
-##                guarantee all the fields got correct value when more fields are added into wifi_init_config_t
-##                in future release. If you want to set your owner initial values, overwrite the default values
-##                which are set by WIFI_INIT_CONFIG_DEFAULT, please be notified that the field 'magic' of
-##                wifi_init_config_t should always be WIFI_INIT_CONFIG_MAGIC!
-##
-##  @param  config pointer to WiFi init configuration structure; can point to a temporary variable.
-##
-##  @return
-##     - ESP_OK: succeed
-##     - ESP_ERR_NO_MEM: out of memory
-##     - others: refer to error code esp_err.h
-##
 
 proc esp_wifi_init*(config: ptr wifi_init_config_t): esp_err_t {.
     importc: "esp_wifi_init", header: "esp_wifi.h".}
@@ -838,7 +727,7 @@ proc esp_wifi_get_promiscuous_ctrl_filter*(filter: ptr wifi_promiscuous_filter_t
 ##     - others: refer to the erro code in esp_err.h
 ##
 
-proc esp_wifi_set_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
+proc esp_wifi_set_config*(intf: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
     importc: "esp_wifi_set_config", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get configuration of specified interface
@@ -853,7 +742,7 @@ proc esp_wifi_set_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t
 ##     - ESP_ERR_WIFI_IF: invalid interface
 ##
 
-proc esp_wifi_get_config*(`interface`: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
+proc esp_wifi_get_config*(intf: wifi_interface_t; conf: ptr wifi_config_t): esp_err_t {.
     importc: "esp_wifi_get_config", header: "esp_wifi.h".}
 ## *
 ##  @brief     Get STAs associated with soft-AP

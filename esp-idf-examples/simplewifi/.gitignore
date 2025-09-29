@@ -3,3 +3,5 @@ src/nimcache/
 src/server
 src/localnim/
 .env
+sdkconfig
+sdkconfig.old

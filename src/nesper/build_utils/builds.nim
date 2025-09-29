@@ -37,6 +37,11 @@ task espClean, "clean the Nim code":
   rmDir(cacheDir)
   mkDir(cacheDir)
 
+task espDistClean, "clean the Nim code":
+  espCleanTask()
+  rmDir("build")
+  rmFile("sdkconfig") # this will trigger going back to sdkconfig.defaults
+
 task espSetup, "setup the esp-idf project":
   let idfPath = getEnv("IDF_PATH")
   if idfPath == "":

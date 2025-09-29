@@ -5,6 +5,9 @@ import options
 import consts
 import general
 import esp/storage/esp_ota_ops
+import esp/storage/esp_app_format
+
+export esp_app_format
 
 const TAG = "OTAUTL"
 
@@ -103,7 +106,7 @@ proc begin*(ota: OtaUpdateHandle) =
     TAG.loge("esp_ota_begin failed (%s)", repr(ota.update))
     raise newEspError[OtaError]("Error ota begin: " & $esp_err_to_name(err), err)
 
-proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = true):
+proc checkImageHeader*(ota: OtaUpdateHandle, data: string; version_check = true):
       tuple[status: OtaUpdateStatus, info: esp_app_desc_t] =
 
     var new_app_info: esp_app_desc_t
@@ -145,7 +148,7 @@ proc checkImageHeader*(ota: OtaUpdateHandle, data: var string; version_check = t
 
     return (status: VersionNewer, info: new_app_info)
 
-proc write*(ota: var OtaUpdateHandle, write_data: var string) =
+proc write*(ota: var OtaUpdateHandle, write_data: string) =
   let err = esp_ota_write(ota.handle, addr write_data[0], write_data.len().csize_t)
   if err != ESP_OK:
     raise newEspError[OtaError]("Error ota write: " & $esp_err_to_name(err), err)

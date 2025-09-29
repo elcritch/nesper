@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.8.1"
+version       = "0.8.2"
 author        = "Jaremy Creechley"
 description   = "Nim wrappers for ESP-IDF (ESP32)"
 license       = "Apache-2.0"
@@ -13,3 +13,5 @@ requires "msgpack4nim >= 0.3.1"
 requires "stew >= 0.1.0"
 requires "bytesequtils"
 
+feature "examples":
+  requires "https://github.com/elcritch/fastrpc >= 0.5.1"

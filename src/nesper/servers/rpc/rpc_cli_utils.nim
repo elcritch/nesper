@@ -48,7 +48,8 @@ type
     count: int
     delay: int
     jsonArg: string
-    ipAddr: string
+    host: string
+    ipaddr: IpAddress
     port: Port
     prettyPrint: bool
     quiet: bool
@@ -65,7 +66,7 @@ proc rpcOptions*(p: var OptParser): RpcCli =
   result.delay = 0
   result.quiet = false
   result.jsonArg = ""
-  result.ipAddr = ""
+  result.host = ""
   result.port = Port(5555)
   result.prettyPrint = false
   result.id = 1
@@ -79,7 +80,7 @@ proc rpcOptions*(p: var OptParser): RpcCli =
       of "count", "c":
         result.count = parseInt(val)
       of "ip", "i":
-        result.ipAddr = val
+        result.host = val
       of "port", "p":
         result.port = Port(parseInt(val))
       of "stats", "s":
@@ -92,7 +93,7 @@ proc rpcOptions*(p: var OptParser): RpcCli =
 
   echo "args: ", $result
 
-  if result.ipAddr == "":
+  if result.host == "":
     # no filename has been given, so we show the help
     raise newException(ValueError, "missing ip address")
 
@@ -100,7 +101,7 @@ proc rpcOptions*(p: var OptParser): RpcCli =
 
   # Check IP address
   try:
-    discard parseIpAddress(result.ipAddr)
+    result.ipaddr = parseIpAddress(result.host)
   except CatchableError as err:
     echo "invalid IP address, check the --ip:$IP argument"
     raise err
@@ -192,14 +193,18 @@ proc runRpc*(args: var RpcCli) =
   else:
     call = %* { "jsonrpc": "2.0", "id": 1 }
 
-  let m = parseJson(args.jsonArg)
+    let m = parseJson(args.jsonArg)
+    for (f,v) in m.pairs():
+      call[f] = v
 
-  for (f,v) in m.pairs():
-    call[f] = v
+  var client: Socket
+  if args.ipaddr.family == IpAddressFamily.IPv6:
+    client = newSocket(buffered=false, domain = AF_INET6)
+  else:
+    client = newSocket(buffered=false, domain = AF_INET)
 
-  let client: Socket = newSocket(buffered=false)
-  client.connect(args.ipAddr, args.port)
-  echo(yellow, "[connected to server ip addr: ", args.ipAddr,"]")
+  client.connect(args.host, args.port)
+  echo(yellow, "[connected to server ip addr: ", args.host,"]")
   echo(blue, "[call: ", $call, "]")
 
   for i in 1..args.count:
