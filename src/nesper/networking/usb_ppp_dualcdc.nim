@@ -86,8 +86,8 @@ const
 var
   sNetif: ptr esp_netif_t
   sEventGroup: EventGroupHandle_t
-  sPppItf: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_0
-  sLogItf: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_1
+  sLogItf: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_0
+  sPppItf: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_1
   rxBuf = newSeq[uint8](CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1)
 
 const
@@ -97,7 +97,7 @@ const
   CONNECT_BITS = GOT_IPV4 or GOT_IPV6 or CONN_FAILED
 
 # PPP transmit: push bytes to CDC PPP interface
-proc pppTransmit(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.} =
+proc pppTransmit*(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.} =
   # logi(TAG, "CDC TX: %d", len)
   discard tinyusb_cdcacm_write_queue(sPppItf, cast[ptr uint8](buffer), len)
   result = tinyusb_cdcacm_write_flush(sPppItf, 0'u32)
@@ -105,7 +105,7 @@ proc pppTransmit(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.}
 var driverCfg: esp_netif_driver_ifconfig_t
 
 # CDC RX: feed data to esp_netif
-proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
+proc onCdcRx*(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   # logi(TAG, "CDC RX: interface %d", itf)
   if tinyusb_cdcacm_itf_t(itf) != sPppItf:
     # logi(TAG, "CDC RX: interface %d not sPppItf", itf)
@@ -116,7 +116,7 @@ proc onCdcRx(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   if ret == ESP_OK and rxSize > 0:
     discard esp_netif_receive(sNetif, addr rxBuf[0], rxSize, nil)
 
-proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
+proc onLineState*(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
   # logi(TAG, "Line state changed on itf %d", itf)
   # Allow host tools (esptool) to reset via DTR/RTS on the console CDC
   if tinyusb_cdcacm_itf_t(itf) == sLogItf:
@@ -129,7 +129,7 @@ proc onLineState(itf: cint; event: ptr cdcacm_event_t) {.cdecl.} =
       esp_restart()
 
 # IP events handler: filter for our PPP netif and set bits
-proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; event_data: pointer) {.cdecl.} =
+proc onIpEvent*(arg: pointer; event_base: esp_event_base_t; event_id: int32; event_data: pointer) {.cdecl.} =
   if event_base != IP_EVENT: return
   case ip_event_t(event_id)
   of IP_EVENT_PPP_GOT_IP:
@@ -148,10 +148,36 @@ proc onIpEvent(arg: pointer; event_base: esp_event_base_t; event_id: int32; even
   else:
     discard
 
-proc setupNetworking*() =
+proc cdcSetupNetworking*() =
   # Initialize esp-netif and default event loop
   check: esp_netif_init()
   check: esp_event_loop_create_default()
+
+proc cdcSetupConsole*(
+    usb_dev: tinyusb_usbdev_t = TINYUSB_USBDEV_0,
+    cdc_port: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_0
+) =
+  # CDC0 for logs/console
+  var acmLog: tinyusb_config_cdcacm_t
+  acmLog.usb_dev = usb_dev
+  acmLog.cdc_port = cdc_port
+  acmLog.callback_line_state_changed = onLineState
+  check: tusb_cdc_acm_init(addr acmLog)
+  check: esp_tusb_init_console(cdc_port)
+
+proc cdcSetupPpp*(
+    usb_dev: tinyusb_usbdev_t = TINYUSB_USBDEV_1,
+    cdc_port: tinyusb_cdcacm_itf_t = TINYUSB_CDC_ACM_1
+) =
+  # CDC1 for PPP
+  var acmPpp: tinyusb_config_cdcacm_t
+  acmPpp.usb_dev = usb_dev
+  acmPpp.cdc_port = cdc_port
+  acmPpp.callback_rx = onCdcRx
+  acmPpp.callback_rx_wanted_char = nil
+  acmPpp.callback_line_state_changed = onLineState
+  acmPpp.callback_line_coding_changed = nil
+  check: tusb_cdc_acm_init(addr acmPpp)
 
 proc initPppConnectDualCdc*(): esp_err_t =
   ## Initializes USB CDC for PPPoS and a serial console
@@ -164,23 +190,8 @@ proc initPppConnectDualCdc*(): esp_err_t =
   tusbCfg.external_phy = false
   check: tinyusb_driver_install(addr tusbCfg)
 
-  # CDC0 for PPP
-  var acmPpp: tinyusb_config_cdcacm_t
-  acmPpp.usb_dev = TINYUSB_USBDEV_0
-  acmPpp.cdc_port = TINYUSB_CDC_ACM_0
-  acmPpp.callback_rx = onCdcRx
-  acmPpp.callback_rx_wanted_char = nil
-  acmPpp.callback_line_state_changed = onLineState
-  acmPpp.callback_line_coding_changed = nil
-  check: tusb_cdc_acm_init(addr acmPpp)
-
-  # CDC1 for logs/console
-  var acmLog: tinyusb_config_cdcacm_t
-  acmLog.usb_dev = TINYUSB_USBDEV_0
-  acmLog.cdc_port = TINYUSB_CDC_ACM_1
-  acmLog.callback_line_state_changed = onLineState
-  check: tusb_cdc_acm_init(addr acmLog)
-  check: esp_tusb_init_console(TINYUSB_CDC_ACM_1)
+  cdcSetupConsole()
+  cdcSetupPpp()
 
   # Event group and handler
   sEventGroup = xEventGroupCreate()
