@@ -98,9 +98,28 @@ const
 
 # PPP transmit: push bytes to CDC PPP interface
 proc pppTransmit*(h: pointer; buffer: pointer; len: csize_t): esp_err_t {.cdecl.} =
-  # logi(TAG, "CDC TX: %d", len)
-  discard tinyusb_cdcacm_write_queue(sPppItf, cast[ptr uint8](buffer), len)
-  result = tinyusb_cdcacm_write_flush(sPppItf, 0'u32)
+  ## transmit bytes to CDC PPP interface
+  ## the while loop is used to handle the case
+  ## where the buffer is larger than the queue size
+
+  var off = 0.csize_t
+  let buff = cast[ptr UncheckedArray[uint8]](buffer)
+  while off < len:
+    let n = tinyusb_cdcacm_write_queue(sPppItf,
+                                       addr buff[off],
+                                       len - off)
+    off += n
+
+    # logi(TAG, "CDC TX: queued: %d off: %d res: %d", n, off, result)
+    if n > 0 and n < len - 1:
+      continue
+
+    result = tinyusb_cdcacm_write_flush(sPppItf, 0'u32)
+
+  # logi(TAG, "CDC TX: result: %d", result)
+  if result == ESP_ERR_NOT_FINISHED:
+    result = ESP_OK
+
 
 var driverCfg: esp_netif_driver_ifconfig_t
 
@@ -213,6 +232,8 @@ proc initPppConnectDualCdc*(): esp_err_t =
 
   sNetif = esp_netif_new(addr netifCfg)
   doAssert sNetif != nil
+  # esp_netif_set_mtu(sNetif, 296) # Start conservative, can increase
+
   esp_netif_action_start(sNetif, nil, 0, nil)
   esp_netif_action_connected(sNetif, nil, 0, nil)
 
