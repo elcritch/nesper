@@ -600,8 +600,12 @@ else:
 ##           NULL if no entry was found, valid nvs_iterator_t otherwise.
 ##
 
-proc nvs_entry_next*(`iterator`: nvs_iterator_t): nvs_iterator_t {.cdecl,
-    importc: "nvs_entry_next", header: "nvs.h".}
+when ESP_IDF_MAJOR == 4:
+    proc nvs_entry_next*(`iterator`: nvs_iterator_t): nvs_iterator_t {.cdecl,
+        importc: "nvs_entry_next", header: "nvs.h".}
+else:
+    proc nvs_entry_next*(`iterator`: nvs_iterator_t): esp_err_t {.
+        importc: "nvs_entry_next", header: "nvs.h".}
 
 
 ## *
@@ -612,8 +616,14 @@ proc nvs_entry_next*(`iterator`: nvs_iterator_t): nvs_iterator_t {.cdecl,
 ##  @param[out]  out_info     Structure to which entry information is copied.
 ##
 
-proc nvs_entry_info*(`iterator`: nvs_iterator_t; out_info: ptr nvs_entry_info_t) {.
-    cdecl, importc: "nvs_entry_info", header: "nvs.h".}
+when ESP_IDF_MAJOR == 4:
+    proc nvs_entry_info*(`iterator`: nvs_iterator_t; out_info: ptr nvs_entry_info_t) {.
+        cdecl, importc: "nvs_entry_info", header: "nvs.h".}
+else:
+    proc nvs_entry_info*(`iterator`: nvs_iterator_t; out_info: ptr nvs_entry_info_t): esp_err_t {.
+        importc: "nvs_entry_info", header: "nvs.h".}
+
+# esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_info);
 
 
 ## *
