@@ -15,7 +15,14 @@ type
     ESP_LOG_VERBOSE           ## !< Bigger chunks of debugging information, or frequent messages which can potentially flood the output.
 
 
-when defined(freertos):
+when defined(nesperMock):
+  proc c_printf*(formatstr: cstring) {.importc: "printf", header: "stdio.h", varargs.}
+  template loge*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "ERROR: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logw*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "WARN: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logi*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "INFO: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logd*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "DEBUG: ", tag, ": "; c_printf(formatstr, args); echo ""
+  template logv*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "VERBOSE: ", tag, ": "; c_printf(formatstr, args); echo ""
+else:
   proc esp_log_timestamp*(): uint32 {.importc: "esp_log_timestamp", header: "esp_log.h".}
 
   proc esp_log_write*(level: esp_log_level_t, tag: cstring, format: cstring) {.
@@ -28,13 +35,6 @@ when defined(freertos):
   proc logv*(tag: cstring, formatstr: cstring) {.importc: "ESP_LOGV", varargs, header: "esp_log.h".}
 
   proc log_timestamp*(): uint32 {.cdecl, importc: "esp_log_timestamp", header: "esp_log.h".}
-else:
-  proc c_printf*(formatstr: cstring) {.importc: "printf", header: "stdio.h", varargs.}
-  template loge*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "ERROR: ", tag, ": "; c_printf(formatstr, args); echo ""
-  template logw*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "WARN: ", tag, ": "; c_printf(formatstr, args); echo ""
-  template logi*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "INFO: ", tag, ": "; c_printf(formatstr, args); echo ""
-  template logd*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "DEBUG: ", tag, ": "; c_printf(formatstr, args); echo ""
-  template logv*(tag: cstring, formatstr: cstring, args: varargs[untyped]) = stdout.write "VERBOSE: ", tag, ": "; c_printf(formatstr, args); echo ""
 
 type 
   MallocCapacity* = enum
