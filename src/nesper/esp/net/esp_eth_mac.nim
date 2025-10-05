@@ -21,7 +21,7 @@ const
 
 type
   ##  @brief Ethernet MAC
-  esp_eth_mac_t* {.importc: "esp_eth_mac_t", header: "esp_eth_mac.h", bycopy.} = object
+  esp_eth_mac_t* {.importc: "esp_eth_mac_t", header: "esp_eth.h", bycopy.} = object
     set_mediator_cb* {.importc: "set_mediator_cb".}: set_mediator_cb_t
     init_cb* {.importc: "init_cb".}: init_cb_t
     deinit_cb* {.importc: "deinit_cb".}: deinit_cb_t
@@ -189,26 +189,34 @@ proc ethMacDefaultConfig*(): eth_mac_config_t =
   """.}
 
 when ESP_IDF_MAJOR == 5:
+  {.emit: "#include \"esp_eth_mac.h\"".}
   type
-    eth_esp32_emac_config_t* {.importc: "eth_esp32_emac_config_t", header: "esp_eth_mac.h", bycopy, incompleteStruct.} = object
+    eth_esp32_emac_config_t* {.importc: "eth_esp32_emac_config_t", header: "esp_eth.h", bycopy, incompleteStruct.} = object
       smi_mdc_gpio_num* {.importc: "smi_mdc_gpio_num".}: cint ## !< SMI MDC GPIO number
       smi_mdio_gpio_num* {.importc: "smi_mdio_gpio_num".}: cint ## !< SMI MDIO GPIO number
 
   # proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "$1", header: "esp_eth_mac.h".}
 
-  proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t {.importc: "esp_eth_mac.h".}
+  # Provide a wrapper that yields the default EMAC config.
+  # The IDF macro expands to a brace-initializer which is only valid in a
+  # declaration context; initialize a local C variable and return it.
+  proc ETH_ESP32_EMAC_DEFAULT_CONFIG*(): eth_esp32_emac_config_t =
+    {.emit: """
+    eth_esp32_emac_config_t cfg = ETH_ESP32_EMAC_DEFAULT_CONFIG();
+    result = cfg;
+    """.}
 
 when ESP_IDF_MAJOR == 4:
   proc esp_eth_mac_new_esp32*(config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
       importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
 elif ESP_IDF_MAJOR == 5:
   proc esp_eth_mac_new_esp32*(esp32_config: ptr eth_esp32_emac_config_t, config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
-      importc: "esp_eth_mac_new_esp32", header: "esp_eth_mac.h".}
+      importc: "esp_eth_mac_new_esp32", header: "esp_eth.h".}
 
 
 ##  @brief DM9051 specific configuration
 type
-  eth_dm9051_config_t* {.importc: "eth_dm9051_config_t", header: "esp_eth_mac.h",
+  eth_dm9051_config_t* {.importc: "eth_dm9051_config_t", header: "esp_eth.h",
                         bycopy.} = object
     spi_hdl* {.importc: "spi_hdl".}: spi_device_handle_t ## !< Handle of SPI device driver
     int_gpio_num* {.importc: "int_gpio_num".}: cint ## !< Interrupt GPIO number
@@ -228,7 +236,7 @@ type
 ##       - NULL: create MAC instance failed because some error occurred
 proc esp_eth_mac_new_dm9051*(dm9051_config: ptr eth_dm9051_config_t;
                             mac_config: ptr eth_mac_config_t): ptr esp_eth_mac_t {.
-    importc: "esp_eth_mac_new_dm9051", header: "esp_eth_mac.h".}
+    importc: "esp_eth_mac_new_dm9051", header: "esp_eth.h".}
 
 
 
@@ -242,7 +250,7 @@ type
   ##
   ##
 proc ETH_W5500_DEFAULT_CONFIG*(spi_device: spi_device_handle_t) {.
-    importc: "$1", header: "esp_eth_mac.h".}
+    importc: "$1", header: "esp_eth.h".}
 
   ## *
   ##  @brief Create W5500 Ethernet MAC instance
@@ -257,5 +265,4 @@ proc ETH_W5500_DEFAULT_CONFIG*(spi_device: spi_device_handle_t) {.
 proc esp_eth_mac_new_w5500*(
         w5500_config: ptr eth_w5500_config_t;
         mac_config: ptr eth_mac_config_t
-      ): ptr esp_eth_mac_t {.importc: "$1", header: "esp_eth_mac.h".}
-
+      ): ptr esp_eth_mac_t {.importc: "$1", header: "esp_eth.h".}
