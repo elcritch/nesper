@@ -110,7 +110,7 @@ type
     ## !< Type of stored key-value pair
 
 
-  nvs_iterator_t* {.importc: "nvs_iterator_t", incompleteStruct, header: "nvs.h".} = object ##
+  nvs_iterator_t* {.importc: "nvs_iterator_t", incompleteStruct, header: "nvs.h".} = pointer ##
                                               ##  Opaque pointer type representing iterator to nvs entries
                                               ##
 
