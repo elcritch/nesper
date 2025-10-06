@@ -28,6 +28,8 @@ type
     reset_timeout_ms* {.importc: "reset_timeout_ms".}: uint32 ## !< Reset timeout value (Unit: ms)
     autonego_timeout_ms* {.importc: "autonego_timeout_ms".}: uint32 ## !< Auto-negotiation timeout value (Unit: ms)
     reset_gpio_num* {.importc: "reset_gpio_num".}: cint ## !< Reset GPIO number, -1 means no hardware reset
+    hw_reset_assert_time_us {.importc: "hw_reset_assert_time_us".}: int32 #  /*!< Time the reset pin is asserted (Unit: us), 0 to use chip specific default */
+    post_hw_reset_delay_ms {.importc: "post_hw_reset_delay_ms".}: int32 #   /*!< Time to wait after the HW reset (Unit: ms), 0 to use chip specific default, -1 means no wait */
 
 
 ##  @brief Ethernet PHY
