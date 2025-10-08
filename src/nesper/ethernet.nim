@@ -65,10 +65,10 @@ when not defined(ESP_IDF_V4_0):
       config*: EthernetConfig
       spi*: EthernetSpiConfig
 
-proc initEthernetConfig*(): EthernetConfig =
-  new(result)
-  result.mac = ethMacDefaultConfig()
-  result.phy = ETH_PHY_DEFAULT_CONFIG()
+# proc initEthernetConfig*(): EthernetConfig =
+#   new(result)
+#   result.mac = ethMacDefaultConfig()
+#   result.phy = ETH_PHY_DEFAULT_CONFIG()
 
 # proc initEthernet*[T](): T =
 #   new(result)
@@ -82,74 +82,74 @@ proc initEthernetConfig*(): EthernetConfig =
 #   result.mac = esp_eth_mac_new_esp32(addr eth.config.mac)
 #   result.phy = esp_eth_phy_new_rtl8201(addr eth.config.phy)
 
-proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj = 
-  check: gpio_install_isr_service(0.esp_intr_flags)
+# proc setupEthernet*(eth: var EthConfigDM9051): EthernetObj = 
+#   check: gpio_install_isr_service(0.esp_intr_flags)
 
-  var
-    spi_handle: spi_device_handle_t = nil
-    buscfg = spi_bus_config_t(
-      miso_io_num: eth.spi.miso.cint,
-      mosi_io_num: eth.spi.mosi.cint,
-      sclk_io_num: eth.spi.sclk.cint,
-      quadwp_io_num: -1,
-      quadhd_io_num: -1
-    )
+#   var
+#     spi_handle: spi_device_handle_t = nil
+#     buscfg = spi_bus_config_t(
+#       miso_io_num: eth.spi.miso.cint,
+#       mosi_io_num: eth.spi.mosi.cint,
+#       sclk_io_num: eth.spi.sclk.cint,
+#       quadwp_io_num: -1,
+#       quadhd_io_num: -1
+#     )
 
-  check: spi_bus_initialize(eth.spi.host, addr buscfg, eth.spi.dma_channel)
+#   check: spi_bus_initialize(eth.spi.host, addr buscfg, eth.spi.dma_channel)
 
-  var
-    devcfg = spi_device_interface_config_t(
-      command_bits: 1,
-      address_bits: 7,
-      mode: 0,
-      clock_speed_hz: 1_000_000'i32 * eth.spi.mhz.int32,
-      spics_io_num: eth.spi.cs.cint,
-      queue_size: 20
-    )
+#   var
+#     devcfg = spi_device_interface_config_t(
+#       command_bits: 1,
+#       address_bits: 7,
+#       mode: 0,
+#       clock_speed_hz: 1_000_000'i32 * eth.spi.mhz.int32,
+#       spics_io_num: eth.spi.cs.cint,
+#       queue_size: 20
+#     )
 
-  check: spi_bus_add_device(eth.spi.host, addr devcfg, addr spi_handle)
+#   check: spi_bus_add_device(eth.spi.host, addr devcfg, addr spi_handle)
 
-  ##  dm9051 ethernet driver is based on spi driver
-  var dm9051_config = eth_dm9051_config_t(spi_hdl: spi_handle, int_gpio_num: eth.spi.intr_pin.int32)
+#   ##  dm9051 ethernet driver is based on spi driver
+#   var dm9051_config = eth_dm9051_config_t(spi_hdl: spi_handle, int_gpio_num: eth.spi.intr_pin.int32)
 
-  result.mac = esp_eth_mac_new_dm9051(addr dm9051_config, addr eth.config.mac)
-  result.phy = esp_eth_phy_new_dm9051(addr eth.config.phy)
+#   result.mac = esp_eth_mac_new_dm9051(addr dm9051_config, addr eth.config.mac)
+#   result.phy = esp_eth_phy_new_dm9051(addr eth.config.phy)
 
-when not defined(ESP_IDF_V4_0):
-  proc setupEthernet*(eth: var EthConfigW5500): EthernetObj = 
-    check: gpio_install_isr_service(0.esp_intr_flags)
+# when not defined(ESP_IDF_V4_0):
+#   proc setupEthernet*(eth: var EthConfigW5500): EthernetObj = 
+#     check: gpio_install_isr_service(0.esp_intr_flags)
 
-    var
-      spi_handle: spi_device_handle_t = nil
-      buscfg = spi_bus_config_t(
-        miso_io_num: eth.spi.miso.cint,
-        mosi_io_num: eth.spi.mosi.cint,
-        sclk_io_num: eth.spi.sclk.cint,
-        quadwp_io_num: -1,
-        quadhd_io_num: -1
-      )
+#     var
+#       spi_handle: spi_device_handle_t = nil
+#       buscfg = spi_bus_config_t(
+#         miso_io_num: eth.spi.miso.cint,
+#         mosi_io_num: eth.spi.mosi.cint,
+#         sclk_io_num: eth.spi.sclk.cint,
+#         quadwp_io_num: -1,
+#         quadhd_io_num: -1
+#       )
 
-    check: spi_bus_initialize(eth.spi.host, addr buscfg, eth.spi.dma_channel)
+#     check: spi_bus_initialize(eth.spi.host, addr buscfg, eth.spi.dma_channel)
 
-    var
-      devcfg = spi_device_interface_config_t(
-        command_bits: 16,
-        address_bits: 8,
-        mode: 0,
-        clock_speed_hz: 1_000_000'i32 * eth.spi.mhz.int32,
-        spics_io_num: eth.spi.cs.cint,
-        queue_size: 20
-      )
+#     var
+#       devcfg = spi_device_interface_config_t(
+#         command_bits: 16,
+#         address_bits: 8,
+#         mode: 0,
+#         clock_speed_hz: 1_000_000'i32 * eth.spi.mhz.int32,
+#         spics_io_num: eth.spi.cs.cint,
+#         queue_size: 20
+#       )
 
-    check: spi_bus_add_device(eth.spi.host, addr devcfg, addr spi_handle)
+#     check: spi_bus_add_device(eth.spi.host, addr devcfg, addr spi_handle)
 
-    # /* w5500 ethernet driver is based on spi driver */
-    var
-      w5500_config = eth_w5500_config_t(spi_hdl: spi_handle, int_gpio_num: 4)
+#     # /* w5500 ethernet driver is based on spi driver */
+#     var
+#       w5500_config = eth_w5500_config_t(spi_hdl: spi_handle, int_gpio_num: 4)
 
 
-    w5500_config.int_gpio_num = eth.spi.intr_pin.int32
+#     w5500_config.int_gpio_num = eth.spi.intr_pin.int32
 
-    result.mac = esp_eth_mac_new_w5500(addr w5500_config, addr eth.config.mac)
-    result.phy = esp_eth_phy_new_w5500(addr eth.config.phy)
+#     result.mac = esp_eth_mac_new_w5500(addr w5500_config, addr eth.config.mac)
+#     result.phy = esp_eth_phy_new_w5500(addr eth.config.phy)
 
