@@ -36,11 +36,11 @@ template sendWrap*(socket: Socket, data: untyped) =
 
 proc sendChunks*(sourceClient: Socket, rmsg: string) =
   let rN = rmsg.len()
-  logi(TAG,"rpc handler send client: %d bytes", rN)
+  logd(TAG,"rpc handler send client: %d bytes", rN)
   var i = 0
   while i < rN:
     var j = min(i + MsgChunk, rN) 
-    logi(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
+    logd(TAG,"rpc handler sending: i: %s j: %s ", $i, $j)
     var sl = rmsg[i..<j]
     sourceClient.sendWrap(move sl)
     i = j
