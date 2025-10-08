@@ -77,7 +77,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
       echo "Got exception ", repr(e), " with message ", msg
 
 
-proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
+proc startRpcQueueSocketServer*(port: Port,  router: var RpcRouter, address="";
                                 task_stack_depth = 8128'u32, task_priority = UBaseType_t(1), task_core = BaseType_t(-1)) =
   logi(TAG, "starting mpack rpc server: buffer: %s", $router.buffer)
   var qh: RpcQueueHandle = new(RpcQueueHandle)
@@ -98,6 +98,7 @@ proc startRpcQueueSocketServer*(port: Port, router: var RpcRouter;
 
   startSocketServer[RpcQueueHandle](
     port,
+    address=address,
     readHandler=rpcMsgPackQueueReadHandler,
     writeHandler=rpcMsgPackQueueWriteHandler,
     data=qh)
