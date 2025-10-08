@@ -70,6 +70,7 @@ proc execRpcSocketTask*(arg: pointer) {.exportc, cdecl.} =
     
           discard xQueueSend(qh.outQueue, addr(res), TickType_t(1_000)) 
           wasMoved(res)
+      delay(10.Millis)
     except:
       let
         e = getCurrentException()
