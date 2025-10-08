@@ -129,7 +129,7 @@ type
 
 proc ETH_PHY_DEFAULT_CONFIG*(): eth_phy_config_t =
   {.emit: """
-  eth_mac_config_t cfg = ETH_PHY_DEFAULT_CONFIG();
+  eth_phy_config_t cfg = ETH_PHY_DEFAULT_CONFIG();
   result = cfg;
   """.}
 
