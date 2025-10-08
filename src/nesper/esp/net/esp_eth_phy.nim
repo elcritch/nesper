@@ -127,12 +127,17 @@ type
     del_cb_t* {.importc: "del".}: del_cb_t
 
 
+proc ETH_PHY_DEFAULT_CONFIG*(): eth_phy_config_t =
+  {.emit: """
+  eth_mac_config_t cfg = ETH_PHY_DEFAULT_CONFIG();
+  result = cfg;
+  """.}
 
 ## *
 ##  @brief Default configuration for Ethernet PHY object
 ##
 ##
-proc ETH_PHY_DEFAULT_CONFIG*(                                
+proc ethPhyDefaultConfig*(                                
          phy_addr = 1,               
          reset_timeout_ms = 100,     
          autonego_timeout_ms = 4000, 

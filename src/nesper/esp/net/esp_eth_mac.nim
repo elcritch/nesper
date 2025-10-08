@@ -182,7 +182,7 @@ type
 
 # proc ETH_MAC_DEFAULT_CONFIG*(): eth_mac_config_t {.importc: "ETH_MAC_DEFAULT_CONFIG", header: "esp_eth_mac.h".}
 
-proc ethMacDefaultConfig*(): eth_mac_config_t =
+proc ETH_MAC_DEFAULT_CONFIG*(): eth_mac_config_t =
   {.emit: """
   eth_mac_config_t cfg = ETH_MAC_DEFAULT_CONFIG();
   result = cfg;

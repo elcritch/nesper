@@ -47,11 +47,21 @@ type
 ##
 when defined(ESP_IDF_V4_0):
   type
-    stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32): esp_err_t {.cdecl.}
+    stack_input_cb_t* = proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8;
+        length: uint32): esp_err_t {.cdecl.}
 else:
   type
-    stack_input_cb_t* =  proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8; length: uint32, priv: pointer): esp_err_t {.cdecl.}
+    stack_input_cb_t* = proc (eth_handle: esp_eth_handle_t; buffer: ptr uint8;
+        length: uint32; priv: pointer): esp_err_t {.cdecl.}
+    esp_eth_read_phy_reg_proc* = proc(eth_handle: esp_eth_handle_t;
+                                      phy_addr: uint32;
+                                      phy_reg: uint32;
+                                      reg_value: ptr uint32): esp_err_t {.cdecl.}
 
+    esp_eth_write_phy_reg_proc* = proc(eth_handle: esp_eth_handle_t;
+                                       phy_addr: uint32;
+                                       phy_reg: uint32;
+                                       reg_value: uint32): esp_err_t {.cdecl.}
 
 type
 
@@ -63,7 +73,7 @@ type
   ##        - ESP_OK: process extra lowlevel initialization successfully
   ##        - ESP_FAIL: error occurred when processing extra lowlevel initialization
   ##
-  on_lowlevel_init_done_cb_t* = proc ( eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.} ## *
+  on_lowlevel_init_done_cb_t* = proc (eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.} ## *
 
   ##  @brief Callback function invoked when lowlevel deinitialization is finished
   ##
@@ -73,29 +83,33 @@ type
   ##        - ESP_OK: process extra lowlevel deinitialization successfully
   ##        - ESP_FAIL: error occurred when processing extra lowlevel deinitialization
   ##
-  on_lowlevel_deinit_done_cb_t* = proc ( eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.}
+  on_lowlevel_deinit_done_cb_t* = proc (eth_handle: esp_eth_handle_t): esp_err_t {.cdecl.}
 
-  esp_eth_config_t* {.importc: "esp_eth_config_t", header: "esp_eth.h", bycopy.} = object
+  esp_eth_config_t* {.importc: "esp_eth_config_t", header: "esp_eth.h",
+      bycopy.} = object
     mac* {.importc: "mac".}: ptr esp_eth_mac_t ##  @brief Ethernet MAC object
     phy* {.importc: "phy".}: ptr esp_eth_phy_t ##  @brief Ethernet PHY object
     check_link_period_ms* {.importc: "check_link_period_ms".}: uint32 ##  @brief Period time of checking Ethernet link status
     stack_input* {.importc: "stack_input".}: stack_input_cb_t
     on_lowlevel_init_done* {.importc: "on_lowlevel_init_done".}: on_lowlevel_init_done_cb_t
     on_lowlevel_deinit_done* {.importc: "on_lowlevel_deinit_done".}: on_lowlevel_deinit_done_cb_t
+    read_phy_reg*: esp_eth_read_phy_reg_proc
+    write_phy_reg*: esp_eth_write_phy_reg_proc
+
 
 ## *
 ##  @brief Default configuration for Ethernet driver
 ##
 ##
 proc eth_default_config*(
-          emac: ptr esp_eth_mac_t,
-          ephy: ptr esp_eth_phy_t,
-          check_link_period_ms = 2000'u32,
-          stack_input: stack_input_cb_t = nil,
-          on_lowlevel_init_done: on_lowlevel_init_done_cb_t = nil,
-          on_lowlevel_deinit_done: on_lowlevel_deinit_done_cb_t = nil,
+          emac: ptr esp_eth_mac_t;
+          ephy: ptr esp_eth_phy_t;
+          check_link_period_ms = 2000'u32;
+          stack_input: stack_input_cb_t = nil;
+          on_lowlevel_init_done: on_lowlevel_init_done_cb_t = nil;
+          on_lowlevel_deinit_done: on_lowlevel_deinit_done_cb_t = nil;
         ): esp_eth_config_t =
-  
+
   result = esp_eth_config_t(
             mac: emac,
             phy: ephy,
@@ -190,7 +204,8 @@ proc esp_eth_stop*(hdl: esp_eth_handle_t): esp_err_t {.importc: "esp_eth_stop",
 ##        - ESP_FAIL: transmit frame buffer failed because some other error occurred
 ##
 
-proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8; length: uint32): esp_err_t {.
+proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8;
+    length: uint32): esp_err_t {.
     importc: "esp_eth_transmit", header: "esp_eth.h".}
 ## *
 ##  @brief General Receive
@@ -205,7 +220,8 @@ proc esp_eth_transmit*(hdl: esp_eth_handle_t; buf: ptr uint8; length: uint32): e
 ##        - ESP_FAIL: receive frame buffer failed because some other error occurred
 ##
 
-proc esp_eth_receive*(hdl: esp_eth_handle_t; buf: ptr uint8; length: ptr uint32): esp_err_t {.
+proc esp_eth_receive*(hdl: esp_eth_handle_t; buf: ptr uint8;
+    length: ptr uint32): esp_err_t {.
     importc: "esp_eth_receive", header: "esp_eth.h".}
 ## *
 ##  @brief Misc IO function of Etherent driver
@@ -220,7 +236,8 @@ proc esp_eth_receive*(hdl: esp_eth_handle_t; buf: ptr uint8; length: ptr uint32)
 ##        - ESP_FAIL: process io command failed because some other error occurred
 ##
 
-proc esp_eth_ioctl*(hdl: esp_eth_handle_t; cmd: esp_eth_io_cmd_t; data: pointer): esp_err_t {.
+proc esp_eth_ioctl*(hdl: esp_eth_handle_t; cmd: esp_eth_io_cmd_t;
+    data: pointer): esp_err_t {.
     importc: "esp_eth_ioctl", header: "esp_eth.h".}
 ## *
 ##  @brief Increase Ethernet driver reference
