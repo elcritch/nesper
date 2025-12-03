@@ -57,7 +57,7 @@ task espArchive, "Archive ESP32 firmware files":
     for file in firmwareFiles("bootloader/"):
       echo "adding: ", file
       exec("zip firmware.zip " & file)
-    for file in firmwareFiles("partition_table /"):
+    for file in firmwareFiles("partition_table/"):
       echo "adding: ", file
       exec("zip firmware.zip " & file)
 
