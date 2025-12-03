@@ -42,6 +42,25 @@ task espDistClean, "clean the Nim code":
   rmDir("build")
   rmFile("sdkconfig") # this will trigger going back to sdkconfig.defaults
 
+task espArchive, "Archive ESP32 firmware files":
+  withDir "build":
+    rmFile("firmware.zip")
+    echo "creating zip: ", "firmware.zip"
+    exec("zip firmware.zip flasher_args.json")
+    exec("zip firmware.zip flash_args")
+    exec("zip firmware.zip flash_bootloader_args")
+    exec("zip firmware.zip flash_project_args")
+
+    for file in firmwareFiles("./"):
+      echo "adding: ", file
+      exec("zip firmware.zip " & file)
+    for file in firmwareFiles("bootloader/"):
+      echo "adding: ", file
+      exec("zip firmware.zip " & file)
+    for file in firmwareFiles("partition_table /"):
+      echo "adding: ", file
+      exec("zip firmware.zip " & file)
+
 task espSetup, "setup the esp-idf project":
   let idfPath = getEnv("IDF_PATH")
   if idfPath == "":
