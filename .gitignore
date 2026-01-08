@@ -2,6 +2,7 @@
 !*/
 !*.*
 /*/*/build/
+esp-idf-examples/*/sdkconfig.old
 *.dSYM
 nimcache/
 deps/
