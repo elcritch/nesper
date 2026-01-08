@@ -63,8 +63,8 @@ task testExampleUartEcho, "Build the UART echo example with QEMU":
     when not defined(skipEspBuild):
       exec("nim espDistClean")
     exec("nim espCompile")
-    exec("idf.py set-target esp32")
     when not defined(skipEspBuild):
+      exec("idf.py set-target esp32")
       exec("nim espBuild")
 
 task testExampleSimpleWifi, "Build the UART echo example with QEMU":
@@ -74,8 +74,8 @@ task testExampleSimpleWifi, "Build the UART echo example with QEMU":
     when not defined(skipEspBuild):
       exec("nim espDistClean")
     exec("nim espCompile")
-    exec("idf.py set-target esp32")
     when not defined(skipEspBuild):
+      exec("idf.py set-target esp32")
       exec("nim espBuild")
 
 task testExamples, "Build all examples":
