@@ -57,3 +57,13 @@ task test_all, "Runs the test suite":
   test_driverTask()
   test_storageTask()
   test_execsTask()
+
+task test_uart_echo_qemu, "Build the UART echo example with QEMU":
+  if findExe("idf.py") == "":
+    echo "\nError: idf.py not found. Please run the esp-idf export commands: `. $IDF_PATH/export.sh` and try again.\n"
+    quit(2)
+
+  let exampleDir = getCurrentDir() / "esp-idf-examples" / "uart_echo"
+  withDir exampleDir:
+    exec("idf.py set-target esp32c3")
+    exec("idf.py qemu")

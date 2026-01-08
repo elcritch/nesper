@@ -1,6 +1,7 @@
 *
 !*/
 !*.*
+/*/*/build/
 *.dSYM
 nimcache/
 deps/
