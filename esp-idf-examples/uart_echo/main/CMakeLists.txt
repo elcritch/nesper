@@ -1,3 +1,16 @@
-idf_component_register(SRCS "uart_echo_example_main.c"
-                    REQUIRES esp_driver_uart esp_driver_gpio
-                    INCLUDE_DIRS ".")
+idf_component_register(SRC_DIRS "./nimcache"
+                    INCLUDE_DIRS ""
+                    PRIV_REQUIRES esp_driver_uart
+                    )
+
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-discarded-qualifiers APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-ignored-qualifiers APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=unused-label APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=parentheses APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=implicit-function-declaration APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=maybe-uninitialized APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=nonnull APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=address APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-but-set-variable APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-discarded-qualifiers APPEND)

@@ -66,4 +66,4 @@ task test_uart_echo_qemu, "Build the UART echo example with QEMU":
   let exampleDir = getCurrentDir() / "esp-idf-examples" / "uart_echo"
   withDir exampleDir:
     exec("idf.py set-target esp32c3")
-    exec("idf.py qemu")
+    exec("nim espBuild")

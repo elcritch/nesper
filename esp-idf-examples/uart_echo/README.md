@@ -32,9 +32,9 @@ Note: Some GPIOs can not be used with certain chips because they are reserved fo
 
 Optionally, you can set-up and use a serial interface that has RTS and CTS signals in order to verify that the
 hardware control flow works. Connect the extra signals according to the following table, configure both extra pins in
-the example code `uart_echo_example_main.c` by replacing existing `UART_PIN_NO_CHANGE` macros with the appropriate pin
-numbers and configure UART1 driver to use the hardware flow control by setting `.flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS`
-and adding `.rx_flow_ctrl_thresh = 122` to the `uart_config` structure.
+the example code `main/main.nim` by replacing existing `UART_PIN_NO_CHANGE` values with the appropriate pin
+numbers and configure UART1 driver to use the hardware flow control by setting `flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS`
+and `rx_flow_ctrl_thresh = 122` in the `newUartConfig` call.
 
 ```
   ---------------------------------------------------------------
@@ -59,6 +59,7 @@ idf.py menuconfig
 Build the project and flash it to the board, then run monitor tool to view serial output:
 
 ```
+nim espBuild
 idf.py -p PORT flash monitor
 ```
 
