@@ -1,6 +1,7 @@
 import nesper
 import nesper/esp/driver/uart
 import nesper/esp/queue
+import nesper/uarts
 
 const
   sdkconfigHdr = "sdkconfig.h"
@@ -15,6 +16,7 @@ let
 const
   TAG: cstring = "UART TEST"
   BUF_SIZE = 1024
+  USE_HIGH_LEVEL_TASK = false
 
 proc echoTask(arg: pointer) {.cdecl.} =
   let uartPort = uart_port_t(CONFIG_EXAMPLE_UART_PORT_NUM)
@@ -56,10 +58,44 @@ proc echoTask(arg: pointer) {.cdecl.} =
     elif len < 0:
       logw(TAG, "uart_read_bytes error: %d", len)
 
+proc echoTaskHighLevel(arg: pointer) {.cdecl.} =
+  let uartPort = uart_port_t(CONFIG_EXAMPLE_UART_PORT_NUM)
+
+  var uartConfig = newUartConfig(
+    baud_rate = CONFIG_EXAMPLE_UART_BAUD_RATE.int,
+    data_bits = UART_DATA_8_BITS,
+    parity = UART_PARITY_DISABLE,
+    stop_bits = UART_STOP_BITS_1,
+    flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+    rx_flow_ctrl_thresh = 0'u8
+  )
+
+  var uart = uartConfig.newUart(
+    uartPort,
+    tx_pin = gpio_num_t(CONFIG_EXAMPLE_UART_TXD),
+    rx_pin = gpio_num_t(CONFIG_EXAMPLE_UART_RXD),
+    buffer = BUF_SIZE.SzBytes
+  )
+
+  while true:
+    var data = uart.read(BUF_SIZE.SzBytes, 20.Millis)
+    if data.len > 0:
+      discard uart.write(data)
+      data.add(0'u8)
+      logi(TAG, "Recv str (hl): %s", cast[cstring](addr data[0]))
+
 app_main():
-  discard xTaskCreate(echoTask,
-                      "uart_echo_task",
-                      CONFIG_EXAMPLE_TASK_STACK_SIZE.uint32,
-                      nil,
-                      10,
-                      nil)
+  if USE_HIGH_LEVEL_TASK:
+    discard xTaskCreate(echoTaskHighLevel,
+                        "uart_echo_task_hl",
+                        CONFIG_EXAMPLE_TASK_STACK_SIZE.uint32,
+                        nil,
+                        10,
+                        nil)
+  else:
+    discard xTaskCreate(echoTask,
+                        "uart_echo_task",
+                        CONFIG_EXAMPLE_TASK_STACK_SIZE.uint32,
+                        nil,
+                        10,
+                        nil)
