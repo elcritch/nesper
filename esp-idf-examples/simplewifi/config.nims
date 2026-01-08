@@ -1,5 +1,5 @@
 switch("define", "ESP_IDF_VERSION=5.5")
-switch("define", "esp32s3") # or other variants
+switch("define", "esp32") # or other variants
 switch("define", "nimNetSocketExtras")
 switch("define", "nimIoselectorEventfd")
 

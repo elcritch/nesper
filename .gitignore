@@ -1,8 +1,11 @@
 *
 !*/
 !*.*
+/*/*/build/
+esp-idf-examples/*/sdkconfig.old
 *.dSYM
 nimcache/
 deps/
 nim.cfg
 .DS_Store
+.nimcache

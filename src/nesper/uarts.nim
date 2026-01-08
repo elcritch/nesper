@@ -24,22 +24,50 @@ type
 
 const SerialNoChange* = gpio_num_t(-1)
 
-proc newUartConfig*(baud_rate: int = 115_200;
-                    data_bits: uart_word_length_t = UART_DATA_8_BITS;
-                    parity: uart_parity_t = UART_PARITY_DISABLE;
-                    stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
-                    flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
-                    rx_flow_ctrl_thresh: uint8 = 122,
-                    ): uart_config_t =
+when ESP_IDF_MAJOR == 4:
+  proc newUartConfig*(baud_rate: int = 115_200;
+                      data_bits: uart_word_length_t = UART_DATA_8_BITS;
+                      parity: uart_parity_t = UART_PARITY_DISABLE;
+                      stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
+                      flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
+                      rx_flow_ctrl_thresh: uint8 = 122,
+                      use_ref_tick: bool = false,
+                      ): uart_config_t =
 
-  result = uart_config_t(
-    baud_rate: baud_rate.cint,
-    data_bits: data_bits,
-    parity: parity,
-    stop_bits: stop_bits,
-    flow_ctrl: flow_ctrl,
-    rx_flow_ctrl_thresh: rx_flow_ctrl_thresh
-  )
+    result = uart_config_t(
+      baud_rate: baud_rate.cint,
+      data_bits: data_bits,
+      parity: parity,
+      stop_bits: stop_bits,
+      flow_ctrl: flow_ctrl,
+      rx_flow_ctrl_thresh: rx_flow_ctrl_thresh,
+      use_ref_tick: use_ref_tick
+    )
+elif ESP_IDF_MAJOR >= 5:
+  proc newUartConfig*(baud_rate: int = 115_200;
+                      data_bits: uart_word_length_t = UART_DATA_8_BITS;
+                      parity: uart_parity_t = UART_PARITY_DISABLE;
+                      stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
+                      flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
+                      rx_flow_ctrl_thresh: uint8 = 122,
+                      source_clk: uart_sclk_t = UART_SCLK_DEFAULT,
+                      allow_pd: bool = false,
+                      backup_before_sleep: bool = false,
+                      ): uart_config_t =
+
+    result = uart_config_t(
+      baud_rate: baud_rate.cint,
+      data_bits: data_bits,
+      parity: parity,
+      stop_bits: stop_bits,
+      flow_ctrl: flow_ctrl,
+      rx_flow_ctrl_thresh: rx_flow_ctrl_thresh,
+      source_clk: source_clk,
+      flags: uart_config_flags_t(
+        allow_pd: (if allow_pd: 1'u32 else: 0'u32),
+        backup_before_sleep: (if backup_before_sleep: 1'u32 else: 0'u32)
+      )
+    )
 
 proc newUart*(config: var uart_config_t;
               uart_num: uart_port_t;
@@ -91,8 +119,6 @@ proc read*(uart: var Uart;
            size = 1024.SzBytes,
            wait: Ticks = 10.Millis): seq[byte] =
 
-  let sz = size.uint32
-
   var bytes_avail = csize_t(0)
   check: uart_get_buffered_data_len(uart.port, addr bytes_avail)
 
@@ -100,23 +126,30 @@ proc read*(uart: var Uart;
     return @[]
 
   else:
-    var buff = newSeq[byte](bytes_avail)
+    let max_read = min(size.int, bytes_avail.int)
+    if max_read <= 0:
+      return @[]
+
+    result = newSeq[byte](max_read)
     let
-      bytes_read = uart_read_bytes(uart.port, addr(buff[0]), sz, wait)
+      bytes_read = uart_read_bytes(uart.port, addr(result[0]), max_read.uint32, wait)
     
     if bytes_read < 0:
       var bytes_read_str = $bytes_read
       raise newEspError[EspError]("uart error: " & $bytes_read_str, bytes_read)
 
-    var nb = buff[0..<bytes_read]
-    result = nb
+    result.setLen(bytes_read.int)
 
 proc write*(uart: var Uart;
             data: openArray[byte]): SzBytes {.discardable.} =
 
   # // Write data to UART.
+  result = SzBytes(0)
+  if data.len == 0:
+    return
+
   let bytes_written = uart_write_bytes(uart.port, cast[cstring](data[0].unsafeAddr), data.len().csize_t)
-  
+
   result = bytes_written.SzBytes()
 
 proc write*(uart: var Uart;
@@ -124,5 +157,8 @@ proc write*(uart: var Uart;
             ): SzBytes {.discardable.} =
   # var buff = data[0..data.len]
 
-  write(uart, data.toOpenArray(0, data.high()))
+  result = SzBytes(0)
+  if data.len == 0:
+    return
 
+  result = write(uart, data.toOpenArray(0, data.high))

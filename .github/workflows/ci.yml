@@ -10,18 +10,10 @@ jobs:
       matrix:
         nimversion:
           - '2.x'
-          - '2.0.14'
         os:
           - ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-
-    - name: Cache packages
-      if: matrix.nimversion != '2.0.14'
-      uses: actions/cache@v3
-      with:
-        path: ~/.nimble
-        key: ${{ runner.os }}-${{ hashFiles('nesper.nimble') }}
 
     - uses: iffy/install-nim@v4
       with:
@@ -29,17 +21,32 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install Nimble
-      run: |
-        nimble install nimble@0.18.2
-        nim -v
-        nimble -v
-
     - name: Install Deps
       run: |
-        # new atlas workspace
-        nimble install -d --verbose
+        nimble install https://github.com/nim-lang/atlas@\#head
+        atlas install --feature:examples
 
     - name: Build Tests
       run: |
         nim test
+
+    # - name: Install ESP-IDF
+    #   uses: espressif/install-esp-idf-action@v1
+    #   with:
+    #     version: "v5.5"
+    #
+    # - name: Check esp-idf
+    #   run: |
+    #     idf.py --version
+
+    - name: Build Tests
+      run: |
+        nim -d:skipEspBuild testExamples
+
+    - name: esp-idf build
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.5
+        target: esp32
+        path: 'esp-idf-examples/uart_echo'
+

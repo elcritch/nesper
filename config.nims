@@ -2,6 +2,8 @@
 # Tasks
 import os, strutils
 
+--nimcache:".nimcache/"
+
 const NFLAGS=" --cincludes:" & (getCurrentDir() / "tests" / "c_headers" / "mock")
 
 proc header(msg: string) =
@@ -55,3 +57,30 @@ task test_all, "Runs the test suite":
   test_driverTask()
   test_storageTask()
   test_execsTask()
+
+task testExampleUartEcho, "Build the UART echo example with QEMU":
+  putEnv("ESP_TARGET", "esp32")
+  withDir getCurrentDir() / "esp-idf-examples" / "uart_echo":
+    when not defined(skipEspBuild):
+      exec("nim espDistClean")
+    exec("nim espCompile")
+    when not defined(skipEspBuild):
+      exec("idf.py set-target esp32")
+      exec("nim espBuild")
+
+task testExampleSimpleWifi, "Build the UART echo example with QEMU":
+  putEnv("ESP_TARGET", "esp32")
+  withDir getCurrentDir() / "esp-idf-examples" / "simplewifi":
+    putEnv("WIFI_SSID", "TESTWIFI")
+    putEnv("WIFI_PASSWORD", "12345678")
+    when not defined(skipEspBuild):
+      exec("nim espDistClean")
+    exec("nim espCompile")
+    when not defined(skipEspBuild):
+      exec("idf.py set-target esp32")
+      exec("nim espBuild")
+
+task testExamples, "Build all examples":
+  testExampleUartEchoTask()
+  testExampleSimpleWifiTask()
+
