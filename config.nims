@@ -58,8 +58,7 @@ task test_all, "Runs the test suite":
   test_storageTask()
   test_execsTask()
 
-task test_uart_echo_qemu, "Build the UART echo example with QEMU":
-  let exampleDir = getCurrentDir() / "esp-idf-examples" / "uart_echo"
-  withDir exampleDir:
+task testExampleUartEcho, "Build the UART echo example with QEMU":
+  withDir getCurrentDir() / "esp-idf-examples" / "uart_echo":
     exec("idf.py set-target esp32")
     exec("nim espBuild")
