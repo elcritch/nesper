@@ -1,6 +1,5 @@
 import nesper
-import nesper/uarts
-import nesper/esp/esp_intr_alloc
+import nesper/esp/driver/uart
 import nesper/esp/queue
 
 const
@@ -20,18 +19,24 @@ const
 proc echoTask(arg: pointer) {.cdecl.} =
   let uartPort = uart_port_t(CONFIG_EXAMPLE_UART_PORT_NUM)
 
-  var uartConfig = newUartConfig(
-    baud_rate = CONFIG_EXAMPLE_UART_BAUD_RATE.int,
-    data_bits = UART_DATA_8_BITS,
-    parity = UART_PARITY_DISABLE,
-    stop_bits = UART_STOP_BITS_1,
-    flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-    rx_flow_ctrl_thresh = 0'u8
-  )
+  var uartConfig: uart_config_t
+  uartConfig.baud_rate = CONFIG_EXAMPLE_UART_BAUD_RATE
+  uartConfig.data_bits = UART_DATA_8_BITS
+  uartConfig.parity = UART_PARITY_DISABLE
+  uartConfig.stop_bits = UART_STOP_BITS_1
+  uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+  uartConfig.rx_flow_ctrl_thresh = 0'u8
+  when ESP_IDF_MAJOR == 4:
+    uartConfig.use_ref_tick = false
+  elif ESP_IDF_MAJOR >= 5:
+    uartConfig.source_clk = UART_SCLK_DEFAULT
+    uartConfig.flags.allow_pd = 0'u32
+    uartConfig.flags.backup_before_sleep = 0'u32
 
   let intrFlags = esp_intr_flags(0)
+  var uartQueue: QueueHandle_t
 
-  check: uart_driver_install(uartPort, (BUF_SIZE * 2).cint, 0, 0, cast[ptr QueueHandle_t](nil), intrFlags)
+  check: uart_driver_install(uartPort, (BUF_SIZE * 2).cint, 0, 0, addr uartQueue, intrFlags)
   check: uart_param_config(uartPort, addr uartConfig)
   check: uart_set_pin(uartPort,
                       CONFIG_EXAMPLE_UART_TXD,
