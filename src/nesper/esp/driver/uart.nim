@@ -17,6 +17,10 @@ import uart_reg
 import ../queue
 
 const
+  uart_hal_hdr = "<hal/uart_types.h>"
+  uart_clk_hdr = "<soc/clk_tree_defs.h>"
+
+const
   UART_FIFO_LEN* = (128)        ## !< Length of the hardware FIFO buffers
   UART_INTR_MASK* = 0x000001FF
   UART_LINE_INV_MASK* = (0x0000003F shl 19) ## !< TBD
@@ -101,6 +105,18 @@ type
     UART_HW_FLOWCTRL_CTS_RTS = 0x00000003, ## !< enable hardware flow control
     UART_HW_FLOWCTRL_MAX = 0x00000004
 
+when ESP_IDF_MAJOR >= 5:
+  type
+    uart_sclk_t* {.importc: "uart_sclk_t", incompleteStruct, header: uart_hal_hdr.} = cint
+    lp_uart_sclk_t* {.importc: "lp_uart_sclk_t", incompleteStruct, header: uart_hal_hdr.} = cint
+
+  type
+    uart_config_flags_t* {.bycopy.} = object
+      allow_pd* {.importc: "allow_pd", bitsize: 1.}: uint32
+      backup_before_sleep* {.importc: "backup_before_sleep", bitsize: 1.}: uint32
+
+  let UART_SCLK_DEFAULT* {.importc: "UART_SCLK_DEFAULT", header: uart_clk_hdr.}: uart_sclk_t
+
 
 ## *
 ##  @brief UART configuration parameters for uart_param_config function
@@ -114,7 +130,11 @@ type
     stop_bits* {.importc: "stop_bits".}: uart_stop_bits_t ## !< UART stop bits
     flow_ctrl* {.importc: "flow_ctrl".}: uart_hw_flowcontrol_t ## !< UART HW flow control mode (cts/rts)
     rx_flow_ctrl_thresh* {.importc: "rx_flow_ctrl_thresh".}: uint8 ## !< UART HW RTS threshold
-    use_ref_tick* {.importc: "use_ref_tick".}: bool ## !< Set to true if UART should be clocked from REF_TICK
+    when ESP_IDF_MAJOR == 4:
+      use_ref_tick* {.importc: "use_ref_tick".}: bool ## !< Set to true if UART should be clocked from REF_TICK
+    elif ESP_IDF_MAJOR >= 5:
+      source_clk* {.importc: "source_clk".}: uart_sclk_t ## !< UART source clock selection
+      flags* {.importc: "flags".}: uart_config_flags_t ## !< Configuration flags
 
 
 ## *

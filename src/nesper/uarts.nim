@@ -24,22 +24,50 @@ type
 
 const SerialNoChange* = gpio_num_t(-1)
 
-proc newUartConfig*(baud_rate: int = 115_200;
-                    data_bits: uart_word_length_t = UART_DATA_8_BITS;
-                    parity: uart_parity_t = UART_PARITY_DISABLE;
-                    stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
-                    flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
-                    rx_flow_ctrl_thresh: uint8 = 122,
-                    ): uart_config_t =
+when ESP_IDF_MAJOR == 4:
+  proc newUartConfig*(baud_rate: int = 115_200;
+                      data_bits: uart_word_length_t = UART_DATA_8_BITS;
+                      parity: uart_parity_t = UART_PARITY_DISABLE;
+                      stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
+                      flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
+                      rx_flow_ctrl_thresh: uint8 = 122,
+                      use_ref_tick: bool = false,
+                      ): uart_config_t =
 
-  result = uart_config_t(
-    baud_rate: baud_rate.cint,
-    data_bits: data_bits,
-    parity: parity,
-    stop_bits: stop_bits,
-    flow_ctrl: flow_ctrl,
-    rx_flow_ctrl_thresh: rx_flow_ctrl_thresh
-  )
+    result = uart_config_t(
+      baud_rate: baud_rate.cint,
+      data_bits: data_bits,
+      parity: parity,
+      stop_bits: stop_bits,
+      flow_ctrl: flow_ctrl,
+      rx_flow_ctrl_thresh: rx_flow_ctrl_thresh,
+      use_ref_tick: use_ref_tick
+    )
+elif ESP_IDF_MAJOR >= 5:
+  proc newUartConfig*(baud_rate: int = 115_200;
+                      data_bits: uart_word_length_t = UART_DATA_8_BITS;
+                      parity: uart_parity_t = UART_PARITY_DISABLE;
+                      stop_bits: uart_stop_bits_t = UART_STOP_BITS_1;
+                      flow_ctrl: uart_hw_flowcontrol_t = UART_HW_FLOWCTRL_DISABLE,
+                      rx_flow_ctrl_thresh: uint8 = 122,
+                      source_clk: uart_sclk_t = UART_SCLK_DEFAULT,
+                      allow_pd: bool = false,
+                      backup_before_sleep: bool = false,
+                      ): uart_config_t =
+
+    result = uart_config_t(
+      baud_rate: baud_rate.cint,
+      data_bits: data_bits,
+      parity: parity,
+      stop_bits: stop_bits,
+      flow_ctrl: flow_ctrl,
+      rx_flow_ctrl_thresh: rx_flow_ctrl_thresh,
+      source_clk: source_clk,
+      flags: uart_config_flags_t(
+        allow_pd: (if allow_pd: 1'u32 else: 0'u32),
+        backup_before_sleep: (if backup_before_sleep: 1'u32 else: 0'u32)
+      )
+    )
 
 proc newUart*(config: var uart_config_t;
               uart_num: uart_port_t;
@@ -125,4 +153,3 @@ proc write*(uart: var Uart;
   # var buff = data[0..data.len]
 
   write(uart, data.toOpenArray(0, data.high()))
-

@@ -2,6 +2,8 @@
 # Tasks
 import os, strutils
 
+--nimcache:".nimcache/"
+
 const NFLAGS=" --cincludes:" & (getCurrentDir() / "tests" / "c_headers" / "mock")
 
 proc header(msg: string) =
