@@ -74,3 +74,7 @@ task testExampleSimpleWifi, "Build the UART echo example with QEMU":
     exec("idf.py set-target esp32")
     exec("nim espBuild")
 
+task testExamples, "Build all examples":
+  testExampleUartEchoTask()
+  testExampleSimpleWifiTask()
+

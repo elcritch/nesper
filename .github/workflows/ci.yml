@@ -9,19 +9,16 @@ jobs:
     strategy:
       matrix:
         nimversion:
-          - '2.x'
-          - '2.0.14'
+          - '2.2.x'
         os:
           - ubuntu-latest
     steps:
     - uses: actions/checkout@v1
 
-    - name: Cache packages
-      if: matrix.nimversion != '2.0.14'
-      uses: actions/cache@v3
+    - name: Install ESP-IDF
+      uses: espressif/install-esp-idf-action@v1
       with:
-        path: ~/.nimble
-        key: ${{ runner.os }}-${{ hashFiles('nesper.nimble') }}
+        version: "v5.5"
 
     - uses: iffy/install-nim@v4
       with:
@@ -29,17 +26,18 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install Nimble
-      run: |
-        nimble install nimble@0.18.2
-        nim -v
-        nimble -v
-
     - name: Install Deps
       run: |
-        # new atlas workspace
-        nimble install -d --verbose
+        atlas install --feature:examples
 
     - name: Build Tests
       run: |
         nim test
+
+    - name: Check esp-idf
+      run: |
+        idf.py --version
+
+    - name: Build Tests
+      run: |
+        nim testExamples
