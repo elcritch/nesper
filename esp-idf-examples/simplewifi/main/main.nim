@@ -88,43 +88,6 @@ proc wifiInitSta() =
   else:
     loge(TAG, "UNEXPECTED EVENT")
 
-when defined(FastRpcServer):
-  import fastrpc/server/fastrpcserver
-  import fastrpc/server/rpcmethods
-  import nesper/esp/esp_vfs_eventfd
-
-  # Define RPC Server #
-  DefineRpcs(name=exampleRpcs):
-
-    proc add(a: int, b: int): int {.rpc.} =
-      echo "RPC: adding: ", a, " + ", b
-      result = 1 + a + b
-
-  proc runFastRpcServer() =
-    try:
-      let cfg = ESP_VFS_EVENTD_CONFIG_DEFAULT()
-      logi(TAG, "cfg: %s", repr(cfg))
-      check esp_vfs_eventfd_register(addr cfg)
-
-      logi(TAG, "setting up fast rpc router")
-      let inetAddrs = [
-        newInetAddr("0.0.0.0", 5556, Protocol.IPPROTO_UDP),
-        newInetAddr("::", 5555, Protocol.IPPROTO_UDP),
-      ]
-      logi(TAG, "newing fast rpc router")
-      var rt: FastRpcRouter = newFastRpcRouter()
-      logi(TAG, "registering rpcs")
-      rt.registerRpcs(exampleRpcs)
-      logi(TAG, "newing fast rpc server")
-      var frpcServer = newFastRpcServer(rt, prefixMsgSize=true, threaded=false)
-      logi(TAG, "starting fast rpc server")
-      startSocketServer(inetAddrs, frpcServer)
-      logi(TAG, "fast rpc server done")
-    except CatchableError as e:
-      loge(TAG, "Error starting FastRpcServer: %s, %s", $e.name, $e.msg)
-      for ste in getCurrentException().getStackTraceEntries():
-        loge(TAG, "Error: %s", $ste)
-
 app_main():
   logw(TAG, "Running main app...")
 
@@ -141,9 +104,6 @@ app_main():
   else:
     wifiInitSta()
   
-  when defined(FastRpcServer):
-    runFastRpcServer()
-
   while true:
     echo "looping..."
     delayMillis(10_000)

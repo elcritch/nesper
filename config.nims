@@ -60,5 +60,16 @@ task test_all, "Runs the test suite":
 
 task testExampleUartEcho, "Build the UART echo example with QEMU":
   withDir getCurrentDir() / "esp-idf-examples" / "uart_echo":
+    exec("nim espCompile")
     exec("idf.py set-target esp32")
     exec("nim espBuild")
+
+task testExampleSimpleWifi, "Build the UART echo example with QEMU":
+  withDir getCurrentDir() / "esp-idf-examples" / "simplewifi":
+    putEnv("WIFI_SSID", "TESTWIFI")
+    putEnv("WIFI_PASSWORD", "12345678")
+    exec("nim espDistClean")
+    exec("nim espCompile")
+    exec("idf.py set-target esp32")
+    exec("nim espBuild")
+

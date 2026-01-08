@@ -1,4 +1,4 @@
 switch("define", "ESP_IDF_VERSION=5.5")
-switch("define", "esp32c3")
+switch("define", "esp32")
 
 include nesper/build_utils/builds
