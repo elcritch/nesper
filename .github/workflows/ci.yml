@@ -30,23 +30,23 @@ jobs:
       run: |
         nim test
 
-    - name: Install ESP-IDF
-      uses: espressif/install-esp-idf-action@v1
-      with:
-        version: "v5.5"
-
-    - name: Check esp-idf
-      run: |
-        idf.py --version
+    # - name: Install ESP-IDF
+    #   uses: espressif/install-esp-idf-action@v1
+    #   with:
+    #     version: "v5.5"
+    #
+    # - name: Check esp-idf
+    #   run: |
+    #     idf.py --version
 
     - name: Build Tests
       run: |
-        nim testExamples
+        nim -d:skipEspBuild testExamples
 
     - name: esp-idf build
       uses: espressif/esp-idf-ci-action@v1
       with:
-        esp_idf_version: v4.4
+        esp_idf_version: v5.5
         target: esp32s2
-        path: 'esp32-s2-hmi-devkit-1/examples/smart-panel'
+        path: 'esp-idf-examples/uart_echo'
 
