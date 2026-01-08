@@ -23,6 +23,7 @@ jobs:
 
     - name: Install Deps
       run: |
+        nimble install atlas@\#head
         atlas install --feature:examples
 
     - name: Build Tests
