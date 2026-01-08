@@ -6,6 +6,7 @@ idf_component_register(SRC_DIRS "./nimcache"
 # set(C_COMPILE_OPTIONS "${C_COMPILE_OPTIONS} -Wno-error=unused-label")
 # list(APPEND C_COMPILE_OPTIONS "-Wno-error=unused-label ")
 
+idf_build_set_property(C_COMPILE_OPTIONS -Wno-incompatible-pointer-types APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-discarded-qualifiers APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-ignored-qualifiers APPEND)
