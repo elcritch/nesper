@@ -59,6 +59,7 @@ task test_all, "Runs the test suite":
   test_execsTask()
 
 task testExampleUartEcho, "Build the UART echo example with QEMU":
+  putEnv("ESP_TARGET", "esp32")
   withDir getCurrentDir() / "esp-idf-examples" / "uart_echo":
     when not defined(skipEspBuild):
       exec("nim espDistClean")
@@ -68,6 +69,7 @@ task testExampleUartEcho, "Build the UART echo example with QEMU":
       exec("nim espBuild")
 
 task testExampleSimpleWifi, "Build the UART echo example with QEMU":
+  putEnv("ESP_TARGET", "esp32")
   withDir getCurrentDir() / "esp-idf-examples" / "simplewifi":
     putEnv("WIFI_SSID", "TESTWIFI")
     putEnv("WIFI_PASSWORD", "12345678")
