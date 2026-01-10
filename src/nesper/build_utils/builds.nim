@@ -6,13 +6,13 @@ var cacheDir* = "main" / "nimcache"
 const
   firmwareExtensions = [".bin", ".elf", ".map", ".hex", ".uf2"]
 
-iterator firmwareFiles*(dir: string): string =
+proc firmwareFiles(dir: string): seq[string] =
   for kind, path in walkDir(dir, relative = true):
     if kind != pcFile:
       continue
     let ext = path.splitFile.ext.toLowerAscii
     if ext in firmwareExtensions:
-      yield path
+      result.add dir / path
 
 task espInstallHeaders, "Install nim headers":
   echo "\n[Nesper ESP] Installing nim headers:"
